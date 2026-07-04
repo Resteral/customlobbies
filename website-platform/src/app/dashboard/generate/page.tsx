@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wand2, Loader2, Sparkles, LayoutTemplate, Palette, Globe } from "lucide-react";
 import Link from "next/link";
+import { saveGeneratedSite } from "./actions";
 
 export default function GenerateSite() {
   const [step, setStep] = useState(1);
@@ -11,8 +12,18 @@ export default function GenerateSite() {
   const [prompt, setPrompt] = useState("");
   const [industry, setIndustry] = useState("");
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setIsGenerating(true);
+    
+    // Call our server action to save the site to the database
+    const result = await saveGeneratedSite(industry, prompt);
+    
+    if (result.error) {
+      alert(result.error);
+      setIsGenerating(false);
+      return;
+    }
+    
     // Simulate generation delay
     setTimeout(() => {
       setIsGenerating(false);

@@ -1,31 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, X, Send, Bot, User } from "lucide-react";
+import { MessageSquare, X, Send, Bot, User, ArrowRight } from "lucide-react";
+import { useChat } from '@ai-sdk/react';
 
 export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?: string }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { role: "bot", content: "Hi there! How can I help you today?" }
-  ]);
-  const [input, setInput] = useState("");
+  
+  const { messages, input, handleInputChange, handleSubmit, toolInvocations } = useChat({
+    api: '/api/chat',
+    initialMessages: [
+      { id: '1', role: 'assistant', content: 'Hi there! How can I help you today?' }
+    ],
+    onToolCall({ toolCall }) {
+      if (toolCall.toolName === 'navigateUser') {
+        const url = (toolCall.args as any).url;
+        // In a real deployed app, this would use next/navigation useRouter
+        // For preview, we just update window location
+        window.location.href = url;
+      }
+    }
+  });
 
-  const handleSend = () => {
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!input.trim()) return;
-    
-    // Add user message
-    const newMessages = [...messages, { role: "user", content: input }];
-    setMessages(newMessages);
-    setInput("");
-
-    // Simulate bot response
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { role: "bot", content: "Thanks for reaching out! Since this is a demo, I'm just a mock response. In production, I'd be connected to an AI model trained on your website's data!" }
-      ]);
-    }, 1000);
+    handleSubmit(e);
   };
 
   return (
@@ -77,7 +78,7 @@ export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?:
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                     msg.role === 'user' ? 'bg-secondary text-muted-foreground' : 'text-white'
                   }`}
-                  style={msg.role === 'bot' ? { backgroundColor: themeColor } : {}}
+                  style={msg.role !== 'user' ? { backgroundColor: themeColor } : {}}
                   >
                     {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                   </div>
@@ -85,29 +86,45 @@ export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?:
                     msg.role === 'user' ? 'bg-secondary text-foreground rounded-tr-sm' : 'bg-background border border-border/50 text-foreground rounded-tl-sm'
                   }`}>
                     {msg.content}
+                    
+                    {/* Render tool calls nicely */}
+                    {msg.toolInvocations?.map(tool => {
+                      if (tool.toolName === 'navigateUser') {
+                        return (
+                          <div key={tool.toolCallId} className="mt-3 p-3 bg-secondary/30 rounded-lg border border-border/50 flex flex-col gap-2">
+                            <span className="font-semibold text-xs text-muted-foreground">Redirecting you...</span>
+                            <div className="flex items-center gap-2 text-primary font-medium">
+                              <ArrowRight className="w-4 h-4" />
+                              {(tool.args as any).url}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">{(tool.args as any).reason}</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Input Area */}
-            <div className="p-3 border-t border-border/50 bg-background flex items-center gap-2">
+            <form onSubmit={onSubmit} className="p-3 border-t border-border/50 bg-background flex items-center gap-2">
               <input 
                 type="text"
                 placeholder="Type your message..."
                 className="flex-grow bg-secondary/50 border border-border/50 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-primary/50"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                onChange={handleInputChange}
               />
               <button 
-                onClick={handleSend}
+                type="submit"
                 className="p-2 rounded-full text-white shrink-0 transition-colors hover:opacity-90"
                 style={{ backgroundColor: themeColor }}
               >
                 <Send className="w-4 h-4" />
               </button>
-            </div>
+            </form>
           </motion.div>
         )}
       </AnimatePresence>

@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AI SiteBuilder Pro | Create, Host & Manage",
+  title: "Resolve.bet Pro | Create, Host & Manage",
   description: "The simpler way to purchase a website, get it hosted, and run it with an AI chatbot.",
 };
 

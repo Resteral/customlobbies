@@ -41,7 +41,7 @@ export default function Home() {
       <nav className="relative z-10 flex items-center justify-between px-6 py-4 md:px-12 backdrop-blur-md border-b border-border/50">
         <div className="flex items-center gap-2">
           <Bot className="w-8 h-8 text-primary" />
-          <span className="text-xl font-bold tracking-tight">AI SiteBuilder</span>
+          <span className="text-xl font-bold tracking-tight">Resolve.bet</span>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/login" className="text-sm font-medium hover:text-primary transition-colors">
