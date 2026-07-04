@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MessageSquare, Send, StopCircle, RefreshCw, ArrowLeft, ShieldAlert } from 'lucide-react';
+import { MessageSquare, Send, StopCircle, RefreshCw, ArrowLeft, ShieldAlert, Gamepad2, Landmark } from 'lucide-react';
 import { findOrCreateDebateRoom, sendDebateMessage, fetchDebateMessages } from './actions';
 import Link from 'next/link';
 
@@ -14,6 +14,7 @@ interface Message {
 
 export default function DebateClient() {
   const [status, setStatus] = useState<'idle' | 'searching' | 'matched'>('idle');
+  const [category, setCategory] = useState<'politics' | 'gaming'>('gaming');
   const [roomId, setRoomId] = useState<string | null>(null);
   const [topic, setTopic] = useState<string>('');
   const [role, setRole] = useState<'User1' | 'User2'>('User1');
@@ -32,7 +33,6 @@ export default function DebateClient() {
   // Polling for new messages when matched
   useEffect(() => {
     if (status === 'matched' && roomId) {
-      // Start polling
       pollIntervalRef.current = setInterval(async () => {
         const dbMsgs = await fetchDebateMessages(roomId);
         if (dbMsgs.length !== messages.length) {
@@ -50,15 +50,16 @@ export default function DebateClient() {
         clearInterval(pollIntervalRef.current);
       }
     };
-  }, [status, roomId, messages]);
+  }, [status, roomId, messages.length]);
 
-  const handleStartSearch = async () => {
+  const handleStartSearch = async (selectedCategory: 'politics' | 'gaming') => {
+    setCategory(selectedCategory);
     setStatus('searching');
     setMessages([]);
     
     // Simulate matchmaking search
     setTimeout(async () => {
-      const res = await findOrCreateDebateRoom();
+      const res = await findOrCreateDebateRoom(selectedCategory);
       if ('error' in res) {
         alert('Matchmaking failed. Please try again.');
         setStatus('idle');
@@ -90,7 +91,6 @@ export default function DebateClient() {
     const text = inputText;
     setInputText('');
 
-    // Optimistic message add
     const optimisticMsg: Message = { sender: role, content: text };
     setMessages(prev => [...prev, optimisticMsg]);
 
@@ -113,7 +113,7 @@ export default function DebateClient() {
 
   const handleNextMatch = async () => {
     await handleDisconnect();
-    handleStartSearch();
+    handleStartSearch(category);
   };
 
   return (
@@ -124,32 +124,63 @@ export default function DebateClient() {
       </Link>
 
       {status === 'idle' && (
-        <div className="bg-secondary/10 border border-border/50 rounded-3xl p-12 text-center space-y-6 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10" />
-          
-          <div className="w-16 h-16 bg-primary/20 text-primary border border-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <MessageSquare className="w-8 h-8" />
-          </div>
-          
-          <div>
+        <div className="space-y-8">
+          <div className="text-center space-y-3 relative overflow-hidden py-4">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10" />
+            
+            <div className="w-14 h-14 bg-primary/20 text-primary border border-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-2">
+              <MessageSquare className="w-7 h-7" />
+            </div>
+            
             <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-purple-400 to-blue-400 bg-clip-text text-transparent">
               Debate Arena
             </h1>
-            <p className="text-gray-400 max-w-md mx-auto mt-2">
-              Get matched anonymous 1-on-1 with a stranger to debate random, controversial topics. 
+            <p className="text-gray-400 max-w-md mx-auto text-sm">
+              Omegle-style 1-on-1 anonymous debates. Select an arena below to enter matchmaking queue.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {/* Gaming Card */}
             <button 
-              onClick={handleStartSearch}
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-primary/25 text-base"
+              onClick={() => handleStartSearch('gaming')}
+              className="bg-secondary/10 hover:bg-secondary/20 border border-border/50 hover:border-primary/40 rounded-3xl p-8 text-center space-y-4 shadow-2xl transition-all group flex flex-col items-center justify-between"
             >
-              Enter Debate Queue
+              <div className="w-14 h-14 bg-primary/10 text-primary border border-primary/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Gamepad2 className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold group-hover:text-primary transition-colors">Gaming & Pop Culture</h3>
+                <p className="text-gray-400 text-xs mt-2 px-4 leading-relaxed">
+                  Fun debates on gaming consoles, pop culture, pizza toppings, tea vs. coffee, and lighthearted internet arguments.
+                </p>
+              </div>
+              <span className="bg-primary text-white font-bold text-xs px-6 py-2 rounded-xl mt-4 inline-block hover:opacity-90 transition-opacity">
+                Enter Gaming Arena
+              </span>
+            </button>
+
+            {/* Politics Card */}
+            <button 
+              onClick={() => handleStartSearch('politics')}
+              className="bg-secondary/10 hover:bg-secondary/20 border border-border/50 hover:border-[#6366f1]/40 rounded-3xl p-8 text-center space-y-4 shadow-2xl transition-all group flex flex-col items-center justify-between"
+            >
+              <div className="w-14 h-14 bg-[#6366f1]/10 text-[#6366f1] border border-[#6366f1]/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Landmark className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold group-hover:text-[#6366f1] transition-colors">Politic & Economic Arena</h3>
+                <p className="text-gray-400 text-xs mt-2 px-4 leading-relaxed">
+                  Structured debates about carbon taxes, remote working, AI automation impacts, free tuition, and current political events.
+                </p>
+              </div>
+              <span className="bg-[#6366f1] text-white font-bold text-xs px-6 py-2 rounded-xl mt-4 inline-block hover:opacity-90 transition-opacity">
+                Enter Politics Arena
+              </span>
             </button>
           </div>
           
-          <div className="text-xs text-muted-foreground flex items-center justify-center gap-1.5 mt-8 opacity-75">
+          <div className="text-[11px] text-muted-foreground flex items-center justify-center gap-1.5 mt-8 opacity-70">
             <ShieldAlert className="w-4 h-4 text-amber-500" />
             Please keep debates clean, respectful, and constructive.
           </div>
@@ -157,13 +188,15 @@ export default function DebateClient() {
       )}
 
       {status === 'searching' && (
-        <div className="bg-secondary/10 border border-border/50 rounded-3xl p-16 text-center space-y-8 shadow-2xl relative">
-          <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto flex items-center justify-center">
-            <RefreshCw className="w-8 h-8 text-primary animate-pulse" />
+        <div className="bg-secondary/10 border border-border/50 rounded-3xl p-16 text-center space-y-8 shadow-2xl relative max-w-xl mx-auto">
+          <div className={`w-20 h-20 border-4 ${category === 'politics' ? 'border-[#6366f1]' : 'border-primary'} border-t-transparent rounded-full animate-spin mx-auto flex items-center justify-center`}>
+            <RefreshCw className={`w-8 h-8 ${category === 'politics' ? 'text-[#6366f1]' : 'text-primary'} animate-pulse`} />
           </div>
           
           <div>
-            <h2 className="text-2xl font-bold">Finding an Opponent...</h2>
+            <h2 className="text-2xl font-bold">
+              Searching {category === 'politics' ? 'Politic' : 'Gaming'} Arena...
+            </h2>
             <p className="text-gray-400 text-sm mt-2">Matching you with someone to debate a random topic.</p>
           </div>
 
@@ -181,7 +214,9 @@ export default function DebateClient() {
           {/* Header Panel */}
           <div className="p-6 border-b border-border/50 bg-[#0e1422] flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div className="flex-grow">
-              <span className="text-xs font-semibold tracking-wider text-primary uppercase block mb-1">Debate Topic</span>
+              <span className={`text-[10px] font-semibold tracking-wider ${category === 'politics' ? 'text-[#6366f1]' : 'text-primary'} uppercase block mb-1`}>
+                {category === 'politics' ? 'Politics' : 'Gaming'} Debate Topic
+              </span>
               <h3 className="text-lg font-bold text-white tracking-tight">{topic}</h3>
             </div>
             
@@ -196,7 +231,9 @@ export default function DebateClient() {
               
               <button 
                 onClick={handleNextMatch}
-                className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-primary/95 transition-all flex items-center gap-1.5"
+                className={`text-white px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-95 transition-all flex items-center gap-1.5 ${
+                  category === 'politics' ? 'bg-[#6366f1]' : 'bg-primary'
+                }`}
               >
                 <RefreshCw className="w-4 h-4" />
                 Next Match
@@ -232,7 +269,7 @@ export default function DebateClient() {
                 <div key={index} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 text-sm ${
                     isMe 
-                      ? 'bg-primary text-white rounded-tr-none' 
+                      ? `${category === 'politics' ? 'bg-[#6366f1]' : 'bg-primary'} text-white rounded-tr-none` 
                       : 'bg-[#182030] border border-border/50 text-white rounded-tl-none'
                   }`}>
                     <span className="text-[10px] font-bold block uppercase tracking-wider opacity-60 mb-1">
@@ -258,7 +295,9 @@ export default function DebateClient() {
             <button 
               type="submit"
               disabled={!inputText.trim() || sending}
-              className="bg-primary hover:bg-primary/95 text-white w-12 h-12 rounded-xl flex items-center justify-center shrink-0 disabled:opacity-50 transition-all"
+              className={`text-white w-12 h-12 rounded-xl flex items-center justify-center shrink-0 disabled:opacity-50 transition-all ${
+                category === 'politics' ? 'bg-[#6366f1] hover:bg-[#6366f1]/90' : 'bg-primary hover:bg-primary/90'
+              }`}
             >
               <Send className="w-5 h-5" />
             </button>

@@ -244,6 +244,7 @@ CREATE POLICY "Anyone can insert driver applications" ON public.driver_applicati
 CREATE TABLE IF NOT EXISTS public.debate_rooms (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   topic TEXT NOT NULL,
+  category TEXT DEFAULT 'gaming', -- politics, gaming
   status TEXT DEFAULT 'active', -- active, finished
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -263,3 +264,57 @@ CREATE POLICY "Anyone can access debate rooms" ON public.debate_rooms FOR SELECT
 CREATE POLICY "Anyone can insert debate rooms" ON public.debate_rooms FOR INSERT WITH CHECK (true);
 CREATE POLICY "Anyone can access debate messages" ON public.debate_messages FOR SELECT USING (true);
 CREATE POLICY "Anyone can insert debate messages" ON public.debate_messages FOR INSERT WITH CHECK (true);
+
+-- PHASE 12: LIVE CHAT SUPPORT
+CREATE TABLE IF NOT EXISTS public.support_tickets (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  site_id UUID REFERENCES public.sites(id) ON DELETE CASCADE,
+  visitor_session_id TEXT NOT NULL,
+  visitor_name TEXT,
+  visitor_email TEXT,
+  status TEXT DEFAULT 'open',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.support_messages (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  ticket_id UUID REFERENCES public.support_tickets(id) ON DELETE CASCADE,
+  sender TEXT NOT NULL, -- 'visitor' or 'agent'
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.support_tickets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.support_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view support tickets for their sites" ON public.support_tickets FOR SELECT TO authenticated USING (
+  EXISTS (SELECT 1 FROM public.sites WHERE sites.id = support_tickets.site_id AND sites.user_id = auth.uid())
+);
+
+CREATE POLICY "Users can update support tickets for their sites" ON public.support_tickets FOR UPDATE TO authenticated USING (
+  EXISTS (SELECT 1 FROM public.sites WHERE sites.id = support_tickets.site_id AND sites.user_id = auth.uid())
+);
+
+CREATE POLICY "Anyone can insert support tickets" ON public.support_tickets FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can select support tickets" ON public.support_tickets FOR SELECT USING (true);
+
+CREATE POLICY "Users can view support messages for their tickets" ON public.support_messages FOR SELECT TO authenticated USING (
+  EXISTS (
+    SELECT 1 FROM public.support_tickets
+    JOIN public.sites ON sites.id = support_tickets.site_id
+    WHERE support_tickets.id = support_messages.ticket_id
+    AND sites.user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "Users can insert support messages for their tickets" ON public.support_messages FOR INSERT TO authenticated WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM public.support_tickets
+    JOIN public.sites ON sites.id = support_tickets.site_id
+    WHERE support_tickets.id = support_messages.ticket_id
+    AND sites.user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "Anyone can insert support messages" ON public.support_messages FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can select support messages" ON public.support_messages FOR SELECT USING (true);
