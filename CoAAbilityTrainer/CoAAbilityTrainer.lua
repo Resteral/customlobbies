@@ -58,6 +58,7 @@ local function InitDB()
     if CoAAT_DB.hudPos           == nil then CoAAT_DB.hudPos           = nil   end
     if CoAAT_DB.rotHelperPos     == nil then CoAAT_DB.rotHelperPos     = nil   end
     if CoAAT_DB.minimapAngle     == nil then CoAAT_DB.minimapAngle     = 30    end
+    if CoAAT_DB.combatLearn      == nil then CoAAT_DB.combatLearn      = {}    end
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────

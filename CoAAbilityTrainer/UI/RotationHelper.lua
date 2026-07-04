@@ -268,8 +268,17 @@ function CoAAT_RotationHelper.SetNextAbilities(m1, m2, m3)
     -- Primary
     if m1 and m1.abilityDef then
         f._icon1:SetTexture(m1.abilityDef.icon)
-        f._abilityName:SetText("|cff22ff22" .. m1.abilityDef.name .. "|r")
-        f._hintText:SetText("|cffffd700" .. (m1.abilityDef.hint or m1.abilityDef.description or "Use immediately!") .. "|r")
+        
+        -- If it's a learned counter action, override the title and hint text!
+        if m1.counterType then
+            local colorHex = (m1.counterType == "interrupt") and "|cffff2222" or "|cff00ffff"
+            f._abilityName:SetText(colorHex .. m1.abilityDef.name .. " ⚡|r")
+            f._hintText:SetText(colorHex .. m1.counterText .. "|r")
+        else
+            f._abilityName:SetText("|cff22ff22" .. m1.abilityDef.name .. "|r")
+            f._hintText:SetText("|cffffd700" .. (m1.abilityDef.hint or m1.abilityDef.description or "Use immediately!") .. "|r")
+        end
+        
         table.insert(spellsToGlow, { spellName = m1.abilityDef.name, r = 0.0, g = 1.0, b = 0.0 })
         
         -- Store name for range check

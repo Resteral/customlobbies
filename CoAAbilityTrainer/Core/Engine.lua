@@ -279,8 +279,92 @@ function CoAAT_Engine.IsPetAlive()    return state.petAlive   end
 -- Rotation evaluator
 -- Returns the highest-priority ability to use right now
 -- ─────────────────────────────────────────────
+local function GetPlayerInterruptSpell()
+    local interrupts = {
+        ["kick"] = true, ["pummel"] = true, ["wind shear"] = true, ["counterspell"] = true,
+        ["shield bash"] = true, ["mind freeze"] = true, ["silence"] = true, 
+        ["arcane binding"] = true, ["whip crack"] = true, ["spear hand strike"] = true
+    }
+    for id, ab in pairs(state.abilities) do
+        if interrupts[ab.name:lower()] and CoAAT_Engine.IsReady(id) then
+            return id, ab
+        end
+    end
+    return nil
+end
+
+local function GetPlayerPurgeSpell()
+    local purges = {
+        ["purge"] = true, ["dispel magic"] = true, ["devour magic"] = true,
+        ["spellsteal"] = true, ["cleanse"] = true
+    }
+    for id, ab in pairs(state.abilities) do
+        if purges[ab.name:lower()] and CoAAT_Engine.IsReady(id) then
+            return id, ab
+        end
+    end
+    return nil
+end
+
 function CoAAT_Engine.EvaluateRotation()
     if not state.classId then return nil end
+
+    -- ── Counter Engine: Real-Time Interrupt & Dispel Checks ──
+    if UnitExists("target") and not UnitIsDead("target") and not UnitIsPlayer("target") then
+        local targetGUID = UnitGUID("target")
+        local npcID = targetGUID and tonumber(string.sub(targetGUID, 9, 12), 16) or 0
+        
+        -- 1. Check target casting (Interrupt)
+        local castName, _, _, _, _, _, _, _, notInterruptible = UnitCastingInfo("target")
+        if castName then
+            local isDangerous = false
+            if CoAAT_DB and CoAAT_DB.combatLearn and CoAAT_DB.combatLearn[npcID] then
+                if CoAAT_DB.combatLearn[npcID].dangerousCasts[castName] then
+                    isDangerous = true
+                end
+            end
+            
+            if not notInterruptible then
+                local intId, intDef = GetPlayerInterruptSpell()
+                if intId then
+                    return {
+                        abilityId = intId,
+                        urgency = isDangerous and "critical" or "high",
+                        abilityDef = intDef,
+                        counterType = "interrupt",
+                        counterText = "INTERRUPT: " .. castName
+                    }
+                end
+            end
+        end
+
+        -- 2. Check target buffs (Purge/Dispel)
+        local purgeId, purgeDef = GetPlayerPurgeSpell()
+        if purgeId then
+            for k = 1, 40 do
+                local buffName, _, _, _, debuffType = UnitBuff("target", k)
+                if not buffName then break end
+                
+                local shouldPurge = (debuffType == "Magic")
+                if CoAAT_DB and CoAAT_DB.combatLearn and CoAAT_DB.combatLearn[npcID] then
+                    if CoAAT_DB.combatLearn[npcID].purgeBuffs[buffName] then
+                        shouldPurge = true
+                    end
+                end
+                
+                if shouldPurge then
+                    return {
+                        abilityId = purgeId,
+                        urgency = "high",
+                        abilityDef = purgeDef,
+                        counterType = "purge",
+                        counterText = "PURGE: " .. buffName
+                    }
+                end
+            end
+        end
+    end
+
     local res, resMax = state.resource, state.resourceMax
     local rules = state.rotationRules
 
@@ -393,6 +477,84 @@ function CoAAT_Engine.OnCLEU(...)
 
     -- Only care about player-sourced events
     local playerGUID = UnitGUID("player")
+    
+    -- ── CLE Learning Loop ──
+    -- 1. SPELL_DAMAGE from target to player
+    if event == "SPELL_DAMAGE" and destGUID == playerGUID then
+        local amount = select(15, ...)
+        if amount and type(amount) == "number" then
+            local maxHealth = UnitHealthMax("player")
+            if maxHealth > 0 and (amount / maxHealth) >= 0.15 then
+                local sourceName = select(5, ...)
+                if sourceName and srcGUID then
+                    local npcID = tonumber(string.sub(srcGUID, 9, 12), 16)
+                    if npcID and CoAAT_DB and CoAAT_DB.combatLearn then
+                        if not CoAAT_DB.combatLearn[npcID] then
+                            CoAAT_DB.combatLearn[npcID] = { dangerousCasts = {}, purgeBuffs = {} }
+                        end
+                        if not CoAAT_DB.combatLearn[npcID].dangerousCasts[spellName] then
+                            CoAAT_DB.combatLearn[npcID].dangerousCasts[spellName] = true
+                            print("|cffFFD700[CoAAT] Learned: |r|cffFF4444" .. spellName .. "|r is dangerous from " .. sourceName .. "!")
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    -- 2. SPELL_AURA_APPLIED (CCs on player, or Magic buffs on target)
+    if event == "SPELL_AURA_APPLIED" then
+        if destGUID == playerGUID then
+            local spellName = select(13, ...)
+            local ccNames = {
+                ["polymorph"] = true, ["fear"] = true, ["stun"] = true, ["silence"] = true,
+                ["psychic scream"] = true, ["seduction"] = true, ["freezing trap"] = true,
+                ["repentance"] = true, ["hammer of justice"] = true, ["death coil"] = true,
+                ["howl of terror"] = true, ["fel prison"] = true
+            }
+            local lowerSpell = spellName and spellName:lower() or ""
+            if ccNames[lowerSpell] or string.find(lowerSpell, "stun") or string.find(lowerSpell, "fear") or string.find(lowerSpell, "silence") then
+                local sourceName = select(5, ...)
+                if sourceName and srcGUID then
+                    local npcID = tonumber(string.sub(srcGUID, 9, 12), 16)
+                    if npcID and CoAAT_DB and CoAAT_DB.combatLearn then
+                        if not CoAAT_DB.combatLearn[npcID] then
+                            CoAAT_DB.combatLearn[npcID] = { dangerousCasts = {}, purgeBuffs = {} }
+                        end
+                        if not CoAAT_DB.combatLearn[npcID].dangerousCasts[spellName] then
+                            CoAAT_DB.combatLearn[npcID].dangerousCasts[spellName] = true
+                            print("|cffFFD700[CoAAT] Learned: |r|cffFF4444" .. spellName .. "|r (CC) is dangerous from " .. sourceName .. "!")
+                        end
+                    end
+                end
+            end
+        elseif destGUID ~= playerGUID and srcGUID ~= playerGUID then
+            -- Target gets a magic buff
+            local spellName = select(13, ...)
+            local magicBuffs = {
+                ["power infusion"] = true, ["bloodlust"] = true, ["heroism"] = true,
+                ["divine shield"] = true, ["ice barrier"] = true, ["mana shield"] = true,
+                ["inner fire"] = true, ["rejuvenation"] = true, ["renew"] = true
+            }
+            local lowerSpell = spellName and spellName:lower() or ""
+            if magicBuffs[lowerSpell] or string.find(lowerSpell, "barrier") or string.find(lowerSpell, "shield") or string.find(lowerSpell, "infusion") then
+                local destName = select(9, ...)
+                if destGUID then
+                    local npcID = tonumber(string.sub(destGUID, 9, 12), 16)
+                    if npcID and CoAAT_DB and CoAAT_DB.combatLearn then
+                        if not CoAAT_DB.combatLearn[npcID] then
+                            CoAAT_DB.combatLearn[npcID] = { dangerousCasts = {}, purgeBuffs = {} }
+                        end
+                        if not CoAAT_DB.combatLearn[npcID].purgeBuffs[spellName] then
+                            CoAAT_DB.combatLearn[npcID].purgeBuffs[spellName] = true
+                            print("|cffFFD700[CoAAT] Learned: |r|cff00ffff" .. spellName .. "|r is purgeable on " .. (destName or "Target") .. "!")
+                        end
+                    end
+                end
+            end
+        end
+    end
+
     if srcGUID ~= playerGUID then return end
 
     local lowerName = spellName and spellName:lower() or ""
