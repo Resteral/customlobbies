@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, X, Send, Bot, User, ArrowRight } from "lucide-react";
 import { useChat } from '@ai-sdk/react';
@@ -8,14 +8,15 @@ import { useChat } from '@ai-sdk/react';
 export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   
-  const { messages, input, handleInputChange, handleSubmit, toolInvocations } = useChat({
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
     api: '/api/chat',
     initialMessages: [
       { id: '1', role: 'assistant', content: 'Hi there! How can I help you today?' }
     ],
     onToolCall({ toolCall }) {
       if (toolCall.toolName === 'navigateUser') {
-        const url = (toolCall.args as any).url;
+        const args = toolCall.args as Record<string, unknown>;
+        const url = args.url as string;
         // In a real deployed app, this would use next/navigation useRouter
         // For preview, we just update window location
         window.location.href = url;
@@ -90,14 +91,15 @@ export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?:
                     {/* Render tool calls nicely */}
                     {msg.toolInvocations?.map(tool => {
                       if (tool.toolName === 'navigateUser') {
+                        const args = tool.args as Record<string, unknown>;
                         return (
                           <div key={tool.toolCallId} className="mt-3 p-3 bg-secondary/30 rounded-lg border border-border/50 flex flex-col gap-2">
                             <span className="font-semibold text-xs text-muted-foreground">Redirecting you...</span>
                             <div className="flex items-center gap-2 text-primary font-medium">
                               <ArrowRight className="w-4 h-4" />
-                              {(tool.args as any).url}
+                              {args.url as string}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">{(tool.args as any).reason}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{args.reason as string}</p>
                           </div>
                         );
                       }

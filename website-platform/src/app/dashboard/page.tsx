@@ -31,7 +31,7 @@ export default async function DashboardOverview() {
       <header className="mb-10 flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
-          <p className="text-muted-foreground text-sm">Here's what's happening with your websites today.</p>
+          <p className="text-muted-foreground text-sm">Here&apos;s what&apos;s happening with your websites today.</p>
         </div>
         <Link href="/dashboard/generate" className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors flex items-center gap-2">
           <Plus className="w-4 h-4" />
@@ -63,7 +63,7 @@ export default async function DashboardOverview() {
               <div className="p-8 border border-dashed border-border/50 rounded-2xl text-center bg-secondary/5">
                 <Globe className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
                 <h3 className="font-bold mb-1">No sites yet</h3>
-                <p className="text-sm text-muted-foreground mb-4">You haven't generated any websites yet.</p>
+                <p className="text-sm text-muted-foreground mb-4">You haven&apos;t generated any websites yet.</p>
                 <Link href="/dashboard/generate" className="text-primary font-medium hover:underline">Generate your first site</Link>
               </div>
             )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User, Mail, Clock, CheckCircle, Globe, ChevronRight } from 'lucide-react';
+import { User, Mail, Clock, Globe, MessageSquare } from 'lucide-react';
 import { updateLeadStatus } from './actions';
 
 type Lead = {

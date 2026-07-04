@@ -4,7 +4,21 @@ import { deleteProduct } from './actions';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-export function ProductList({ products, sites }: { products: any[], sites: any[] }) {
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  site_id: string;
+  description?: string;
+  image_url?: string;
+}
+
+interface Site {
+  id: string;
+  name: string;
+}
+
+export function ProductList({ products, sites }: { products: Product[], sites: Site[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (productId: string, siteId: string) => {

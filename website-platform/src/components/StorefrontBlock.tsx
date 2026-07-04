@@ -4,11 +4,19 @@ import { useState } from 'react';
 import { ShoppingCart, Plus, Minus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export function StorefrontBlock({ products, storeName }: { products: any[], storeName?: string }) {
-  const [cart, setCart] = useState<{product: any, quantity: number}[]>([]);
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  description?: string;
+  image_url?: string;
+}
+
+export function StorefrontBlock({ products, storeName }: { products: Product[], storeName?: string }) {
+  const [cart, setCart] = useState<{product: Product, quantity: number}[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const addToCart = (product: any) => {
+  const addToCart = (product: Product) => {
     setCart(prev => {
       const existing = prev.find(item => item.product.id === product.id);
       if (existing) {

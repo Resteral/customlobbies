@@ -5,7 +5,6 @@ import {
   Head,
   Heading,
   Html,
-  Link,
   Preview,
   Section,
   Text,
@@ -38,7 +37,7 @@ export const WelcomeEmail = ({
                 Confirm your email address
               </Heading>
               <Text className="text-base leading-6 text-gray-600 mb-6">
-                Thanks for starting your journey with Resolve.bet. We're excited to help you generate beautiful, high-performing websites in seconds.
+                Thanks for starting your journey with Resolve.bet. We&apos;re excited to help you generate beautiful, high-performing websites in seconds.
               </Text>
               <Text className="text-base leading-6 text-gray-600 mb-6">
                 To get started, please confirm your email address by clicking the button below:
@@ -54,7 +53,7 @@ export const WelcomeEmail = ({
               </Section>
               
               <Text className="text-sm leading-5 text-gray-500 mt-8">
-                If you didn't create an account with Resolve.bet, you can safely ignore this email.
+                If you didn&apos;t create an account with Resolve.bet, you can safely ignore this email.
               </Text>
             </Section>
           </Container>

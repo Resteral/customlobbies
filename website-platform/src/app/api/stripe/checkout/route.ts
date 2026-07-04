@@ -12,7 +12,13 @@ export async function POST(req: NextRequest) {
     const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' });
     const { items, successUrl, cancelUrl } = await req.json();
 
-    const lineItems = items.map((item: any) => ({
+    interface CheckoutItem {
+      name: string;
+      price: number;
+      quantity: number;
+    }
+
+    const lineItems = items.map((item: CheckoutItem) => ({
       price_data: {
         currency: 'usd',
         product_data: {
@@ -32,8 +38,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Stripe Checkout Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const err = error as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

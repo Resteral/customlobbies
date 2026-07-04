@@ -12,7 +12,7 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
         </Link>
         <h2 className="text-3xl font-extrabold text-foreground mb-2">Welcome back</h2>
         <p className="text-muted-foreground text-sm">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/signup" className="text-primary hover:underline font-medium">
             Sign up for free
           </Link>

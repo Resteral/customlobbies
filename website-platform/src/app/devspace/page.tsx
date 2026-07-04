@@ -1,4 +1,4 @@
-import { ArrowUpRight, TrendingUp, Star, Search, PlusCircle, Megaphone } from "lucide-react";
+import { TrendingUp, Star, Search, PlusCircle, Megaphone } from "lucide-react";
 import Link from "next/link";
 import { createClient } from '@/utils/supabase/server';
 import { DevSpaceSiteCard } from "@/components/DevSpaceSiteCard";
@@ -14,7 +14,7 @@ export default async function DevSpace() {
     .order('likes_count', { ascending: false });
 
   // Get user's liked sites
-  let userLikes = new Set<string>();
+  const userLikes = new Set<string>();
   if (user) {
     const { data: likes } = await supabase
       .from('site_likes')

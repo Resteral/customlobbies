@@ -1,16 +1,24 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, Heart, Share2 } from "lucide-react";
+import { Heart, Share2 } from "lucide-react";
 import { useState } from "react";
 import { toggleLikeSite, incrementShare } from "@/app/devspace/actions";
+
+interface DevSpaceSite {
+  id: string;
+  name: string;
+  url: string | null;
+  likes_count?: number;
+  shares_count?: number;
+}
 
 export function DevSpaceSiteCard({ 
   site, 
   sponsored = false,
   isLikedByMe = false
 }: { 
-  site: any, 
+  site: DevSpaceSite, 
   sponsored?: boolean,
   isLikedByMe?: boolean
 }) {

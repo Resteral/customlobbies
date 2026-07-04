@@ -50,7 +50,7 @@ export const ResetPasswordEmail = ({
               </Section>
               
               <Text className="text-sm leading-5 text-gray-500 mt-8">
-                If you didn't request this, you can safely ignore this email and your password will remain unchanged.
+                If you didn&apos;t request this, you can safely ignore this email and your password will remain unchanged.
               </Text>
             </Section>
           </Container>
