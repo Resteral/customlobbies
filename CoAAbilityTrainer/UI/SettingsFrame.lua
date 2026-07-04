@@ -1,13 +1,12 @@
 -- ============================================================
--- CoAAbilityTrainer - Settings Frame
--- Class / Spec picker + options panel
+-- CoAAbilityTrainer - Settings Frame (Customizable & Modular Options)
+-- Class / Spec picker + Options panel
 -- ============================================================
 
 CoAAT_SettingsFrame = {}
 
 local _frame = nil
 
--- Class display order
 local CLASS_ORDER = {
     { id="barbarian",       specs={"berserker","wild","chieftain"} },
     { id="bloodmage",       specs={"vitality","crimson","sanguine"} },
@@ -32,85 +31,63 @@ local CLASS_ORDER = {
     { id="witch_hunter",    specs={"inquisitor","ravager","warden"} },
 }
 
--- Friendly spec names
 local SPEC_NAMES = {
-    -- Barbarian
     berserker        = "Berserker",
     wild             = "Wild",
     chieftain        = "Chieftain",
-    -- Bloodmage
     vitality         = "Vitality",
     crimson          = "Crimson",
     sanguine         = "Sanguine",
-    -- Chronomancer
     acceleration     = "Acceleration",
     temporal_rift    = "Temporal Rift",
     timeless         = "Timeless",
-    -- Cultist
     darkness         = "Darkness",
     shadow           = "Shadow",
     corruption       = "Corruption",
-    -- Felsworn
     infernal         = "Infernal (Caster)",
     slayer           = "Slayer (Melee)",
     tyrant           = "Tyrant (Tank)",
-    -- Guardian
     defense          = "Defense",
     protection       = "Protection",
     valor            = "Valor",
-    -- Knight of Xoroth
     destruction      = "Destruction",
     doom             = "Doom",
     hellfire         = "Hellfire",
-    -- Necromancer
     reanimation      = "Reanimation",
     death            = "Death",
     frost            = "Frost",
-    -- Primalist
     elemental        = "Elemental",
     beast            = "Beast",
     wildgrowth       = "Wildgrowth",
-    -- Pyromancer
     fire             = "Fire",
     ember            = "Ember",
     combustion       = "Combustion",
-    -- Ranger
     marksmanship     = "Marksmanship",
     survival         = "Survival",
     beast_master     = "Beast Master",
-    -- Reaper
     harvest          = "Harvest",
     soul             = "Soul",
     defiance         = "Defiance",
-    -- Runemaster
     inscription      = "Inscription",
     runic_fury       = "Runic Fury",
     arcane_binding   = "Arcane Binding",
-    -- Starcaller
     astral           = "Astral",
     solar            = "Solar",
     lunar            = "Lunar",
-    -- Stormbringer
     lightning        = "Lightning",
     tempest          = "Tempest",
     thunder          = "Thunder",
-    -- Sun Cleric
     light            = "Light",
     healing          = "Healing",
-    -- Templar
     retribution      = "Retribution",
-    justice          = "Justice",
-    -- Tinker
+    color            = "Color",
     battletech       = "Battletech",
     medic            = "Medic",
     juggernaut       = "Juggernaut",
-    -- Venomancer
     poison           = "Poison",
     toxin            = "Toxin",
-    -- Witch Doctor
     voodoo           = "Voodoo",
     hex              = "Hex",
-    -- Witch Hunter
     inquisitor       = "Inquisitor",
     ravager          = "Ravager",
     warden           = "Warden",
@@ -118,7 +95,7 @@ local SPEC_NAMES = {
 
 function CoAAT_SettingsFrame.Build()
     local f = CreateFrame("Frame", "CoAATSettingsFrame", UIParent)
-    f:SetSize(380, 440)
+    f:SetSize(380, 500)
     f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     f:SetToplevel(true)
     f:SetMovable(true)
@@ -132,7 +109,7 @@ function CoAAT_SettingsFrame.Build()
     bg:SetAllPoints()
     bg:SetTexture(0.03, 0.04, 0.10, 0.97)
 
-    -- Borders (glowing blue thin lines)
+    -- Borders
     local function makeLine(parent, w, h, point, relPoint, offX, offY)
         local l = parent:CreateTexture(nil, "OVERLAY")
         l:SetSize(w, h)
@@ -142,8 +119,8 @@ function CoAAT_SettingsFrame.Build()
     end
     makeLine(f, 380, 1, "TOPLEFT",     "TOPLEFT",     0,  0)
     makeLine(f, 380, 1, "BOTTOMLEFT",  "BOTTOMLEFT",  0,  0)
-    makeLine(f, 1, 440, "TOPLEFT",     "TOPLEFT",     0,  0)
-    makeLine(f, 1, 440, "TOPRIGHT",    "TOPRIGHT",    0,  0)
+    makeLine(f, 1, 500, "TOPLEFT",     "TOPLEFT",     0,  0)
+    makeLine(f, 1, 500, "TOPRIGHT",    "TOPRIGHT",    0,  0)
 
     -- Close button
     local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
@@ -208,7 +185,7 @@ function CoAAT_SettingsFrame.Build()
     UIDropDownMenu_SetText(specDropdown, "-- Select Spec --")
     f._specDropdown = specDropdown
 
-    -- ── Apply button ──
+    -- Apply button
     local applyBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
     applyBtn:SetSize(120, 26)
     applyBtn:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -110)
@@ -235,71 +212,133 @@ function CoAAT_SettingsFrame.Build()
         CoAAT_TutorialPanel.ShowClassIntro(classId)
     end)
 
-    -- ── Divider ──
+    -- Divider
     local div1 = f:CreateTexture(nil, "OVERLAY")
     div1:SetSize(352, 1)
     div1:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -144)
     div1:SetTexture(0.0, 0.4, 0.7, 0.4)
 
-    -- ── Options section ──
+    -- ── Section: Options ──
     local optHdr = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     optHdr:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -152)
     optHdr:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
-    optHdr:SetText("|cffFFD700Display Options|r")
+    optHdr:SetText("|cffFFD700HUD Configuration & Customization|r")
 
-    -- Option: Hide out of combat
+    -- Checkboxes: Col 1 (X = 10)
     local hideCombatCB = CreateFrame("CheckButton", "CoAATHideCombatCB", f, "UICheckButtonTemplate")
     hideCombatCB:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -172)
-    _G[hideCombatCB:GetName() .. "Text"]:SetText("|cffddddddHide tracker when out of combat|r")
+    _G[hideCombatCB:GetName() .. "Text"]:SetText("|cffddddddHide out of combat|r")
     hideCombatCB:SetChecked(CoAAT_DB and CoAAT_DB.hideOutOfCombat or false)
     hideCombatCB:SetScript("OnClick", function(self)
         if CoAAT_DB then CoAAT_DB.hideOutOfCombat = self:GetChecked() end
     end)
 
-    -- Option: Show proc alerts
+    local rotHelperCB = CreateFrame("CheckButton", "CoAATRotHelperCB", f, "UICheckButtonTemplate")
+    rotHelperCB:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -198)
+    _G[rotHelperCB:GetName() .. "Text"]:SetText("|cffddddddShow Rotation HUD|r")
+    rotHelperCB:SetChecked(CoAAT_DB and CoAAT_DB.showRotHelper ~= false)
+    rotHelperCB:SetScript("OnClick", function(self)
+        if CoAAT_DB then CoAAT_DB.showRotHelper = self:GetChecked() end
+        CoAAT_CombatHUD.RefreshLayout()
+    end)
+
+    local resBarCB = CreateFrame("CheckButton", "CoAATResBarCB", f, "UICheckButtonTemplate")
+    resBarCB:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -224)
+    _G[resBarCB:GetName() .. "Text"]:SetText("|cffddddddShow Resource Bar|r")
+    resBarCB:SetChecked(CoAAT_DB and CoAAT_DB.showResourceBar ~= false)
+    resBarCB:SetScript("OnClick", function(self)
+        if CoAAT_DB then CoAAT_DB.showResourceBar = self:GetChecked() end
+        CoAAT_CombatHUD.RefreshLayout()
+    end)
+
+    local aurasCB = CreateFrame("CheckButton", "CoAATAurasCB", f, "UICheckButtonTemplate")
+    aurasCB:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -250)
+    _G[aurasCB:GetName() .. "Text"]:SetText("|cffddddddShow Aura Tracker|r")
+    aurasCB:SetChecked(CoAAT_DB and CoAAT_DB.showAuras ~= false)
+    aurasCB:SetScript("OnClick", function(self)
+        if CoAAT_DB then CoAAT_DB.showAuras = self:GetChecked() end
+        CoAAT_CombatHUD.RefreshLayout()
+    end)
+
+    -- Checkboxes: Col 2 (X = 190)
     local procAlertCB = CreateFrame("CheckButton", "CoAATShowProcAlertCB", f, "UICheckButtonTemplate")
-    procAlertCB:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -198)
-    _G[procAlertCB:GetName() .. "Text"]:SetText("|cffddddddShow center-screen proc alerts|r")
+    procAlertCB:SetPoint("TOPLEFT", f, "TOPLEFT", 190, -172)
+    _G[procAlertCB:GetName() .. "Text"]:SetText("|cffddddddShow proc alerts|r")
     procAlertCB:SetChecked(CoAAT_DB and CoAAT_DB.showProcAlerts ~= false)
     procAlertCB:SetScript("OnClick", function(self)
         if CoAAT_DB then CoAAT_DB.showProcAlerts = self:GetChecked() end
     end)
 
-    -- Option: Rotation helper visible
-    local rotHelperCB = CreateFrame("CheckButton", "CoAATRotHelperCB", f, "UICheckButtonTemplate")
-    rotHelperCB:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -224)
-    _G[rotHelperCB:GetName() .. "Text"]:SetText("|cffddddddShow rotation helper (next ability)|r")
-    rotHelperCB:SetChecked(CoAAT_DB and CoAAT_DB.showRotHelper ~= false)
-    rotHelperCB:SetScript("OnClick", function(self)
-        if CoAAT_DB then CoAAT_DB.showRotHelper = self:GetChecked() end
-        CoAAT_RotationHelper.Toggle()
-    end)
-
-    -- Option: AoE Mode Toggle
     local aoeModeCB = CreateFrame("CheckButton", "CoAATAoEModeCB", f, "UICheckButtonTemplate")
-    aoeModeCB:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -250)
-    _G[aoeModeCB:GetName() .. "Text"]:SetText("|cffddddddEnable AoE Mode (cleave recommendations)|r")
+    aoeModeCB:SetPoint("TOPLEFT", f, "TOPLEFT", 190, -198)
+    _G[aoeModeCB:GetName() .. "Text"]:SetText("|cffddddddEnable AoE Mode|r")
     aoeModeCB:SetChecked(CoAAT_Engine.GetAoEMode())
     aoeModeCB:SetScript("OnClick", function(self)
         CoAAT_Engine.ToggleAoEMode()
     end)
     f._aoeModeCB = aoeModeCB
 
-    -- ── Divider ──
+    local cdStripCB = CreateFrame("CheckButton", "CoAATCdStripCB", f, "UICheckButtonTemplate")
+    cdStripCB:SetPoint("TOPLEFT", f, "TOPLEFT", 190, -224)
+    _G[cdStripCB:GetName() .. "Text"]:SetText("|cffddddddShow Cooldowns|r")
+    cdStripCB:SetChecked(CoAAT_DB and CoAAT_DB.showCooldowns ~= false)
+    cdStripCB:SetScript("OnClick", function(self)
+        if CoAAT_DB then CoAAT_DB.showCooldowns = self:GetChecked() end
+        CoAAT_CombatHUD.RefreshLayout()
+    end)
+
+    -- Divider
     local div2 = f:CreateTexture(nil, "OVERLAY")
     div2:SetSize(352, 1)
     div2:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -280)
     div2:SetTexture(0.0, 0.4, 0.7, 0.4)
 
+    -- Sliders: Scale & Opacity (Y = -305)
+    local scaleSlider = CreateFrame("Slider", "CoAATHUDScaleSlider", f, "OptionsSliderTemplate")
+    scaleSlider:SetPoint("TOPLEFT", f, "TOPLEFT", 20, -305)
+    scaleSlider:SetWidth(150)
+    scaleSlider:SetMinMaxValues(0.5, 1.5)
+    scaleSlider:SetValueStep(0.05)
+    _G[scaleSlider:GetName() .. "Text"]:SetText("HUD Scale: 1.00")
+    _G[scaleSlider:GetName() .. "Low"]:SetText("0.5")
+    _G[scaleSlider:GetName() .. "High"]:SetText("1.5")
+    scaleSlider:SetScript("OnValueChanged", function(self, value)
+        if CoAAT_DB then CoAAT_DB.hudScale = value end
+        _G[self:GetName() .. "Text"]:SetText("HUD Scale: " .. string.format("%.2f", value))
+        CoAAT_CombatHUD.RefreshLayout()
+    end)
+    f._scaleSlider = scaleSlider
+
+    local alphaSlider = CreateFrame("Slider", "CoAATHUDAlphaSlider", f, "OptionsSliderTemplate")
+    alphaSlider:SetPoint("TOPLEFT", f, "TOPLEFT", 190, -305)
+    alphaSlider:SetWidth(150)
+    alphaSlider:SetMinMaxValues(0.2, 1.0)
+    alphaSlider:SetValueStep(0.05)
+    _G[alphaSlider:GetName() .. "Text"]:SetText("HUD Opacity: 1.00")
+    _G[alphaSlider:GetName() .. "Low"]:SetText("0.2")
+    _G[alphaSlider:GetName() .. "High"]:SetText("1.0")
+    alphaSlider:SetScript("OnValueChanged", function(self, value)
+        if CoAAT_DB then CoAAT_DB.hudAlpha = value end
+        _G[self:GetName() .. "Text"]:SetText("HUD Opacity: " .. string.format("%.2f", value))
+        CoAAT_CombatHUD.RefreshLayout()
+    end)
+    f._alphaSlider = alphaSlider
+
+    -- Divider
+    local div3 = f:CreateTexture(nil, "OVERLAY")
+    div3:SetSize(352, 1)
+    div3:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -340)
+    div3:SetTexture(0.0, 0.4, 0.7, 0.4)
+
     -- ── Quick Rotation Summary ──
     local rotHdr = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    rotHdr:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -290)
+    rotHdr:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -350)
     rotHdr:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
     rotHdr:SetText("|cffFFD700Current Rotation Summary|r")
 
     local rotSummary = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    rotSummary:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -310)
-    rotSummary:SetSize(352, 80)
+    rotSummary:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -370)
+    rotSummary:SetSize(352, 70)
     rotSummary:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
     rotSummary:SetJustifyH("LEFT")
     rotSummary:SetJustifyV("TOP")
@@ -344,67 +383,6 @@ function CoAAT_SettingsFrame.Build()
     end)
 end
 
--- ─────────────────────────────────────────────
--- Dynamically create macros and place on Page 2
--- ─────────────────────────────────────────────
-function CoAAT_SettingsFrame.SetupHotbarPage2()
-    if InCombatLockdown() then
-        print("|cffff2222[CoAAT] Error: Cannot setup action bar in combat!|r")
-        return
-    end
-
-    local specDef = CoAAT_Engine.GetSpecDef()
-    if not specDef or not specDef.abilities then
-        print("|cffff2222[CoAAT] Error: No active class specialization selected.|r")
-        return
-    end
-
-    print("|cff00ccff[CoAAT] Setting up hotbar Page 2 for " .. specDef.name .. "...|r")
-
-    -- Clean up cursor first
-    ClearCursor()
-
-    for i, ability in ipairs(specDef.abilities) do
-        local slot = 12 + i
-        if slot > 24 then break end -- Only fill slots 13-24 (page 2)
-
-        -- Clean macro name (WoW limit 16 characters)
-        local macroName = "CoA_" .. ability.name:gsub("%s", ""):sub(1, 12)
-        local macroBody = "/cast " .. ability.name
-
-        -- Try to find existing macro (returns 1-54, or 0 if not found)
-        local macroIndex = GetMacroIndexByName(macroName)
-        if not macroIndex or macroIndex == 0 then
-            local _, numChar = GetNumMacros()
-            if numChar < 18 then
-                -- Create character-specific macro
-                macroIndex = CreateMacro(macroName, "INV_Misc_QuestionMark", macroBody, 1)
-            else
-                local numGlobal = GetNumMacros()
-                if numGlobal < 36 then
-                    -- Fallback to global macro
-                    macroIndex = CreateMacro(macroName, "INV_Misc_QuestionMark", macroBody, nil)
-                else
-                    print("|cffff2222[CoAAT] Error: Macro list is full! Clear some macros.|r")
-                    break
-                end
-            end
-        else
-            -- Update existing macro body
-            EditMacro(macroIndex, nil, nil, macroBody)
-        end
-
-        if macroIndex and macroIndex > 0 then
-            -- Place macro in slot
-            PickupMacro(macroIndex)
-            PlaceAction(slot)
-            ClearCursor()
-        end
-    end
-
-    print("|cff00ccff[CoAAT] Hotbar Page 2 setup complete! Switched page 2 icons.|r")
-end
-
 function CoAAT_SettingsFrame.UpdateSpecDropdown(cls)
     local f = _frame
     if not f then return end
@@ -439,8 +417,23 @@ function CoAAT_SettingsFrame.OnOpen()
     local f = _frame
     if not f then return end
 
+    -- Sync toggles
     if f._aoeModeCB then
         f._aoeModeCB:SetChecked(CoAAT_Engine.GetAoEMode())
+    end
+    _G["CoAATHideCombatCB"]:SetChecked(CoAAT_DB and CoAAT_DB.hideOutOfCombat or false)
+    _G["CoAATRotHelperCB"]:SetChecked(CoAAT_DB and CoAAT_DB.showRotHelper ~= false)
+    _G["CoAATResBarCB"]:SetChecked(CoAAT_DB and CoAAT_DB.showResourceBar ~= false)
+    _G["CoAATAurasCB"]:SetChecked(CoAAT_DB and CoAAT_DB.showAuras ~= false)
+    _G["CoAATShowProcAlertCB"]:SetChecked(CoAAT_DB and CoAAT_DB.showProcAlerts ~= false)
+    _G["CoAATCdStripCB"]:SetChecked(CoAAT_DB and CoAAT_DB.showCooldowns ~= false)
+
+    -- Sync sliders
+    if f._scaleSlider then
+        f._scaleSlider:SetValue(CoAAT_DB and CoAAT_DB.hudScale or 1.0)
+    end
+    if f._alphaSlider then
+        f._alphaSlider:SetValue(CoAAT_DB and CoAAT_DB.hudAlpha or 1.0)
     end
 
     local classId = CoAAT_Engine.GetClassId()
@@ -480,13 +473,67 @@ end
 function CoAAT_SettingsFrame.Toggle()
     if _frame then
         if _frame:IsShown() then
-            PlaySound(830) -- Window close
+            PlaySound(830)
             _frame:Hide()
         else
-            PlaySound(829) -- Window open
+            PlaySound(829)
             _frame:SetAlpha(1.0)
             CoAAT_SettingsFrame.OnOpen()
             _frame:Show()
         end
     end
+end
+
+-- ─────────────────────────────────────────────
+-- Dynamically create macros and place on Page 2
+-- ─────────────────────────────────────────────
+function CoAAT_SettingsFrame.SetupHotbarPage2()
+    if InCombatLockdown() then
+        print("|cffff2222[CoAAT] Error: Cannot setup action bar in combat!|r")
+        return
+    end
+
+    local specDef = CoAAT_Engine.GetSpecDef()
+    if not specDef or not specDef.abilities then
+        print("|cffff2222[CoAAT] Error: No active class specialization selected.|r")
+        return
+    end
+
+    print("|cff00ccff[CoAAT] Setting up hotbar Page 2 for " .. specDef.name .. "...|r")
+
+    ClearCursor()
+
+    for i, ability in ipairs(specDef.abilities) do
+        local slot = 12 + i
+        if slot > 24 then break end
+
+        local macroName = "CoA_" .. ability.name:gsub("%s", ""):sub(1, 12)
+        local macroBody = "/cast " .. ability.name
+
+        local macroIndex = GetMacroIndexByName(macroName)
+        if not macroIndex or macroIndex == 0 then
+            local _, numChar = GetNumMacros()
+            if numChar < 18 then
+                macroIndex = CreateMacro(macroName, "INV_Misc_QuestionMark", macroBody, 1)
+            else
+                local numGlobal = GetNumMacros()
+                if numGlobal < 36 then
+                    macroIndex = CreateMacro(macroName, "INV_Misc_QuestionMark", macroBody, nil)
+                else
+                    print("|cffff2222[CoAAT] Error: Macro list is full! Clear some macros.|r")
+                    break
+                end
+            end
+        else
+            EditMacro(macroIndex, nil, nil, macroBody)
+        end
+
+        if macroIndex and macroIndex > 0 then
+            PickupMacro(macroIndex)
+            PlaceAction(slot)
+            ClearCursor()
+        end
+    end
+
+    print("|cff00ccff[CoAAT] Hotbar Page 2 setup complete! Switched page 2 icons.|r")
 end

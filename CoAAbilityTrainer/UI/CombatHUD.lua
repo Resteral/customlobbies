@@ -1,14 +1,11 @@
 -- ============================================================
--- CoAAbilityTrainer - Combat HUD (Full Rotational Overhaul)
+-- CoAAbilityTrainer - Combat HUD (Modular & Customizable Overhaul)
 -- A completely transparent WeakAuras-style master container
 -- ============================================================
 
 CoAAT_CombatHUD = {}
 
--- Larger width to accommodate the massive rotational icons
 local HUD_W = 400
-local HUD_H = 340
-
 local _hud = nil
 
 -- ─────────────────────────────────────────────
@@ -16,7 +13,7 @@ local _hud = nil
 -- ─────────────────────────────────────────────
 function CoAAT_CombatHUD.Build()
     local hud = CreateFrame("Frame", "CoAATCombatHUD", UIParent)
-    hud:SetSize(HUD_W, HUD_H)
+    hud:SetSize(HUD_W, 340)
     hud:SetFrameStrata("MEDIUM")
     hud:SetToplevel(true)
     hud:SetMovable(true)
@@ -45,6 +42,13 @@ function CoAAT_CombatHUD.Build()
     dragBG:SetAlpha(1)
     hud._dragBG = dragBG
 
+    -- Outer border glow
+    local borderTex = hud:CreateTexture(nil, "ARTWORK")
+    borderTex:SetSize(HUD_W + 4, 344)
+    borderTex:SetPoint("CENTER", hud, "CENTER", 0, 0)
+    borderTex:SetTexture(0.0, 0.5, 0.9, 0.25)
+    hud._border = borderTex
+
     -- Drag instructions (hidden in combat)
     local dragHint = hud:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     dragHint:SetPoint("TOP", hud, "TOP", 0, -5)
@@ -52,30 +56,26 @@ function CoAAT_CombatHUD.Build()
     dragHint:SetText("|cff00ccffCoA Ability Trainer|r\n|cffaaaaaaDrag to move. Disappears in combat.|r")
     hud._dragHint = dragHint
 
-    -- ── Section containers (Top to Bottom Flow) ──
+    -- ── Section containers ──
 
     -- 1. Aura grid (Top, 100px)
     local auraSection = CreateFrame("Frame", nil, hud)
     auraSection:SetSize(HUD_W, 100)
-    auraSection:SetPoint("TOP", hud, "TOP", 0, -35)
     hud._auraSection = auraSection
 
     -- 2. Rotation Helper (Centerpiece, 120px)
     local rotSection = CreateFrame("Frame", nil, hud)
     rotSection:SetSize(HUD_W, 120)
-    rotSection:SetPoint("TOP", auraSection, "BOTTOM", 0, -5)
     hud._rotSection = rotSection
 
     -- 3. Resource bar (Below Rotation, 30px)
     local resSection = CreateFrame("Frame", nil, hud)
     resSection:SetSize(HUD_W, 30)
-    resSection:SetPoint("TOP", rotSection, "BOTTOM", 0, -5)
     hud._resSection = resSection
 
     -- 4. Cooldown strip (Bottom, 40px)
     local cdSection = CreateFrame("Frame", nil, hud)
     cdSection:SetSize(HUD_W, 40)
-    cdSection:SetPoint("TOP", resSection, "BOTTOM", 0, -5)
     hud._cdSection = cdSection
 
     -- Build sub-panels inside their sections
@@ -92,15 +92,88 @@ function CoAAT_CombatHUD.Build()
         if CoAAT_Engine.IsInCombat() then
             self._dragBG:SetAlpha(0)
             self._dragHint:SetAlpha(0)
+            self._border:SetTexture(0.0, 0.6, 1.0, 0.0) -- No border in combat
         else
             self._dragBG:SetAlpha(1)
             self._dragHint:SetAlpha(1)
+            self._border:SetTexture(0.0, 0.5, 0.9, 0.25)
         end
     end)
 
     _hud = hud
     CoAAT_CombatHUD._hud = hud
+
+    -- Apply customization layouts
+    CoAAT_CombatHUD.RefreshLayout()
+
     return hud
+end
+
+-- ─────────────────────────────────────────────
+-- Dynamically show/hide sections, resize HUD, apply scale/alpha
+-- ─────────────────────────────────────────────
+function CoAAT_CombatHUD.RefreshLayout()
+    local hud = _hud
+    if not hud then return end
+
+    local db = CoAAT_DB or {
+        hudScale = 1.0,
+        hudAlpha = 1.0,
+        showAuras = true,
+        showRotHelper = true,
+        showResourceBar = true,
+        showCooldowns = true
+    }
+
+    -- Apply Scale and Alpha
+    hud:SetScale(db.hudScale or 1.0)
+    hud:SetAlpha(db.hudAlpha or 1.0)
+
+    -- Determine layout Y offsets dynamically (preventing blank gaps)
+    local yOffset = -30
+
+    -- 1. Auras
+    if db.showAuras and hud._auraSection then
+        hud._auraSection:Show()
+        hud._auraSection:SetPoint("TOP", hud, "TOP", 0, yOffset)
+        yOffset = yOffset - 100 - 5
+    else
+        if hud._auraSection then hud._auraSection:Hide() end
+    end
+
+    -- 2. Rotation Helper
+    if db.showRotHelper and hud._rotSection then
+        hud._rotSection:Show()
+        hud._rotSection:SetPoint("TOP", hud, "TOP", 0, yOffset)
+        yOffset = yOffset - 120 - 5
+    else
+        if hud._rotSection then hud._rotSection:Hide() end
+    end
+
+    -- 3. Resource Bar
+    if db.showResourceBar and hud._resSection then
+        hud._resSection:Show()
+        hud._resSection:SetPoint("TOP", hud, "TOP", 0, yOffset)
+        yOffset = yOffset - 30 - 5
+    else
+        if hud._resSection then hud._resSection:Hide() end
+    end
+
+    -- 4. Cooldowns
+    if db.showCooldowns and hud._cdSection then
+        hud._cdSection:Show()
+        hud._cdSection:SetPoint("TOP", hud, "TOP", 0, yOffset)
+        yOffset = yOffset - 40 - 5
+    else
+        if hud._cdSection then hud._cdSection:Hide() end
+    end
+
+    -- Set dynamic overall HUD container height
+    local finalHeight = math.abs(yOffset)
+    hud:SetHeight(finalHeight)
+    if hud._border then
+        hud._border:SetSize(HUD_W + 4, finalHeight + 4)
+    end
 end
 
 -- ─────────────────────────────────────────────
@@ -117,7 +190,7 @@ function CoAAT_CombatHUD.OnClassChanged(classId, specId)
 end
 
 function CoAAT_CombatHUD.OnCombatChange(inCombat)
-    -- Let sub-panels know if needed
+    -- Relay combat changes if modules need it
 end
 
 function CoAAT_CombatHUD.Show()

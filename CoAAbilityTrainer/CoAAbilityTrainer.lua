@@ -59,6 +59,12 @@ local function InitDB()
     if CoAAT_DB.rotHelperPos     == nil then CoAAT_DB.rotHelperPos     = nil   end
     if CoAAT_DB.minimapAngle     == nil then CoAAT_DB.minimapAngle     = 30    end
     if CoAAT_DB.combatLearn      == nil then CoAAT_DB.combatLearn      = {}    end
+    -- HUD Customization Defaults
+    if CoAAT_DB.hudScale         == nil then CoAAT_DB.hudScale         = 1.0   end
+    if CoAAT_DB.hudAlpha         == nil then CoAAT_DB.hudAlpha         = 1.0   end
+    if CoAAT_DB.showResourceBar  == nil then CoAAT_DB.showResourceBar  = true  end
+    if CoAAT_DB.showCooldowns    == nil then CoAAT_DB.showCooldowns    = true  end
+    if CoAAT_DB.showAuras        == nil then CoAAT_DB.showAuras        = true  end
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
