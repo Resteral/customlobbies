@@ -498,10 +498,95 @@ SlashCmdList["COADPM"] = function(msg)
     end
 end
 
+-- ─────────────────────────────────────────────
+-- Create Minimap Button
+-- ─────────────────────────────────────────────
+function CoADpsAndMobTracker_UI.CreateMinimapButton()
+    local button = CreateFrame("Button", "CoADpsAndMobTrackerMinimapButton", Minimap)
+    button:SetSize(26, 26)
+    button:SetFrameStrata("MEDIUM")
+    button:SetFrameLevel(8)
+
+    local icon = button:CreateTexture(nil, "BACKGROUND")
+    icon:SetAllPoints()
+    icon:SetTexture("Interface\\Icons\\Spell_Lightning_LightningBolt01") -- DPS lightning bolt
+
+    local border = button:CreateTexture(nil, "OVERLAY")
+    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+    border:SetSize(47, 47)
+    border:SetPoint("TOPLEFT", button, "TOPLEFT", -9, 9)
+
+    local function UpdatePosition()
+        local angle = math.rad(CoADpsAndMobTrackerDB and CoADpsAndMobTrackerDB.minimapAngle or -120)
+        local radius = 80
+        local x = math.cos(angle) * radius
+        local y = math.sin(angle) * radius
+        button:SetPoint("CENTER", Minimap, "CENTER", x, y)
+    end
+
+    local dragging = false
+    button:RegisterForDrag("LeftButton")
+    button:SetScript("OnDragStart", function()
+        dragging = true
+        button:SetScript("OnUpdate", function()
+            if dragging then
+                local mx, my = GetCursorPosition()
+                local scale = Minimap:GetEffectiveScale()
+                mx = mx / scale
+                my = my / scale
+                local cx, cy = Minimap:GetCenter()
+                local angle = math.deg(math.atan2(my - cy, mx - cx))
+                if CoADpsAndMobTrackerDB then
+                    CoADpsAndMobTrackerDB.minimapAngle = angle
+                end
+                UpdatePosition()
+            end
+        end)
+    end)
+    button:SetScript("OnDragStop", function()
+        dragging = false
+        button:SetScript("OnUpdate", nil)
+    end)
+
+    button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    button:SetScript("OnClick", function(self, btn)
+        if btn == "LeftButton" then
+            PlaySound(856)
+            if _frame then
+                if _frame:IsShown() then
+                    _frame:Hide()
+                    if _detailFrame then _detailFrame:Hide() end
+                else
+                    _frame:Show()
+                    CoADpsAndMobTracker_UI.Refresh()
+                end
+            end
+        elseif btn == "RightButton" then
+            PlaySound(856)
+            CoADpsAndMobTracker_Engine.ResetSession()
+            print("|cff00ccff[CoADpsAndMobTracker] Combat data reset!|r")
+        end
+    end)
+
+    button:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+        GameTooltip:AddLine("|cff00ccffCoA DPS & Mob Tracker|r")
+        GameTooltip:AddLine("|cffddddddLeft-Click:|r Toggle Dashboard")
+        GameTooltip:AddLine("|cffddddddRight-Click:|r Reset Combat Logs")
+        GameTooltip:Show()
+    end)
+    button:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
+    UpdatePosition()
+end
+
 -- Hook login build
 local loginHook = CreateFrame("Frame")
 loginHook:RegisterEvent("PLAYER_LOGIN")
 loginHook:SetScript("OnEvent", function()
     CreateMainFrame()
+    CoADpsAndMobTracker_UI.CreateMinimapButton()
     CoADpsAndMobTracker_UI.Refresh()
 end)
