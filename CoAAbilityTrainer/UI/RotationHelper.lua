@@ -1,5 +1,5 @@
 -- ============================================================
--- CoAAbilityTrainer - Rotation Helper (Full UI Overhaul)
+-- CoAAbilityTrainer - Rotation Helper (Full UI Overhaul with Keybinds)
 -- Centralized WeakAura style HUD showing exact rotational priority
 -- ============================================================
 
@@ -16,6 +16,75 @@ local UGC = {
     medium   = { r=0.2, g=0.8, b=1.0, pulse=2.5 },
     low      = { r=0.5, g=0.6, b=0.7, pulse=1.0 },
 }
+
+-- Cache mapping spell names to their active keybinds
+local spellKeybinds = {}
+
+-- ─────────────────────────────────────────────
+-- Helper to format raw keybind strings
+-- ─────────────────────────────────────────────
+local function FormatKeybind(key)
+    if not key then return "" end
+    
+    key = key:upper()
+    key = key:gsub("ALT%-", "A-")
+    key = key:gsub("CTRL%-", "C-")
+    key = key:gsub("SHIFT%-", "S-")
+    key = key:gsub("BUTTON", "M")
+    key = key:gsub("MOUSEWHEELUP", "WU")
+    key = key:gsub("MOUSEWHEELDOWN", "WD")
+    key = key:gsub("NUMPAD", "N")
+    key = key:gsub("SPACE", "SP")
+    key = key:gsub("INSERT", "INS")
+    key = key:gsub("DELETE", "DEL")
+    key = key:gsub("HOME", "HM")
+    key = key:gsub("PAGEUP", "PU")
+    key = key:gsub("PAGEDOWN", "PD")
+    
+    return key
+end
+
+-- ─────────────────────────────────────────────
+-- Scan action bars to map spells/macros to keybinds
+-- ─────────────────────────────────────────────
+function CoAAT_RotationHelper.UpdateKeybindCache()
+    wipe(spellKeybinds)
+    
+    local barConfigs = {
+        { prefix = "ActionButton", bind = "ACTIONBUTTON" },
+        { prefix = "MultiBarBottomLeftButton", bind = "MULTIBARBOTTOMLEFT" },
+        { prefix = "MultiBarBottomRightButton", bind = "MULTIBARBOTTOMRIGHT" },
+        { prefix = "MultiBarRightButton", bind = "MULTIBARRIGHT" },
+        { prefix = "MultiBarLeftButton", bind = "MULTIBARLEFT" }
+    }
+
+    for _, config in ipairs(barConfigs) do
+        for i = 1, 12 do
+            local buttonName = config.prefix .. i
+            local button = _G[buttonName]
+            if button and button.action then
+                local actionType, id = GetActionInfo(button.action)
+                local spellName = nil
+                
+                if actionType == "spell" then
+                    spellName = GetSpellInfo(id)
+                elseif actionType == "macro" then
+                    -- Support macros that cast spells
+                    spellName = GetMacroSpell(id)
+                end
+                
+                if spellName then
+                    -- Get raw keybind
+                    local bindingName = config.bind .. i
+                    local key = GetBindingKey(bindingName)
+                    if key then
+                        spellKeybinds[spellName:lower()] = FormatKeybind(key)
+                    end
+                end
+            end
+        end
+    end
+end
 
 -- ─────────────────────────────────────────────
 -- Build the rotation helper panel
@@ -43,6 +112,12 @@ function CoAAT_RotationHelper.Build(parent)
         tex:SetPoint("CENTER", border, "CENTER")
         tex:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
 
+        -- Keybind Text Overlay
+        local keyText = parentFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmallOutline")
+        keyText:SetPoint("TOPRIGHT", border, "TOPRIGHT", -2, -2)
+        keyText:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+        keyText:SetTextColor(1, 1, 1, 0.95)
+
         -- Gloss/Highlight overlay
         local gloss = parentFrame:CreateTexture(nil, "OVERLAY")
         gloss:SetSize(size, size)
@@ -51,11 +126,11 @@ function CoAAT_RotationHelper.Build(parent)
         gloss:SetBlendMode("ADD")
         gloss:SetAlpha(0.4)
 
-        return tex, border
+        return tex, border, keyText
     end
 
     -- Primary Icon (Center-Left, MASSIVE)
-    f._icon1, f._border1 = createIconSlot(f, 72, 0.0, 1.0, 0.0)
+    f._icon1, f._border1, f._key1 = createIconSlot(f, 72, 0.0, 1.0, 0.0)
     f._border1:SetPoint("CENTER", f, "CENTER", -50, 10)
 
     -- Pulsing glow ring around primary icon
@@ -68,11 +143,11 @@ function CoAAT_RotationHelper.Build(parent)
     f._glowRing = glowRing
 
     -- Secondary Icon (Center-Right, Medium)
-    f._icon2, f._border2 = createIconSlot(f, 48, 1.0, 0.5, 0.0)
+    f._icon2, f._border2, f._key2 = createIconSlot(f, 48, 1.0, 0.5, 0.0)
     f._border2:SetPoint("LEFT", f._border1, "RIGHT", 15, -12)
 
     -- Tertiary Icon (Far Right, Small)
-    f._icon3, f._border3 = createIconSlot(f, 36, 1.0, 0.0, 0.0)
+    f._icon3, f._border3, f._key3 = createIconSlot(f, 36, 1.0, 0.0, 0.0)
     f._border3:SetPoint("LEFT", f._border2, "RIGHT", 10, -6)
 
     -- Ability name (large, prominent under primary)
@@ -96,8 +171,20 @@ function CoAAT_RotationHelper.Build(parent)
         CoAAT_RotationHelper.AnimTick(self, dt)
     end)
 
+    -- Keybind Update Events
+    f:RegisterEvent("UPDATE_BINDINGS")
+    f:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
+    f:RegisterEvent("PLAYER_ENTERING_WORLD")
+    f:SetScript("OnEvent", function(self, event, ...)
+        CoAAT_RotationHelper.UpdateKeybindCache()
+    end)
+
     _frame = f
     f:Show()
+    
+    -- Initial scan
+    CoAAT_RotationHelper.UpdateKeybindCache()
+    
     return f
 end
 
@@ -167,33 +254,50 @@ function CoAAT_RotationHelper.SetNextAbilities(m1, m2, m3)
 
     local spellsToGlow = {}
 
+    -- Primary
     if m1 and m1.abilityDef then
         f._icon1:SetTexture(m1.abilityDef.icon)
         f._abilityName:SetText("|cff22ff22" .. m1.abilityDef.name .. "|r")
         f._hintText:SetText("|cffffd700" .. (m1.abilityDef.hint or m1.abilityDef.description or "Use immediately!") .. "|r")
         table.insert(spellsToGlow, { spellName = m1.abilityDef.name, r = 0.0, g = 1.0, b = 0.0 })
+        
+        -- Keybind Lookup
+        local bind = spellKeybinds[m1.abilityDef.name:lower()] or ""
+        f._key1:SetText(bind)
+        
         _current = m1.abilityId
         _urgency = m1.urgency
     else
         f._icon1:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
         f._abilityName:SetText("|cffaaaaaa—|r")
         f._hintText:SetText("|cffaaaaaa Waiting for combat...|r")
+        f._key1:SetText("")
         _current = nil
         _urgency = nil
     end
 
+    -- Secondary
     if m2 and m2.abilityDef then
         f._icon2:SetTexture(m2.abilityDef.icon)
         table.insert(spellsToGlow, { spellName = m2.abilityDef.name, r = 1.0, g = 0.5, b = 0.0 })
+        
+        local bind = spellKeybinds[m2.abilityDef.name:lower()] or ""
+        f._key2:SetText(bind)
     else
         f._icon2:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+        f._key2:SetText("")
     end
 
+    -- Tertiary
     if m3 and m3.abilityDef then
         f._icon3:SetTexture(m3.abilityDef.icon)
         table.insert(spellsToGlow, { spellName = m3.abilityDef.name, r = 1.0, g = 0.0, b = 0.0 })
+        
+        local bind = spellKeybinds[m3.abilityDef.name:lower()] or ""
+        f._key3:SetText(bind)
     else
         f._icon3:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+        f._key3:SetText("")
     end
 
     UpdateActionBarGlows(spellsToGlow)
@@ -229,6 +333,9 @@ function CoAAT_RotationHelper.OnClassChanged(classId, specId)
         _frame._icon1:SetTexture("Interface\\Icons\\Ability_Warrior_Rampage")
         _frame._icon2:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
         _frame._icon3:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+        _frame._key1:SetText("")
+        _frame._key2:SetText("")
+        _frame._key3:SetText("")
     end
 end
 
