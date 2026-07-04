@@ -1,6 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
-import { ProductManagerForm } from './ProductManagerForm';
-import { ProductList } from './ProductList';
+import { StoreManagerClient } from './StoreManagerClient';
 import { ShoppingCart } from 'lucide-react';
 
 export default async function StorePage() {
@@ -39,17 +38,7 @@ export default async function StorePage() {
       </header>
 
       {sites && sites.length > 0 ? (
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="md:col-span-1 bg-secondary/10 border border-border/50 rounded-2xl p-6 self-start">
-            <h3 className="font-bold text-lg mb-6">Add New Product</h3>
-            <ProductManagerForm sites={sites} />
-          </div>
-          
-          <div className="md:col-span-2">
-            <h3 className="font-bold text-lg mb-6">Your Inventory</h3>
-            <ProductList products={products} sites={sites} />
-          </div>
-        </div>
+        <StoreManagerClient initialProducts={products} sites={sites} />
       ) : (
         <div className="text-center p-12 border border-dashed border-border/50 rounded-2xl bg-secondary/5 text-muted-foreground">
           You need to generate a website before you can add products to it!

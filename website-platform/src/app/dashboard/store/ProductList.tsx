@@ -1,7 +1,7 @@
 'use client';
 
 import { deleteProduct } from './actions';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Edit } from 'lucide-react';
 import { useState } from 'react';
 
 interface Product {
@@ -11,6 +11,8 @@ interface Product {
   site_id: string;
   description?: string;
   image_url?: string;
+  stock?: number;
+  is_active?: boolean;
 }
 
 interface Site {
@@ -18,7 +20,15 @@ interface Site {
   name: string;
 }
 
-export function ProductList({ products, sites }: { products: Product[], sites: Site[] }) {
+export function ProductList({ 
+  products, 
+  sites,
+  onEditProduct
+}: { 
+  products: Product[], 
+  sites: Site[],
+  onEditProduct?: (product: Product) => void
+}) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (productId: string, siteId: string) => {
@@ -44,7 +54,7 @@ export function ProductList({ products, sites }: { products: Product[], sites: S
   return (
     <div className="grid sm:grid-cols-2 gap-4">
       {products.map(product => (
-        <div key={product.id} className="border border-border/50 rounded-xl overflow-hidden bg-background flex flex-col group">
+        <div key={product.id} className="border border-border/50 rounded-xl overflow-hidden bg-background flex flex-col group relative">
           <div className="h-40 w-full bg-secondary/30 relative">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
@@ -56,23 +66,60 @@ export function ProductList({ products, sites }: { products: Product[], sites: S
             <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded">
               {getSiteName(product.site_id)}
             </div>
-            <button 
-              onClick={() => handleDelete(product.id, product.site_id)}
-              disabled={deletingId === product.id}
-              className="absolute top-2 right-2 bg-rose-500/90 text-white p-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-600 disabled:opacity-50"
-              title="Delete Product"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="p-4 flex flex-col flex-grow">
-            <div className="flex justify-between items-start mb-1">
-              <h4 className="font-bold">{product.name}</h4>
-              <span className="font-medium text-primary">${product.price.toFixed(2)}</span>
+            
+            {/* Controls */}
+            <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              {onEditProduct && (
+                <button 
+                  onClick={() => onEditProduct(product)}
+                  className="bg-primary text-white p-1.5 rounded hover:bg-primary/95 transition-colors"
+                  title="Edit Product"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+              )}
+              <button 
+                onClick={() => handleDelete(product.id, product.site_id)}
+                disabled={deletingId === product.id}
+                className="bg-rose-500 text-white p-1.5 rounded hover:bg-rose-600 disabled:opacity-50 transition-colors"
+                title="Delete Product"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+          </div>
+          
+          <div className="p-4 flex flex-col flex-grow">
+            <div className="flex justify-between items-start mb-1 gap-2">
+              <h4 className="font-bold truncate">{product.name}</h4>
+              <span className="font-medium text-primary shrink-0">${product.price.toFixed(2)}</span>
+            </div>
+            
+            <p className="text-xs text-muted-foreground line-clamp-2 mt-1 flex-grow">
               {product.description || 'No description provided.'}
             </p>
+            
+            {/* Stock & Active Indicators */}
+            <div className="mt-4 pt-3 border-t border-border/50 flex justify-between items-center text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className={`w-2.5 h-2.5 rounded-full ${
+                  product.is_active !== false ? 'bg-green-500' : 'bg-gray-400'
+                }`} />
+                <span className="text-muted-foreground">
+                  {product.is_active !== false ? 'Active (For Sale)' : 'Inactive'}
+                </span>
+              </div>
+              
+              <div className="text-muted-foreground font-medium">
+                {product.stock === undefined || product.stock === -1 ? (
+                  <span className="text-green-600 font-semibold">In Stock (∞)</span>
+                ) : product.stock === 0 ? (
+                  <span className="text-rose-500 font-semibold">Out of Stock</span>
+                ) : (
+                  <span>Stock: {product.stock}</span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       ))}

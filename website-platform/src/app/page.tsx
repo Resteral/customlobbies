@@ -82,6 +82,33 @@ export default function Home() {
         >
           Purchase a bundle, let AI build your website, host it instantly, and engage your visitors with an integrated AI chatbot—all in one place.
         </motion.p>
+
+        {/* Local Product Search Bar */}
+        <motion.form
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const query = formData.get('q');
+            window.location.href = `/marketplace?q=${query || ''}`;
+          }}
+          className="w-full max-w-xl mt-10 bg-secondary/30 backdrop-blur-md border border-border/50 rounded-2xl p-2.5 flex gap-2.5 shadow-xl relative z-20"
+        >
+          <input 
+            type="text" 
+            name="q" 
+            placeholder="Search local stores near you... (e.g. coffee, tacos)" 
+            className="flex-grow bg-transparent border-0 px-3 py-2.5 text-sm focus:outline-none focus:ring-0 text-white placeholder:text-gray-500"
+          />
+          <button 
+            type="submit" 
+            className="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-2.5 rounded-xl text-sm transition-all flex items-center gap-1.5"
+          >
+            Find Products
+          </button>
+        </motion.form>
       </main>
 
       {/* Pricing/Bundles Section */}

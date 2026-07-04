@@ -8,18 +8,31 @@ interface Product {
   id: string;
   name: string;
   price: number;
+  site_id: string;
   description?: string;
   image_url?: string;
+  stock?: number;
+  is_active?: boolean;
 }
 
 export function StorefrontBlock({ products, storeName }: { products: Product[], storeName?: string }) {
   const [cart, setCart] = useState<{product: Product, quantity: number}[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  const activeProducts = products.filter(p => p.is_active !== false);
+
   const addToCart = (product: Product) => {
+    // If out of stock, do nothing
+    if (product.stock === 0) return;
+
     setCart(prev => {
       const existing = prev.find(item => item.product.id === product.id);
       if (existing) {
+        // Enforce stock limit
+        if (product.stock !== undefined && product.stock !== -1 && existing.quantity >= product.stock) {
+          alert(`Sorry! Only ${product.stock} units are currently available.`);
+          return prev;
+        }
         return prev.map(item => item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
       }
       return [...prev, { product, quantity: 1 }];
@@ -30,8 +43,13 @@ export function StorefrontBlock({ products, storeName }: { products: Product[], 
   const updateQuantity = (productId: string, delta: number) => {
     setCart(prev => prev.map(item => {
       if (item.product.id === productId) {
-        const newQuantity = Math.max(0, item.quantity + delta);
-        return { ...item, quantity: newQuantity };
+        const newQuantity = item.quantity + delta;
+        // Enforce stock limit on increase
+        if (delta > 0 && item.product.stock !== undefined && item.product.stock !== -1 && newQuantity > item.product.stock) {
+          alert(`Sorry! Only ${item.product.stock} units are currently available.`);
+          return item;
+        }
+        return { ...item, quantity: Math.max(0, newQuantity) };
       }
       return item;
     }).filter(item => item.quantity > 0));
@@ -65,7 +83,7 @@ export function StorefrontBlock({ products, storeName }: { products: Product[], 
   };
 
   return (
-    <section className="py-16 bg-white relative">
+    <section className="py-16 bg-white relative text-gray-900">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-end mb-12">
           <div>
@@ -89,28 +107,54 @@ export function StorefrontBlock({ products, storeName }: { products: Product[], 
         </div>
 
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {products.length > 0 ? products.map((product) => (
-            <div key={product.id} className="group flex flex-col">
-              <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={product.image_url} 
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x300?text=No+Image' }}
-                />
-                <button 
-                  onClick={() => addToCart(product)}
-                  className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-gray-900 font-bold px-6 py-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-105"
-                >
-                  Add to Cart
-                </button>
+          {activeProducts.length > 0 ? activeProducts.map((product) => {
+            const isOutOfStock = product.stock === 0;
+            const isLowStock = product.stock !== undefined && product.stock > 0 && product.stock <= 5;
+            
+            return (
+              <div key={product.id} className="group flex flex-col relative">
+                <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={product.image_url} 
+                    alt={product.name}
+                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${
+                      isOutOfStock ? 'opacity-40 grayscale' : ''
+                    }`}
+                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x300?text=No+Image' }}
+                  />
+                  
+                  {isOutOfStock && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                      <span className="bg-rose-500 text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-md">
+                        Out of Stock
+                      </span>
+                    </div>
+                  )}
+
+                  {!isOutOfStock && (
+                    <button 
+                      onClick={() => addToCart(product)}
+                      className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white text-gray-900 font-bold px-6 py-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-105"
+                    >
+                      Add to Cart
+                    </button>
+                  )}
+                  
+                  {isLowStock && (
+                    <div className="absolute top-2 left-2">
+                      <span className="bg-amber-500 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded shadow-sm">
+                        Only {product.stock} left!
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <h3 className="font-bold text-gray-900 text-lg">{product.name}</h3>
+                <p className="text-gray-500 text-sm mb-2 line-clamp-2 flex-grow">{product.description}</p>
+                <div className="font-bold text-gray-900">${product.price.toFixed(2)}</div>
               </div>
-              <h3 className="font-bold text-gray-900 text-lg">{product.name}</h3>
-              <p className="text-gray-500 text-sm mb-2 line-clamp-2 flex-grow">{product.description}</p>
-              <div className="font-bold text-gray-900">${product.price.toFixed(2)}</div>
-            </div>
-          )) : (
+            );
+          }) : (
             <div className="col-span-full py-12 text-center text-gray-500 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
               No products available in this store yet.
             </div>
@@ -158,21 +202,30 @@ export function StorefrontBlock({ products, storeName }: { products: Product[], 
                       </div>
                       <div className="flex-1 flex flex-col justify-between py-1">
                         <div>
-                          <h4 className="font-bold text-gray-900 line-clamp-1">{item.product.name}</h4>
-                          <div className="text-gray-500 font-medium">${item.product.price.toFixed(2)}</div>
+                          <div className="flex justify-between font-bold text-gray-900">
+                            <h3 className="truncate max-w-[200px]">{item.product.name}</h3>
+                            <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-0.5">${item.product.price.toFixed(2)} each</p>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <button onClick={() => updateQuantity(item.product.id, -1)} className="p-1 hover:bg-gray-100 rounded">
-                            <Minus className="w-4 h-4 text-gray-900" />
-                          </button>
-                          <span className="font-bold text-sm w-4 text-center text-gray-900">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.product.id, 1)} className="p-1 hover:bg-gray-100 rounded">
-                            <Plus className="w-4 h-4 text-gray-900" />
-                          </button>
+                        
+                        <div className="flex justify-between items-center mt-2">
+                          <div className="flex items-center border border-gray-200 rounded-full overflow-hidden">
+                            <button 
+                              onClick={() => updateQuantity(item.product.id, -1)}
+                              className="p-1.5 hover:bg-gray-50 transition-colors text-gray-500 hover:text-gray-900"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="px-3 text-sm font-semibold text-gray-800">{item.quantity}</span>
+                            <button 
+                              onClick={() => updateQuantity(item.product.id, 1)}
+                              className="p-1.5 hover:bg-gray-50 transition-colors text-gray-500 hover:text-gray-900"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <div className="font-bold text-gray-900 py-1">
-                        ${(item.product.price * item.quantity).toFixed(2)}
                       </div>
                     </div>
                   ))
@@ -180,16 +233,16 @@ export function StorefrontBlock({ products, storeName }: { products: Product[], 
               </div>
 
               {cart.length > 0 && (
-                <div className="p-6 border-t border-gray-100 bg-gray-50">
-                  <div className="flex justify-between items-center mb-6 text-gray-900">
-                    <span className="font-medium">Subtotal</span>
-                    <span className="font-bold text-xl">${totalPrice.toFixed(2)}</span>
+                <div className="p-6 border-t border-gray-100 space-y-4 bg-white">
+                  <div className="flex justify-between font-bold text-lg text-gray-900">
+                    <span>Total</span>
+                    <span>${totalPrice.toFixed(2)}</span>
                   </div>
                   <button 
                     onClick={handleCheckout}
-                    className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg shadow-rose-500/25"
+                    className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-gray-200"
                   >
-                    Checkout with Stripe
+                    Checkout
                   </button>
                 </div>
               )}
