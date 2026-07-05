@@ -365,6 +365,22 @@ function CoAAT_Engine.EvaluateRotation()
         end
     end
 
+    local function IsSpellAvailable(ab)
+        if not ab then return false end
+        local name = GetSpellInfo(ab.name)
+        if not name then return false end
+        
+        local playerLevel = UnitLevel("player") or 1
+        if playerLevel < 60 then
+            if CoAAT_RotationHelper and CoAAT_RotationHelper.IsSpellOnHotbar then
+                if not CoAAT_RotationHelper.IsSpellOnHotbar(ab.name) then
+                    return false
+                end
+            end
+        end
+        return true
+    end
+
     local res, resMax = state.resource, state.resourceMax
     local rules = state.rotationRules
 
@@ -406,15 +422,18 @@ function CoAAT_Engine.EvaluateRotation()
 
             if matched then
                 local aId = rule.abilityId
-                if not seen[aId] then
-                    seen[aId] = true
-                    table.insert(matches, {
-                        abilityId = aId,
-                        urgency = rule.urgency,
-                        abilityDef = state.abilities[aId]
-                    })
-                    if #matches >= 3 then
-                        break
+                local abDef = state.abilities[aId]
+                if abDef and IsSpellAvailable(abDef) then
+                    if not seen[aId] then
+                        seen[aId] = true
+                        table.insert(matches, {
+                            abilityId = aId,
+                            urgency = rule.urgency,
+                            abilityDef = abDef
+                        })
+                        if #matches >= 3 then
+                            break
+                        end
                     end
                 end
             end

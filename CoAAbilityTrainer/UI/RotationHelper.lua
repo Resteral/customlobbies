@@ -75,9 +75,7 @@ function CoAAT_RotationHelper.UpdateKeybindCache()
                 if spellName then
                     local bindingName = config.bind .. i
                     local key = GetBindingKey(bindingName)
-                    if key then
-                        spellKeybinds[spellName:lower()] = FormatKeybind(key)
-                    end
+                    spellKeybinds[spellName:lower()] = key and FormatKeybind(key) or "NO_BIND"
                 end
             end
         end
@@ -287,6 +285,7 @@ function CoAAT_RotationHelper.SetNextAbilities(m1, m2, m3)
         
         -- Keybind Lookup
         local bind = spellKeybinds[m1.abilityDef.name:lower()] or ""
+        if bind == "NO_BIND" then bind = "" end
         f._key1:SetText(bind)
 
         -- Cooldown / GCD Sweep
@@ -318,6 +317,7 @@ function CoAAT_RotationHelper.SetNextAbilities(m1, m2, m3)
         f._spellName2 = m2.abilityDef.name
         
         local bind = spellKeybinds[m2.abilityDef.name:lower()] or ""
+        if bind == "NO_BIND" then bind = "" end
         f._key2:SetText(bind)
 
         local start, duration = GetSpellCooldown(m2.abilityDef.name)
@@ -341,6 +341,7 @@ function CoAAT_RotationHelper.SetNextAbilities(m1, m2, m3)
         f._spellName3 = m3.abilityDef.name
         
         local bind = spellKeybinds[m3.abilityDef.name:lower()] or ""
+        if bind == "NO_BIND" then bind = "" end
         f._key3:SetText(bind)
 
         local start, duration = GetSpellCooldown(m3.abilityDef.name)
@@ -499,4 +500,10 @@ function CoAAT_RotationHelper.Toggle()
     if _frame then
         if _frame:IsShown() then _frame:Hide() else _frame:Show() end
     end
+end
+
+function CoAAT_RotationHelper.IsSpellOnHotbar(spellName)
+    if not spellName then return false end
+    local key = spellName:lower()
+    return spellKeybinds[key] ~= nil
 end
