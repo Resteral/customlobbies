@@ -88,6 +88,7 @@ local function CreateMainFrame()
     dt:SetAllPoints()
     dt:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
     dt:SetText("⚔ DPS")
+    dpsTab._text = dt
     dpsTab:SetScript("OnClick", function()
         activeTab = 1
         PlaySound(856)
@@ -102,6 +103,7 @@ local function CreateMainFrame()
     mt:SetAllPoints()
     mt:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
     mt:SetText("👾 Mobs")
+    mobTab._text = mt
     mobTab:SetScript("OnClick", function()
         activeTab = 2
         PlaySound(856)
@@ -331,11 +333,11 @@ function CoADpsAndMobTracker_UI.Refresh()
 
     -- Sync Tab visual headers
     if activeTab == 1 then
-        _frame._dpsTab:GetFontString():SetText("|cff00ccff[⚔ DPS]|r")
-        _frame._mobTab:GetFontString():SetText("|cffaaaaaa👾 Mobs|r")
+        _frame._dpsTab._text:SetText("|cff00ccff[⚔ DPS]|r")
+        _frame._mobTab._text:SetText("|cffaaaaaa👾 Mobs|r")
     else
-        _frame._dpsTab:GetFontString():SetText("|cffaaaaaa⚔ DPS|r")
-        _frame._mobTab:GetFontString():SetText("|cff00ccff[👾 Mobs]|r")
+        _frame._dpsTab._text:SetText("|cffaaaaaa⚔ DPS|r")
+        _frame._mobTab._text:SetText("|cff00ccff[👾 Mobs]|r")
     end
 
     local child = _frame._scrollChild

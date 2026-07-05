@@ -162,18 +162,18 @@ function CoAAT_RotationHelper.Build(parent)
     aoeBadge:SetText("|cff22ff22[SINGLE TARGET]|r")
     f._aoeBadge = aoeBadge
 
-    -- Ability name (large, prominent under primary)
+    -- Ability name (large, prominent above primary)
     local abilityName = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    abilityName:SetPoint("TOP", f._border1, "BOTTOM", 0, -8)
-    abilityName:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
+    abilityName:SetPoint("BOTTOM", f._border1, "TOP", 0, 8)
+    abilityName:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
     abilityName:SetText("")
     f._abilityName = abilityName
 
-    -- Dynamic Teaching Hint (Under ability name)
+    -- Dynamic Teaching Hint (Above ability name)
     local hintText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    hintText:SetPoint("TOP", abilityName, "BOTTOM", 0, -4)
+    hintText:SetPoint("BOTTOM", abilityName, "TOP", 0, 4)
     hintText:SetWidth(250)
-    hintText:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+    hintText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
     hintText:SetJustifyH("CENTER")
     hintText:SetText("|cffaaaaaa Waiting for combat...|r")
     f._hintText = hintText

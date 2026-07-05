@@ -3,10 +3,26 @@
 
 local _, addon = ...
 
-local TargetLootFrame = CreateFrame("Frame", "CoALevelGuideTargetLootFrame", UIParent, "BasicFrameTemplateWithInset")
+local TargetLootFrame = CreateFrame("Frame", "CoALevelGuideTargetLootFrame", UIParent)
 TargetLootFrame:SetSize(220, 150)
 TargetLootFrame:SetPoint("TOPLEFT", TargetFrame, "BOTTOMRIGHT", -20, 20)
 TargetLootFrame:Hide() -- Hide by default
+
+-- Background
+local bg = TargetLootFrame:CreateTexture(nil, "BACKGROUND")
+bg:SetAllPoints()
+bg:SetTexture(0.04, 0.06, 0.12, 0.9)
+
+-- Border
+local function makeBorder()
+    local t = TargetLootFrame:CreateTexture(nil, "OVERLAY")
+    t:SetTexture(0.0, 0.5, 0.9, 0.4)
+    return t
+end
+local bTop = makeBorder(); bTop:SetPoint("TOPLEFT"); bTop:SetPoint("TOPRIGHT"); bTop:SetHeight(1.5)
+local bBottom = makeBorder(); bBottom:SetPoint("BOTTOMLEFT"); bBottom:SetPoint("BOTTOMRIGHT"); bBottom:SetHeight(1.5)
+local bLeft = makeBorder(); bLeft:SetPoint("TOPLEFT"); bLeft:SetPoint("BOTTOMLEFT"); bLeft:SetWidth(1.5)
+local bRight = makeBorder(); bRight:SetPoint("TOPRIGHT"); bRight:SetPoint("BOTTOMRIGHT"); bRight:SetWidth(1.5)
 
 -- Title
 TargetLootFrame.title = TargetLootFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")

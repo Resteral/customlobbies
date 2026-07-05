@@ -38,16 +38,26 @@ function CoAAT_CombatHUD.Build()
     -- Transparent backdrop (Only visible when out of combat for dragging)
     local dragBG = hud:CreateTexture(nil, "BACKGROUND")
     dragBG:SetAllPoints()
-    dragBG:SetTexture(0, 0, 0, 0.4)
+    dragBG:SetTexture(0, 0, 0, 0.05) -- extremely subtle out of combat tint
     dragBG:SetAlpha(1)
     hud._dragBG = dragBG
 
-    -- Outer border glow
-    local borderTex = hud:CreateTexture(nil, "ARTWORK")
-    borderTex:SetSize(HUD_W + 4, 344)
-    borderTex:SetPoint("CENTER", hud, "CENTER", 0, 0)
-    borderTex:SetTexture(0.0, 0.5, 0.9, 0.25)
-    hud._border = borderTex
+    -- Subtle 1.5px border lines (only shown out of combat)
+    local border = CreateFrame("Frame", nil, hud)
+    border:SetAllPoints()
+    hud._borderFrame = border
+
+    local function drawBorder(point1, point2, w, h)
+        local t = border:CreateTexture(nil, "OVERLAY")
+        t:SetTexture(0.0, 0.5, 0.9, 0.4)
+        t:SetPoint(point1)
+        t:SetPoint(point2)
+        if w then t:SetWidth(w) else t:SetHeight(h) end
+    end
+    drawBorder("TOPLEFT", "TOPRIGHT", nil, 1.5)
+    drawBorder("BOTTOMLEFT", "BOTTOMRIGHT", nil, 1.5)
+    drawBorder("TOPLEFT", "BOTTOMLEFT", 1.5, nil)
+    drawBorder("TOPRIGHT", "BOTTOMRIGHT", 1.5, nil)
 
     -- Drag instructions (hidden in combat)
     local dragHint = hud:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -98,11 +108,11 @@ function CoAAT_CombatHUD.Build()
         if CoAAT_Engine.IsInCombat() then
             self._dragBG:SetAlpha(0)
             self._dragHint:SetAlpha(0)
-            self._border:SetTexture(0.0, 0.6, 1.0, 0.0) -- No border in combat
+            if self._borderFrame then self._borderFrame:Hide() end
         else
             self._dragBG:SetAlpha(1)
             self._dragHint:SetAlpha(1)
-            self._border:SetTexture(0.0, 0.5, 0.9, 0.25)
+            if self._borderFrame then self._borderFrame:Show() end
         end
     end)
 
@@ -184,8 +194,8 @@ function CoAAT_CombatHUD.RefreshLayout()
     -- Set dynamic overall HUD container height
     local finalHeight = math.abs(yOffset)
     hud:SetHeight(finalHeight)
-    if hud._border then
-        hud._border:SetSize(HUD_W + 4, finalHeight + 4)
+    if hud._borderFrame then
+        hud._borderFrame:SetSize(HUD_W, finalHeight)
     end
 end
 

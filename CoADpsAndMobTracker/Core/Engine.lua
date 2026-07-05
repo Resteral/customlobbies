@@ -194,6 +194,7 @@ end
 -- ─────────────────────────────────────────────
 function CoADpsAndMobTracker_Engine.OnCLEU(...)
     local ts, event, _, srcGUID, srcName, srcFlags, _, destGUID, destName, _, _ = ...
+    srcFlags = srcFlags or 0
 
     -- Check if source is player, player's pet, or a group member
     local isPlayer = (srcGUID == playerGUID)
