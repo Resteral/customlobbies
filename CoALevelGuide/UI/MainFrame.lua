@@ -607,7 +607,7 @@ function CoALevelGuide_MainFrame.BuildGearPanel(parent)
         local cardBorder = bisCard:CreateTexture(nil, "OVERLAY")
         cardBorder:SetSize(2, cardH)
         cardBorder:SetPoint("TOPLEFT", bisCard, "TOPLEFT", 0, 0)
-        cardBorder:SetTexture(0.0, 0.8, 1.0, 0.9)
+        cardBorder:SetTexture(0.0, 0.8, 1.0, 0.25)
 
         yOff = yOff - cardH - 12
 
@@ -666,7 +666,7 @@ function CoALevelGuide_MainFrame.BuildGearPanel(parent)
             local sideBorder = phaseFrame:CreateTexture(nil, "OVERLAY")
             sideBorder:SetSize(2, localFrameHeight)
             sideBorder:SetPoint("TOPLEFT", phaseFrame, "TOPLEFT", 0, 0)
-            sideBorder:SetTexture(0.0, 0.75, 1.0, 0.8)
+            sideBorder:SetTexture(0.0, 0.75, 1.0, 0.25)
 
             yOff = yOff - localFrameHeight - 14
         end
@@ -675,7 +675,7 @@ function CoALevelGuide_MainFrame.BuildGearPanel(parent)
         local divider = child:CreateTexture(nil, "OVERLAY")
         divider:SetSize(child:GetWidth() - 8, 2)
         divider:SetPoint("TOPLEFT", child, "TOPLEFT", 4, yOff)
-        divider:SetTexture(0.55, 0.0, 0.85, 0.8)
+        divider:SetTexture(0.55, 0.0, 0.85, 0.20)
         yOff = yOff - 12
 
         -- PvP Header
@@ -788,7 +788,7 @@ function CoALevelGuide_MainFrame.BuildGearPanel(parent)
             local sideBorder = phaseFrame:CreateTexture(nil, "OVERLAY")
             sideBorder:SetSize(2, localFrameHeight)
             sideBorder:SetPoint("TOPLEFT", phaseFrame, "TOPLEFT", 0, 0)
-            sideBorder:SetTexture(0.55, 0.0, 0.85, 0.8)
+            sideBorder:SetTexture(0.55, 0.0, 0.85, 0.25)
 
             yOff = yOff - localFrameHeight - 16
         end
@@ -797,7 +797,7 @@ function CoALevelGuide_MainFrame.BuildGearPanel(parent)
         local divider2 = child:CreateTexture(nil, "OVERLAY")
         divider2:SetSize(child:GetWidth() - 8, 2)
         divider2:SetPoint("TOPLEFT", child, "TOPLEFT", 4, yOff)
-        divider2:SetTexture(0.0, 0.75, 1.0, 0.8)
+        divider2:SetTexture(0.0, 0.75, 1.0, 0.20)
         yOff = yOff - 12
 
         -- Lower Level BiS Header
@@ -840,7 +840,7 @@ function CoALevelGuide_MainFrame.BuildGearPanel(parent)
             local sideBorder = phaseFrame:CreateTexture(nil, "OVERLAY")
             sideBorder:SetSize(2, localFrameHeight)
             sideBorder:SetPoint("TOPLEFT", phaseFrame, "TOPLEFT", 0, 0)
-            sideBorder:SetTexture(0.0, 0.75, 1.0, 0.8)
+            sideBorder:SetTexture(0.0, 0.75, 1.0, 0.25)
 
             yOff = yOff - localFrameHeight - 14
         end
@@ -849,7 +849,7 @@ function CoALevelGuide_MainFrame.BuildGearPanel(parent)
         local divider3 = child:CreateTexture(nil, "OVERLAY")
         divider3:SetSize(child:GetWidth() - 8, 2)
         divider3:SetPoint("TOPLEFT", child, "TOPLEFT", 4, yOff)
-        divider3:SetTexture(0.55, 0.0, 0.85, 0.8)
+        divider3:SetTexture(0.55, 0.0, 0.85, 0.20)
         yOff = yOff - 12
 
         -- Professions Header
@@ -887,7 +887,7 @@ function CoALevelGuide_MainFrame.BuildGearPanel(parent)
             local sideBorder = phaseFrame:CreateTexture(nil, "OVERLAY")
             sideBorder:SetSize(2, localFrameHeight)
             sideBorder:SetPoint("TOPLEFT", phaseFrame, "TOPLEFT", 0, 0)
-            sideBorder:SetTexture(0.55, 0.0, 0.85, 0.8)
+            sideBorder:SetTexture(0.55, 0.0, 0.85, 0.25)
 
             yOff = yOff - localFrameHeight - 14
         end
@@ -991,7 +991,7 @@ function CoALevelGuide_MainFrame.BuildPvPPanel(parent)
             local cardBorder = card:CreateTexture(nil, "OVERLAY")
             cardBorder:SetSize(2, cardH)
             cardBorder:SetPoint("TOPLEFT", card, "TOPLEFT", 0, 0)
-            cardBorder:SetTexture(0.77, 0.27, 1.0, 0.9) -- violet border for PvP cards
+            cardBorder:SetTexture(0.77, 0.27, 1.0, 0.25) -- Softened violet border
 
             yOff = yOff - cardH - 12
         end
@@ -1114,7 +1114,7 @@ function CoALevelGuide_MainFrame.BuildPvPPanel(parent)
             local sideBorder = mFrame:CreateTexture(nil, "OVERLAY")
             sideBorder:SetSize(2, frameH)
             sideBorder:SetPoint("TOPLEFT", mFrame, "TOPLEFT", 0, 0)
-            sideBorder:SetTexture(0.55, 0.0, 0.85, 0.8)
+            sideBorder:SetTexture(0.55, 0.0, 0.85, 0.25)
 
             yOff = yOff - frameH - 12
         end
@@ -1151,7 +1151,7 @@ function CoALevelGuide_MainFrame.BuildPvPPanel(parent)
         local tBorder = tipsCard:CreateTexture(nil, "OVERLAY")
         tBorder:SetSize(2, tipsCardH)
         tBorder:SetPoint("TOPLEFT", tipsCard, "TOPLEFT", 0, 0)
-        tBorder:SetTexture(0.77, 0.27, 1.0, 0.9)
+        tBorder:SetTexture(0.77, 0.27, 1.0, 0.25)
 
         yOff = yOff - tipsCardH - 20
 
