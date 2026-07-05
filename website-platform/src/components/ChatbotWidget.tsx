@@ -5,6 +5,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, X, Send, Bot, User, ArrowRight } from "lucide-react";
 import { useChat } from '@ai-sdk/react';
 
+interface ToolInvocation {
+  toolCallId: string;
+  toolName: string;
+  args: Record<string, unknown>;
+}
+
+interface ChatbotMessage {
+  role: 'system' | 'user' | 'assistant' | 'data';
+  content: string;
+  toolInvocations?: ToolInvocation[];
+}
+
 export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   
@@ -13,16 +25,21 @@ export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?:
     initialMessages: [
       { id: '1', role: 'assistant', content: 'Hi there! How can I help you today?' }
     ],
-    onToolCall({ toolCall }: { toolCall: any }) {
+    onToolCall({ toolCall }: { toolCall: { toolName: string; args: Record<string, unknown>; toolCallId: string } }) {
       if (toolCall.toolName === 'navigateUser') {
-        const args = toolCall.args as Record<string, unknown>;
+        const args = toolCall.args;
         const url = args.url as string;
         // In a real deployed app, this would use next/navigation useRouter
         // For preview, we just update window location
         window.location.href = url;
       }
     }
-  } as any) as any;
+  } as unknown as Record<string, unknown>) as unknown as {
+    messages: ChatbotMessage[];
+    input: string;
+    handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +88,7 @@ export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?:
 
             {/* Messages Area */}
             <div className="flex-grow p-4 overflow-y-auto flex flex-col gap-4 bg-secondary/10">
-              {messages.map((msg: any, idx: number) => (
+              {messages.map((msg: ChatbotMessage, idx: number) => (
                 <div 
                   key={idx} 
                   className={`flex gap-2 max-w-[85%] ${msg.role === 'user' ? 'self-end flex-row-reverse' : 'self-start'}`}
@@ -89,7 +106,7 @@ export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?:
                     {msg.content}
                     
                     {/* Render tool calls nicely */}
-                    {msg.toolInvocations?.map((tool: any) => {
+                    {msg.toolInvocations?.map((tool: ToolInvocation) => {
                       if (tool.toolName === 'navigateUser') {
                         const args = tool.args as Record<string, unknown>;
                         return (

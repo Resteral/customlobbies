@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ url: '/checkout/success' });
     }
 
-    const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' as any });
+    const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' as '2026-06-24.dahlia' });
     const { items, successUrl, cancelUrl } = await req.json();
 
     interface CheckoutItem {

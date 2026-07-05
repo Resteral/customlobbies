@@ -34,5 +34,5 @@ If a user asks to buy something, see products, or checkout, use the navigateUser
     },
   });
 
-  return (result as any).toDataStreamResponse();
+  return (result as unknown as { toDataStreamResponse: () => Response }).toDataStreamResponse();
 }

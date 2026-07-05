@@ -263,13 +263,26 @@ end
 function CoADpsAndMobTracker_UI.ReportDPS()
     local list = {}
     for guid, data in pairs(CoADpsAndMobTracker_Session.players) do
-        table.insert(list, {
-            name = data.name,
-            damage = data.damage,
-            dps = CoADpsAndMobTracker_Engine.GetPlayerDPS(guid)
-        })
+        local value = 0
+        if activeStat == "dps" then
+            value = CoADpsAndMobTracker_Engine.GetPlayerDPS(guid)
+        elseif activeStat == "damage" then
+            value = data.damage or 0
+        elseif activeStat == "tanked" then
+            value = data.tanked or 0
+        elseif activeStat == "healing" then
+            value = data.healing or 0
+        end
+
+        if value > 0 then
+            table.insert(list, {
+                name = data.name,
+                val = value,
+                damage = data.damage or 0
+            })
+        end
     end
-    table.sort(list, function(a,b) return a.damage > b.damage end)
+    table.sort(list, function(a,b) return a.val > b.val end)
 
     if #list == 0 then return end
 
@@ -283,11 +296,26 @@ function CoADpsAndMobTracker_UI.ReportDPS()
         channel = "GUILD"
     end
 
-    SendChatMessage("=== CoA DPS Tracker ===", channel)
+    local titleStr = "=== CoA Tracker (DPS) ==="
+    if activeStat == "damage" then
+        titleStr = "=== CoA Tracker (Damage) ==="
+    elseif activeStat == "tanked" then
+        titleStr = "=== CoA Tracker (Damage Tanked) ==="
+    elseif activeStat == "healing" then
+        titleStr = "=== CoA Tracker (Damage Healed) ==="
+    end
+
+    SendChatMessage(titleStr, channel)
     for i = 1, math.min(3, #list) do
         local r = list[i]
-        local dStr = CoADpsAndMobTracker_Engine.FormatNumber(r.damage)
-        SendChatMessage(string.format("%d. %s — %s (%d DPS)", i, r.name, dStr, r.dps), channel)
+        local vStr = CoADpsAndMobTracker_Engine.FormatNumber(r.val)
+        if activeStat == "dps" then
+            local dStr = CoADpsAndMobTracker_Engine.FormatNumber(r.damage)
+            SendChatMessage(string.format("%d. %s — %s (%d DPS)", i, r.name, dStr, r.val), channel)
+        else
+            local label = (activeStat == "damage" and "damage") or (activeStat == "tanked" and "tanked") or "healed"
+            SendChatMessage(string.format("%d. %s — %s %s", i, r.name, vStr, label), channel)
+        end
     end
 end
 

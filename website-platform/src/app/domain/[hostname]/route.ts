@@ -13,8 +13,17 @@ export async function GET(
 
   const supabase = await createClient();
 
+  interface SiteResult {
+    id: string;
+    user_id: string;
+    html_content: string | null;
+    status: string | null;
+    is_verified_secure?: boolean;
+    is_verified_human_review?: boolean;
+  }
+
   // Find the site by custom_domain
-  let site: any = null;
+  let site: SiteResult | null = null;
   const { data: initialSite, error: initialError } = await supabase
     .from('sites')
     .select('id, user_id, html_content, status, is_verified_secure, is_verified_human_review')
