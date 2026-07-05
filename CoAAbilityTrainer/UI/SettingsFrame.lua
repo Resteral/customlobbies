@@ -568,12 +568,66 @@ function CoAAT_SettingsFrame.SetupHotbarPage2()
 
     ClearCursor()
 
+    -- 1. Formulate the one-button rotation castsequence macro (CoA_Rot)
+    local generator, spender, debuff
+    for _, abi in ipairs(specDef.abilities) do
+        if abi.type == "generator" then
+            generator = abi.name
+        elseif abi.type == "spender" then
+            spender = abi.name
+        elseif abi.type == "debuff" then
+            debuff = abi.name
+        end
+    end
+
+    local seqParts = {}
+    if debuff then table.insert(seqParts, debuff) end
+    if generator then 
+        table.insert(seqParts, generator)
+        table.insert(seqParts, generator)
+    end
+    if spender then table.insert(seqParts, spender) end
+    local castSeq = #seqParts > 0 and table.concat(seqParts, ", ") or nil
+
+    if castSeq then
+        local rotMacroName = "CoA_Rot"
+        local rotMacroBody = "#showtooltip\n/use 13\n/use 14\n/use 10\n/castsequence reset=combat/target " .. castSeq
+        local rotMacroIndex = GetMacroIndexByName(rotMacroName)
+
+        if not rotMacroIndex or rotMacroIndex == 0 then
+            local _, numChar = GetNumMacros()
+            if numChar < 18 then
+                rotMacroIndex = CreateMacro(rotMacroName, "INV_Misc_QuestionMark", rotMacroBody, 1)
+            else
+                local numGlobal = GetNumMacros()
+                if numGlobal < 36 then
+                    rotMacroIndex = CreateMacro(rotMacroName, "INV_Misc_QuestionMark", rotMacroBody, nil)
+                end
+            end
+        else
+            EditMacro(rotMacroIndex, nil, nil, rotMacroBody)
+        end
+
+        if rotMacroIndex and rotMacroIndex > 0 then
+            PickupMacro(rotMacroIndex)
+            PlaceAction(13) -- Place one-button rotation in Slot 13 (Page 2 Slot 1)
+            ClearCursor()
+            print("|cff00ffaa[CoAAT] Created/Updated One-Button Rotation Macro: CoA_Rot|r")
+        end
+    end
+
+    -- 2. Create/Update individual optimized abilities macros (pop trinkets + engineering)
     for i, ability in ipairs(specDef.abilities) do
-        local slot = 12 + i
+        local slot = 13 + i -- Place individual macros in slots 14 onwards
         if slot > 24 then break end
 
+        -- Warn if spell not learned
+        if not GetSpellInfo(ability.name) then
+            print("|cffffaa00[CoAAT] Alert: You have not learned " .. ability.name .. " yet. Visit your trainer!|r")
+        end
+
         local macroName = "CoA_" .. ability.name:gsub("%s", ""):sub(1, 12)
-        local macroBody = "/cast " .. ability.name
+        local macroBody = "#showtooltip " .. ability.name .. "\n/use 13\n/use 14\n/use 10\n/cast " .. ability.name
 
         local macroIndex = GetMacroIndexByName(macroName)
         if not macroIndex or macroIndex == 0 then
@@ -584,9 +638,6 @@ function CoAAT_SettingsFrame.SetupHotbarPage2()
                 local numGlobal = GetNumMacros()
                 if numGlobal < 36 then
                     macroIndex = CreateMacro(macroName, "INV_Misc_QuestionMark", macroBody, nil)
-                else
-                    print("|cffff2222[CoAAT] Error: Macro list is full! Clear some macros.|r")
-                    break
                 end
             end
         else
