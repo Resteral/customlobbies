@@ -28,6 +28,9 @@ function CoALevelGuide_Progress.Init()
     if not CoALevelGuideDB.activeClass then
         CoALevelGuideDB.activeClass = nil
     end
+    if not CoALevelGuideDB.activeTheme then
+        CoALevelGuideDB.activeTheme = "default"
+    end
 end
 
 -- Check if a step is complete

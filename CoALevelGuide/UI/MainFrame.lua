@@ -23,7 +23,7 @@ local C = {
     highlight  = { r=0.1,  g=0.2,  b=0.35, a=0.6  },
 }
 
-local tabs = { "Guide", "Classes", "Talents", "Zone Info", "Gear Guide", "PvP Guide" }
+local tabs = { "Guide", "Classes", "Talents", "Dungeons", "Gear Guide", "PvP Guide" }
 local activeTab = 1
 local tabFrames = {}
 
@@ -33,37 +33,76 @@ local classThemes = {
         accent = { r=0.0,  g=0.8,  b=1.0,  a=1.0  },
         logo   = "|cff00ccff⚔ CoA|r |cffFFD700Lvl Guide|r",
         textHex = "00ccff",
-        bg = { r=0.04, g=0.06, b=0.12, a=0.97 }
+        bg = { r=0.03, g=0.05, b=0.12, a=0.97 }
     },
     felsworn = {
-        border = { r=0.2,  g=0.9,  b=0.2,  a=0.25 },
+        border = { r=0.2,  g=0.9,  b=0.2,  a=0.20 },
         accent = { r=0.1,  g=1.0,  b=0.1,  a=1.0  },
         logo   = "|cff39e639⚔ Felsworn|r |cffFFD700Guide|r",
         textHex = "39e639",
         bg = { r=0.03, g=0.08, b=0.04, a=0.97 }
     },
     necromancer = {
-        border = { r=0.0,  g=0.8,  b=0.8,  a=0.25 },
+        border = { r=0.0,  g=0.8,  b=0.8,  a=0.20 },
         accent = { r=0.2,  g=0.9,  b=1.0,  a=1.0  },
         logo   = "|cff4dff4d⚔ Necro|r |cffFFD700Guide|r",
         textHex = "4dff4d",
         bg = { r=0.02, g=0.08, b=0.08, a=0.97 }
     },
     reaper = {
-        border = { r=0.7,  g=0.0,  b=0.8,  a=0.25 },
+        border = { r=0.7,  g=0.0,  b=0.8,  a=0.20 },
         accent = { r=0.8,  g=0.1,  b=1.0,  a=1.0  },
         logo   = "|cffb300b3⚔ Reaper|r |cffFFD700Guide|r",
         textHex = "b300b3",
         bg = { r=0.05, g=0.02, b=0.08, a=0.97 }
+    },
+    obsidian = {
+        border = { r=0.9,  g=0.7,  b=0.2,  a=0.20 },
+        accent = { r=1.0,  g=0.8,  b=0.1,  a=1.0  },
+        logo   = "|cffffcc00⚔ Obsidian|r |cffFFD700Guide|r",
+        textHex = "ffcc00",
+        bg = { r=0.04, g=0.04, b=0.04, a=0.97 }
+    },
+    cyberpunk = {
+        border = { r=1.0,  g=0.1,  b=0.6,  a=0.20 },
+        accent = { r=1.0,  g=0.2,  b=0.8,  a=1.0  },
+        logo   = "|cffff33aa⚔ Neon|r |cff00ffffGuide|r",
+        textHex = "ff33aa",
+        bg = { r=0.06, g=0.02, b=0.10, a=0.97 }
+    },
+    emerald = {
+        border = { r=0.0,  g=0.9,  b=0.4,  a=0.20 },
+        accent = { r=0.1,  g=1.0,  b=0.5,  a=1.0  },
+        logo   = "|cff11ff77⚔ Emerald|r |cffFFD700Guide|r",
+        textHex = "11ff77",
+        bg = { r=0.02, g=0.07, b=0.03, a=0.97 }
+    },
+    frozen = {
+        border = { r=0.2,  g=0.6,  b=1.0,  a=0.20 },
+        accent = { r=0.3,  g=0.8,  b=1.0,  a=1.0  },
+        logo   = "|cff55ccff⚔ Frozen|r |cffFFD700Guide|r",
+        textHex = "55ccff",
+        bg = { r=0.02, g=0.04, b=0.09, a=0.97 }
+    },
+    crimson = {
+        border = { r=0.9,  g=0.1,  b=0.1,  a=0.20 },
+        accent = { r=1.0,  g=0.2,  b=0.2,  a=1.0  },
+        logo   = "|cffff3333⚔ Crimson|r |cffFFD700Guide|r",
+        textHex = "ff3333",
+        bg = { r=0.06, g=0.02, b=0.02, a=0.97 }
     }
 }
 
 local function GetActiveTheme()
-    local activeClass = CoALevelGuideDB and CoALevelGuideDB.activeClass
-    if not activeClass or activeClass == "" then
-        activeClass = CoALevelGuide_Utils.GetClass():lower()
+    local theme = CoALevelGuideDB and CoALevelGuideDB.activeTheme or "default"
+    if theme == "default" then
+        local activeClass = CoALevelGuideDB and CoALevelGuideDB.activeClass
+        if not activeClass or activeClass == "" or activeClass == "auto" then
+            activeClass = CoALevelGuide_Utils.GetClass():lower()
+        end
+        return classThemes[activeClass] or classThemes.default
     end
-    return classThemes[activeClass] or classThemes.default
+    return classThemes[theme] or classThemes.default
 end
 
 
@@ -143,7 +182,7 @@ function CoALevelGuide_MainFrame.Create()
 
     -- Class Selector Dropdown on Header
     local classDropdown = CreateFrame("Frame", "CoALevelGuideHeaderClassDropdown", f, "UIDropDownMenuTemplate")
-    classDropdown:SetPoint("TOPRIGHT", f, "TOPRIGHT", -150, -8)
+    classDropdown:SetPoint("TOPRIGHT", f, "TOPRIGHT", -40, -8)
     UIDropDownMenu_SetWidth(classDropdown, 90)
     UIDropDownMenu_SetButtonWidth(classDropdown, 104)
 
@@ -189,8 +228,71 @@ function CoALevelGuide_MainFrame.Create()
     UIDropDownMenu_SetText(classDropdown, activeTexts[activeVal])
     f._headerDropdown = classDropdown
 
+    -- Theme Selector Dropdown on Header
+    local themeDropdown = CreateFrame("Frame", "CoALevelGuideHeaderThemeDropdown", f, "UIDropDownMenuTemplate")
+    themeDropdown:SetPoint("TOPRIGHT", f, "TOPRIGHT", -150, -8)
+    UIDropDownMenu_SetWidth(themeDropdown, 90)
+    UIDropDownMenu_SetButtonWidth(themeDropdown, 104)
+
+    local function ThemeDropdown_OnClick(self)
+        UIDropDownMenu_SetSelectedValue(themeDropdown, self.value)
+        CoALevelGuideDB.activeTheme = self.value
+        CoALevelGuide_MainFrame.UpdateTheme()
+        if CoAAT_CombatHUD and CoAAT_CombatHUD.RefreshLayout then
+            CoAAT_CombatHUD.RefreshLayout()
+        end
+    end
+
+    UIDropDownMenu_Initialize(themeDropdown, function(self, level)
+        local info = UIDropDownMenu_CreateInfo()
+        info.func = ThemeDropdown_OnClick
+
+        info.text = "Class Theme"
+        info.value = "default"
+        info.checked = (CoALevelGuideDB.activeTheme == "default" or CoALevelGuideDB.activeTheme == nil)
+        UIDropDownMenu_AddButton(info)
+
+        info.text = "|cffffcc00Obsidian|r"
+        info.value = "obsidian"
+        info.checked = (CoALevelGuideDB.activeTheme == "obsidian")
+        UIDropDownMenu_AddButton(info)
+
+        info.text = "|cffff33aaCyberpunk|r"
+        info.value = "cyberpunk"
+        info.checked = (CoALevelGuideDB.activeTheme == "cyberpunk")
+        UIDropDownMenu_AddButton(info)
+
+        info.text = "|cff11ff77Emerald|r"
+        info.value = "emerald"
+        info.checked = (CoALevelGuideDB.activeTheme == "emerald")
+        UIDropDownMenu_AddButton(info)
+
+        info.text = "|cff55ccffFrozen|r"
+        info.value = "frozen"
+        info.checked = (CoALevelGuideDB.activeTheme == "frozen")
+        UIDropDownMenu_AddButton(info)
+
+        info.text = "|cffff3333Crimson|r"
+        info.value = "crimson"
+        info.checked = (CoALevelGuideDB.activeTheme == "crimson")
+        UIDropDownMenu_AddButton(info)
+    end)
+
+    local activeThemeVal = CoALevelGuideDB.activeTheme or "default"
+    UIDropDownMenu_SetSelectedValue(themeDropdown, activeThemeVal)
+    local themeTexts = {
+        default = "Class Theme",
+        obsidian = "Obsidian",
+        cyberpunk = "Cyberpunk",
+        emerald = "Emerald",
+        frozen = "Frozen",
+        crimson = "Crimson"
+    }
+    UIDropDownMenu_SetText(themeDropdown, themeTexts[activeThemeVal] or "Class Theme")
+    f._themeDropdown = themeDropdown
+
     local level = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    level:SetPoint("TOPRIGHT", f, "TOPRIGHT", -40, -16)
+    level:SetPoint("LEFT", logo, "RIGHT", 14, 0)
     level:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
     level:SetText("|cffaaaaaa" .. (UnitName("player") or "Hero") .. " — Lvl " .. UnitLevel("player") .. "|r")
     f._levelText = level
@@ -415,79 +517,244 @@ function CoALevelGuide_MainFrame.SwitchTab(idx)
 end
 
 -- ─────────────────────────────────────────────
--- Zone Info Panel (Tab 3)
 -- ─────────────────────────────────────────────
+-- Dungeon Loot Dashboard Panel (Tab 4)
+-- ─────────────────────────────────────────────
+local dungeonLoot = {
+    rfc = {
+        name = "Ragefire Chasm", level = "15-21",
+        drops = {
+            { boss = "Oggleflint", item = "Oggleflint's Inspiration", type = "Staff", spec = "Necromancer", desc = "High intellect & spell power staff." },
+            { boss = "Taragaman", item = "Subterranean Fel-Core", type = "Reagent", spec = "Felsworn", desc = "Required for forging early Felsworn armor." },
+            { boss = "Taragaman", item = "Fiery Cord of the Underworld", type = "Belt", spec = "Felsworn", desc = "Increases Fire spell power and critical strike." }
+        }
+    },
+    wc = {
+        name = "Wailing Caverns", level = "17-24",
+        drops = {
+            { boss = "Verdan the Everliving", item = "Living Serpent-Scale Vest", type = "Chest", spec = "Reaper", desc = "High Agility S-tier armor for physical Reaper specs." },
+            { boss = "Mutanus the Devourer", item = "Spore-Covered Stave", type = "Staff", spec = "Necromancer", desc = "Great early spell power/spirit leveling staff." },
+            { boss = "Kresh", item = "Kresh's Backplate", type = "Shield", spec = "Felsworn", desc = "High armor shield for Felsworn tank specs." }
+        }
+    },
+    sfk = {
+        name = "Shadowfang Keep", level = "22-30",
+        drops = {
+            { boss = "Archmage Arugal", item = "Robes of Arugal", type = "Chest", spec = "Necromancer", desc = "S-tier leveling robes with high Intellect and Spell Power." },
+            { boss = "Archmage Arugal", item = "Arugal's Gift", type = "Neck", spec = "Reaper / Necro", desc = "Spell power neck that scales well into level 40." },
+            { boss = "Baron Silverlaine", item = "Baron Silverlaine's Seal", type = "Ring", spec = "PvP", desc = "Early PvP ring adding stamina and resilience." }
+        }
+    },
+    bfd = {
+        name = "Blackfathom Deeps", level = "24-32",
+        drops = {
+            { boss = "Aku'mai", item = "Strike of the Hydra", type = "2H Sword", spec = "Reaper", desc = "High physical damage with poison proc. Perfect for Reaper poison builds." },
+            { boss = "Aku'mai", item = "Deepfathom Ring", type = "Ring", spec = "Necromancer", desc = "Intellect and shadow spell power." }
+        }
+    },
+    gnomer = {
+        name = "Gnomeregan", level = "28-36",
+        drops = {
+            { boss = "Mekgineer Thermoplugg", item = "Thermoplugg's Left Arm", type = "2H Axe", spec = "Felsworn", desc = "High strength/stamina two-handed axe." },
+            { boss = "Crowd Pummel 9-60", item = "Manual Crowd Pummel", type = "2H Mace", spec = "Reaper", desc = "Haste proc, S-tier for physical attack speed." }
+        }
+    },
+    sm = {
+        name = "Scarlet Monastery", level = "32-44",
+        drops = {
+            { boss = "High Inquisitor Whitemane", item = "Whitemane's Chapeau", type = "Head", spec = "Necromancer", desc = "S-tier Intellect/Spirit headpiece." },
+            { boss = "Scarlet Commander Mograine", item = "Mograine's Might", type = "2H Mace", spec = "Felsworn", desc = "High crit rating 2H mace." },
+            { boss = "Herod", item = "Ravager", type = "2H Axe", spec = "Felsworn / Reaper", desc = "Spins the character in a whirlwind. Essential for leveling." },
+            { boss = "Herod", item = "Herod's Shoulder", type = "Shoulder", spec = "Reaper", desc = "Strength and critical strike leather shoulders." }
+        }
+    },
+    rfd = {
+        name = "Razorfen Downs", level = "35-46",
+        drops = {
+            { boss = "Amnennar the Coldbringer", item = "Coldrage Dagger", type = "Dagger", spec = "Reaper", desc = "Frost damage proc, S-tier leveling offhand." },
+            { boss = "Amnennar the Coldbringer", item = "Plaguebringer's Tunic", type = "Chest", spec = "Necromancer", desc = "High shadow spell power chestpiece." }
+        }
+    },
+    zf = {
+        name = "Zul'Farrak", level = "44-54",
+        drops = {
+            { boss = "Chief Sandscalp", item = "Sang'thraze the Deflector", type = "1H Sword", spec = "Felsworn / Reaper", desc = "Combine with Jang'thraze to forge Sul'thraze the Lasher." },
+            { boss = "Antu'sul", item = "Jang'thraze the Protector", type = "1H Sword", spec = "Felsworn / Reaper", desc = "Combine with Sang'thraze to forge Sul'thraze the Lasher." },
+            { boss = "Gahz'rilla", item = "Gahz'rilla Fang", type = "Dagger", spec = "Reaper", desc = "Very fast dagger with high critical rating." }
+        }
+    },
+    mara = {
+        name = "Maraudon", level = "46-55",
+        drops = {
+            { boss = "Princess Theradras", item = "Blackstone Ring", type = "Ring", spec = "Reaper", desc = "S-tier physical hit and attack power ring." },
+            { boss = "Princess Theradras", item = "Princess Theradras' Scepter", type = "2H Mace", spec = "Felsworn", desc = "High strength block two-handed mace." }
+        }
+    },
+    st = {
+        name = "Sunken Temple", level = "50-60",
+        drops = {
+            { boss = "Avatar of Hakkar", item = "Spire of Hakkar", type = "Staff", spec = "Necromancer", desc = "Highest spell power leveling staff." },
+            { boss = "Eranikus", item = "Dragon's Call", type = "1H Sword", spec = "Reaper", desc = "Proc summons a green dragon helper." }
+        }
+    },
+    brd = {
+        name = "Blackrock Depths", level = "52-60",
+        drops = {
+            { boss = "Emperor Dagran Thaurissan", item = "Ironfoe", type = "1H Mace", spec = "Reaper / Felsworn", desc = "Legendary proc for extra attacks. Elite physical BiS." },
+            { boss = "General Angerforge", item = "Hand of Justice", type = "Trinket", spec = "Reaper / Felsworn", desc = "Proc grants an extra attack. S-tier physical trinket." },
+            { boss = "Emperor Dagran Thaurissan", item = "Savage Gladiator Chain", type = "Chest", spec = "Reaper", desc = "S-tier physical crit/AP chain chest." }
+        }
+    },
+    scholo = {
+        name = "Scholomance", level = "58-60",
+        drops = {
+            { boss = "Darkmaster Gandling", item = "Darkmaster's Scourge Grimoire", type = "Offhand", spec = "Necromancer", desc = "Increases shadow minion damage and spell power." },
+            { boss = "Darkmaster Gandling", item = "Headmaster's Charge", type = "Staff", spec = "Necromancer / Reaper", desc = "Intellect staff with group buff proc." }
+        }
+    },
+    strat = {
+        name = "Stratholme", level = "58-60",
+        drops = {
+            { boss = "Baron Rivendare", item = "Book of the Dead", type = "Offhand", spec = "Necromancer", desc = "Summons a skeletal minion to fight for you." },
+            { boss = "Baron Rivendare", item = "Deathcharger's Reins", type = "Mount", spec = "Vanity", desc = "Ultra-rare skeletal warhorse mount." }
+        }
+    },
+    dm = {
+        name = "Dire Maul", level = "56-60",
+        drops = {
+            { boss = "King Gordok", item = "Barbarous Blade", type = "2H Sword", spec = "Felsworn / Reaper", desc = "High critical strike rating two-handed sword." },
+            { boss = "Alzzin the Wildshaper", item = "Mindtap Talisman", type = "Trinket", spec = "Necromancer", desc = "Trinket restoring mana/felfury over time." }
+        }
+    }
+}
+
 function CoALevelGuide_MainFrame.BuildZonePanel(parent)
-    local panel = CreateFrame("ScrollFrame", "CoALevelGuideZoneScroll", parent, "UIPanelScrollFrameTemplate")
+    -- Main outer container panel
+    local panel = CreateFrame("Frame", nil, parent)
     panel:SetAllPoints(parent)
 
-    local child = CreateFrame("Frame", nil, panel)
-    child:SetWidth(parent:GetWidth() - 24)
-    child:SetHeight(1) -- grows dynamically
-    panel:SetScrollChild(child)
+    -- Header Title
+    local title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    title:SetPoint("TOPLEFT", panel, "TOPLEFT", 12, -8)
+    title:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+    title:SetText("|cffFFD700Dungeon Loot Dashboard|r")
 
-    local yOff = -8
-    local faction = CoALevelGuide_Utils.GetFaction()
+    -- Scroll area for cards list below dropdown
+    local scrollFrame = CreateFrame("ScrollFrame", "CoALevelGuideDungeonScroll", panel, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -64)
+    scrollFrame:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -26, 8)
 
-    -- Header
-    local header = child:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    header:SetPoint("TOPLEFT", child, "TOPLEFT", 4, yOff)
-    header:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-    header:SetText("|cff00ccffLeveling Zones — 1 to 60|r")
-    yOff = yOff - 28
+    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+    scrollChild:SetWidth(parent:GetWidth() - 36)
+    scrollChild:SetHeight(1)
+    scrollFrame:SetScrollChild(scrollChild)
 
-    for _, zone in ipairs(CoALevelGuide_Zones) do
-        if zone.faction == "Both" or zone.faction == faction then
-            -- Zone header row
-            local zRow = child:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            zRow:SetPoint("TOPLEFT", child, "TOPLEFT", 4, yOff)
-            zRow:SetWidth(child:GetWidth() - 8)
-            zRow:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
-            zRow:SetJustifyH("LEFT")
-            local factionColor = (zone.faction == "Alliance") and "|cff5599ff" or
-                                 (zone.faction == "Horde")    and "|cffff4444" or "|cffaaaaaa"
-            zRow:SetText(factionColor .. "■|r |cffFFD700" .. zone.name .. "|r  |cffaaaaaa(Lvl " .. zone.minLevel .. "-" .. zone.maxLevel .. ")|r")
-            yOff = yOff - 20
+    -- Dropdown Selector
+    local dungeonDropdown = CreateFrame("Frame", "CoALevelGuideDungeonSelectDropdown", panel, "UIDropDownMenuTemplate")
+    dungeonDropdown:SetPoint("TOPLEFT", panel, "TOPLEFT", 12, -26)
+    UIDropDownMenu_SetWidth(dungeonDropdown, 160)
+    UIDropDownMenu_SetButtonWidth(dungeonDropdown, 174)
 
-            -- Description
-            local desc = child:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-            desc:SetPoint("TOPLEFT", child, "TOPLEFT", 14, yOff)
-            desc:SetWidth(child:GetWidth() - 18)
-            desc:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-            desc:SetJustifyH("LEFT")
-            desc:SetText("|cffcccccc" .. zone.description .. "|r")
-            yOff = yOff - (desc:GetStringHeight() + 4)
+    local dungeonKeys = { "rfc", "wc", "sfk", "bfd", "gnomer", "sm", "rfd", "zf", "mara", "st", "brd", "scholo", "strat", "dm" }
+    local activeDungeonKey = "rfc"
 
-            -- Tips
-            for _, tip in ipairs(zone.tips) do
-                local tipText = child:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-                tipText:SetPoint("TOPLEFT", child, "TOPLEFT", 20, yOff)
-                tipText:SetWidth(child:GetWidth() - 24)
-                tipText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-                tipText:SetJustifyH("LEFT")
-                tipText:SetText("|cff44aaff•|r |cffdddddd" .. tip .. "|r")
-                yOff = yOff - (tipText:GetStringHeight() + 2)
-            end
-
-            -- Hub / Flight info
-            local info = child:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-            info:SetPoint("TOPLEFT", child, "TOPLEFT", 14, yOff)
-            info:SetWidth(child:GetWidth() - 18)
-            info:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-            info:SetJustifyH("LEFT")
-            info:SetText("|cffaaaaaa✈ FP: |r|cffffd700" .. (zone.flightPath or "N/A") .. "|r  |cffaaaaaa🏠 Hub: |r|cff88ff88" .. (zone.mainTown or "N/A") .. "|r")
-            yOff = yOff - 20
-
-            -- Divider
-            local div = child:CreateTexture(nil, "OVERLAY")
-            div:SetSize(child:GetWidth() - 8, 1)
-            div:SetPoint("TOPLEFT", child, "TOPLEFT", 4, yOff)
-            div:SetTexture(C.separator.r, C.separator.g, C.separator.b, C.separator.a)
-            yOff = yOff - 10
+    local function RenderDungeonDrops()
+        -- Clear scroll child
+        for _, obj in ipairs({ scrollChild:GetChildren() }) do
+            obj:Hide()
+            obj:SetParent(nil)
         end
+        for _, obj in ipairs({ scrollChild:GetRegions() }) do
+            obj:Hide()
+        end
+
+        local dbEntry = dungeonLoot[activeDungeonKey]
+        if not dbEntry then return end
+
+        local yOff = -8
+
+        for idx, drop in ipairs(dbEntry.drops) do
+            -- Card frame container
+            local card = CreateFrame("Frame", nil, scrollChild)
+            card:SetSize(scrollChild:GetWidth() - 8, 54)
+            card:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 4, yOff)
+
+            -- Glassmorphic BG
+            local cbg = card:CreateTexture(nil, "BACKGROUND")
+            cbg:SetAllPoints()
+            cbg:SetTexture(0.06, 0.08, 0.16, 0.45)
+
+            -- Left border stripe matching recommended class/spec color
+            local border = card:CreateTexture(nil, "OVERLAY")
+            border:SetSize(3, 54)
+            border:SetPoint("LEFT", card, "LEFT", 0, 0)
+            
+            local cR, cG, cB = 0.5, 0.5, 0.5
+            if drop.spec:find("Necromancer") then
+                cR, cG, cB = 0.2, 0.9, 1.0
+            elseif drop.spec:find("Felsworn") then
+                cR, cG, cB = 0.2, 0.9, 0.2
+            elseif drop.spec:find("Reaper") then
+                cR, cG, cB = 0.8, 0.1, 1.0
+            end
+            border:SetTexture(cR, cG, cB, 0.85)
+
+            -- Boss & Item name info
+            local mainTxt = card:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            mainTxt:SetPoint("TOPLEFT", card, "TOPLEFT", 10, -6)
+            mainTxt:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+            
+            local epicColor = "|cffff8000" -- Epic orange for all notable drops
+            mainTxt:SetText(string.format("|cffaaaaaaBoss: %s  •  |r%s%s|r |cffcccccc(%s)|r", drop.boss, epicColor, drop.item, drop.type))
+
+            -- Spec suitability
+            local specTxt = card:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+            specTxt:SetPoint("TOPRIGHT", card, "TOPRIGHT", -10, -6)
+            specTxt:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+            specTxt:SetTextColor(cR, cG, cB, 1)
+            specTxt:SetText(drop.spec)
+
+            -- Description text
+            local descTxt = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            descTxt:SetPoint("TOPLEFT", mainTxt, "BOTTOMLEFT", 0, -4)
+            descTxt:SetWidth(card:GetWidth() - 20)
+            descTxt:SetJustifyH("LEFT")
+            descTxt:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+            descTxt:SetTextColor(0.8, 0.8, 0.8, 0.9)
+            descTxt:SetText(drop.desc)
+
+            yOff = yOff - 60
+        end
+
+        scrollChild:SetHeight(math.abs(yOff) + 12)
     end
 
-    child:SetHeight(math.abs(yOff) + 20)
+    local function Dropdown_OnClick(self)
+        UIDropDownMenu_SetSelectedValue(dungeonDropdown, self.value)
+        activeDungeonKey = self.value
+        RenderDungeonDrops()
+    end
+
+    UIDropDownMenu_Initialize(dungeonDropdown, function(self, level)
+        local info = UIDropDownMenu_CreateInfo()
+        info.func = Dropdown_OnClick
+
+        for _, k in ipairs(dungeonKeys) do
+            local entry = dungeonLoot[k]
+            if entry then
+                info.text = entry.name .. " (" .. entry.level .. ")"
+                info.value = k
+                info.checked = (activeDungeonKey == k)
+                UIDropDownMenu_AddButton(info)
+            end
+        end
+    end)
+
+    UIDropDownMenu_SetSelectedValue(dungeonDropdown, activeDungeonKey)
+    UIDropDownMenu_SetText(dungeonDropdown, dungeonLoot[activeDungeonKey].name)
+
+    RenderDungeonDrops()
+
     panel:Hide()
     return panel
 end
