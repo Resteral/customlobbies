@@ -8,6 +8,7 @@ CoADpsAndMobTracker_UI = {}
 local _frame = nil
 local _detailFrame = nil
 local activeTab = 1 -- 1 = DPS, 2 = Mobs
+local activeStat = "dps" -- "dps", "damage", "tanked", "healing"
 local selectedPlayerGUID = nil
 
 -- Standard WoW Class Colors
@@ -146,14 +147,59 @@ local function CreateMainFrame()
 
     -- ── Scroll Container for Content Rows ──
     local scroll = CreateFrame("ScrollFrame", "CoADpsAndMobTrackerScroll", f, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", f, "TOPLEFT", 6, -32)
+    scroll:SetPoint("TOPLEFT", f, "TOPLEFT", 6, -58)
     scroll:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -26, 6)
+    f._scroll = scroll
 
     -- Scroll Child
     local child = CreateFrame("Frame", nil, scroll)
     child:SetSize(218, 1) -- auto height
     scroll:SetScrollChild(child)
     f._scrollChild = child
+
+    -- Stat Selector Dropdown
+    local statDropdown = CreateFrame("Frame", "CoADpsAndMobTrackerStatDropdown", f, "UIDropDownMenuTemplate")
+    statDropdown:SetPoint("TOPLEFT", f, "TOPLEFT", -6, -28)
+    UIDropDownMenu_SetWidth(statDropdown, 140)
+
+    local function StatDropdown_OnClick(self)
+        UIDropDownMenu_SetSelectedValue(statDropdown, self.value)
+        activeStat = self.value
+        UIDropDownMenu_SetText(statDropdown, self.text)
+        CoADpsAndMobTracker_UI.Refresh()
+    end
+
+    UIDropDownMenu_Initialize(statDropdown, function(self, level)
+        local info = UIDropDownMenu_CreateInfo()
+        
+        info.text = "⚔ DPS (Damage/Sec)"
+        info.value = "dps"
+        info.func = StatDropdown_OnClick
+        info.checked = (activeStat == "dps")
+        UIDropDownMenu_AddButton(info, level)
+
+        info.text = "💥 Overall Damage"
+        info.value = "damage"
+        info.func = StatDropdown_OnClick
+        info.checked = (activeStat == "damage")
+        UIDropDownMenu_AddButton(info, level)
+
+        info.text = "🛡 Damage Tanked"
+        info.value = "tanked"
+        info.func = StatDropdown_OnClick
+        info.checked = (activeStat == "tanked")
+        UIDropDownMenu_AddButton(info, level)
+
+        info.text = "💚 Damage Healed"
+        info.value = "healing"
+        info.func = StatDropdown_OnClick
+        info.checked = (activeStat == "healing")
+        UIDropDownMenu_AddButton(info, level)
+    end)
+
+    UIDropDownMenu_SetSelectedValue(statDropdown, "dps")
+    UIDropDownMenu_SetText(statDropdown, "⚔ DPS (Damage/Sec)")
+    f._statDropdown = statDropdown
 
     _frame = f
 end
@@ -331,13 +377,17 @@ end
 function CoADpsAndMobTracker_UI.Refresh()
     if not _frame or not _frame:IsShown() then return end
 
-    -- Sync Tab visual headers
+    -- Sync Tab visual headers and dropdown visibility
     if activeTab == 1 then
         _frame._dpsTab._text:SetText("|cff00ccff[⚔ DPS]|r")
         _frame._mobTab._text:SetText("|cffaaaaaa👾 Mobs|r")
+        if _frame._statDropdown then _frame._statDropdown:Show() end
+        _frame._scroll:SetPoint("TOPLEFT", _frame, "TOPLEFT", 6, -58)
     else
         _frame._dpsTab._text:SetText("|cffaaaaaa⚔ DPS|r")
         _frame._mobTab._text:SetText("|cff00ccff[👾 Mobs]|r")
+        if _frame._statDropdown then _frame._statDropdown:Hide() end
+        _frame._scroll:SetPoint("TOPLEFT", _frame, "TOPLEFT", 6, -32)
     end
 
     local child = _frame._scrollChild
@@ -352,12 +402,26 @@ function CoADpsAndMobTracker_UI.Refresh()
     if activeTab == 1 then
         -- ── DPS MODE ──
         local list = {}
-        local highestDmg = 0
+        local highestVal = 0
         for guid, data in pairs(CoADpsAndMobTracker_Session.players) do
-            table.insert(list, { guid = guid, name = data.name, damage = data.damage, class = data.class })
-            if data.damage > highestDmg then highestDmg = data.damage end
+            local value = 0
+            if activeStat == "dps" then
+                value = CoADpsAndMobTracker_Engine.GetPlayerDPS(guid)
+            elseif activeStat == "damage" then
+                value = data.damage or 0
+            elseif activeStat == "tanked" then
+                value = data.tanked or 0
+            elseif activeStat == "healing" then
+                value = data.healing or 0
+            end
+
+            -- Only include players who have actual data for this stat
+            if value > 0 then
+                table.insert(list, { guid = guid, name = data.name, val = value, class = data.class, rawData = data })
+                if value > highestVal then highestVal = value end
+            end
         end
-        table.sort(list, function(a,b) return a.damage > b.damage end)
+        table.sort(list, function(a,b) return a.val > b.val end)
 
         for i, row in ipairs(list) do
             local rFrame = CreateFrame("Button", nil, child)
@@ -374,7 +438,7 @@ function CoADpsAndMobTracker_UI.Refresh()
             fill:SetPoint("LEFT", rFrame, "LEFT")
             fill:SetPoint("TOP", rFrame, "TOP")
             fill:SetPoint("BOTTOM", rFrame, "BOTTOM")
-            local pct = highestDmg > 0 and (row.damage / highestDmg) or 0
+            local pct = highestVal > 0 and (row.val / highestVal) or 0
             fill:SetWidth(218 * pct)
             local c = ClassColors[row.class] or { r=0.5, g=0.5, b=0.5 }
             fill:SetGradientAlpha("HORIZONTAL", c.r, c.g, c.b, 0.85, c.r * 0.4, c.g * 0.4, c.b * 0.4, 0.3)
@@ -385,13 +449,18 @@ function CoADpsAndMobTracker_UI.Refresh()
             nameStr:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
             nameStr:SetText(string.format("%d. %s", i, row.name))
 
-            -- Label text: damage / DPS
-            local dps = CoADpsAndMobTracker_Engine.GetPlayerDPS(row.guid)
-            local formattedVal = CoADpsAndMobTracker_Engine.FormatNumber(row.damage)
+            -- Label text: value
+            local formattedVal = CoADpsAndMobTracker_Engine.FormatNumber(row.val)
             local valueStr = rFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
             valueStr:SetPoint("RIGHT", rFrame, "RIGHT", -6, 0)
             valueStr:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-            valueStr:SetText(string.format("%s (%d)", formattedVal, dps))
+
+            if activeStat == "dps" then
+                local dmg = CoADpsAndMobTracker_Engine.FormatNumber(row.rawData.damage)
+                valueStr:SetText(string.format("%s (%d dps)", dmg, row.val))
+            else
+                valueStr:SetText(formattedVal)
+            end
 
             -- Tooltip on hover
             rFrame:SetScript("OnEnter", function(self)
@@ -400,11 +469,13 @@ function CoADpsAndMobTracker_UI.Refresh()
                 local hex = GetClassHexColor(row.class)
                 GameTooltip:AddLine("|c" .. hex .. row.name .. "|r")
                 GameTooltip:AddDoubleLine("Class:", "|c" .. hex .. row.class .. "|r")
-                GameTooltip:AddDoubleLine("Total Damage:", CoADpsAndMobTracker_Engine.FormatNumber(row.damage) .. " (" .. row.damage .. ")")
+                GameTooltip:AddDoubleLine("Total Damage:", CoADpsAndMobTracker_Engine.FormatNumber(row.rawData.damage) .. " (" .. row.rawData.damage .. ")")
                 local dps = CoADpsAndMobTracker_Engine.GetPlayerDPS(row.guid)
                 GameTooltip:AddDoubleLine("DPS:", tostring(dps))
-                local share = highestDmg > 0 and (row.damage / highestDmg * 100) or 0
-                GameTooltip:AddDoubleLine("Damage Share:", string.format("%.1f%%", share))
+                GameTooltip:AddDoubleLine("Damage Tanked (Taken):", CoADpsAndMobTracker_Engine.FormatNumber(row.rawData.tanked or 0))
+                GameTooltip:AddDoubleLine("Damage Healed:", CoADpsAndMobTracker_Engine.FormatNumber(row.rawData.healing or 0))
+                local share = highestVal > 0 and (row.val / highestVal * 100) or 0
+                GameTooltip:AddDoubleLine("Stat Share:", string.format("%.1f%%", share))
                 GameTooltip:AddLine(" ")
                 GameTooltip:AddLine("|cffFFD700Left-Click to toggle spell details|r")
                 GameTooltip:Show()
@@ -432,7 +503,7 @@ function CoADpsAndMobTracker_UI.Refresh()
             local empty = child:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
             empty:SetPoint("TOPLEFT", child, "TOPLEFT", 6, -10)
             empty:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-            empty:SetText("|cffaaaaaa[No combat damage recorded]|r")
+            empty:SetText("|cffaaaaaa[No combat stats recorded]|r")
             yOff = -30
         end
 

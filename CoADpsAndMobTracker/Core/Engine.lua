@@ -193,19 +193,82 @@ end
 -- Combat Log Parsing
 -- ─────────────────────────────────────────────
 function CoADpsAndMobTracker_Engine.OnCLEU(...)
-    local ts, event, _, srcGUID, srcName, srcFlags, _, destGUID, destName, _, _ = ...
+    local ts, event, _, srcGUID, srcName, srcFlags, _, destGUID, destName, destFlags, _ = ...
     srcFlags = srcFlags or 0
+    destFlags = destFlags or 0
 
     -- Check if source is player, player's pet, or a group member
     local isPlayer = (srcGUID == playerGUID)
     local isPet = (bit.band(srcFlags, COMBATLOG_OBJECT_TYPE_PET) ~= 0 and bit.band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) ~= 0)
     local isGroup = (bit.band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_PARTY) ~= 0 or bit.band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_RAID) ~= 0)
 
-    if not (isPlayer or isPet or isGroup) then return end
+    local isDestPlayer = (destGUID == playerGUID)
+    local isDestGroup = (bit.band(destFlags, COMBATLOG_OBJECT_AFFILIATION_PARTY) ~= 0 or bit.band(destFlags, COMBATLOG_OBJECT_AFFILIATION_RAID) ~= 0)
 
-    -- Extract damage details
+    -- If combat timer hasn't started, start it on any player/group action
+    if (isPlayer or isPet or isGroup or isDestPlayer or isDestGroup) and not CoADpsAndMobTracker_Session.startTime then
+        CoADpsAndMobTracker_Session.startTime = GetTime()
+    end
+
+    -- 1. HEALING TRACKING
+    if event == "SPELL_HEAL" or event == "SPELL_PERIODIC_HEAL" then
+        if not (isPlayer or isPet or isGroup) then return end
+        local spellName = select(13, ...) or "Unknown Heal"
+        local amount = select(15, ...) or 0
+        local overheal = select(16, ...) or 0
+        local isCrit = select(18, ...) or false
+
+        local healActual = amount - overheal
+        if healActual <= 0 then return end
+
+        local trackerGUID = srcGUID
+        local trackerName = srcName
+        if isPet then
+            trackerGUID = playerGUID
+            trackerName = UnitName("player") .. " (Pet)"
+        end
+
+        -- Get or create player log
+        if not CoADpsAndMobTracker_Session.players[trackerGUID] then
+            local _, classToken = UnitClass(isPlayer and "player" or srcName)
+            CoADpsAndMobTracker_Session.players[trackerGUID] = {
+                name = trackerName,
+                class = classToken or "WARRIOR",
+                damage = 0,
+                healing = 0,
+                tanked = 0,
+                spells = {}
+            }
+        end
+
+        local pLog = CoADpsAndMobTracker_Session.players[trackerGUID]
+        pLog.healing = pLog.healing + healActual
+
+        -- Update Spell details
+        if not pLog.spells[spellName] then
+            pLog.spells[spellName] = {
+                damage = 0, -- heals count as damage in this nested table to reuse details UI!
+                hits = 0,
+                crits = 0,
+                min = 9999999,
+                max = 0
+            }
+        end
+        local sLog = pLog.spells[spellName]
+        sLog.damage = sLog.damage + healActual
+        sLog.hits = sLog.hits + 1
+        if isCrit then sLog.crits = sLog.crits + 1 end
+        if healActual < sLog.min then sLog.min = healActual end
+        if healActual > sLog.max then sLog.max = healActual end
+
+        if CoADpsAndMobTracker_UI and CoADpsAndMobTracker_UI.Refresh then
+            CoADpsAndMobTracker_UI.Refresh()
+        end
+        return
+    end
+
+    -- 2. DAMAGE TRACKING (DONE & TAKEN)
     local amount, spellName, isCrit = 0, nil, false
-
     if event == "SWING_DAMAGE" then
         amount = select(12, ...) or select(9, ...)
         spellName = "Melee Swing"
@@ -218,59 +281,72 @@ function CoADpsAndMobTracker_Engine.OnCLEU(...)
 
     if not amount or type(amount) ~= "number" or amount <= 0 then return end
     if not spellName then spellName = "Unknown Spell" end
-
-    -- Register target if it's an NPC
-    RegisterMob(destGUID, destName)
-
-    -- If combat timer hasn't started, start it
-    if not CoADpsAndMobTracker_Session.startTime then
-        CoADpsAndMobTracker_Session.startTime = GetTime()
+    -- Track Damage Tanked (Damage Taken by player/group)
+    if isDestPlayer or isDestGroup then
+        if not CoADpsAndMobTracker_Session.players[destGUID] then
+            local _, classToken = UnitClass(isDestPlayer and "player" or destName)
+            CoADpsAndMobTracker_Session.players[destGUID] = {
+                name = destName,
+                class = classToken or "WARRIOR",
+                damage = 0,
+                healing = 0,
+                tanked = 0,
+                spells = {}
+            }
+        end
+        local pLog = CoADpsAndMobTracker_Session.players[destGUID]
+        pLog.tanked = pLog.tanked + amount
     end
 
-    -- Identify owner (attribute pet damage directly to player for simplicity, or keep distinct)
-    local trackerGUID = srcGUID
-    local trackerName = srcName
-    if isPet then
-        trackerGUID = playerGUID
-        trackerName = UnitName("player") .. " (Pet)"
+    -- Track Damage Done
+    if isPlayer or isPet or isGroup then
+        -- Register target NPC
+        RegisterMob(destGUID, destName)
+
+        local trackerGUID = srcGUID
+        local trackerName = srcName
+        if isPet then
+            trackerGUID = playerGUID
+            trackerName = UnitName("player") .. " (Pet)"
+        end
+
+        CoADpsAndMobTracker_Session.totalDamage = CoADpsAndMobTracker_Session.totalDamage + amount
+
+        if not CoADpsAndMobTracker_Session.players[trackerGUID] then
+            local _, classToken = UnitClass(isPlayer and "player" or srcName)
+            CoADpsAndMobTracker_Session.players[trackerGUID] = {
+                name = trackerName,
+                class = classToken or "WARRIOR",
+                damage = 0,
+                healing = 0,
+                tanked = 0,
+                spells = {}
+            }
+        end
+
+        local pLog = CoADpsAndMobTracker_Session.players[trackerGUID]
+        pLog.damage = pLog.damage + amount
+
+        -- Update Spell details
+        if not pLog.spells[spellName] then
+            pLog.spells[spellName] = {
+                damage = 0,
+                hits = 0,
+                crits = 0,
+                min = 9999999,
+                max = 0
+            }
+        end
+
+        local sLog = pLog.spells[spellName]
+        sLog.damage = sLog.damage + amount
+        sLog.hits = sLog.hits + 1
+        if isCrit then
+            sLog.crits = sLog.crits + 1
+        end
+        if amount < sLog.min then sLog.min = amount end
+        if amount > sLog.max then sLog.max = amount end
     end
-
-    -- Update session total
-    CoADpsAndMobTracker_Session.totalDamage = CoADpsAndMobTracker_Session.totalDamage + amount
-
-    -- Get or create player log
-    if not CoADpsAndMobTracker_Session.players[trackerGUID] then
-        local _, classToken = UnitClass(isPlayer and "player" or srcName)
-        CoADpsAndMobTracker_Session.players[trackerGUID] = {
-            name = trackerName,
-            class = classToken or "WARRIOR",
-            damage = 0,
-            spells = {}
-        }
-    end
-
-    local pLog = CoADpsAndMobTracker_Session.players[trackerGUID]
-    pLog.damage = pLog.damage + amount
-
-    -- Update Spell details
-    if not pLog.spells[spellName] then
-        pLog.spells[spellName] = {
-            damage = 0,
-            hits = 0,
-            crits = 0,
-            min = 9999999,
-            max = 0
-        }
-    end
-
-    local sLog = pLog.spells[spellName]
-    sLog.damage = sLog.damage + amount
-    sLog.hits = sLog.hits + 1
-    if isCrit then
-        sLog.crits = sLog.crits + 1
-    end
-    if amount < sLog.min then sLog.min = amount end
-    if amount > sLog.max then sLog.max = amount end
 
     -- Trigger UI updates
     if CoADpsAndMobTracker_UI and CoADpsAndMobTracker_UI.Refresh then
