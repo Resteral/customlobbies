@@ -155,7 +155,9 @@ function CoAAT_PlayerCard.UpdateTarget()
     if _model then
         _model:ClearModel()
         _model:SetUnit("target")
-        _model:SetPortraitZoom(0.8)
+        if _model.SetPortraitZoom then
+            _model:SetPortraitZoom(0.8)
+        end
         _model:SetPosition(0, 0, 0)
         _model:SetRotation(0)
     end
