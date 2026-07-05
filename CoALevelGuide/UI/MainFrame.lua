@@ -177,10 +177,24 @@ function CoALevelGuide_MainFrame.Create()
     AddHeaderGradient(f)
 
     -- ── HEADER ──
+    -- 3D Spinning Character bust logo icon
+    local logoModel = CreateFrame("PlayerModel", nil, f)
+    logoModel:SetSize(36, 36)
+    logoModel:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -5)
+    logoModel:SetUnit("player")
+    logoModel:SetCamera(0)
+    
+    local rot = 0
+    logoModel:SetScript("OnUpdate", function(self, elapsed)
+        rot = rot + elapsed * 0.4
+        self:SetRotation(rot)
+    end)
+    f._logoModel = logoModel
+
     local logo = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    logo:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -12)
+    logo:SetPoint("LEFT", logoModel, "RIGHT", 6, 0)
     logo:SetText("|cff00ccff⚔ CoA|r |cffFFD700Lvl Guide|r")
-    logo:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+    logo:SetFont("Fonts\\FRIZQT__.TTF", 17, "OUTLINE")
     f._logoText = logo
 
     -- Class Selector Dropdown on Header

@@ -14,10 +14,80 @@ local _guildText = nil
 local _rankText = nil
 local _pvpStatsText = nil
 
+local function StyleNameplate(frame)
+    if not frame or frame.styledCoA then return end
+
+    local healthBar, castBar
+    local children = { frame:GetChildren() }
+    for _, child in ipairs(children) do
+        local objType = child:GetObjectType()
+        if objType == "StatusBar" then
+            if not healthBar then
+                healthBar = child
+            else
+                castBar = child
+            end
+        end
+    end
+
+    if healthBar then
+        local tex = healthBar:GetStatusBarTexture()
+        if tex then
+            tex:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+        end
+
+        if not healthBar.bg then
+            local bg = healthBar:CreateTexture(nil, "BACKGROUND")
+            bg:SetAllPoints()
+            bg:SetTexture(0.04, 0.04, 0.08, 0.6)
+            healthBar.bg = bg
+        end
+
+        if castBar then
+            local cTex = castBar:GetStatusBarTexture()
+            if cTex then
+                cTex:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+            end
+            if not castBar.bg then
+                local bg = castBar:CreateTexture(nil, "BACKGROUND")
+                bg:SetAllPoints()
+                bg:SetTexture(0.04, 0.04, 0.08, 0.6)
+                castBar.bg = bg
+            end
+        end
+
+        frame.styledCoA = true
+    end
+end
+
+local function StyleAllNameplates()
+    local kids = { WorldFrame:GetChildren() }
+    for _, frame in ipairs(kids) do
+        if frame:IsShown() and not frame:GetName() then
+            local regions = { frame:GetRegions() }
+            local isNameplate = false
+            for _, region in ipairs(regions) do
+                if region:GetObjectType() == "Texture" then
+                    local texPath = region:GetTexture()
+                    if texPath and (string.find(texPath, "Nameplate") or string.find(texPath, "TargetFrame")) then
+                        isNameplate = true
+                        break
+                    end
+                end
+            end
+            if isNameplate then
+                StyleNameplate(frame)
+            end
+        end
+    end
+end
+
 local function FindTargetNameplate()
     if not UnitExists("target") then return nil end
     local targetName = UnitName("target")
     if not targetName then return nil end
+
+    StyleAllNameplates()
 
     local kids = { WorldFrame:GetChildren() }
     for _, frame in ipairs(kids) do
