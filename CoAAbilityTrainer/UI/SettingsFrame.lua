@@ -331,14 +331,28 @@ function CoAAT_SettingsFrame.Build()
     f._rotSummary = rotSummary
 
     -- ── Bottom Button (The Single Setup Button) ──
+    -- ── Bottom Buttons ──
     local saveBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    saveBtn:SetSize(352, 32)
-    saveBtn:SetPoint("BOTTOM", f, "BOTTOM", 0, 12)
+    saveBtn:SetSize(220, 32)
+    saveBtn:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 14, 12)
     saveBtn:SetText("⚡ Save & Setup Hotbar")
     saveBtn:SetScript("OnClick", function()
         CoAAT_SettingsFrame.SaveAndSetup()
     end)
     f._saveBtn = saveBtn
+
+    local resetBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+    resetBtn:SetSize(122, 32)
+    resetBtn:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -14, 12)
+    resetBtn:SetText("↺ Reset Layout")
+    resetBtn:SetScript("OnClick", function()
+        if CoAAT_DB then
+            CoAAT_DB.positions = {}
+            print("|cff00ccff[CoAAT] HUD layouts reset to default!|r")
+            CoAAT_CombatHUD.RefreshLayout()
+        end
+    end)
+    f._resetBtn = resetBtn
 
     f:Hide()
     _frame = f

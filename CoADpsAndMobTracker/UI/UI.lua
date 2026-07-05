@@ -292,7 +292,7 @@ local function RenderDetail(guid)
         fill:SetPoint("BOTTOM", rFrame, "BOTTOM")
         local pct = pLog.damage > 0 and (item.damage / pLog.damage) or 0
         fill:SetWidth(198 * pct)
-        fill:SetTexture(0.3, 0.1, 0.5, 0.7)
+        fill:SetGradientAlpha("HORIZONTAL", 0.4, 0.2, 0.7, 0.85, 0.15, 0.05, 0.3, 0.3)
 
         -- Spell Name & details
         local nameStr = rFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -364,6 +364,11 @@ function CoADpsAndMobTracker_UI.Refresh()
             rFrame:SetSize(218, 22)
             rFrame:SetPoint("TOPLEFT", child, "TOPLEFT", 0, yOff)
 
+            -- Progress bar row backdrop
+            local rowBG = rFrame:CreateTexture(nil, "BACKGROUND", nil, -1)
+            rowBG:SetAllPoints()
+            rowBG:SetTexture(0, 0, 0, 0.2)
+
             -- Progress bar fill (class colored)
             local fill = rFrame:CreateTexture(nil, "BACKGROUND")
             fill:SetPoint("LEFT", rFrame, "LEFT")
@@ -372,7 +377,7 @@ function CoADpsAndMobTracker_UI.Refresh()
             local pct = highestDmg > 0 and (row.damage / highestDmg) or 0
             fill:SetWidth(218 * pct)
             local c = ClassColors[row.class] or { r=0.5, g=0.5, b=0.5 }
-            fill:SetTexture(c.r, c.g, c.b, 0.7)
+            fill:SetGradientAlpha("HORIZONTAL", c.r, c.g, c.b, 0.85, c.r * 0.4, c.g * 0.4, c.b * 0.4, 0.3)
 
             -- Label text: name and rank
             local nameStr = rFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -464,7 +469,7 @@ function CoADpsAndMobTracker_UI.Refresh()
             local hpPct = mob.maxHp > 0 and (mob.hp / mob.maxHp) or 0
             fill:SetWidth((218 - 4) * hpPct)
             -- HP color goes from green to red based on health percentage
-            fill:SetTexture(1 - hpPct, hpPct, 0.0, 0.35)
+            fill:SetGradientAlpha("HORIZONTAL", 1 - hpPct, hpPct, 0.0, 0.65, (1 - hpPct) * 0.4, hpPct * 0.4, 0.0, 0.2)
 
             -- Mob name and target overlay
             local nameStr = rFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")

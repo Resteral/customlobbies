@@ -66,31 +66,80 @@ function CoAAT_CombatHUD.Build()
     dragHint:SetText("|cff00ccffCoA Ability Trainer|r\n|cffaaaaaaDrag to move. Disappears in combat.|r")
     hud._dragHint = dragHint
 
+    local function MakeSectionDraggable(section, name, labelText)
+        section:EnableMouse(true)
+        section:SetMovable(true)
+        section:RegisterForDrag("LeftButton")
+        
+        -- Section drag border & label
+        local border = CreateFrame("Frame", nil, section)
+        border:SetAllPoints()
+        section._dragBorder = border
+
+        local bg = border:CreateTexture(nil, "BACKGROUND")
+        bg:SetAllPoints()
+        bg:SetTexture(0.0, 0.4, 0.8, 0.08)
+
+        local function drawBorderLine(point1, point2, w, h)
+            local t = border:CreateTexture(nil, "OVERLAY")
+            t:SetTexture(0.0, 0.5, 1.0, 0.4)
+            t:SetPoint(point1)
+            t:SetPoint(point2)
+            if w then t:SetWidth(w) else t:SetHeight(h) end
+        end
+        drawBorderLine("TOPLEFT", "TOPRIGHT", nil, 1.2)
+        drawBorderLine("BOTTOMLEFT", "BOTTOMRIGHT", nil, 1.2)
+        drawBorderLine("TOPLEFT", "BOTTOMLEFT", 1.2, nil)
+        drawBorderLine("TOPRIGHT", "BOTTOMRIGHT", 1.2, nil)
+
+        local lbl = border:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        lbl:SetPoint("CENTER", border, "CENTER", 0, 0)
+        lbl:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+        lbl:SetText("|cff00ccff" .. labelText .. "|r")
+
+        section:SetScript("OnDragStart", function(self)
+            if not InCombatLockdown() then self:StartMoving() end
+        end)
+        section:SetScript("OnDragStop", function(self)
+            self:StopMovingOrSizing()
+            local pt, _, relPt, x, y = self:GetPoint()
+            if CoAAT_DB then
+                if not CoAAT_DB.positions then CoAAT_DB.positions = {} end
+                CoAAT_DB.positions[name] = { pt = pt, relPt = relPt, x = x, y = y }
+            end
+        end)
+    end
+
     -- ── Section containers ──
 
     -- 1. Rotation Helper (Top suggested floating icon, 50px)
     local rotSection = CreateFrame("Frame", nil, hud)
     rotSection:SetSize(HUD_W, 50)
+    MakeSectionDraggable(rotSection, "rotSection", "Rotation Helper (Drag)")
     hud._rotSection = rotSection
 
     -- 2. Aura grid (Main horizontal row, 34px)
     local auraSection = CreateFrame("Frame", nil, hud)
     auraSection:SetSize(HUD_W, 34)
+    MakeSectionDraggable(auraSection, "auraSection", "Aura Tracker (Drag)")
     hud._auraSection = auraSection
 
     -- 3. Resource bar (Below Auras, 14px)
     local resSection = CreateFrame("Frame", nil, hud)
     resSection:SetSize(HUD_W, 14)
+    MakeSectionDraggable(resSection, "resSection", "Resource Bar (Drag)")
     hud._resSection = resSection
 
     -- 4. Casting Bar (Below Resource, 20px)
     local castSection = CreateFrame("Frame", nil, hud)
     castSection:SetSize(HUD_W, 20)
+    MakeSectionDraggable(castSection, "castSection", "Casting Bar (Drag)")
     hud._castSection = castSection
 
     -- 5. Cooldown strip (Bottom, 44px)
     local cdSection = CreateFrame("Frame", nil, hud)
     cdSection:SetSize(HUD_W, 44)
+    MakeSectionDraggable(cdSection, "cdSection", "Cooldown Bar (Drag)")
     hud._cdSection = cdSection
 
     -- Build sub-panels inside their sections
@@ -105,12 +154,14 @@ function CoAAT_CombatHUD.Build()
         CoAAT_Engine.OnUpdate(dt)
         
         -- Hide drag backgrounds during combat
-        if CoAAT_Engine.IsInCombat() then
+        local inCombat = CoAAT_Engine.IsInCombat()
+        local hideBorder = (CoAAT_DB and CoAAT_DB.hideDragBorder) or inCombat
+
+        if inCombat then
             self._dragBG:SetAlpha(0)
             self._dragHint:SetAlpha(0)
             if self._borderFrame then self._borderFrame:Hide() end
         else
-            local hideBorder = (CoAAT_DB and CoAAT_DB.hideDragBorder)
             self._dragBG:SetAlpha(hideBorder and 0 or 1)
             self._dragHint:SetAlpha(hideBorder and 0 or 1)
             if self._borderFrame then
@@ -118,6 +169,16 @@ function CoAAT_CombatHUD.Build()
                     self._borderFrame:Hide()
                 else
                     self._borderFrame:Show()
+                end
+            end
+        end
+
+        for _, section in ipairs({ self._rotSection, self._auraSection, self._resSection, self._castSection, self._cdSection }) do
+            if section and section._dragBorder then
+                if hideBorder then
+                    section._dragBorder:Hide()
+                else
+                    section._dragBorder:Show()
                 end
             end
         end
@@ -155,10 +216,26 @@ function CoAAT_CombatHUD.RefreshLayout()
     -- Determine layout Y offsets dynamically (preventing blank gaps)
     local yOffset = -30
 
+    local function AlignSection(section, name, defaultY)
+        section:ClearAllPoints()
+        if CoAAT_DB and CoAAT_DB.positions and CoAAT_DB.positions[name] then
+            local pos = CoAAT_DB.positions[name]
+            section:SetParent(UIParent)
+            section:SetPoint(pos.pt, UIParent, pos.relPt, pos.x, pos.y)
+            section:SetScale(db.hudScale or 1.0)
+            section:SetAlpha(db.hudAlpha or 1.0)
+        else
+            section:SetParent(hud)
+            section:SetPoint("TOP", hud, "TOP", 0, defaultY)
+            section:SetScale(1.0)
+            section:SetAlpha(1.0)
+        end
+    end
+
     -- 1. Rotation Helper (Floating Suggested Action)
     if db.showRotHelper and hud._rotSection then
         hud._rotSection:Show()
-        hud._rotSection:SetPoint("TOP", hud, "TOP", 0, yOffset)
+        AlignSection(hud._rotSection, "rotSection", yOffset)
         yOffset = yOffset - 50 - 4
     else
         if hud._rotSection then hud._rotSection:Hide() end
@@ -167,7 +244,7 @@ function CoAAT_CombatHUD.RefreshLayout()
     -- 2. Aura Display (Main Row)
     if db.showAuras and hud._auraSection then
         hud._auraSection:Show()
-        hud._auraSection:SetPoint("TOP", hud, "TOP", 0, yOffset)
+        AlignSection(hud._auraSection, "auraSection", yOffset)
         yOffset = yOffset - 34 - 2
     else
         if hud._auraSection then hud._auraSection:Hide() end
@@ -176,7 +253,7 @@ function CoAAT_CombatHUD.RefreshLayout()
     -- 3. Resource Bar (Segmented)
     if db.showResourceBar and hud._resSection then
         hud._resSection:Show()
-        hud._resSection:SetPoint("TOP", hud, "TOP", 0, yOffset)
+        AlignSection(hud._resSection, "resSection", yOffset)
         yOffset = yOffset - 14 - 4
     else
         if hud._resSection then hud._resSection:Hide() end
@@ -185,14 +262,14 @@ function CoAAT_CombatHUD.RefreshLayout()
     -- 4. Casting Bar (Cast/GCD tracker)
     if hud._castSection then
         hud._castSection:Show()
-        hud._castSection:SetPoint("TOP", hud, "TOP", 0, yOffset)
+        AlignSection(hud._castSection, "castSection", yOffset)
         yOffset = yOffset - 20 - 4
     end
 
     -- 5. Cooldowns (Bottom Row)
     if db.showCooldowns and hud._cdSection then
         hud._cdSection:Show()
-        hud._cdSection:SetPoint("TOP", hud, "TOP", 0, yOffset)
+        AlignSection(hud._cdSection, "cdSection", yOffset)
         yOffset = yOffset - 44 - 4
     else
         if hud._cdSection then hud._cdSection:Hide() end
