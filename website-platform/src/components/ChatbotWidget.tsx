@@ -41,7 +41,7 @@ export default function ChatbotWidget({ themeColor = "#3b82f6" }: { themeColor?:
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim()) return;
     handleSubmit(e);
