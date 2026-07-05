@@ -19,6 +19,7 @@ Core\ResourceBar.lua
 UI\AuraDisplay.lua
 UI\RotationHelper.lua
 UI\CastingBar.lua
+UI\TargetHeadbar.lua
 UI\CombatHUD.lua
 UI\TutorialPanel.lua
 UI\SettingsFrame.lua

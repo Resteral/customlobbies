@@ -84,6 +84,12 @@ function CoAAT_CombatHUD.Build()
 
     -- ── Section containers ──
 
+    -- 0. Target Headbar (Top, 44px)
+    local targetSection = CreateFrame("Frame", nil, hud)
+    targetSection:SetSize(HUD_W, 44)
+    MakeSectionDraggable(targetSection, "targetSection", "Target Headbar (Drag)")
+    hud._targetSection = targetSection
+
     -- 1. Rotation Helper (Top suggested floating icon, 50px)
     local rotSection = CreateFrame("Frame", nil, hud)
     rotSection:SetSize(HUD_W, 50)
@@ -115,6 +121,7 @@ function CoAAT_CombatHUD.Build()
     hud._cdSection = cdSection
 
     -- Build sub-panels inside their sections
+    CoAAT_TargetHeadbar.Build(targetSection)
     CoAAT_RotationHelper.Build(rotSection)
     CoAAT_AuraDisplay.Build(auraSection)
     CoAAT_ResourceBar.Build(resSection, 0, -6)
@@ -145,7 +152,7 @@ function CoAAT_CombatHUD.Build()
             end
         end
 
-        for _, section in ipairs({ self._rotSection, self._auraSection, self._resSection, self._castSection, self._cdSection }) do
+        for _, section in ipairs({ self._targetSection, self._rotSection, self._auraSection, self._resSection, self._castSection, self._cdSection }) do
             if section and section._dragBorder then
                 if hideBorder then
                     section._dragBorder:Hide()
@@ -202,6 +209,13 @@ function CoAAT_CombatHUD.RefreshLayout()
             section:SetScale(1.0)
             section:SetAlpha(1.0)
         end
+    end
+
+    -- 0. Target Headbar (Top target frame)
+    if hud._targetSection then
+        hud._targetSection:Show()
+        AlignSection(hud._targetSection, "targetSection", yOffset)
+        yOffset = yOffset - 44 - 4
     end
 
     -- 1. Rotation Helper (Floating Suggested Action)
