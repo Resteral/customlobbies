@@ -14,14 +14,32 @@ export async function GET(
   const supabase = await createClient();
 
   // Find the site by URL
-  const { data: site, error } = await supabase
+  let site: any = null;
+  const { data: initialSite, error: initialError } = await supabase
     .from('sites')
     .select('id, user_id, html_content, status, is_verified_secure, is_verified_human_review')
     .eq('url', url)
     .single();
 
-  if (error || !site) {
-    return new NextResponse('Site not found', { status: 404 });
+  if (initialError) {
+    // Graceful fallback if columns do not exist in schema yet
+    const { data: fallbackSite, error: fallbackError } = await supabase
+      .from('sites')
+      .select('id, user_id, html_content, status')
+      .eq('url', url)
+      .single();
+
+    if (fallbackError || !fallbackSite) {
+      return new NextResponse('Site not found', { status: 404 });
+    }
+
+    site = {
+      ...fallbackSite,
+      is_verified_secure: true,
+      is_verified_human_review: false
+    };
+  } else {
+    site = initialSite;
   }
 
   // If no html content exists (like for mock sites generated before Phase 5)

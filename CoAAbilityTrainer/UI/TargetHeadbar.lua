@@ -31,6 +31,17 @@ local function FindTargetNameplate()
     return nil
 end
 
+local function GetNameplateHealthBar(nameplate)
+    if not nameplate then return nil end
+    local children = { nameplate:GetChildren() }
+    for _, child in ipairs(children) do
+        if child:GetObjectType() == "StatusBar" then
+            return child
+        end
+    end
+    return nil
+end
+
 function CoAAT_TargetHeadbar.Build(parent)
     local f = CreateFrame("Frame", nil, parent)
     f:SetSize(400, 44)
@@ -40,6 +51,7 @@ function CoAAT_TargetHeadbar.Build(parent)
     local bg = f:CreateTexture(nil, "BACKGROUND")
     bg:SetAllPoints()
     bg:SetTexture(0.03, 0.05, 0.12, 0.05)
+    f._bg = bg
     if bg.SetGradientAlpha then
         bg:SetGradientAlpha("HORIZONTAL", 0.03, 0.05, 0.12, 0.05, 0.03, 0.05, 0.12, 0.0)
     end
@@ -202,14 +214,87 @@ function CoAAT_TargetHeadbar.Build(parent)
             timeSinceLast = 0
             if CoAAT_DB and CoAAT_DB.attachToNameplate ~= false then
                 local np = FindTargetNameplate()
-                if np then
+                local npHP = GetNameplateHealthBar(np)
+                if npHP then
+                    -- Build directly off the nameplate health bar!
+                    _healthBar:Hide()
+                    if _healthText then _healthText:Hide() end
+                    if self._mpBar then self._mpBar:Hide() end
+                    if _nameText then _nameText:Hide() end
+                    if _classifText then _classifText:Hide() end
+                    if self._border then self._border:Hide() end
+                    if self._bg then self._bg:Hide() end
+
+                    if _model then
+                        _model:ClearAllPoints()
+                        _model:SetPoint("RIGHT", npHP, "LEFT", -8, 0)
+                    end
+
+                    if self._buffs and self._buffs[1] then
+                        self._buffs[1]:ClearAllPoints()
+                        self._buffs[1]:SetPoint("TOPLEFT", npHP, "BOTTOMLEFT", 0, -2)
+                    end
+
+                    if self._debuffs and self._debuffs[1] then
+                        self._debuffs[1]:ClearAllPoints()
+                        self._debuffs[1]:SetPoint("BOTTOMLEFT", npHP, "TOPLEFT", 0, 2)
+                    end
+
                     self:ClearAllPoints()
-                    self:SetPoint("LEFT", np, "RIGHT", 15, -45)
+                    self:SetPoint("CENTER", npHP, "CENTER", 0, 0)
                 else
+                    -- Fallback to standard HUD card layout
+                    _healthBar:Show()
+                    if _healthText then _healthText:Show() end
+                    if self._mpBar then self._mpBar:Show() end
+                    if _nameText then _nameText:Show() end
+                    if _classifText then _classifText:Show() end
+                    if self._border then self._border:Show() end
+                    if self._bg then self._bg:Show() end
+
+                    if _model then
+                        _model:ClearAllPoints()
+                        _model:SetPoint("LEFT", self, "LEFT", 10, 0)
+                    end
+
+                    if self._buffs and self._buffs[1] then
+                        self._buffs[1]:ClearAllPoints()
+                        self._buffs[1]:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 10, -5)
+                    end
+
+                    if self._debuffs and self._debuffs[1] then
+                        self._debuffs[1]:ClearAllPoints()
+                        self._debuffs[1]:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 10, -22)
+                    end
+
                     self:ClearAllPoints()
                     self:SetAllPoints(parent)
                 end
             else
+                -- Fallback to standard HUD card layout
+                _healthBar:Show()
+                if _healthText then _healthText:Show() end
+                if self._mpBar then self._mpBar:Show() end
+                if _nameText then _nameText:Show() end
+                if _classifText then _classifText:Show() end
+                if self._border then self._border:Show() end
+                if self._bg then self._bg:Show() end
+
+                if _model then
+                    _model:ClearAllPoints()
+                    _model:SetPoint("LEFT", self, "LEFT", 10, 0)
+                end
+
+                if self._buffs and self._buffs[1] then
+                    self._buffs[1]:ClearAllPoints()
+                    self._buffs[1]:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 10, -5)
+                end
+
+                if self._debuffs and self._debuffs[1] then
+                    self._debuffs[1]:ClearAllPoints()
+                    self._debuffs[1]:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 10, -22)
+                end
+
                 self:ClearAllPoints()
                 self:SetAllPoints(parent)
             end
