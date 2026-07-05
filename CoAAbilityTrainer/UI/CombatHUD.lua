@@ -90,9 +90,9 @@ function CoAAT_CombatHUD.Build()
     MakeSectionDraggable(targetSection, "targetSection", "Target Headbar (Drag)")
     hud._targetSection = targetSection
 
-    -- 00. Player Card (Below Target Headbar, 68px)
+    -- 00. Player Card (Below Target Headbar, 72px)
     local playerCardSection = CreateFrame("Frame", nil, hud)
-    playerCardSection:SetSize(HUD_W, 68)
+    playerCardSection:SetSize(HUD_W, 72)
     MakeSectionDraggable(playerCardSection, "playerCardSection", "Player Card (Drag)")
     hud._playerCardSection = playerCardSection
 
@@ -230,7 +230,7 @@ function CoAAT_CombatHUD.RefreshLayout()
     if hud._playerCardSection then
         hud._playerCardSection:Show()
         AlignSection(hud._playerCardSection, "playerCardSection", yOffset)
-        yOffset = yOffset - 68 - 4
+        yOffset = yOffset - 72 - 4
     end
 
     -- 1. Rotation Helper (Floating Suggested Action)

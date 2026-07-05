@@ -169,32 +169,14 @@ function CoAAT_CursorHUD.Build(parent)
         local maxHp = UnitHealthMax("player") or 1
         _healthBar:SetValue((hpVal / maxHp) * 100)
 
-        -- Change color based on health status
-        local hpPct = (hpVal / maxHp) * 100
-        if hpPct > 50 then
-            _healthBar:SetStatusBarColor(0.2, 0.8, 0.4, 0.9) -- Green
-        elseif hpPct > 20 then
-            _healthBar:SetStatusBarColor(1.0, 0.6, 0.0, 0.9) -- Orange
-        else
-            _healthBar:SetStatusBarColor(1.0, 0.2, 0.2, 0.9) -- Red
-        end
+        -- Statically color Red as health and Blue as mana/resource
+        _healthBar:SetStatusBarColor(1.0, 0.15, 0.15, 0.95)
 
-        local powerType = UnitPowerType("player") or 0
         local mpVal = UnitPower("player") or 0
         local maxMp = UnitPowerMax("player") or 1
         _mpBar:SetMinMaxValues(0, maxMp)
         _mpBar:SetValue(mpVal)
-
-        -- Resource color
-        if powerType == 1 then
-            _mpBar:SetStatusBarColor(1.0, 0.2, 0.2, 0.9)
-        elseif powerType == 3 then
-            _mpBar:SetStatusBarColor(1.0, 0.8, 0.2, 0.9)
-        elseif powerType == 6 then
-            _mpBar:SetStatusBarColor(0.2, 0.8, 1.0, 0.9)
-        else
-            _mpBar:SetStatusBarColor(0.2, 0.5, 1.0, 0.9)
-        end
+        _mpBar:SetStatusBarColor(0.15, 0.55, 1.0, 0.95)
 
         -- Update Cast Bar progress
         if isCasting then
@@ -257,7 +239,7 @@ function CoAAT_CursorHUD.ApplyLayout()
             _buffs[i]:ClearAllPoints()
             _buffs[i]:SetPoint("BOTTOM", _frame, "TOP", (i - 2) * 10, 8)
         end
-    else
+    elseif orientation == "horizontal" then
         -- Horizontal stacked right next to each other
         _healthBar:ClearAllPoints()
         _healthBar:SetSize(36, 4)
@@ -277,6 +259,27 @@ function CoAAT_CursorHUD.ApplyLayout()
         for i = 1, 3 do
             _buffs[i]:ClearAllPoints()
             _buffs[i]:SetPoint("TOP", _castBar, "BOTTOM", (i - 2) * 10, -4)
+        end
+    else
+        -- Angled L-shape framing bottom-left corner (red vertical health left, blue horizontal mana bottom)
+        _healthBar:ClearAllPoints()
+        _healthBar:SetSize(4, 26)
+        _healthBar:SetPoint("BOTTOMRIGHT", _frame, "CENTER", -10, -10)
+        _healthBar:SetOrientation("VERTICAL")
+
+        _mpBar:ClearAllPoints()
+        _mpBar:SetSize(26, 4)
+        _mpBar:SetPoint("TOPLEFT", _frame, "CENTER", -10, -10)
+        _mpBar:SetOrientation("HORIZONTAL")
+
+        _castBar:ClearAllPoints()
+        _castBar:SetSize(26, 3)
+        _castBar:SetPoint("TOPLEFT", _mpBar, "BOTTOMLEFT", 0, -3)
+
+        -- Position buff icons above the corner
+        for i = 1, 3 do
+            _buffs[i]:ClearAllPoints()
+            _buffs[i]:SetPoint("BOTTOM", _frame, "TOP", (i - 2) * 10, 8)
         end
     end
 end

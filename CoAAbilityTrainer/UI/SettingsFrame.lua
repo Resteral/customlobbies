@@ -293,16 +293,49 @@ function CoAAT_SettingsFrame.Build()
         CoAAT_CombatHUD.RefreshLayout()
     end)
 
-    local cursorHUDOrientCB = CreateFrame("CheckButton", "CoAATCursorHUDOrientCB", f, "UICheckButtonTemplate")
-    cursorHUDOrientCB:SetPoint("TOPLEFT", f, "TOPLEFT", 190, -260)
-    _G[cursorHUDOrientCB:GetName() .. "Text"]:SetText("|cffddddddHorizontal Cursor HUD|r")
-    cursorHUDOrientCB:SetChecked(CoAAT_DB and CoAAT_DB.cursorHUDOrientation == "horizontal")
-    cursorHUDOrientCB:SetScript("OnClick", function(self)
+    -- Dropdown: Cursor HUD Layout
+    local layoutLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    layoutLabel:SetPoint("TOPLEFT", f, "TOPLEFT", 190, -260)
+    layoutLabel:SetText("|cffddddddCursor HUD Layout:|r")
+
+    local layoutDropdown = CreateFrame("Frame", "CoAATCursorHUDLayoutDropdown", f, "UIDropDownMenuTemplate")
+    layoutDropdown:SetPoint("TOPLEFT", f, "TOPLEFT", 175, -276)
+    UIDropDownMenu_SetWidth(layoutDropdown, 120)
+
+    local function Dropdown_OnClick(self)
+        UIDropDownMenu_SetSelectedValue(layoutDropdown, self.value)
         if CoAAT_DB then
-            CoAAT_DB.cursorHUDOrientation = self:GetChecked() and "horizontal" or "vertical"
+            CoAAT_DB.cursorHUDOrientation = self.value
         end
+        UIDropDownMenu_SetText(layoutDropdown, self.text)
         CoAAT_CombatHUD.RefreshLayout()
+    end
+
+    UIDropDownMenu_Initialize(layoutDropdown, function(self, level)
+        local info = UIDropDownMenu_CreateInfo()
+        
+        info.text = "Angled Corner"
+        info.value = "angled"
+        info.func = Dropdown_OnClick
+        info.checked = (CoAAT_DB and CoAAT_DB.cursorHUDOrientation == "angled")
+        UIDropDownMenu_AddButton(info, level)
+
+        info.text = "Vertical Brackets"
+        info.value = "vertical"
+        info.func = Dropdown_OnClick
+        info.checked = (CoAAT_DB and CoAAT_DB.cursorHUDOrientation == "vertical")
+        UIDropDownMenu_AddButton(info, level)
+
+        info.text = "Horizontal Stack"
+        info.value = "horizontal"
+        info.func = Dropdown_OnClick
+        info.checked = (CoAAT_DB and CoAAT_DB.cursorHUDOrientation == "horizontal")
+        UIDropDownMenu_AddButton(info, level)
     end)
+
+    local currentOrient = CoAAT_DB and CoAAT_DB.cursorHUDOrientation or "angled"
+    UIDropDownMenu_SetSelectedValue(layoutDropdown, currentOrient)
+    UIDropDownMenu_SetText(layoutDropdown, (currentOrient == "horizontal" and "Horizontal Stack") or (currentOrient == "vertical" and "Vertical Brackets") or "Angled Corner")
 
     -- Divider
     local div2 = f:CreateTexture(nil, "OVERLAY")

@@ -223,7 +223,7 @@ end
 function CoAAT_TargetHeadbar.UpdateTarget()
     if not _frame then return end
 
-    if not UnitExists("target") or UnitIsDead("target") then
+    if not UnitExists("target") or UnitIsDead("target") or UnitIsPlayer("target") then
         _frame:Hide()
         return
     end

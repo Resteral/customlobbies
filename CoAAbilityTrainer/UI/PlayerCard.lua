@@ -35,7 +35,7 @@ end
 
 function CoAAT_PlayerCard.Build(parent)
     local f = CreateFrame("Frame", nil, parent)
-    f:SetSize(400, 68)
+    f:SetSize(400, 72)
     f:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0)
 
     -- Glassmorphic Card BG with horizontal fade out (near transparent to prevent box lines)
@@ -72,29 +72,29 @@ function CoAAT_PlayerCard.Build(parent)
 
     -- Target Name (anchored directly to f to prevent model scaling inheritance)
     local nameText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    nameText:SetPoint("TOPLEFT", f, "LEFT", 68, 18)
-    nameText:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+    nameText:SetPoint("TOPLEFT", f, "TOPLEFT", 68, -6)
+    nameText:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
     nameText:SetTextColor(1, 0.85, 0, 1)
     _nameText = nameText
 
     -- Guild Name (<Guild>)
     local guildText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    guildText:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -2)
-    guildText:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+    guildText:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -1)
+    guildText:SetFont("Fonts\\FRIZQT__.TTF", 8.5, "OUTLINE")
     guildText:SetTextColor(0.4, 0.8, 1.0, 0.95)
     _guildText = guildText
 
     -- PvP Rank (e.g. Sergeant / Knight-Lieutenant)
     local rankText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    rankText:SetPoint("TOPLEFT", guildText, "BOTTOMLEFT", 0, -2)
-    rankText:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+    rankText:SetPoint("TOPLEFT", guildText, "BOTTOMLEFT", 0, -1)
+    rankText:SetFont("Fonts\\FRIZQT__.TTF", 8.5, "OUTLINE")
     rankText:SetTextColor(0.9, 0.4, 1.0, 0.95)
     _rankText = rankText
 
     -- Health Bar (Segmented style, anchored directly to f)
     local hpBar = CreateFrame("StatusBar", nil, f)
     hpBar:SetSize(160, 12)
-    hpBar:SetPoint("TOPLEFT", f, "LEFT", 68, -12)
+    hpBar:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 68, 18)
     hpBar:SetMinMaxValues(0, 100)
     hpBar:SetValue(100)
 
