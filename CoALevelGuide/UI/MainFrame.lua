@@ -1013,7 +1013,7 @@ function CoALevelGuide_MainFrame.BuildPvPPanel(parent)
 
             -- EditBox for Copying (Ctrl+C)
             local eb = CreateFrame("EditBox", nil, mFrame)
-            eb:SetSize(mFrame:GetWidth() - 16, 40)
+            eb:SetSize(mFrame:GetWidth() - 140, 40)
             eb:SetPoint("TOPLEFT", mFrame, "TOPLEFT", 8, -20)
             eb:SetFontObject("GameFontHighlightSmall")
             eb:SetMultiLine(true)
@@ -1033,6 +1033,57 @@ function CoALevelGuide_MainFrame.BuildPvPPanel(parent)
 
             eb:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
             eb:SetScript("OnEditFocusGained", function(self) self:HighlightText() end)
+
+            -- Auto-Create & Place Macro Button
+            local btn = CreateFrame("Button", nil, mFrame, "UIPanelButtonTemplate")
+            btn:SetSize(120, 24)
+            btn:SetPoint("TOPRIGHT", mFrame, "TOPRIGHT", -8, -24)
+            btn:SetText("⚡ Setup Macro")
+            btn:SetScript("OnClick", function()
+                if InCombatLockdown() then
+                    print("|cffff2222[CoALvl] Error: Cannot create macro in combat!|r")
+                    return
+                end
+                
+                local macroName = mac.name:gsub("%s", ""):sub(1, 12)
+                local macroBody = mac.body
+                local macroIndex = GetMacroIndexByName(macroName)
+                
+                if not macroIndex or macroIndex == 0 then
+                    local _, numChar = GetNumMacros()
+                    if numChar < 18 then
+                        macroIndex = CreateMacro(macroName, "INV_Misc_QuestionMark", macroBody, 1)
+                    else
+                        local numGlobal = GetNumMacros()
+                        if numGlobal < 36 then
+                            macroIndex = CreateMacro(macroName, "INV_Misc_QuestionMark", macroBody, nil)
+                        else
+                            print("|cffff2222[CoALvl] Error: Macro list is full! Please delete some macros.|r")
+                            return
+                        end
+                    end
+                else
+                    EditMacro(macroIndex, nil, nil, macroBody)
+                end
+                
+                if macroIndex and macroIndex > 0 then
+                    local placed = false
+                    for slot = 1, 120 do
+                        if not HasAction(slot) then
+                            PickupMacro(macroIndex)
+                            PlaceAction(slot)
+                            ClearCursor()
+                            placed = true
+                            print(string.format("|cff00ccff[CoALvl] Macro '%s' created and placed in action slot %d!|r", macroName, slot))
+                            break
+                        end
+                    end
+                    if not placed then
+                        PickupMacro(macroIndex)
+                        print(string.format("|cff00ccff[CoALvl] Macro '%s' created! Action bars are full, picked up on cursor.|r", macroName))
+                    end
+                end
+            end)
             
             -- EditBox Background
             local ebBG = eb:CreateTexture(nil, "BACKGROUND")
