@@ -49,6 +49,44 @@ CoALevelGuide_PvPGuides = {
             body = "#showtooltip\n/cast [@mouseover,harm,nodead][] Polymorph"
         }
     },
+    classMacros = {
+        felsworn = {
+            {
+                name = "Fel Charge & Incursion Combo",
+                desc = "Initiate combat with Fel Rush, then automatically cast Chaos Incursion on the run.",
+                body = "#showtooltip Fel Hoof Charge\n/cast Fel Hoof Charge\n/cast Chaos Incursion"
+            },
+            {
+                name = "Voidblaze Focus Burn",
+                desc = "Applies Voidblaze to your focus target to build Felfury passively.",
+                body = "#showtooltip Voidblaze\n/cast [@focus,harm,nodead][] Voidblaze"
+            }
+        },
+        necromancer = {
+            {
+                name = "Ghoul Stun & Burst",
+                desc = "Commands your summoned ghoul to leap and stun the target, casting Death Coil in sync.",
+                body = "#showtooltip Death Coil\n/cast [@target] Gnaw\n/cast Death Coil"
+            },
+            {
+                name = "Lichborne Self-Heal",
+                desc = "Triggers Lichborne and casts Death Coil on yourself to heal rapidly in combat.",
+                body = "#showtooltip Lichborne\n/cast Lichborne\n/cast [@player] Death Coil"
+            }
+        },
+        reaper = {
+            {
+                name = "Harvest Sweep & Soul Reap",
+                desc = "Swings in a wide sweep, then reaps soul shards instantly if target is below 30% HP.",
+                body = "#showtooltip Soul Reap\n/cast Harvest Sweep\n/cast Soul Reap"
+            },
+            {
+                name = "Anti-Magic Shield Utility",
+                desc = "Activates shroud, then casts Anti-Magic Shield on yourself to absorb spells.",
+                body = "#showtooltip Anti-Magic Shield\n/cast Shroud of Shadows\n/cast Anti-Magic Shield"
+            }
+        }
+    },
     tips = {
         "Resilience Cap: Aim for at least 800+ Resilience for arena. Do not socket PvE gems.",
         "Spell Penetration: Caster classes must reach 130 Spell Penetration via gems/cloaks to bypass player resistances.",
