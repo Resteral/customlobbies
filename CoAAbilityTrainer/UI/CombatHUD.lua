@@ -300,6 +300,16 @@ function CoAAT_CombatHUD.RefreshLayout()
     if CoAAT_CursorHUD and CoAAT_CursorHUD.Refresh then
         CoAAT_CursorHUD.Refresh()
     end
+
+    if CoAAT_RotationHelper and CoAAT_RotationHelper.UpdateSizes then
+        CoAAT_RotationHelper.UpdateSizes()
+    end
+    if CoAAT_CooldownTracker and CoAAT_CooldownTracker.UpdateSizes then
+        CoAAT_CooldownTracker.UpdateSizes()
+    end
+    if CoAAT_ResourceBar and CoAAT_ResourceBar.UpdateSizes then
+        CoAAT_ResourceBar.UpdateSizes()
+    end
 end
 
 -- ─────────────────────────────────────────────

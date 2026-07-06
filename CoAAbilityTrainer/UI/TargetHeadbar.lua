@@ -318,75 +318,71 @@ function CoAAT_TargetHeadbar.Build(parent)
                     if _model then
                         _model:ClearAllPoints()
                         _model:SetPoint("RIGHT", npHP, "LEFT", -8, 0)
+                        _model:Show()
+                    end
+                    if self._ring then self._ring:Show() end
+
+                    if self._buffs then
+                        for i = 1, 8 do
+                            if self._buffs[i] and self._buffs[i].tex:GetTexture() then
+                                self._buffs[i]:Show()
+                            end
+                        end
+                        if self._buffs[1] then
+                            self._buffs[1]:ClearAllPoints()
+                            self._buffs[1]:SetPoint("TOPLEFT", npHP, "BOTTOMLEFT", 0, -2)
+                        end
                     end
 
-                    if self._buffs and self._buffs[1] then
-                        self._buffs[1]:ClearAllPoints()
-                        self._buffs[1]:SetPoint("TOPLEFT", npHP, "BOTTOMLEFT", 0, -2)
-                    end
-
-                    if self._debuffs and self._debuffs[1] then
-                        self._debuffs[1]:ClearAllPoints()
-                        self._debuffs[1]:SetPoint("BOTTOMLEFT", npHP, "TOPLEFT", 0, 2)
+                    if self._debuffs then
+                        for i = 1, 8 do
+                            if self._debuffs[i] and self._debuffs[i].tex:GetTexture() then
+                                self._debuffs[i]:Show()
+                            end
+                        end
+                        if self._debuffs[1] then
+                            self._debuffs[1]:ClearAllPoints()
+                            self._debuffs[1]:SetPoint("BOTTOMLEFT", npHP, "TOPLEFT", 0, 2)
+                        end
                     end
 
                     self:ClearAllPoints()
                     self:SetPoint("CENTER", npHP, "CENTER", 0, 0)
                 else
-                    -- Fallback to standard HUD card layout
-                    _healthBar:Show()
-                    if _healthText then _healthText:Show() end
-                    if self._mpBar then self._mpBar:Show() end
-                    if _nameText then _nameText:Show() end
-                    if _classifText then _classifText:Show() end
-                    if self._border then self._border:Show() end
-                    if self._bg then self._bg:Show() end
-
-                    if _model then
-                        _model:ClearAllPoints()
-                        _model:SetPoint("LEFT", self, "LEFT", 10, 0)
+                    -- No nameplate found: hide child elements completely (no HUD fallback!)
+                    _healthBar:Hide()
+                    if _healthText then _healthText:Hide() end
+                    if self._mpBar then self._mpBar:Hide() end
+                    if _nameText then _nameText:Hide() end
+                    if _classifText then _classifText:Hide() end
+                    if self._border then self._border:Hide() end
+                    if self._bg then self._bg:Hide() end
+                    if _model then _model:Hide() end
+                    if self._ring then self._ring:Hide() end
+                    if self._buffs then
+                        for i = 1, 8 do self._buffs[i]:Hide() end
                     end
-
-                    if self._buffs and self._buffs[1] then
-                        self._buffs[1]:ClearAllPoints()
-                        self._buffs[1]:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 10, -5)
+                    if self._debuffs then
+                        for i = 1, 8 do self._debuffs[i]:Hide() end
                     end
-
-                    if self._debuffs and self._debuffs[1] then
-                        self._debuffs[1]:ClearAllPoints()
-                        self._debuffs[1]:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 10, -22)
-                    end
-
-                    self:ClearAllPoints()
-                    self:SetAllPoints(parent)
                 end
             else
-                -- Fallback to standard HUD card layout
-                _healthBar:Show()
-                if _healthText then _healthText:Show() end
-                if self._mpBar then self._mpBar:Show() end
-                if _nameText then _nameText:Show() end
-                if _classifText then _classifText:Show() end
-                if self._border then self._border:Show() end
-                if self._bg then self._bg:Show() end
-
-                if _model then
-                    _model:ClearAllPoints()
-                    _model:SetPoint("LEFT", self, "LEFT", 10, 0)
+                -- Snap disabled: hide completely (no HUD fallback!)
+                _healthBar:Hide()
+                if _healthText then _healthText:Hide() end
+                if self._mpBar then self._mpBar:Hide() end
+                if _nameText then _nameText:Hide() end
+                if _classifText then _classifText:Hide() end
+                if self._border then self._border:Hide() end
+                if self._bg then self._bg:Hide() end
+                if _model then _model:Hide() end
+                if self._ring then self._ring:Hide() end
+                if self._buffs then
+                    for i = 1, 8 do self._buffs[i]:Hide() end
                 end
-
-                if self._buffs and self._buffs[1] then
-                    self._buffs[1]:ClearAllPoints()
-                    self._buffs[1]:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 10, -5)
+                if self._debuffs then
+                    for i = 1, 8 do self._debuffs[i]:Hide() end
                 end
-
-                if self._debuffs and self._debuffs[1] then
-                    self._debuffs[1]:ClearAllPoints()
-                    self._debuffs[1]:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 10, -22)
-                end
-
-                self:ClearAllPoints()
-                self:SetAllPoints(parent)
             end
         end
     end)

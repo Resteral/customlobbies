@@ -153,6 +153,7 @@ function CoAAT_RotationHelper.Build(parent)
         tex:SetSize(size, size)
         tex:SetPoint("CENTER", border, "CENTER")
         tex:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+        tex:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 
         -- Keybind Text Overlay
         local keyText = parentFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmallOutline")
@@ -170,7 +171,7 @@ function CoAAT_RotationHelper.Build(parent)
         local gloss = parentFrame:CreateTexture(nil, "OVERLAY")
         gloss:SetSize(size, size)
         gloss:SetPoint("CENTER", border, "CENTER")
-        gloss:SetTexture("Interface\\Buttons\\UI-Quickslot2")
+        gloss:SetTexture(1.0, 1.0, 1.0, 0.05)
         gloss:SetBlendMode("ADD")
         gloss:SetAlpha(0.4)
 
@@ -491,6 +492,9 @@ function CoAAT_RotationHelper.AnimTick(f, dt)
     end
 
     -- 1. Pulse animations
+    local size = CoAAT_DB and CoAAT_DB.rotIconSize or 50
+    local ringSize = size + 28
+
     if _current then
         local ugc = UGC[_urgency] or UGC.low
         local pulse = ugc.pulse
@@ -503,19 +507,19 @@ function CoAAT_RotationHelper.AnimTick(f, dt)
 
         -- Animate scaling of icon, border, and sweep CD overlay
         local scaleMult = 1.0 + math.sin(_animPhase * pulse * 1.5) * 0.08
-        f._icon1:SetSize(40 * scaleMult, 40 * scaleMult)
-        f._border1:SetSize((40 + 4) * scaleMult, (40 + 4) * scaleMult)
-        f._cd1:SetSize(40 * scaleMult, 40 * scaleMult)
+        f._icon1:SetSize(size * scaleMult, size * scaleMult)
+        f._border1:SetSize((size + 4) * scaleMult, (size + 4) * scaleMult)
+        f._cd1:SetSize(size * scaleMult, size * scaleMult)
 
         -- Scale glow ring to pulse in tandem
         local glowScale = 1.0 + math.sin(_animPhase * pulse * 1.5) * 0.15
-        f._glowRing:SetSize(68 * glowScale, 68 * glowScale)
+        f._glowRing:SetSize(ringSize * glowScale, ringSize * glowScale)
     else
         -- Reset to normal size if nothing suggested
-        f._icon1:SetSize(40, 40)
-        f._border1:SetSize(44, 44)
-        f._cd1:SetSize(40, 40)
-        f._glowRing:SetSize(68, 68)
+        f._icon1:SetSize(size, size)
+        f._border1:SetSize(size + 4, size + 4)
+        f._cd1:SetSize(size, size)
+        f._glowRing:SetSize(ringSize, ringSize)
         f._glowRing:SetAlpha(0)
     end
 
@@ -552,4 +556,21 @@ function CoAAT_RotationHelper.IsSpellOnHotbar(spellName)
     if not spellName then return false end
     local key = spellName:lower()
     return spellKeybinds[key] ~= nil
+end
+
+function CoAAT_RotationHelper.UpdateSizes()
+    local f = _frame
+    if not f then return end
+    local db = CoAAT_DB
+    local size = db and db.rotIconSize or 50
+    local ringSize = size + 28
+
+    if f._icon1 then
+        f._icon1:SetSize(size, size)
+        f._border1:SetSize(size + 4, size + 4)
+        f._cd1:SetSize(size, size)
+        if f._glowRing then
+            f._glowRing:SetSize(ringSize, ringSize)
+        end
+    end
 end

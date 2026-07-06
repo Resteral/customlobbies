@@ -24,12 +24,14 @@ function CoAAT_ResourceBar.Build(parent, posX, posY)
     trackBG:SetSize(BAR_W, BAR_H)
     trackBG:SetPoint("CENTER", f, "CENTER", 0, 4)
     trackBG:SetTexture(0.04, 0.04, 0.1, 0.95)
+    f._trackBG = trackBG
 
     -- Subtle inner groove
     local groove = f:CreateTexture(nil, "ARTWORK")
     groove:SetSize(BAR_W - 4, BAR_H - 6)
     groove:SetPoint("CENTER", f, "CENTER", 0, 4)
     groove:SetTexture(0.02, 0.02, 0.06, 0.95)
+    f._groove = groove
 
     -- Fill bar
     local fill = f:CreateTexture(nil, "ARTWORK")
@@ -97,11 +99,13 @@ function CoAAT_ResourceBar.Build(parent, posX, posY)
     f._overflow = overflowTex
 
     -- Chunk segments (visual black separator blocks for segmented look)
+    f._segments = {}
     for i = 1, 5 do
         local seg = f:CreateTexture(nil, "OVERLAY")
         seg:SetSize(2, BAR_H)
         seg:SetPoint("LEFT", groove, "LEFT", math.floor((BAR_W - 4) * (i / 6)), 0)
         seg:SetTexture(0, 0, 0, 1)
+        f._segments[i] = seg
     end
 
     -- Animation tick
@@ -132,6 +136,10 @@ function CoAAT_ResourceBar.Update(current, maxVal, color)
     local f = _frame
     if not f then return end
 
+    f._lastCurrent = current
+    f._lastMax = maxVal
+    f._lastColor = color
+
     local pct = (maxVal > 0) and (current / maxVal) or 0
     local w   = math.max(0, math.floor(f._fillMaxW * pct))
 
@@ -158,11 +166,9 @@ function CoAAT_ResourceBar.Update(current, maxVal, color)
     local thresholdPct = threshold / maxVal
 
     -- Update marker position
-    local markerX = math.floor((BAR_W - 8) * thresholdPct)
-    f._marker:SetPoint("LEFT", f._fill, "LEFT", markerX, 0)
-    f._marker:SetPoint("LEFT", f:GetChildren() and select(1, f:GetChildren()) or f, "LEFT", markerX, 0)
-    -- Simpler: just hardcode marker relative to groove
-    -- The marker position update is via width scaling
+    local markerX = math.floor((f._fillMaxW) * thresholdPct)
+    f._marker:ClearAllPoints()
+    f._marker:SetPoint("LEFT", f._groove, "LEFT", markerX, 0)
     f._markerPos = thresholdPct
 
     -- SPEND NOW flash
@@ -195,6 +201,32 @@ end
 
 function CoAAT_ResourceBar.Hide()
     if _frame then _frame:Hide() end
+end
+
+function CoAAT_ResourceBar.UpdateSizes()
+    local f = _frame
+    if not f then return end
+    local db = CoAAT_DB
+    local w = db and db.resBarWidth or 264
+
+    f:SetWidth(w + 60)
+    if f._trackBG then f._trackBG:SetWidth(w) end
+    if f._groove then f._groove:SetWidth(w - 4) end
+    if f._shimmer then f._shimmer:SetWidth(w - 4) end
+    f._fillMaxW = w - 4
+
+    -- Re-position segment dividers
+    if f._segments then
+        for i, seg in ipairs(f._segments) do
+            seg:ClearAllPoints()
+            seg:SetPoint("LEFT", f._groove, "LEFT", math.floor((w - 4) * (i / 6)), 0)
+        end
+    end
+
+    -- Refresh values to resize filled area
+    if f._lastCurrent then
+        CoAAT_ResourceBar.Update(f._lastCurrent, f._lastMax or 100, f._lastColor)
+    end
 end
 
 -- Update resource name when class changes

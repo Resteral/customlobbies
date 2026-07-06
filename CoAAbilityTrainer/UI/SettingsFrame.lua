@@ -95,7 +95,7 @@ local SPEC_NAMES = {
 
 function CoAAT_SettingsFrame.Build()
     local f = CreateFrame("Frame", "CoAATSettingsFrame", UIParent)
-    f:SetSize(380, 480)
+    f:SetSize(380, 560)
     f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     f:SetToplevel(true)
     f:SetMovable(true)
@@ -122,8 +122,8 @@ function CoAAT_SettingsFrame.Build()
     end
     makeLine(f, 380, 1, "TOPLEFT",     "TOPLEFT",     0,  0)
     makeLine(f, 380, 1, "BOTTOMLEFT",  "BOTTOMLEFT",  0,  0)
-    makeLine(f, 1, 480, "TOPLEFT",     "TOPLEFT",     0,  0)
-    makeLine(f, 1, 480, "TOPRIGHT",    "TOPRIGHT",    0,  0)
+    makeLine(f, 1, 560, "TOPLEFT",     "TOPLEFT",     0,  0)
+    makeLine(f, 1, 560, "TOPRIGHT",    "TOPRIGHT",    0,  0)
 
     -- Close button (top right)
     local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
@@ -343,7 +343,7 @@ function CoAAT_SettingsFrame.Build()
     div2:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -288)
     div2:SetTexture(0.0, 0.4, 0.7, 0.4)
 
-    -- Sliders: Scale & Opacity (Y = -295)
+    -- Sliders Row 1: Scale & Opacity (Y = -295)
     local scaleSlider = CreateFrame("Slider", "CoAATHUDScaleSlider", f, "OptionsSliderTemplate")
     scaleSlider:SetPoint("TOPLEFT", f, "TOPLEFT", 20, -295)
     scaleSlider:SetWidth(150)
@@ -374,28 +374,74 @@ function CoAAT_SettingsFrame.Build()
     end)
     f._alphaSlider = alphaSlider
 
+    -- Sliders Row 2: Rotation & Cooldown sizes (Y = -340)
+    local rotIconSizeSlider = CreateFrame("Slider", "CoAATRotIconSizeSlider", f, "OptionsSliderTemplate")
+    rotIconSizeSlider:SetPoint("TOPLEFT", f, "TOPLEFT", 20, -340)
+    rotIconSizeSlider:SetWidth(150)
+    rotIconSizeSlider:SetMinMaxValues(30, 80)
+    rotIconSizeSlider:SetValueStep(1)
+    _G[rotIconSizeSlider:GetName() .. "Text"]:SetText("Rotation Icon: 50")
+    _G[rotIconSizeSlider:GetName() .. "Low"]:SetText("30")
+    _G[rotIconSizeSlider:GetName() .. "High"]:SetText("80")
+    rotIconSizeSlider:SetScript("OnValueChanged", function(self, value)
+        if CoAAT_DB then CoAAT_DB.rotIconSize = value end
+        _G[self:GetName() .. "Text"]:SetText("Rotation Icon: " .. string.format("%.0f", value))
+        CoAAT_CombatHUD.RefreshLayout()
+    end)
+    f._rotIconSizeSlider = rotIconSizeSlider
+
+    local cdIconSizeSlider = CreateFrame("Slider", "CoAATCdIconSizeSlider", f, "OptionsSliderTemplate")
+    cdIconSizeSlider:SetPoint("TOPLEFT", f, "TOPLEFT", 190, -340)
+    cdIconSizeSlider:SetWidth(150)
+    cdIconSizeSlider:SetMinMaxValues(25, 70)
+    cdIconSizeSlider:SetValueStep(1)
+    _G[cdIconSizeSlider:GetName() .. "Text"]:SetText("Cooldown Icon: 46")
+    _G[cdIconSizeSlider:GetName() .. "Low"]:SetText("25")
+    _G[cdIconSizeSlider:GetName() .. "High"]:SetText("70")
+    cdIconSizeSlider:SetScript("OnValueChanged", function(self, value)
+        if CoAAT_DB then CoAAT_DB.cdIconSize = value end
+        _G[cdIconSizeSlider:GetName() .. "Text"]:SetText("Cooldown Icon: " .. string.format("%.0f", value))
+        CoAAT_CombatHUD.RefreshLayout()
+    end)
+    f._cdIconSizeSlider = cdIconSizeSlider
+
+    -- Sliders Row 3: Resource Bar Width (Y = -385)
+    local resBarWidthSlider = CreateFrame("Slider", "CoAATResBarWidthSlider", f, "OptionsSliderTemplate")
+    resBarWidthSlider:SetPoint("TOPLEFT", f, "TOPLEFT", 20, -385)
+    resBarWidthSlider:SetWidth(150)
+    resBarWidthSlider:SetMinMaxValues(150, 400)
+    resBarWidthSlider:SetValueStep(5)
+    _G[resBarWidthSlider:GetName() .. "Text"]:SetText("Resource Bar: 264")
+    _G[resBarWidthSlider:GetName() .. "Low"]:SetText("150")
+    _G[resBarWidthSlider:GetName() .. "High"]:SetText("400")
+    resBarWidthSlider:SetScript("OnValueChanged", function(self, value)
+        if CoAAT_DB then CoAAT_DB.resBarWidth = value end
+        _G[resBarWidthSlider:GetName() .. "Text"]:SetText("Resource Bar: " .. string.format("%.0f", value))
+        CoAAT_CombatHUD.RefreshLayout()
+    end)
+    f._resBarWidthSlider = resBarWidthSlider
+
     -- Divider
     local div3 = f:CreateTexture(nil, "OVERLAY")
     div3:SetSize(352, 1)
-    div3:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -298)
+    div3:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -425)
     div3:SetTexture(0.0, 0.4, 0.7, 0.4)
 
     -- ── Quick Rotation Summary ──
     local rotHdr = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    rotHdr:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -308)
+    rotHdr:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -435)
     rotHdr:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
     rotHdr:SetText("|cffFFD700Current Rotation Summary|r")
 
     local rotSummary = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    rotSummary:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -328)
-    rotSummary:SetSize(352, 70)
+    rotSummary:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -455)
+    rotSummary:SetSize(352, 55)
     rotSummary:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
     rotSummary:SetJustifyH("LEFT")
     rotSummary:SetJustifyV("TOP")
     rotSummary:SetText("|cffaaaaaa[No class selected]|r")
     f._rotSummary = rotSummary
 
-    -- ── Bottom Button (The Single Setup Button) ──
     -- ── Bottom Buttons ──
     local saveBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
     saveBtn:SetSize(220, 32)
@@ -475,7 +521,13 @@ function CoAAT_SettingsFrame.OnOpen()
     _G["CoAATCdStripCB"]:SetChecked(CoAAT_DB and CoAAT_DB.showCooldowns ~= false)
     _G["CoAATHideBorderCB"]:SetChecked(CoAAT_DB and CoAAT_DB.hideDragBorder or false)
     _G["CoAATCursorHUDCB"]:SetChecked(CoAAT_DB and CoAAT_DB.showCursorHUD or false)
-    _G["CoAATCursorHUDOrientCB"]:SetChecked(CoAAT_DB and CoAAT_DB.cursorHUDOrientation == "horizontal")
+
+    -- Sync dropdown values
+    if CoAATCursorHUDLayoutDropdown then
+        local currentOrient = CoAAT_DB and CoAAT_DB.cursorHUDOrientation or "angled"
+        UIDropDownMenu_SetSelectedValue(CoAATCursorHUDLayoutDropdown, currentOrient)
+        UIDropDownMenu_SetText(CoAATCursorHUDLayoutDropdown, (currentOrient == "horizontal" and "Horizontal Stack") or (currentOrient == "vertical" and "Vertical Brackets") or "Angled Corner")
+    end
 
     -- Sync sliders
     if f._scaleSlider then
@@ -483,6 +535,15 @@ function CoAAT_SettingsFrame.OnOpen()
     end
     if f._alphaSlider then
         f._alphaSlider:SetValue(CoAAT_DB and CoAAT_DB.hudAlpha or 1.0)
+    end
+    if f._rotIconSizeSlider then
+        f._rotIconSizeSlider:SetValue(CoAAT_DB and CoAAT_DB.rotIconSize or 50)
+    end
+    if f._cdIconSizeSlider then
+        f._cdIconSizeSlider:SetValue(CoAAT_DB and CoAAT_DB.cdIconSize or 46)
+    end
+    if f._resBarWidthSlider then
+        f._resBarWidthSlider:SetValue(CoAAT_DB and CoAAT_DB.resBarWidth or 264)
     end
 
     local classId = CoAAT_Engine.GetClassId()
