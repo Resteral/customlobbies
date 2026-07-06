@@ -2,7 +2,8 @@ import { login } from './actions'
 import Link from 'next/link'
 import { Bot, ArrowRight, AlertCircle } from 'lucide-react'
 
-export default function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const resolvedParams = await searchParams;
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
@@ -22,10 +23,10 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-secondary/20 py-8 px-4 shadow sm:rounded-3xl sm:px-10 border border-border/50">
           
-          {searchParams?.error && (
+          {resolvedParams?.error && (
             <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
-              {searchParams.error}
+              {resolvedParams.error}
             </div>
           )}
 
