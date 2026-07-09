@@ -67,7 +67,7 @@ local LESSONS = {
                 "Slayer is a fast dual-wielding fighter. You use mobility and attack speed stacks to slice down targets.",
                 "STEP 1: Use |cffb048b5Fel Hoof Charge|r to close the gap and build 25 Felfury.",
                 "STEP 2: Maintain |cffb048b5Infernal Alacrity stacks (up to 5)|r by casting Voidblaze at 40 Felfury.",
-                "STEP 3: Spam |cffb048b5Fell Strike|r to build Felfury to 80.",
+                "STEP 3: Spam |cffb048b5Fel Strike|r to build Felfury to 80.",
                 "STEP 4: Spend 80 Felfury with |cffff4444Slayer Cleave|r to hit all nearby enemies.",
             },
         },
@@ -562,18 +562,18 @@ local SIM_SEQUENCES = {
         color = {0.7, 0.1, 0.9},
         abilities = {
             { name = "Fel Hoof Charge", icon = "Interface\\Icons\\Ability_Rider_Deathchargelevel2" },
-            { name = "Fell Strike",     icon = "Interface\\Icons\\Ability_Warrior_SavageBlow" },
+            { name = "Fel Strike",      icon = "Interface\\Icons\\Ability_Warrior_SavageBlow" },
             { name = "Voidblaze",       icon = "Interface\\Icons\\Spell_Fire_SelfDestruct" },
             { name = "Slayer Cleave",   icon = "Interface\\Icons\\Ability_Warrior_Cleave" }
         },
         steps = {
             { targetBtn = 1, resourceAdd = 25,  desc = "Enemy spotted! Click Fel Hoof Charge to engage." },
-            { targetBtn = 2, resourceAdd = 15,  desc = "Perfect! Now click Fell Strike to build Felfury to 40." },
+            { targetBtn = 2, resourceAdd = 15,  desc = "Perfect! Now click Fel Strike to build Felfury to 40." },
             { targetBtn = 3, resourceAdd = -40, desc = "Stack Haste! Click Voidblaze at 40 Felfury to gain Haste." },
-            { targetBtn = 2, resourceAdd = 15,  desc = "Build Power! Click Fell Strike to reach 15 Felfury." },
-            { targetBtn = 2, resourceAdd = 20,  desc = "Keep building! Click Fell Strike to reach 35 Felfury." },
-            { targetBtn = 2, resourceAdd = 25,  desc = "Almost there! Click Fell Strike to reach 60 Felfury." },
-            { targetBtn = 2, resourceAdd = 40,  desc = "Max Felfury! Click Fell Strike to hit 100 Felfury." },
+            { targetBtn = 2, resourceAdd = 15,  desc = "Build Power! Click Fel Strike to reach 15 Felfury." },
+            { targetBtn = 2, resourceAdd = 20,  desc = "Keep building! Click Fel Strike to reach 35 Felfury." },
+            { targetBtn = 2, resourceAdd = 25,  desc = "Almost there! Click Fel Strike to reach 60 Felfury." },
+            { targetBtn = 2, resourceAdd = 40,  desc = "Max Felfury! Click Fel Strike to hit 100 Felfury." },
             { targetBtn = 4, resourceAdd = -100, desc = "FINISHER READY! Click Slayer Cleave to execute the target!", damage = "* CRITICAL! 18,400 Shadowflame *" },
             { desc = "🎉 Combo Mastered! You executed the perfect Slayer burst! Click Exit Sim." }
         }

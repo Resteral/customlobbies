@@ -127,6 +127,7 @@ eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 eventFrame:RegisterEvent("PLAYER_LEVEL_UP")
 eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+eventFrame:RegisterEvent("SPELLS_CHANGED")
 
 local initialized = false
 
@@ -145,6 +146,9 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
         initialized = true
 
         BuildAllModules()
+        if CoAAT_Engine and CoAAT_Engine.ScanSpellbook then
+            CoAAT_Engine.ScanSpellbook()
+        end
 
         -- Ensure nameplates are visible
         pcall(SetCVar, "nameplateShowEnemies", 1)
@@ -204,6 +208,12 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
     elseif event == "ZONE_CHANGED_NEW_AREA" then
         if CoAAT_CombatLog and CoAAT_CombatLog.OnZoneChanged then
             CoAAT_CombatLog.OnZoneChanged()
+        end
+
+    -- ── SPELLS CHANGED ────────────────────────────────────────
+    elseif event == "SPELLS_CHANGED" then
+        if CoAAT_Engine and CoAAT_Engine.ScanSpellbook then
+            CoAAT_Engine.ScanSpellbook()
         end
     end
 end)

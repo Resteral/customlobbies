@@ -25,7 +25,7 @@ CoAAT_RotationRules = {
             { condition = "resource_gte",    threshold  = 80,                    abilityId = "slayer_cleave",       urgency = "critical" },
             { condition = "cd_ready",        abilityId  = "fel_hoof_charge",                                        urgency = "high" },
             { condition = "resource_gte",    threshold  = 40,                    abilityId = "voidblaze_slayer",    urgency = "medium" },
-            { condition = "always",                                               abilityId = "fell_strike",         urgency = "low" },
+            { condition = "always",                                               abilityId = "fel_strike",         urgency = "low" },
         },
         -- Tyrant (Tank)
         tyrant = {

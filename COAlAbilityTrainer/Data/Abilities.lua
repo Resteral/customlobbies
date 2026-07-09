@@ -102,8 +102,8 @@ CoAAT_Abilities = {
                 name = "Slayer",
                 abilities = {
                     {
-                        id = "fell_strike",
-                        name = "Fell Strike",
+                        id = "fel_strike",
+                        name = "Fel Strike",
                         type = "generator",
                         icon = "Interface\\Icons\\Ability_Warrior_SavageBlow",
                         description = "Dual twin blades slash combo. Generates 20 Felfury.",
@@ -177,11 +177,11 @@ CoAAT_Abilities = {
                 rotation = {
                     "1. MAINTAIN Infernal Alacrity (use Voidblaze at 40+ Felfury)",
                     "2. USE Fel Hoof Charge on cooldown (to build Felfury)",
-                    "3. BUILD Felfury with Fell Strike",
+                    "3. BUILD Felfury with Fel Strike",
                     "4. SPEND at 80+ with Slayer Cleave",
                     "5. USE Idan's Guard to avoid incoming spike physical damage",
                 },
-                rotationSummary = "Fel Hoof Charge → Fell Strike to build → Voidblaze at 40 → Slayer Cleave at 80",
+                rotationSummary = "Fel Hoof Charge → Fel Strike to build → Voidblaze at 40 → Slayer Cleave at 80",
             },
             -- Tyrant (Tank)
             tyrant = {

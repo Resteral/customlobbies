@@ -306,6 +306,24 @@ local function GetPlayerPurgeSpell()
     return nil
 end
 
+local knownSpells = {}
+
+function CoAAT_Engine.ScanSpellbook()
+    knownSpells = {}
+    local numTabs = GetNumSpellTabs() or 0
+    for tab = 1, numTabs do
+        local _, _, offset, numSlots = GetSpellTabInfo(tab)
+        offset = offset or 0
+        numSlots = numSlots or 0
+        for slot = offset + 1, offset + numSlots do
+            local spellName = GetSpellBookItemName(slot, "spell")
+            if spellName then
+                knownSpells[spellName:lower()] = true
+            end
+        end
+    end
+end
+
 function CoAAT_Engine.EvaluateRotation()
     if not state.classId then return nil end
 
@@ -367,8 +385,8 @@ function CoAAT_Engine.EvaluateRotation()
 
     local function IsSpellAvailable(ab)
         if not ab then return false end
-        local name = GetSpellInfo(ab.name)
-        if not name then return false end
+        local nameLower = ab.name:lower()
+        if not knownSpells[nameLower] then return false end
         
         local playerLevel = UnitLevel("player") or 1
         if playerLevel < 60 then
