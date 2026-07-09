@@ -304,13 +304,17 @@ function CoAAT_TutorialPanel.Build()
     topGrad:SetGradientAlpha("HORIZONTAL",
         0.0, 0.55, 0.85, 0.95,
         0.0, 0.15, 0.30, 0.95)
+    f._topGrad = topGrad
 
     -- Borders
+    f._borderLines = {}
     local function border(w, h, point, relPoint, ox, oy)
         local t = f:CreateTexture(nil, "OVERLAY")
         t:SetSize(w, h)
         t:SetPoint(point, f, relPoint, ox, oy)
-        t:SetTexture(0.0, 0.6, 1.0, 0.5)
+        t:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+        t:SetVertexColor(0.0, 0.6, 1.0, 0.5)
+        table.insert(f._borderLines, t)
     end
     border(420, 1, "TOPLEFT",     "TOPLEFT",     0, 0)
     border(420, 1, "BOTTOMLEFT",  "BOTTOMLEFT",  0, 0)
@@ -770,3 +774,19 @@ function CoAAT_TutorialPanel.Toggle()
         end
     end
 end
+
+function CoAAT_TutorialPanel.ApplyTheme(r, g, b, hex)
+    local f = _panel
+    if not f then return end
+    if f._borderLines then
+        for _, line in ipairs(f._borderLines) do
+            line:SetVertexColor(r, g, b, 0.5)
+        end
+    end
+    if f._topGrad and f._topGrad.SetGradientAlpha then
+        f._topGrad:SetGradientAlpha("HORIZONTAL",
+            r, g, b, 0.95,
+            r * 0.25, g * 0.25, b * 0.25, 0.95)
+    end
+end
+

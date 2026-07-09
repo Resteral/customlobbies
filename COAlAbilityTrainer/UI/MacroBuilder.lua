@@ -354,6 +354,7 @@ function CoAAT_MacroBuilder.Build()
     bg:SetVertexColor(0.04, 0.04, 0.09, 0.97)
 
     -- Border accent lines
+    f._borderLines = {}
     for _, edge in ipairs({
         {"TOPLEFT","TOPRIGHT",2,0},{"BOTTOMLEFT","BOTTOMRIGHT",2,0},
         {"TOPLEFT","BOTTOMLEFT",0,2},{"TOPRIGHT","BOTTOMRIGHT",0,2}
@@ -370,6 +371,7 @@ function CoAAT_MacroBuilder.Build()
             line:SetPoint("TOP",f,edge[1],0,0)
             line:SetPoint("BOTTOM",f,edge[2],0,0)
         end
+        table.insert(f._borderLines, line)
     end
 
     -- Title
@@ -756,3 +758,14 @@ function CoAAT_MacroBuilder.Toggle()
     if not _frame then CoAAT_MacroBuilder.Build() end
     if _frame:IsShown() then _frame:Hide() else CoAAT_MacroBuilder.Open() end
 end
+
+function CoAAT_MacroBuilder.ApplyTheme(r, g, b, hex)
+    local f = _frame
+    if not f then return end
+    if f._borderLines then
+        for _, line in ipairs(f._borderLines) do
+            line:SetVertexColor(r, g, b, 0.8)
+        end
+    end
+end
+

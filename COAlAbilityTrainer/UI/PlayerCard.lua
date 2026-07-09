@@ -197,7 +197,8 @@ function CoAAT_PlayerCard.Build(parent)
     local border = f:CreateTexture(nil, "OVERLAY")
     border:SetSize(4, parent:GetHeight())
     border:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
-    border:SetTexture(0.77, 0.27, 1.0, 0.8) -- Default violet for PvP
+    border:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+    border:SetVertexColor(0.77, 0.27, 1.0, 0.8) -- Default violet for PvP
     f._border = border
 
     -- 3D Model frame (larger 3D player portrait)
@@ -649,3 +650,12 @@ function CoAAT_PlayerCard.UpdateAuras()
         end
     end
 end
+
+function CoAAT_PlayerCard.ApplyTheme(r, g, b, hex)
+    local f = _frame
+    if not f then return end
+    if f._border then
+        f._border:SetVertexColor(r, g, b, 0.8)
+    end
+end
+

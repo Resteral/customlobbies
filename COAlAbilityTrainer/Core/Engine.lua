@@ -119,6 +119,8 @@ function CoAAT_Engine.SetClass(classId, specId)
         CoAAT_RotationHelper.OnClassChanged(classId, specId)
     end
 
+    CoAAT_Engine.ApplyClassTheme()
+
     print("|cff00ccff[CoA Trainer]|r Class set to: |cffFFD700" ..
         (CoAAT_Abilities[classId].resource and (classId .. " (" .. specId .. ")") or classId) .. "|r")
 end
@@ -763,3 +765,65 @@ end
 function CoAAT_Engine.GetAoEMode()
     return state.aoeMode
 end
+
+CoAAT_ClassColors = {
+    felsworn        = { r=0.70, g=0.10, b=0.90, hex="af1ae6" }, -- Purple
+    necromancer     = { r=0.20, g=0.80, b=0.40, hex="33cc66" }, -- Unholy Green
+    witch_hunter    = { r=0.95, g=0.65, b=0.10, hex="f2a61a" }, -- Inquisitor Gold
+    runemaster      = { r=0.20, g=0.70, b=1.00, hex="33b2ff" }, -- Runic Blue
+    reaper          = { r=0.85, g=0.12, b=0.15, hex="d91e26" }, -- Crimson Red
+    spiritwalker    = { r=0.10, g=0.85, b=0.75, hex="1ad9bf" }, -- Turquoise / Spirit
+    tinker          = { r=0.90, g=0.80, b=0.30, hex="e6cc4d" }, -- Brass/Bronze
+    chronomancer    = { r=0.65, g=0.35, b=0.95, hex="a659f2" }, -- Temporal Violet
+    barbarian       = { r=0.78, g=0.61, b=0.43, hex="c79c6e" }, -- Warrior Brown
+    bloodmage       = { r=0.80, g=0.05, b=0.10, hex="cc0c1a" }, -- Blood Red
+    cultist         = { r=0.40, g=0.10, b=0.60, hex="661a99" }, -- Dark Shadow
+    guardian        = { r=0.80, g=0.85, b=0.90, hex="ccd9e6" }, -- Steel Blue
+    knight_of_xoroth= { r=0.90, g=0.30, b=0.00, hex="e64c00" }, -- Fel Fire Orange
+    primalist       = { r=1.00, g=0.49, b=0.04, hex="ff7d0a" }, -- Druid Orange
+    pyromancer      = { r=1.00, g=0.25, b=0.00, hex="ff4000" }, -- Fire Red/Orange
+    ranger          = { r=0.67, g=0.83, b=0.45, hex="abd473" }, -- Hunter Green
+    starcaller      = { r=0.00, g=0.55, b=0.85, hex="008cd9" }, -- Astral Blue
+    stormbringer    = { r=0.00, g=0.44, b=0.87, hex="0070de" }, -- Lightning Blue
+    sun_cleric      = { r=0.96, g=0.85, b=0.35, hex="f5d959" }, -- Holy Gold
+    templar         = { r=0.96, g=0.55, b=0.73, hex="f58cba" }, -- Retribution Pink
+    venomancer      = { r=0.50, g=0.80, b=0.10, hex="80cc1a" }, -- Toxic Green
+    witch_doctor    = { r=0.30, g=0.80, b=0.50, hex="4dcc80" }, -- Voodoo Teal
+    general         = { r=0.60, g=0.20, b=1.00, hex="9933ff" }, -- Default Purple
+}
+
+function CoAAT_Engine.GetClassColor(classId)
+    local c = CoAAT_ClassColors[classId or "general"] or CoAAT_ClassColors.general
+    return c.r, c.g, c.b, c.hex
+end
+
+function CoAAT_Engine.ApplyClassTheme()
+    local classId = CoAAT_Engine.GetClassId() or "general"
+    local r, g, b, hex = CoAAT_Engine.GetClassColor(classId)
+
+    -- Dispatch to SettingsFrame
+    if CoAAT_SettingsFrame and CoAAT_SettingsFrame.ApplyTheme then
+        CoAAT_SettingsFrame.ApplyTheme(r, g, b, hex)
+    end
+    -- Dispatch to MacroBuilder
+    if CoAAT_MacroBuilder and CoAAT_MacroBuilder.ApplyTheme then
+        CoAAT_MacroBuilder.ApplyTheme(r, g, b, hex)
+    end
+    -- Dispatch to CombatLog
+    if CoAAT_CombatLog and CoAAT_CombatLog.ApplyTheme then
+        CoAAT_CombatLog.ApplyTheme(r, g, b, hex)
+    end
+    -- Dispatch to CombatHUD (Resource bar + border)
+    if CoAAT_CombatHUD and CoAAT_CombatHUD.ApplyTheme then
+        CoAAT_CombatHUD.ApplyTheme(r, g, b, hex)
+    end
+    -- Dispatch to TutorialPanel
+    if CoAAT_TutorialPanel and CoAAT_TutorialPanel.ApplyTheme then
+        CoAAT_TutorialPanel.ApplyTheme(r, g, b, hex)
+    end
+    -- Dispatch to PlayerCard
+    if CoAAT_PlayerCard and CoAAT_PlayerCard.ApplyTheme then
+        CoAAT_PlayerCard.ApplyTheme(r, g, b, hex)
+    end
+end
+

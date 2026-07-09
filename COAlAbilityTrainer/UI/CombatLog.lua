@@ -211,12 +211,15 @@ function CoAAT_CombatLog.Build()
     bg:SetTexture(0.02, 0.03, 0.07, db.winOpacity or 0.90)
     f._bg = bg
 
-    -- Border lines (thin purple accent)
+    -- Border lines (thin accent)
+    f._borderLines = {}
     local function MakeLine(p1, p2, w, h)
         local l = f:CreateTexture(nil, "OVERLAY")
-        l:SetTexture(0.5, 0.1, 0.9, 0.55)
+        l:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+        l:SetVertexColor(0.5, 0.1, 0.9, 0.55)
         l:SetSize(w, h)
         l:SetPoint(p1, f, p2, 0, 0)
+        table.insert(f._borderLines, l)
     end
     MakeLine("TOPLEFT",    "TOPLEFT",    420, 1)
     MakeLine("BOTTOMLEFT", "BOTTOMLEFT", 420, 1)
@@ -227,7 +230,9 @@ function CoAAT_CombatLog.Build()
     local titleBG = f:CreateTexture(nil, "ARTWORK")
     titleBG:SetSize(420, 22)
     titleBG:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
-    titleBG:SetTexture(0.08, 0.04, 0.18, 0.95)
+    titleBG:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+    titleBG:SetVertexColor(0.08, 0.04, 0.18, 0.95)
+    f._titleBG = titleBG
 
     local title = f:CreateFontString(nil, "OVERLAY")
     title:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
@@ -315,3 +320,18 @@ function CoAAT_CombatLog.OnZoneChanged()
         CoAAT_CombatLog.AddEntry("cast", "|cff888888-- Zone changed, log cleared --|r", 0.5, 0.5, 0.5)
     end
 end
+
+function CoAAT_CombatLog.ApplyTheme(r, g, b, hex)
+    local f = _frame
+    if not f then return end
+    if f._borderLines then
+        for _, line in ipairs(f._borderLines) do
+            line:SetVertexColor(r, g, b, 0.55)
+        end
+    end
+    if f._titleBG then
+        -- Title bar is slightly darker version of class color
+        f._titleBG:SetVertexColor(r * 0.4, g * 0.4, b * 0.4, 0.95)
+    end
+end
+

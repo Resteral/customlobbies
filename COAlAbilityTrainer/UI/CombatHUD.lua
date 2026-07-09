@@ -324,6 +324,13 @@ function CoAAT_CombatHUD.OnClassChanged(classId, specId)
     CoAAT_RotationHelper.OnClassChanged(classId, specId)
 end
 
+function CoAAT_CombatHUD.ApplyTheme(r, g, b, hex)
+    if CoAAT_ResourceBar and CoAAT_ResourceBar.ApplyTheme then
+        CoAAT_ResourceBar.ApplyTheme(r, g, b, hex)
+    end
+end
+
+
 function CoAAT_CombatHUD.OnCombatChange(inCombat)
     -- Relay combat changes if modules need it
 end

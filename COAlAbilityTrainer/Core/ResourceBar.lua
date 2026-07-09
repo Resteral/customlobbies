@@ -60,12 +60,16 @@ function CoAAT_ResourceBar.Build(parent, posX, posY)
     local lBorder = f:CreateTexture(nil, "OVERLAY")
     lBorder:SetSize(2, BAR_H + 4)
     lBorder:SetPoint("LEFT", trackBG, "LEFT", -1, 0)
-    lBorder:SetTexture(0.1, 0.4, 0.7, 0.8)
+    lBorder:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+    lBorder:SetVertexColor(0.1, 0.4, 0.7, 0.8)
+    f._lBorder = lBorder
 
     local rBorder = f:CreateTexture(nil, "OVERLAY")
     rBorder:SetSize(2, BAR_H + 4)
     rBorder:SetPoint("RIGHT", trackBG, "RIGHT", 1, 0)
-    rBorder:SetTexture(0.1, 0.4, 0.7, 0.8)
+    rBorder:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+    rBorder:SetVertexColor(0.1, 0.4, 0.7, 0.8)
+    f._rBorder = rBorder
 
     -- Resource label (left of bar)
     local resLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -237,3 +241,11 @@ function CoAAT_ResourceBar.OnClassChanged(classId, specId)
         CoAAT_ResourceBar.Update(0, cd.resourceMax, cd.resourceColor)
     end
 end
+
+function CoAAT_ResourceBar.ApplyTheme(r, g, b, hex)
+    local f = _frame
+    if not f then return end
+    if f._lBorder then f._lBorder:SetVertexColor(r, g, b, 0.8) end
+    if f._rBorder then f._rBorder:SetVertexColor(r, g, b, 0.8) end
+end
+

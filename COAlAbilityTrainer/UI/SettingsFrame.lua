@@ -113,11 +113,14 @@ function CoAAT_SettingsFrame.Build()
     end
 
     -- Borders (softened to 0.15 alpha to remove boxiness)
+    f._borderLines = {}
     local function makeLine(parent, w, h, point, relPoint, offX, offY)
         local l = parent:CreateTexture(nil, "OVERLAY")
         l:SetSize(w, h)
-        l:SetTexture(0.0, 0.5, 0.8, 0.15)
+        l:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+        l:SetVertexColor(0.0, 0.5, 0.8, 0.15)
         l:SetPoint(point, parent, relPoint, offX, offY)
+        table.insert(f._borderLines, l)
         return l
     end
     makeLine(f, 380, 1, "TOPLEFT",     "TOPLEFT",     0,  0)
@@ -353,7 +356,9 @@ function CoAAT_SettingsFrame.Build()
     local div2 = f:CreateTexture(nil, "OVERLAY")
     div2:SetSize(352, 1)
     div2:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -288)
-    div2:SetTexture(0.0, 0.4, 0.7, 0.4)
+    div2:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+    div2:SetVertexColor(0.0, 0.4, 0.7, 0.4)
+    f._div2 = div2
 
     -- Sliders Row 1: Scale & Opacity (Y = -295)
     local scaleSlider = CreateFrame("Slider", "CoAATHUDScaleSlider", f, "OptionsSliderTemplate")
@@ -437,7 +442,9 @@ function CoAAT_SettingsFrame.Build()
     local div3 = f:CreateTexture(nil, "OVERLAY")
     div3:SetSize(352, 1)
     div3:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -425)
-    div3:SetTexture(0.0, 0.4, 0.7, 0.4)
+    div3:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+    div3:SetVertexColor(0.0, 0.4, 0.7, 0.4)
+    f._div3 = div3
 
     -- ── Quick Rotation Summary ──
     local rotHdr = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -485,7 +492,9 @@ function CoAAT_SettingsFrame.Build()
     local divCL = f:CreateTexture(nil, "OVERLAY")
     divCL:SetSize(352, 1)
     divCL:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -510)
-    divCL:SetTexture(0.5, 0.1, 0.9, 0.45)
+    divCL:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
+    divCL:SetVertexColor(0.5, 0.1, 0.9, 0.45)
+    f._divCL = divCL
 
     local clHdr = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     clHdr:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -520)
@@ -880,3 +889,17 @@ function CoAAT_SettingsFrame.SetupHotbarPage2()
 
     print("|cff00ccff[CoAAT] Hotbar Page 2 setup complete! Switched page 2 icons.|r")
 end
+
+function CoAAT_SettingsFrame.ApplyTheme(r, g, b, hex)
+    local f = _frame
+    if not f then return end
+    if f._borderLines then
+        for _, line in ipairs(f._borderLines) do
+            line:SetVertexColor(r, g, b, 0.25)
+        end
+    end
+    if f._div2 then f._div2:SetVertexColor(r, g, b, 0.45) end
+    if f._div3 then f._div3:SetVertexColor(r, g, b, 0.45) end
+    if f._divCL then f._divCL:SetVertexColor(r, g, b, 0.45) end
+end
+

@@ -574,3 +574,12 @@ function CoAAT_RotationHelper.UpdateSizes()
         end
     end
 end
+
+function CoAAT_RotationHelper.ApplyTheme(r, g, b, hex)
+    local f = _frame
+    if not f then return end
+    if f._border1 then
+        f._border1:SetVertexColor(r, g, b, 0.85)
+    end
+end
+
