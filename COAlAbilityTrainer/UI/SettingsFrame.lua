@@ -518,7 +518,14 @@ function CoAAT_SettingsFrame.Build()
         end
         cb:SetScript("OnClick", function(self)
             if not CoAAT_DB then return end
-            if not CoAAT_DB.combatLog then CoAAT_CombatLog.DEFAULTS and CoAAT_CombatLog.AddEntry end
+            if not CoAAT_DB.combatLog then
+                CoAAT_DB.combatLog = {}
+                if CoAAT_CombatLog and CoAAT_CombatLog.DEFAULTS then
+                    for k, v in pairs(CoAAT_CombatLog.DEFAULTS) do
+                        CoAAT_DB.combatLog[k] = v
+                    end
+                end
+            end
             if CoAAT_DB.combatLog then CoAAT_DB.combatLog[dbKey] = self:GetChecked() end
         end)
         Sync()
