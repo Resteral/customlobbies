@@ -271,6 +271,28 @@ local ALL_CLASSES_DEFINITIONS = {
             hex = { name = "Hex", generator = "Shadow Word", spender = "Hex Curse", cooldown = "Mana Tide Totem" },
             healing = { name = "Healing", generator = "Healing Wave", spender = "Chain Heal", cooldown = "Healing Tide Totem" }
         }
+    },
+    demon_hunter = {
+        resource = "Fury", max = 100, color = {r=0.64, g=0.19, b=0.79},
+        specs = {
+            havoc = { name = "Havoc", generator = "Demon's Bite", spender = "Chaos Strike", cooldown = "Metamorphosis" },
+            vengeance = { name = "Vengeance", generator = "Shear", spender = "Soul Cleave", cooldown = "Demon Spikes" }
+        }
+    },
+    monk = {
+        resource = "Energy", max = 100, color = {r=0.0, g=1.0, b=0.59},
+        specs = {
+            windwalker = { name = "Windwalker", generator = "Tiger Palm", spender = "Rising Sun Kick", cooldown = "Fists of Fury" },
+            brewmaster = { name = "Brewmaster", generator = "Keg Smash", spender = "Blackout Strike", cooldown = "Fortifying Brew" },
+            mistweaver = { name = "Mistweaver", generator = "Effuse", spender = "Enveloping Mist", cooldown = "Life Cocoon" }
+        }
+    },
+    son_of_arugal = {
+        resource = "Rage", max = 100, color = {r=0.65, g=0.53, b=0.39},
+        specs = {
+            feral = { name = "Feral", generator = "Claw Strike", spender = "Rake", cooldown = "Lupine Howl" },
+            blood = { name = "Blood", generator = "Ravaging Bite", spender = "Frenzy", cooldown = "Savage Roar" }
+        }
     }
 }
 

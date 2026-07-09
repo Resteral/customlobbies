@@ -29,6 +29,9 @@ local CLASS_ORDER = {
     { id="venomancer",      specs={"poison","shadow","toxin"} },
     { id="witch_doctor",    specs={"voodoo","hex","healing"} },
     { id="witch_hunter",    specs={"inquisitor","ravager","warden"} },
+    { id="demon_hunter",    specs={"havoc","vengeance"} },
+    { id="monk",            specs={"windwalker","brewmaster","mistweaver"} },
+    { id="son_of_arugal",   specs={"feral","blood"} },
 }
 
 local SPEC_NAMES = {
@@ -91,6 +94,13 @@ local SPEC_NAMES = {
     inquisitor       = "Inquisitor",
     ravager          = "Ravager",
     warden           = "Warden",
+    havoc            = "Havoc",
+    vengeance        = "Vengeance",
+    windwalker       = "Windwalker",
+    brewmaster       = "Brewmaster",
+    mistweaver       = "Mistweaver",
+    feral            = "Feral",
+    blood            = "Blood",
 }
 
 function CoAAT_SettingsFrame.Build()

@@ -95,6 +95,13 @@ function CoAAT_Engine.SetClass(classId, specId)
     if specId and classDef.specs and classDef.specs[specId] then
         local specDef = classDef.specs[specId]
         for _, ab in ipairs(specDef.abilities) do
+            -- Dynamically resolve real spell icon from client if it is default question mark
+            if not ab.icon or ab.icon == "Interface\\Icons\\INV_Misc_QuestionMark" or ab.icon == "Interface\\Icons\\INV_Misc_QuestionMark" then
+                local _, _, realIcon = GetSpellInfo(ab.name)
+                if realIcon then
+                    ab.icon = realIcon
+                end
+            end
             state.abilities[ab.id] = ab
         end
     end
@@ -794,6 +801,9 @@ CoAAT_ClassColors = {
     templar         = { r=0.96, g=0.55, b=0.73, hex="f58cba" }, -- Retribution Pink
     venomancer      = { r=0.50, g=0.80, b=0.10, hex="80cc1a" }, -- Toxic Green
     witch_doctor    = { r=0.30, g=0.80, b=0.50, hex="4dcc80" }, -- Voodoo Teal
+    demon_hunter    = { r=0.64, g=0.19, b=0.79, hex="a330c9" }, -- Purple/Green
+    monk            = { r=0.00, g=1.00, b=0.59, hex="00ff96" }, -- Jade Green
+    son_of_arugal   = { r=0.65, g=0.53, b=0.39, hex="a58763" }, -- Worgen Brown
     general         = { r=0.60, g=0.20, b=1.00, hex="9933ff" }, -- Default Purple
 }
 
