@@ -671,9 +671,8 @@ function CoAAT_MacroBuilder.Build()
         local errs  = {}
         for _, ab in ipairs(abs) do
             if _selectedAbs[ab.id] then
-                local icon = ab.icon or "INV_Misc_QuestionMark"
                 local body = MakeMacroText(ab)
-                local ok, msg = TryCreateMacro(ab.name, icon, body)
+                local ok, msg = TryCreateMacro(ab.name, 1, body)
                 if ok then
                     made = made + 1
                 else

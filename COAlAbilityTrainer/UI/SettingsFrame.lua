@@ -824,11 +824,11 @@ function CoAAT_SettingsFrame.SetupHotbarPage2()
         if not rotMacroIndex or rotMacroIndex == 0 then
             local _, numChar = GetNumMacros()
             if numChar < 18 then
-                rotMacroIndex = CreateMacro(rotMacroName, "INV_Misc_QuestionMark", rotMacroBody, false)
+                rotMacroIndex = CreateMacro(rotMacroName, 1, rotMacroBody, false)
             else
                 local numGlobal = GetNumMacros()
                 if numGlobal < 36 then
-                    rotMacroIndex = CreateMacro(rotMacroName, "INV_Misc_QuestionMark", rotMacroBody, false)
+                    rotMacroIndex = CreateMacro(rotMacroName, 1, rotMacroBody, false)
                 end
             end
         else
@@ -860,11 +860,11 @@ function CoAAT_SettingsFrame.SetupHotbarPage2()
         if not macroIndex or macroIndex == 0 then
             local _, numChar = GetNumMacros()
             if numChar < 18 then
-                macroIndex = CreateMacro(macroName, "INV_Misc_QuestionMark", macroBody, false)
+                macroIndex = CreateMacro(macroName, 1, macroBody, false)
             else
                 local numGlobal = GetNumMacros()
                 if numGlobal < 36 then
-                    macroIndex = CreateMacro(macroName, "INV_Misc_QuestionMark", macroBody, false)
+                    macroIndex = CreateMacro(macroName, 1, macroBody, false)
                 end
             end
         else
