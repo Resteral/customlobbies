@@ -28,6 +28,7 @@ UI\MobInfoHUD.lua
 UI\EnemyTacticHUD.lua
 UI\TreasureHUD.lua
 UI\NameplateHUD.lua
+UI\MacroBuilder.lua
 UI\CombatHUD.lua
 UI\TutorialPanel.lua
 UI\SettingsFrame.lua

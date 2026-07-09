@@ -109,6 +109,8 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 
         -- Init engine (restores saved class/spec)
         CoAAT_Engine.Init()
+        CoAAT_MacroBuilder.Build()
+        CoAAT_NameplateHUD.Build()
 
         -- Auto-configure CVars so nameplates display correctly above mob models
         SetCVar("nameplateShowEnemies", 1)
@@ -206,6 +208,14 @@ SlashCmdList["COAAT"] = function(msg)
 
     elseif msg == "aoe" or msg == "mode" then
         CoAAT_Engine.ToggleAoEMode()
+
+    elseif msg == "macros" or msg == "macro" then
+        CoAAT_MacroBuilder.Toggle()
+
+    elseif msg == "nameplates" or msg == "np" then
+        CoAAT_NameplateHUD.Toggle()
+        local state = (CoAAT_DB.nameplateHUD ~= false) and "|cff00ff88ON|r" or "|cffff4444OFF|r"
+        DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r Nameplate HUD " .. state)
 
     elseif msg == "reset" then
         CoAAT_Engine._state.resource = 0
