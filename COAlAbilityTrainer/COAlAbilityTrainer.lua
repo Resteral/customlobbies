@@ -106,6 +106,7 @@ local function BuildAllModules()
     SafeCall("EnemyTacticHUD", function() CoAAT_EnemyTacticHUD.Build()         end)
     SafeCall("EnemyTacticEvt", function() CoAAT_EnemyTacticHUD.RegisterEvents() end)
     SafeCall("TreasureHUD",    function() CoAAT_TreasureHUD.Build()            end)
+    SafeCall("CombatLog",      function() CoAAT_CombatLog.Build()              end)
     SafeCall("SettingsFrame",  function() CoAAT_SettingsFrame.Build()          end)
     SafeCall("TutorialPanel",  function() CoAAT_TutorialPanel.Build()          end)
     SafeCall("MinimapButton",  function() CoAAT_MinimapButton.Create()         end)
@@ -125,6 +126,7 @@ eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 eventFrame:RegisterEvent("PLAYER_LEVEL_UP")
 eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 
 local initialized = false
 
@@ -197,6 +199,12 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
         if CoAAT_Engine and CoAAT_Engine.OnCLEU then
             SafeCall("CLEU", CoAAT_Engine.OnCLEU, ...)
         end
+
+    -- ── ZONE CHANGE ──────────────────────────────────────────
+    elseif event == "ZONE_CHANGED_NEW_AREA" then
+        if CoAAT_CombatLog and CoAAT_CombatLog.OnZoneChanged then
+            CoAAT_CombatLog.OnZoneChanged()
+        end
     end
 end)
 
@@ -245,6 +253,13 @@ SlashCmdList["COAAT"] = function(msg)
             CoAAT_CombatHUD.Toggle()
         end
 
+    elseif msg == "log" then
+        if CoAAT_CombatLog and CoAAT_CombatLog.Toggle then
+            CoAAT_CombatLog.Toggle()
+        else
+            DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r Combat Log not loaded.")
+        end
+
     elseif msg == "enemy" then
         if CoAAT_EnemyTacticHUD and CoAAT_EnemyTacticHUD.Toggle then
             CoAAT_EnemyTacticHUD.Toggle()
@@ -287,6 +302,7 @@ SlashCmdList["COAAT"] = function(msg)
         DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r |cffFFD700Commands:|r")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal|r                — Settings panel")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal macros|r         — Macro Builder")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal log|r            — Toggle Combat Log")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal np|r              — Toggle nameplate HUD")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal hud|r             — Toggle Combat HUD")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal enemy|r           — Toggle Enemy Tactic HUD")

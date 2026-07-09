@@ -95,7 +95,7 @@ local SPEC_NAMES = {
 
 function CoAAT_SettingsFrame.Build()
     local f = CreateFrame("Frame", "CoAATSettingsFrame", UIParent)
-    f:SetSize(380, 560)
+    f:SetSize(380, 740)
     f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     f:SetToplevel(true)
     f:SetMovable(true)
@@ -122,8 +122,8 @@ function CoAAT_SettingsFrame.Build()
     end
     makeLine(f, 380, 1, "TOPLEFT",     "TOPLEFT",     0,  0)
     makeLine(f, 380, 1, "BOTTOMLEFT",  "BOTTOMLEFT",  0,  0)
-    makeLine(f, 1, 560, "TOPLEFT",     "TOPLEFT",     0,  0)
-    makeLine(f, 1, 560, "TOPRIGHT",    "TOPRIGHT",    0,  0)
+    makeLine(f, 1, 740, "TOPLEFT",     "TOPLEFT",     0,  0)
+    makeLine(f, 1, 740, "TOPRIGHT",    "TOPRIGHT",    0,  0)
 
     -- Close button (top right)
     local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
@@ -481,6 +481,132 @@ function CoAAT_SettingsFrame.Build()
     _frame = f
     CoAAT_SettingsFrame._frame = f
 
+    -- ── Section: Combat Log Settings ──────────────────────────────
+    local divCL = f:CreateTexture(nil, "OVERLAY")
+    divCL:SetSize(352, 1)
+    divCL:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -510)
+    divCL:SetTexture(0.5, 0.1, 0.9, 0.45)
+
+    local clHdr = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    clHdr:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -520)
+    clHdr:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+    clHdr:SetText("|cffcc88ff⚔|r |cffFFD700Combat Log Settings|r")
+
+    local clDesc = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    clDesc:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -536)
+    clDesc:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+    clDesc:SetText("|cffaaaaaa Control what events appear in |cff00ccff/coal log|r |cffaaaaaa.|r")
+
+    -- View Log button (opens the combat log window)
+    local viewLogBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+    viewLogBtn:SetSize(100, 22)
+    viewLogBtn:SetPoint("TOPRIGHT", f, "TOPRIGHT", -14, -516)
+    viewLogBtn:SetText("|cff00ccff⧉ View Log|r")
+    viewLogBtn:SetScript("OnClick", function()
+        if CoAAT_CombatLog then CoAAT_CombatLog.Toggle() end
+    end)
+
+    -- ── Col 1 filter checkboxes (x=10, starting y=-548) ──
+    local function MakeCBFilter(name, label, dbKey, x, y)
+        local cb = CreateFrame("CheckButton", name, f, "UICheckButtonTemplate")
+        cb:SetPoint("TOPLEFT", f, "TOPLEFT", x, y)
+        _G[name .. "Text"]:SetText("|cffdddddd" .. label .. "|r")
+        local function Sync()
+            if CoAAT_DB and CoAAT_DB.combatLog then
+                cb:SetChecked(CoAAT_DB.combatLog[dbKey] ~= false)
+            end
+        end
+        cb:SetScript("OnClick", function(self)
+            if not CoAAT_DB then return end
+            if not CoAAT_DB.combatLog then CoAAT_CombatLog.DEFAULTS and CoAAT_CombatLog.AddEntry end
+            if CoAAT_DB.combatLog then CoAAT_DB.combatLog[dbKey] = self:GetChecked() end
+        end)
+        Sync()
+        return cb, Sync
+    end
+
+    -- Col 1 (x=10)
+    local cb1,  s1  = MakeCBFilter("CoAATCL_DmgOut",   "Damage Out",  "showDamageOut",  10, -548)
+    local cb2,  s2  = MakeCBFilter("CoAATCL_DmgIn",    "Damage In",   "showDamageIn",   10, -568)
+    local cb3,  s3  = MakeCBFilter("CoAATCL_HealOut",  "Heals Cast",  "showHealOut",    10, -588)
+    local cb4,  s4  = MakeCBFilter("CoAATCL_HealIn",   "Heals Recv.", "showHealIn",     10, -608)
+    local cb5,  s5  = MakeCBFilter("CoAATCL_Casts",    "Casts",       "showCasts",      10, -628)
+    -- Col 2 (x=190)
+    local cb6,  s6  = MakeCBFilter("CoAATCL_Misses",   "Misses",      "showMisses",    190, -548)
+    local cb7,  s7  = MakeCBFilter("CoAATCL_Procs",    "Procs/Auras", "showProcs",     190, -568)
+    local cb8,  s8  = MakeCBFilter("CoAATCL_CC",       "CC Events",   "showCC",        190, -588)
+    local cb9,  s9  = MakeCBFilter("CoAATCL_Ints",     "Interrupts",  "showInterrupts",190, -608)
+    local cb10, s10 = MakeCBFilter("CoAATCL_Deaths",   "Kills/Deaths","showDeaths",    190, -628)
+
+    -- Timestamp + Auto-clear on second row
+    local tsEnabled = CreateFrame("CheckButton", "CoAATCL_Timestamp", f, "UICheckButtonTemplate")
+    tsEnabled:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -648)
+    _G["CoAATCL_TimestampText"]:SetText("|cffddddddShow Timestamps|r")
+    tsEnabled:SetScript("OnClick", function(self)
+        if CoAAT_DB and CoAAT_DB.combatLog then
+            CoAAT_DB.combatLog.showTimestamp = self:GetChecked()
+        end
+    end)
+
+    local autoClearCB = CreateFrame("CheckButton", "CoAATCL_AutoClear", f, "UICheckButtonTemplate")
+    autoClearCB:SetPoint("TOPLEFT", f, "TOPLEFT", 190, -648)
+    _G["CoAATCL_AutoClearText"]:SetText("|cffddddddAuto-clear on Zone|r")
+    autoClearCB:SetScript("OnClick", function(self)
+        if CoAAT_DB and CoAAT_DB.combatLog then
+            CoAAT_DB.combatLog.autoClearZone = self:GetChecked()
+        end
+    end)
+
+    -- ── Sliders: font size, opacity, max entries ──
+    local clFontSlider = CreateFrame("Slider", "CoAATCL_FontSlider", f, "OptionsSliderTemplate")
+    clFontSlider:SetPoint("TOPLEFT", f, "TOPLEFT", 20, -672)
+    clFontSlider:SetWidth(100)
+    clFontSlider:SetMinMaxValues(8, 16)
+    clFontSlider:SetValueStep(1)
+    _G[clFontSlider:GetName() .. "Text"]:SetText("Font: 10")
+    _G[clFontSlider:GetName() .. "Low"]:SetText("8")
+    _G[clFontSlider:GetName() .. "High"]:SetText("16")
+    clFontSlider:SetScript("OnValueChanged", function(self, v)
+        _G[self:GetName() .. "Text"]:SetText("Font: " .. math.floor(v))
+        if CoAAT_DB and CoAAT_DB.combatLog then CoAAT_DB.combatLog.fontSize = math.floor(v) end
+        if CoAAT_CombatLog then CoAAT_CombatLog.ApplySettings() end
+    end)
+    f._clFontSlider = clFontSlider
+
+    local clAlphaSlider = CreateFrame("Slider", "CoAATCL_AlphaSlider", f, "OptionsSliderTemplate")
+    clAlphaSlider:SetPoint("TOPLEFT", f, "TOPLEFT", 140, -672)
+    clAlphaSlider:SetWidth(100)
+    clAlphaSlider:SetMinMaxValues(0.2, 1.0)
+    clAlphaSlider:SetValueStep(0.05)
+    _G[clAlphaSlider:GetName() .. "Text"]:SetText("Opacity: 0.90")
+    _G[clAlphaSlider:GetName() .. "Low"]:SetText("0.2")
+    _G[clAlphaSlider:GetName() .. "High"]:SetText("1.0")
+    clAlphaSlider:SetScript("OnValueChanged", function(self, v)
+        _G[self:GetName() .. "Text"]:SetText("Opacity: " .. string.format("%.2f", v))
+        if CoAAT_DB and CoAAT_DB.combatLog then CoAAT_DB.combatLog.winOpacity = v end
+        if CoAAT_CombatLog then CoAAT_CombatLog.ApplySettings() end
+    end)
+    f._clAlphaSlider = clAlphaSlider
+
+    local clMaxSlider = CreateFrame("Slider", "CoAATCL_MaxSlider", f, "OptionsSliderTemplate")
+    clMaxSlider:SetPoint("TOPLEFT", f, "TOPLEFT", 258, -672)
+    clMaxSlider:SetWidth(100)
+    clMaxSlider:SetMinMaxValues(25, 500)
+    clMaxSlider:SetValueStep(25)
+    _G[clMaxSlider:GetName() .. "Text"]:SetText("Max: 120")
+    _G[clMaxSlider:GetName() .. "Low"]:SetText("25")
+    _G[clMaxSlider:GetName() .. "High"]:SetText("500")
+    clMaxSlider:SetScript("OnValueChanged", function(self, v)
+        _G[self:GetName() .. "Text"]:SetText("Max: " .. math.floor(v))
+        if CoAAT_DB and CoAAT_DB.combatLog then CoAAT_DB.combatLog.maxEntries = math.floor(v) end
+    end)
+    f._clMaxSlider = clMaxSlider
+
+    -- Store sync references for OnOpen
+    f._clCBSyncs = { s1,s2,s3,s4,s5,s6,s7,s8,s9,s10 }
+    f._clTimestampCB  = tsEnabled
+    f._clAutoClearCB  = autoClearCB
+
     -- Hook: update rotation summary when class changes
     hooksecurefunc(CoAAT_Engine, "SetClass", function(classId, specId)
         CoAAT_SettingsFrame.UpdateRotSummary()
@@ -556,6 +682,27 @@ function CoAAT_SettingsFrame.OnOpen()
     end
     if f._resBarWidthSlider then
         f._resBarWidthSlider:SetValue(CoAAT_DB and CoAAT_DB.resBarWidth or 264)
+    end
+
+    -- Sync combat log settings
+    local clDB = CoAAT_DB and CoAAT_DB.combatLog
+    if f._clCBSyncs then
+        for _, syncFn in ipairs(f._clCBSyncs) do syncFn() end
+    end
+    if f._clTimestampCB then
+        f._clTimestampCB:SetChecked(clDB and clDB.showTimestamp ~= false)
+    end
+    if f._clAutoClearCB then
+        f._clAutoClearCB:SetChecked(clDB and clDB.autoClearZone or false)
+    end
+    if f._clFontSlider then
+        f._clFontSlider:SetValue(clDB and clDB.fontSize or 10)
+    end
+    if f._clAlphaSlider then
+        f._clAlphaSlider:SetValue(clDB and clDB.winOpacity or 0.90)
+    end
+    if f._clMaxSlider then
+        f._clMaxSlider:SetValue(clDB and clDB.maxEntries or 120)
     end
 
     local classId = CoAAT_Engine.GetClassId()

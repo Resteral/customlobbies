@@ -491,8 +491,9 @@ end
 -- CLEU event parser: detect ability usage
 -- ─────────────────────────────────────────────
 function CoAAT_Engine.OnCLEU(...)
-    local ts, event, _, srcGUID, _, _, _, destGUID, _, _, _,
+    local ts, event, _, srcGUID, srcName, _, _, destGUID, destName, _, _,
           spellId, spellName = ...
+    local log = CoAAT_CombatLog and CoAAT_CombatLog.AddEntry
 
     -- Only care about player-sourced events
     local playerGUID = UnitGUID("player")
@@ -503,9 +504,15 @@ function CoAAT_Engine.OnCLEU(...)
         local amount = select(15, ...)
         if amount and type(amount) == "number" then
             local maxHealth = UnitHealthMax("player")
-            if maxHealth > 0 and (amount / maxHealth) >= 0.15 then
-                local sourceName = select(5, ...)
-                if sourceName and srcGUID then
+            local pct = maxHealth > 0 and math.floor((amount / maxHealth) * 100) or 0
+            -- Log incoming damage
+            if log then
+                local col = pct >= 15 and "|cffFF4444" or "|cffFF8844"
+                log("damageIn", string.format("%s%s|r |cffaaaaaa→ you|r |cffFF6644-%d|r (|cffff9999%d%%|r)",
+                    col, srcName or "?", amount, pct), 1, 0.4, 0.4)
+            end
+            if maxHealth > 0 and pct >= 15 then
+                if srcGUID then
                     local npcID = tonumber(string.sub(srcGUID, 9, 12), 16)
                     if npcID and CoAAT_DB and CoAAT_DB.combatLearn then
                         if not CoAAT_DB.combatLearn[npcID] then
@@ -513,11 +520,20 @@ function CoAAT_Engine.OnCLEU(...)
                         end
                         if not CoAAT_DB.combatLearn[npcID].dangerousCasts[spellName] then
                             CoAAT_DB.combatLearn[npcID].dangerousCasts[spellName] = true
-                            print("|cffFFD700[CoAAT] Learned: |r|cffFF4444" .. spellName .. "|r is dangerous from " .. sourceName .. "!")
+                            if log then log("damageIn", "|cffFFD700⚠ Learned:|r |cffFF4444" .. spellName .. "|r is |cffff0000DANGEROUS|r from " .. (srcName or "?"), 1, 0.85, 0.1) end
                         end
                     end
                 end
             end
+        end
+    end
+
+    -- Incoming heals
+    if (event == "SPELL_HEAL" or event == "SPELL_PERIODIC_HEAL") and destGUID == playerGUID then
+        local amount = select(15, ...)
+        if amount and type(amount) == "number" and log then
+            log("healIn", string.format("|cff44FF88%s|r |cffaaaaaa→ you|r |cff44FF88+%d|r",
+                srcName or "?", amount), 0.27, 1, 0.53)
         end
     end
 
@@ -533,8 +549,11 @@ function CoAAT_Engine.OnCLEU(...)
             }
             local lowerSpell = spellName and spellName:lower() or ""
             if ccNames[lowerSpell] or string.find(lowerSpell, "stun") or string.find(lowerSpell, "fear") or string.find(lowerSpell, "silence") then
-                local sourceName = select(5, ...)
-                if sourceName and srcGUID then
+                if log then
+                    log("cc", string.format("|cffFF44FF🔒 CC:|r |cfffff000%s|r on |cffFF4444you|r from |cffaaaaaa%s|r",
+                        spellName or "?", srcName or "?"), 1, 0.27, 1)
+                end
+                if srcGUID then
                     local npcID = tonumber(string.sub(srcGUID, 9, 12), 16)
                     if npcID and CoAAT_DB and CoAAT_DB.combatLearn then
                         if not CoAAT_DB.combatLearn[npcID] then
@@ -542,7 +561,6 @@ function CoAAT_Engine.OnCLEU(...)
                         end
                         if not CoAAT_DB.combatLearn[npcID].dangerousCasts[spellName] then
                             CoAAT_DB.combatLearn[npcID].dangerousCasts[spellName] = true
-                            print("|cffFFD700[CoAAT] Learned: |r|cffFF4444" .. spellName .. "|r (CC) is dangerous from " .. sourceName .. "!")
                         end
                     end
                 end
@@ -557,7 +575,10 @@ function CoAAT_Engine.OnCLEU(...)
             }
             local lowerSpell = spellName and spellName:lower() or ""
             if magicBuffs[lowerSpell] or string.find(lowerSpell, "barrier") or string.find(lowerSpell, "shield") or string.find(lowerSpell, "infusion") then
-                local destName = select(9, ...)
+                if log then
+                    log("proc", string.format("|cff00ffff💡 Purgeable:|r |cfffff000%s|r on |cffaaaaaa%s|r",
+                        spellName or "?", destName or "target"), 0, 1, 1)
+                end
                 if destGUID then
                     local npcID = tonumber(string.sub(destGUID, 9, 12), 16)
                     if npcID and CoAAT_DB and CoAAT_DB.combatLearn then
@@ -566,7 +587,6 @@ function CoAAT_Engine.OnCLEU(...)
                         end
                         if not CoAAT_DB.combatLearn[npcID].purgeBuffs[spellName] then
                             CoAAT_DB.combatLearn[npcID].purgeBuffs[spellName] = true
-                            print("|cffFFD700[CoAAT] Learned: |r|cff00ffff" .. spellName .. "|r is purgeable on " .. (destName or "Target") .. "!")
                         end
                     end
                 end
@@ -578,8 +598,37 @@ function CoAAT_Engine.OnCLEU(...)
 
     local lowerName = spellName and spellName:lower() or ""
 
+    -- Player damage dealt
+    if (event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE") and srcGUID == playerGUID then
+        local amount = select(15, ...)
+        if amount and type(amount) == "number" and log then
+            local isCrit = select(21, ...) -- crit flag
+            local critStr = isCrit and "|cffFFD700 ★CRIT|r" or ""
+            log("damageOut", string.format("→ |cff00ccff%s|r |cffFFD700%s|r |cff00FF88+%d|r%s",
+                destName or "?", spellName or "?", amount, critStr), 0.27, 1, 0.53)
+        end
+    end
+
+    -- Misses / dodges / parries / immunities
+    if event == "SPELL_MISSED" and srcGUID == playerGUID and log then
+        local missType = select(15, ...) or "MISS"
+        log("miss", string.format("✗ |cffaaaaaa%s|r |cffFF8844%s|r → |cffaaaaaa%s|r",
+            spellName or "?", missType, destName or "?"), 1, 0.53, 0.27)
+    end
+
+    -- Interrupt: SPELL_INTERRUPT
+    if event == "SPELL_INTERRUPT" and srcGUID == playerGUID and log then
+        local interruptedSpell = select(15, ...)
+        log("interrupt", string.format("|cff44CCFF⚡ Interrupted:|r |cfffff000%s|r on |cffaaaaaa%s|r",
+            interruptedSpell or spellName or "?", destName or "?"), 0.27, 0.8, 1)
+    end
+
     -- Spell cast: start cooldown + resource change
     if event == "SPELL_CAST_SUCCESS" then
+        -- Log cast
+        if srcGUID == playerGUID and log then
+            log("cast", string.format("|cffcccccc▶ Cast:|r |cff00ccff%s|r", spellName or "?"), 0.8, 0.8, 0.8)
+        end
         -- Find matching ability by name fragment
         for id, ab in pairs(state.abilities) do
             if ab.name:lower() == lowerName then
@@ -590,9 +639,11 @@ function CoAAT_Engine.OnCLEU(...)
                 -- Apply resource cost/gain
                 if ab.resourceCost then
                     CoAAT_Engine.ModifyResource(-ab.resourceCost)
+                    if log then log("resource", string.format("|cffFFD700⚡ Resource:|r -%d (%s)", ab.resourceCost, ab.name), 1, 0.85, 0) end
                 end
                 if ab.resourceGain then
                     CoAAT_Engine.ModifyResource(ab.resourceGain)
+                    if log then log("resource", string.format("|cff44FF88⚡ Resource:|r +%d (%s)", ab.resourceGain, ab.name), 0.27, 1, 0.53) end
                 end
                 -- Apply buff/debuff tracking
                 if ab.type == "buff" then
@@ -616,6 +667,7 @@ function CoAAT_Engine.OnCLEU(...)
         for id, ab in pairs(state.abilities) do
             if ab.type == "proc" and ab.name:lower() == lowerName then
                 CoAAT_Engine.TriggerProc(ab.name, 8)
+                if log then log("proc", string.format("|cffFF88FF✦ Proc:|r |cfffff000%s|r triggered!", ab.name), 1, 0.53, 1) end
             end
         end
     end
@@ -623,14 +675,39 @@ function CoAAT_Engine.OnCLEU(...)
     -- Buff removed
     if event == "SPELL_AURA_REMOVED" and destGUID == playerGUID then
         CoAAT_Engine.RemoveBuff(spellName)
+        if srcGUID == playerGUID and log then
+            log("proc", string.format("|cffaaaaaa↓ Faded:|r |cffcccccc%s|r", spellName or "?"), 0.7, 0.7, 0.7)
+        end
     end
 
     -- Debuff applied on target
     if event == "SPELL_AURA_APPLIED" and destGUID ~= playerGUID and srcGUID == playerGUID then
+        if log then
+            log("damageOut", string.format("|cffFF8844◈ Debuff:|r |cfffff000%s|r on |cffaaaaaa%s|r",
+                spellName or "?", destName or "?"), 1, 0.53, 0.27)
+        end
         for id, ab in pairs(state.abilities) do
             if ab.type == "debuff" and ab.name:lower() == lowerName then
                 CoAAT_Engine.SetDebuff(ab.name, ab.duration or 10)
             end
+        end
+    end
+
+    -- Player heals dealt
+    if (event == "SPELL_HEAL" or event == "SPELL_PERIODIC_HEAL") and srcGUID == playerGUID then
+        local amount = select(15, ...)
+        if amount and type(amount) == "number" and log then
+            log("healOut", string.format("|cff44FF88♥ Heal:|r |cfffff000%s|r → |cffaaaaaa%s|r |cff44FF88+%d|r",
+                spellName or "?", destName or "?", amount), 0.27, 1, 0.53)
+        end
+    end
+
+    -- Deaths / kills
+    if event == "UNIT_DIED" then
+        if destGUID == playerGUID and log then
+            log("death", "|cffFF2222💀 YOU DIED|r", 1, 0.13, 0.13)
+        elseif srcGUID == playerGUID and log then
+            log("death", string.format("|cff00FF88☠ Killed:|r |cffaaaaaa%s|r", destName or "?"), 0, 1, 0.53)
         end
     end
 end
