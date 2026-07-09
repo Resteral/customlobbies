@@ -1,17 +1,30 @@
 -- ============================================================
--- CoAAbilityTrainer - Main Entry Point
+-- COAlAbilityTrainer - Main Entry Point
 -- Events, initialization, slash commands
 -- ============================================================
 
 local ADDON_NAME = "COAlAbilityTrainer"
 
--- Global Fade Transitions for Trainer Addon
+-- ─────────────────────────────────────────────────────────────
+-- Safe call wrapper — prevents one broken module from killing
+-- the entire addon
+-- ─────────────────────────────────────────────────────────────
+local function SafeCall(label, fn, ...)
+    local ok, err = pcall(fn, ...)
+    if not ok then
+        DEFAULT_CHAT_FRAME:AddMessage(
+            "|cffFF4444[COAl Error]|r " .. label .. ": " .. tostring(err))
+    end
+end
+
+-- ─────────────────────────────────────────────────────────────
+-- Fade helpers (used by other modules)
+-- ─────────────────────────────────────────────────────────────
 function CoAAT_FadeIn(frame, duration)
     if not frame then return end
     duration = duration or 0.25
     frame:Show()
     frame:SetAlpha(0.01)
-    
     local elapsed = 0
     local f = CreateFrame("Frame")
     f:SetScript("OnUpdate", function(self, dt)
@@ -28,7 +41,6 @@ end
 function CoAAT_FadeOut(frame, duration, callback)
     if not frame then return end
     duration = duration or 0.25
-    
     local elapsed = 0
     local f = CreateFrame("Frame")
     f:SetScript("OnUpdate", function(self, dt)
@@ -44,243 +56,278 @@ function CoAAT_FadeOut(frame, duration, callback)
     end)
 end
 
--- ─────────────────────────────────────────────────────────────────────────────
+-- ─────────────────────────────────────────────────────────────
 -- SavedVariables defaults
--- ─────────────────────────────────────────────────────────────────────────────
+-- ─────────────────────────────────────────────────────────────
 local function InitDB()
     if not CoAAT_DB then CoAAT_DB = {} end
-    if CoAAT_DB.selectedClass    == nil then CoAAT_DB.selectedClass    = nil   end
-    if CoAAT_DB.selectedSpec     == nil then CoAAT_DB.selectedSpec     = nil   end
-    if CoAAT_DB.hideOutOfCombat  == nil then CoAAT_DB.hideOutOfCombat  = false end
-    if CoAAT_DB.showProcAlerts   == nil then CoAAT_DB.showProcAlerts   = true  end
-    if CoAAT_DB.showRotHelper    == nil then CoAAT_DB.showRotHelper    = true  end
-    if CoAAT_DB.firstRun         == nil then CoAAT_DB.firstRun         = true  end
-    if CoAAT_DB.hudPos           == nil then CoAAT_DB.hudPos           = nil   end
-    if CoAAT_DB.rotHelperPos     == nil then CoAAT_DB.rotHelperPos     = nil   end
-    if CoAAT_DB.minimapAngle     == nil then CoAAT_DB.minimapAngle     = 30    end
-    if CoAAT_DB.combatLearn      == nil then CoAAT_DB.combatLearn      = {}    end
-    -- HUD Customization Defaults
-    if CoAAT_DB.hudScale         == nil then CoAAT_DB.hudScale         = 1.0   end
-    if CoAAT_DB.hudAlpha         == nil then CoAAT_DB.hudAlpha         = 1.0   end
-    if CoAAT_DB.showResourceBar  == nil then CoAAT_DB.showResourceBar  = true  end
-    if CoAAT_DB.showCooldowns    == nil then CoAAT_DB.showCooldowns    = true  end
-    if CoAAT_DB.showAuras        == nil then CoAAT_DB.showAuras        = true  end
-    if CoAAT_DB.hideDragBorder   == nil then CoAAT_DB.hideDragBorder   = false end
-    if CoAAT_DB.showCursorHUD    == nil then CoAAT_DB.showCursorHUD    = false end
-    if CoAAT_DB.cursorHUDOrientation == nil then CoAAT_DB.cursorHUDOrientation = "angled" end
-    if CoAAT_DB.attachToNameplate == nil then CoAAT_DB.attachToNameplate = true end
-    if CoAAT_DB.rotIconSize      == nil then CoAAT_DB.rotIconSize      = 50   end
-    if CoAAT_DB.cdIconSize       == nil then CoAAT_DB.cdIconSize       = 46   end
-    if CoAAT_DB.resBarWidth      == nil then CoAAT_DB.resBarWidth      = 264  end
-    if CoAAT_DB.positions        == nil then CoAAT_DB.positions        = {}    end
+    local defaults = {
+        selectedClass     = false,
+        selectedSpec      = false,
+        hideOutOfCombat   = false,
+        showProcAlerts    = true,
+        showRotHelper     = true,
+        firstRun          = true,
+        hudPos            = false,
+        rotHelperPos      = false,
+        minimapAngle      = 45,
+        combatLearn       = {},
+        hudScale          = 1.0,
+        hudAlpha          = 1.0,
+        showResourceBar   = true,
+        showCooldowns     = true,
+        showAuras         = true,
+        hideDragBorder    = false,
+        showCursorHUD     = false,
+        cursorHUDOrientation = "angled",
+        attachToNameplate = true,
+        rotIconSize       = 50,
+        cdIconSize        = 46,
+        resBarWidth       = 264,
+        positions         = {},
+        nameplateHUD      = true,
+        auraDisabled      = {},
+    }
+    for k, v in pairs(defaults) do
+        -- only set if truly absent (don't overwrite false/0)
+        if CoAAT_DB[k] == nil then
+            CoAAT_DB[k] = v
+        end
+    end
 end
 
--- ─────────────────────────────────────────────────────────────────────────────
+-- ─────────────────────────────────────────────────────────────
+-- Build all UI modules safely
+-- ─────────────────────────────────────────────────────────────
+local function BuildAllModules()
+    SafeCall("CombatHUD",      function() CoAAT_CombatHUD.Build()              end)
+    SafeCall("MobInfoHUD",     function() CoAAT_MobInfoHUD.Build()             end)
+    SafeCall("MobInfoEvents",  function() CoAAT_MobInfoHUD.RegisterEvents()    end)
+    SafeCall("EnemyTacticHUD", function() CoAAT_EnemyTacticHUD.Build()         end)
+    SafeCall("EnemyTacticEvt", function() CoAAT_EnemyTacticHUD.RegisterEvents() end)
+    SafeCall("TreasureHUD",    function() CoAAT_TreasureHUD.Build()            end)
+    SafeCall("SettingsFrame",  function() CoAAT_SettingsFrame.Build()          end)
+    SafeCall("TutorialPanel",  function() CoAAT_TutorialPanel.Build()          end)
+    SafeCall("MinimapButton",  function() CoAAT_MinimapButton.Create()         end)
+    SafeCall("Engine",         function() CoAAT_Engine.Init()                  end)
+    SafeCall("MacroBuilder",   function() CoAAT_MacroBuilder.Build()           end)
+    SafeCall("NameplateHUD",   function() CoAAT_NameplateHUD.Build()           end)
+end
+
+-- ─────────────────────────────────────────────────────────────
 -- Event frame
--- ─────────────────────────────────────────────────────────────────────────────
+-- ─────────────────────────────────────────────────────────────
 local eventFrame = CreateFrame("Frame", ADDON_NAME .. "EventFrame", UIParent)
 eventFrame:RegisterEvent("ADDON_LOADED")
 eventFrame:RegisterEvent("PLAYER_LOGIN")
-eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")   -- enter combat
-eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")    -- leave combat
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")   -- fallback
+eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 eventFrame:RegisterEvent("PLAYER_LEVEL_UP")
 eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
-local addonReady = false
+local initialized = false
 
 eventFrame:SetScript("OnEvent", function(self, event, ...)
-    -- ── ADDON_LOADED ──
-    if event == "ADDON_LOADED" and ... == ADDON_NAME then
-        InitDB()
-        addonReady = true
+    -- ── ADDON_LOADED ──────────────────────────────────────────
+    if event == "ADDON_LOADED" then
+        local name = ...
+        if name == ADDON_NAME then
+            InitDB()
+        end
 
-    -- ── PLAYER_LOGIN ──
-    elseif event == "PLAYER_LOGIN" and addonReady then
-        -- Build all UI
-        CoAAT_CombatHUD.Build()
-        CoAAT_MobInfoHUD.Build()
-        CoAAT_MobInfoHUD.RegisterEvents()
-        CoAAT_EnemyTacticHUD.Build()
-        CoAAT_EnemyTacticHUD.RegisterEvents()
-        CoAAT_TreasureHUD.Build()
-        CoAAT_SettingsFrame.Build()
-        CoAAT_TutorialPanel.Build()
-        CoAAT_MinimapButton.Create()
+    -- ── LOGIN / ENTERING WORLD ────────────────────────────────
+    elseif (event == "PLAYER_LOGIN" or event == "PLAYER_ENTERING_WORLD") and not initialized then
+        -- Make sure DB is ready even if ADDON_LOADED somehow fired late
+        if not CoAAT_DB then InitDB() end
+        initialized = true
 
-        -- Init engine (restores saved class/spec)
-        CoAAT_Engine.Init()
-        CoAAT_MacroBuilder.Build()
-        CoAAT_NameplateHUD.Build()
+        BuildAllModules()
 
-        -- Auto-configure CVars so nameplates display correctly above mob models
-        SetCVar("nameplateShowEnemies", 1)
-        SetCVar("nameplateMotion", 1) -- Stack nameplates above heads instead of overlapping body/HUD
+        -- Ensure nameplates are visible
+        pcall(SetCVar, "nameplateShowEnemies", 1)
+        pcall(SetCVar, "nameplateMotion", 1)
 
-        -- First run: show welcome tutorial
+        -- First run tutorial
         if CoAAT_DB.firstRun then
             CoAAT_DB.firstRun = false
             C_Timer_After(2, function()
-                CoAAT_TutorialPanel.ShowLesson("general", 1)
-            end)
-        end
-
-        -- Print welcome
-        DEFAULT_CHAT_FRAME:AddMessage(
-            "|cffb048b5[COAl Ability Trainer]|r |cff00ccffv1.0 loaded!|r  " ..
-            "Type |cff00ccff/coal|r to open settings, |cff00ccff/coaattut|r for tutorial."
-        )
-
-        if CoAAT_DB.selectedClass then
-            DEFAULT_CHAT_FRAME:AddMessage(
-                "|cffb048b5[CoAT]|r Restoring: |cffFFD700" ..
-                CoAAT_DB.selectedClass .. " — " .. (CoAAT_DB.selectedSpec or "?") .. "|r"
-            )
-        else
-            DEFAULT_CHAT_FRAME:AddMessage(
-                "|cffb048b5[COAl]|r Type |cff00ccff/coal|r and pick your class to get started!"
-            )
-        end
-
-    -- ── ENTER COMBAT ──
-    elseif event == "PLAYER_REGEN_DISABLED" then
-        CoAAT_Engine.SetCombat(true)
-
-    -- ── LEAVE COMBAT ──
-    elseif event == "PLAYER_REGEN_ENABLED" then
-        CoAAT_Engine.SetCombat(false)
-
-    -- ── LEVEL UP ──
-    elseif event == "PLAYER_LEVEL_UP" then
-        local newLevel = ...
-        DEFAULT_CHAT_FRAME:AddMessage(
-            "|cffb048b5[CoAT]|r |cffFFD700Level up! " .. newLevel ..
-            "|r — Check your trainer for new abilities!"
-        )
-        -- Queue level-up reminder tutorial
-        local classId = CoAAT_Engine.GetClassId()
-        if classId and LESSONS and CoAAT_TutorialPanel then
-            C_Timer_After(3, function()
-                if CoAAT_TutorialPanel.ShowLesson then
-                    CoAAT_TutorialPanel.ShowLesson(classId, 1)
+                if CoAAT_TutorialPanel and CoAAT_TutorialPanel.ShowLesson then
+                    CoAAT_TutorialPanel.ShowLesson("general", 1)
                 end
             end)
         end
 
-    -- ── COMBAT LOG ──
+        -- Welcome message
+        DEFAULT_CHAT_FRAME:AddMessage(
+            "|cffcc88ff[COAl]|r |cff00ccffAddon loaded!|r  " ..
+            "Type |cffFFD700/coal|r to open settings  •  " ..
+            "|cffFFD700/coal macros|r for macros  •  " ..
+            "|cffFFD700/coal np|r toggle nameplates"
+        )
+        if CoAAT_DB.selectedClass then
+            DEFAULT_CHAT_FRAME:AddMessage(
+                "|cffcc88ff[COAl]|r Class: |cffFFD700" ..
+                CoAAT_DB.selectedClass ..
+                " — " .. (CoAAT_DB.selectedSpec or "?") .. "|r"
+            )
+        end
+
+    -- ── ENTER COMBAT ─────────────────────────────────────────
+    elseif event == "PLAYER_REGEN_DISABLED" then
+        if CoAAT_Engine and CoAAT_Engine.SetCombat then
+            CoAAT_Engine.SetCombat(true)
+        end
+
+    -- ── LEAVE COMBAT ─────────────────────────────────────────
+    elseif event == "PLAYER_REGEN_ENABLED" then
+        if CoAAT_Engine and CoAAT_Engine.SetCombat then
+            CoAAT_Engine.SetCombat(false)
+        end
+
+    -- ── LEVEL UP ─────────────────────────────────────────────
+    elseif event == "PLAYER_LEVEL_UP" then
+        local newLevel = ...
+        DEFAULT_CHAT_FRAME:AddMessage(
+            "|cffcc88ff[COAl]|r |cffFFD700Level " .. newLevel ..
+            "!|r Check your trainer for new abilities!")
+
+    -- ── COMBAT LOG ───────────────────────────────────────────
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-        CoAAT_Engine.OnCLEU(CombatLog_Object_IsA and select(1, ...) or ...)
+        if CoAAT_Engine and CoAAT_Engine.OnCLEU then
+            SafeCall("CLEU", CoAAT_Engine.OnCLEU, ...)
+        end
     end
 end)
 
--- ─────────────────────────────────────────────────────────────────────────────
--- Slash Commands
--- ─────────────────────────────────────────────────────────────────────────────
+-- ─────────────────────────────────────────────────────────────
+-- Slash Commands  /coal  /coaat
+-- ─────────────────────────────────────────────────────────────
 SLASH_COAAT1 = "/coal"
 SLASH_COAAT2 = "/coaat"
-SLASH_COAAT3 = "/coaabilitytrainer"
-SlashCmdList["COAAT"] = function(msg)
-    msg = msg:lower():trim()
+SLASH_COAAT3 = "/coaltrainer"
 
-    if msg == "" or msg == "settings" then
-        CoAAT_SettingsFrame.Toggle()
+SlashCmdList["COAAT"] = function(msg)
+    -- Trim + lower safely
+    msg = (msg or ""):lower()
+    msg = msg:match("^%s*(.-)%s*$") or ""
+
+    if msg == "" or msg == "settings" or msg == "config" then
+        if CoAAT_SettingsFrame and CoAAT_SettingsFrame.Toggle then
+            CoAAT_SettingsFrame.Toggle()
+        else
+            DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r Settings not loaded yet.")
+        end
+
+    elseif msg == "macros" or msg == "macro" then
+        if CoAAT_MacroBuilder and CoAAT_MacroBuilder.Toggle then
+            SafeCall("MacroBuilder.Toggle", CoAAT_MacroBuilder.Toggle)
+        else
+            DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r Macro Builder not loaded.")
+        end
+
+    elseif msg == "nameplates" or msg == "np" then
+        if CoAAT_NameplateHUD and CoAAT_NameplateHUD.Toggle then
+            SafeCall("NameplateHUD.Toggle", CoAAT_NameplateHUD.Toggle)
+            local state = (CoAAT_DB and CoAAT_DB.nameplateHUD ~= false)
+                and "|cff00ff88ON|r" or "|cffff4444OFF|r"
+            DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r Nameplates " .. state)
+        end
 
     elseif msg == "hud" then
-        CoAAT_CombatHUD.Toggle()
+        if CoAAT_CombatHUD and CoAAT_CombatHUD.Toggle then
+            CoAAT_CombatHUD.Toggle()
+        end
 
     elseif msg == "enemy" then
-        CoAAT_EnemyTacticHUD.Toggle()
+        if CoAAT_EnemyTacticHUD and CoAAT_EnemyTacticHUD.Toggle then
+            CoAAT_EnemyTacticHUD.Toggle()
+        end
 
     elseif msg == "treasure" or msg == "pvp" then
-        CoAAT_TreasureHUD.Toggle()
+        if CoAAT_TreasureHUD and CoAAT_TreasureHUD.Toggle then
+            CoAAT_TreasureHUD.Toggle()
+        end
 
-    elseif msg:sub(1, 5) == "class" then
-        -- /coaat class felsworn inquisitor
+    elseif msg == "aoe" or msg == "mode" then
+        if CoAAT_Engine and CoAAT_Engine.ToggleAoEMode then
+            CoAAT_Engine.ToggleAoEMode()
+        end
+
+    elseif msg:sub(1,5) == "class" then
         local parts = {}
         for part in msg:gmatch("%S+") do parts[#parts+1] = part end
         local classId = parts[2]
         local specId  = parts[3]
-        if classId and CoAAT_Abilities[classId] then
-            CoAAT_Engine.SetClass(classId, specId or "infernal_assault")
+        if classId and CoAAT_Abilities and CoAAT_Abilities[classId] then
+            if CoAAT_Engine and CoAAT_Engine.SetClass then
+                CoAAT_Engine.SetClass(classId, specId or "")
+            end
         else
-            DEFAULT_CHAT_FRAME:AddMessage("|cffb048b5[CoAT]|r Usage: /coaat class <classid> [specid]")
-            DEFAULT_CHAT_FRAME:AddMessage("|cffaaaaaa  Classes: felsworn, necromancer, witch_hunter, tinker, runemaster, chronomancer, spiritwalker")
+            DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r Usage: /coal class <id> [specid]")
+            DEFAULT_CHAT_FRAME:AddMessage("|cffaaaaaa  e.g. /coal class felsworn infernal")
         end
 
-    elseif msg == "aoe" or msg == "mode" then
-        CoAAT_Engine.ToggleAoEMode()
-
-    elseif msg == "macros" or msg == "macro" then
-        CoAAT_MacroBuilder.Toggle()
-
-    elseif msg == "nameplates" or msg == "np" then
-        CoAAT_NameplateHUD.Toggle()
-        local state = (CoAAT_DB.nameplateHUD ~= false) and "|cff00ff88ON|r" or "|cffff4444OFF|r"
-        DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r Nameplate HUD " .. state)
-
     elseif msg == "reset" then
-        CoAAT_Engine._state.resource = 0
-        DEFAULT_CHAT_FRAME:AddMessage("|cffb048b5[CoAT]|r Resource reset to 0.")
+        if CoAAT_Engine and CoAAT_Engine._state then
+            CoAAT_Engine._state.resource = 0
+            DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r Resource reset.")
+        end
 
-    elseif msg == "help" then
-        DEFAULT_CHAT_FRAME:AddMessage("|cffb048b5[CoAT]|r |cffFFD700Commands:|r")
-        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coaat|r              — Open settings")
-        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coaat hud|r          — Toggle Combat HUD")
-        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coaat enemy|r        — Toggle Enemy Tactic HUD")
-        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coaat treasure|r     — Toggle PvP Treasure Hunt HUD")
-        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coaat aoe|r          — Toggle AoE/Single Target mode")
-        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coaat class <id>|r   — Set active class")
-        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coaattut|r           — Show tutorial")
-        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coaat help|r         — This message")
+    elseif msg == "reload" or msg == "rl" then
+        ReloadUI()
+
+    elseif msg == "help" or msg == "?" then
+        DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r |cffFFD700Commands:|r")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal|r                — Settings panel")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal macros|r         — Macro Builder")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal np|r              — Toggle nameplate HUD")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal hud|r             — Toggle Combat HUD")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal enemy|r           — Toggle Enemy Tactic HUD")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal aoe|r             — Toggle AoE mode")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal class <id>|r      — Set class")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal rl|r              — Reload UI")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal help|r            — This list")
 
     else
-        DEFAULT_CHAT_FRAME:AddMessage("|cffb048b5[CoAT]|r Unknown command. Try |cff00ccff/coaat help|r")
+        DEFAULT_CHAT_FRAME:AddMessage(
+            "|cffcc88ff[COAl]|r Unknown: '" .. msg ..
+            "' — try |cff00ccff/coal help|r")
     end
 end
 
 -- Tutorial shortcut
 SLASH_COAATTUT1 = "/coaattut"
 SlashCmdList["COAATTUT"] = function(msg)
-    local classId = msg:trim():lower()
-    if classId == "" then
-        classId = CoAAT_Engine.GetClassId() or "general"
+    msg = (msg or ""):match("^%s*(.-)%s*$") or ""
+    local classId = (msg ~= "") and msg or (CoAAT_Engine and CoAAT_Engine.GetClassId and CoAAT_Engine.GetClassId()) or "general"
+    if CoAAT_TutorialPanel and CoAAT_TutorialPanel.ShowClassIntro then
+        CoAAT_TutorialPanel.ShowClassIntro(classId)
     end
-    CoAAT_TutorialPanel.ShowClassIntro(classId)
 end
 
--- ─────────────────────────────────────────────────────────────────────────────
--- Simulate resource generation for testing
--- (Since we can't hook CoA's custom resource APIs directly,
---  we provide a "/coaat sim" command to simulate combat)
--- ─────────────────────────────────────────────────────────────────────────────
+-- Simulation command
 SLASH_COAATSIM1 = "/coaatsim"
 SlashCmdList["COAATSIM"] = function(msg)
     local val = tonumber(msg)
     if val then
-        CoAAT_Engine.SetResource(val)
-        DEFAULT_CHAT_FRAME:AddMessage("|cffb048b5[CoAT Sim]|r Resource set to " .. val)
+        if CoAAT_Engine and CoAAT_Engine.SetResource then
+            CoAAT_Engine.SetResource(val)
+            DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl Sim]|r Resource set to " .. val)
+        end
     else
-        -- Auto-simulate: ramp up resource over time
-        DEFAULT_CHAT_FRAME:AddMessage("|cffb048b5[CoAT Sim]|r Starting resource simulation...")
+        DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl Sim]|r Starting simulation...")
         local simFrame = CreateFrame("Frame")
-        local elapsed = 0
+        local elapsed  = 0
         simFrame:SetScript("OnUpdate", function(self, dt)
             elapsed = elapsed + dt
             local res = math.min(100, math.floor(elapsed * 15))
-            CoAAT_Engine.SetResource(res)
-            -- Simulate a proc at ~50 resource
-            if res == 50 then
-                local classId = CoAAT_Engine.GetClassId()
-                if classId == "felsworn" then
-                    CoAAT_Engine.TriggerProc("Fel Explosion", 6)
-                elseif classId == "necromancer" then
-                    -- Simulate pet dying for tutorial
-                elseif classId == "witch_hunter" then
-                    CoAAT_Engine.TriggerProc("Purge", 5)
-                end
+            if CoAAT_Engine and CoAAT_Engine.SetResource then
+                CoAAT_Engine.SetResource(res)
             end
             if elapsed > 7 then
                 self:SetScript("OnUpdate", nil)
-                DEFAULT_CHAT_FRAME:AddMessage("|cffb048b5[CoAT Sim]|r Simulation complete.")
+                DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl Sim]|r Done.")
             end
         end)
     end
