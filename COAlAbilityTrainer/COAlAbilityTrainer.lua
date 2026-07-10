@@ -300,6 +300,13 @@ SlashCmdList["COAAT"] = function(msg)
             CoAAT_Engine.ToggleAoEMode()
         end
 
+    elseif msg == "spellbook" or msg == "book" or msg == "spells" then
+        if CoAAT_Engine and CoAAT_Engine.PrintSpellbook then
+            CoAAT_Engine.PrintSpellbook()
+        else
+            DEFAULT_CHAT_FRAME:AddMessage("|cffcc88ff[COAl]|r Engine not loaded.")
+        end
+
     elseif msg:sub(1,5) == "class" then
         local parts = {}
         for part in msg:gmatch("%S+") do parts[#parts+1] = part end
@@ -333,6 +340,7 @@ SlashCmdList["COAAT"] = function(msg)
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal hud|r             — Toggle Combat HUD")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal enemy|r           — Toggle Enemy Tactic HUD")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal treasure|r        — Toggle Treasure Map HUD")
+        DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal spellbook|r       — Scan & print your learned spells")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal aoe|r             — Toggle AoE mode")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal class <id>|r      — Set class")
         DEFAULT_CHAT_FRAME:AddMessage("  |cff00ccff/coal rl|r              — Reload UI")

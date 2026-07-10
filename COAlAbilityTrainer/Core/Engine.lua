@@ -842,3 +842,33 @@ function CoAAT_Engine.ApplyClassTheme()
     end
 end
 
+function CoAAT_Engine.PrintSpellbook()
+    local numTabs = GetNumSpellTabs() or 0
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ccff[CoAAT] Scanning Spellbook:|r")
+    local count = 0
+    local svSpellbook = {}
+    for tab = 1, numTabs do
+        local tabName, _, offset, numSlots = GetSpellTabInfo(tab)
+        offset = offset or 0
+        numSlots = numSlots or 0
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|cffFFD700Tab: %s (Offset: %d, Slots: %d)|r", tabName or "Unknown", offset, numSlots))
+        for slot = offset + 1, offset + numSlots do
+            local spellName, spellSubName = GetSpellBookItemName(slot, "spell")
+            local spellType, spellId = GetSpellBookItemInfo(slot, "spell")
+            if spellName then
+                count = count + 1
+                local rankStr = (spellSubName and spellSubName ~= "") and (" (" .. spellSubName .. ")") or ""
+                DEFAULT_CHAT_FRAME:AddMessage(string.format("  [%d] |cff00ffaa%s|r%s (ID: %s, Type: %s)", slot, spellName, rankStr, tostring(spellId or "?"), tostring(spellType or "?")))
+                table.insert(svSpellbook, { slot = slot, name = spellName, rank = spellSubName, id = spellId, type = spellType })
+            end
+        end
+    end
+    DEFAULT_CHAT_FRAME:AddMessage(string.format("|cff00ccff[CoAAT] Scan complete. Found %d known spells.|r", count))
+
+    if CoAAT_DB then
+        CoAAT_DB.lastScannedSpellbook = svSpellbook
+        DEFAULT_CHAT_FRAME:AddMessage("|cff00ccff[CoAAT] Saved complete list to saved variables (lastScannedSpellbook) for easy copy-pasting.|r")
+    end
+end
+
+
