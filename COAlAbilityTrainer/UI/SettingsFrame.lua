@@ -805,34 +805,83 @@ function CoAAT_SettingsFrame.SetupHotbarPage2()
         return
     end
 
-    local specDef = CoAAT_Engine.GetSpecDef()
-    if not specDef or not specDef.abilities then
-        return
-    end
-
-    print("|cff00ccff[CoAAT] Setting up hotbar Page 2 for " .. specDef.name .. "...|r")
+    print("|cff00ccff[CoAAT] Scanning spellbook for dynamic macro creation...|r")
 
     ClearCursor()
 
-    -- 1. Formulate the one-button rotation castsequence macro (CoA_Rot)
+    -- 1. Scan spellbook tabs 2 onwards for learned combat spells
+    local numTabs = GetNumSpellTabs() or 0
+    local learnedSpells = {}
+
+    -- Helper to classify spells using the global database
+    local function GetAbilityType(spellName)
+        local lowerName = spellName:lower()
+        if CoAAT_Abilities then
+            for classId, classDef in pairs(CoAAT_Abilities) do
+                if classDef.specs then
+                    for specId, specDef in pairs(classDef.specs) do
+                        if specDef.abilities then
+                            for _, ab in ipairs(specDef.abilities) do
+                                if ab.name:lower() == lowerName then
+                                    return ab.type
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return "cooldown" -- default type if not found in db
+    end
+
+    for tab = 2, numTabs do
+        local _, _, offset, numSlots = GetSpellTabInfo(tab)
+        offset = offset or 0
+        numSlots = numSlots or 0
+        for slot = offset + 1, offset + numSlots do
+            local spellName, spellSubName = GetSpellBookItemName(slot, "spell")
+            local isPassive = IsPassiveSpell(slot, "spell")
+            if spellName and not isPassive then
+                table.insert(learnedSpells, {
+                    name = spellName,
+                    type = GetAbilityType(spellName)
+                })
+            end
+        end
+    end
+
+    if #learnedSpells == 0 then
+        print("|cffff4444[CoAAT] Error: No active combat spells found in your spellbook! Make sure you have trained spells.|r")
+        return
+    end
+
+    -- 2. Formulate the rotation sequence macro (CoA_Rot) using actual learned spells
     local generator, spender, debuff
-    for _, abi in ipairs(specDef.abilities) do
-        if abi.type == "generator" then
-            generator = abi.name
-        elseif abi.type == "spender" then
-            spender = abi.name
-        elseif abi.type == "debuff" then
-            debuff = abi.name
+    for _, sp in ipairs(learnedSpells) do
+        if sp.type == "generator" then
+            generator = sp.name
+        elseif sp.type == "spender" then
+            spender = sp.name
+        elseif sp.type == "debuff" then
+            debuff = sp.name
         end
     end
 
     local seqParts = {}
     if debuff then table.insert(seqParts, debuff) end
-    if generator then 
+    if generator then
         table.insert(seqParts, generator)
         table.insert(seqParts, generator)
     end
     if spender then table.insert(seqParts, spender) end
+
+    -- Fallback rotation sequence using the first 3 spells if we couldn't classify them
+    if #seqParts == 0 then
+        for i = 1, math.min(3, #learnedSpells) do
+            table.insert(seqParts, learnedSpells[i].name)
+        end
+    end
+
     local castSeq = #seqParts > 0 and table.concat(seqParts, ", ") or nil
 
     if castSeq then
@@ -856,24 +905,19 @@ function CoAAT_SettingsFrame.SetupHotbarPage2()
 
         if rotMacroIndex and rotMacroIndex > 0 then
             PickupMacro(rotMacroIndex)
-            PlaceAction(13) -- Place one-button rotation in Slot 13 (Page 2 Slot 1)
+            PlaceAction(13) -- Place rotation macro in Page 2 Slot 1 (Slot index 13)
             ClearCursor()
-            print("|cff00ffaa[CoAAT] Created/Updated One-Button Rotation Macro: CoA_Rot|r")
+            print("|cff00ffaa[CoAAT] Created/Updated Rotation Macro: CoA_Rot|r")
         end
     end
 
-    -- 2. Create/Update individual optimized abilities macros (pop trinkets + engineering)
-    for i, ability in ipairs(specDef.abilities) do
+    -- 3. Create/Update individual macros for each learned ability and place on Action Bar Page 2
+    for i, sp in ipairs(learnedSpells) do
         local slot = 13 + i -- Place individual macros in slots 14 onwards
         if slot > 24 then break end
 
-        -- Warn if spell not learned
-        if not GetSpellInfo(ability.name) then
-            print("|cffffaa00[CoAAT] Alert: You have not learned " .. ability.name .. " yet. Visit your trainer!|r")
-        end
-
-        local macroName = "CoA_" .. ability.name:gsub("%s", ""):sub(1, 12)
-        local macroBody = "#showtooltip " .. ability.name .. "\n/use 13\n/use 14\n/use 10\n/cast " .. ability.name
+        local macroName = "CoA_" .. sp.name:gsub("%s", ""):sub(1, 12)
+        local macroBody = string.format("#showtooltip\n/use 13\n/use 14\n/use 10\n/cast %s", sp.name)
 
         local macroIndex = GetMacroIndexByName(macroName)
         if not macroIndex or macroIndex == 0 then
@@ -894,10 +938,11 @@ function CoAAT_SettingsFrame.SetupHotbarPage2()
             PickupMacro(macroIndex)
             PlaceAction(slot)
             ClearCursor()
+            print(string.format("|cff00ffaa[CoAAT] Placed Macro for: %s on Slot %d|r", sp.name, slot))
         end
     end
 
-    print("|cff00ccff[CoAAT] Hotbar Page 2 setup complete! Switched page 2 icons.|r")
+    print("|cff00ccff[CoAAT] Hotbar Page 2 setup complete using spellbook spells!|r")
 end
 
 function CoAAT_SettingsFrame.ApplyTheme(r, g, b, hex)
