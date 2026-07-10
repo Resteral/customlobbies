@@ -190,12 +190,12 @@ function CoAAT_AuraDisplay.RefreshFromSpellbook()
         for slot = offset + 1, offset + numSlots do
             local spellName, spellSubName = GetSpellBookItemName(slot, "spell")
             local isPassive = IsPassiveSpell(slot, "spell")
-            local iconTex = GetSpellBookItemTexture(slot, "spell")
 
             if spellName and not isPassive then
                 count = count + 1
                 if count > #auraIcons then break end
 
+                local _, _, iconTex = GetSpellInfo(spellName)
                 local ic = auraIcons[count]
 
                 -- Construct a dynamic ability definition for this spell
