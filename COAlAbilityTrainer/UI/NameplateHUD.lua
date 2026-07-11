@@ -427,17 +427,17 @@ end
 
 local function GetCastData(unit)
     local now = GetTime()
-    local name,_,_,startMS,endMS,_,notInt = UnitCastingInfo(unit)
+    local name, _, _, _, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(unit)
     if name then
-        local s,e = startMS/1000, endMS/1000
-        local pct = math.max(0, math.min(1,(now-s)/(e-s)))
-        return name, pct, false, not notInt
+        local s, e = startTime / 1000, endTime / 1000
+        local pct = math.max(0, math.min(1, (now - s) / (e - s)))
+        return name, pct, false, not notInterruptible
     end
-    local cname,_,_,cs,ce = UnitChannelInfo(unit)
+    local cname, _, _, _, startTime, endTime, _, notInterruptible = UnitChannelInfo(unit)
     if cname then
-        local s,e = cs/1000, ce/1000
-        local pct = math.max(0, math.min(1,1-(now-s)/(e-s)))
-        return cname, pct, true, true
+        local s, e = startTime / 1000, endTime / 1000
+        local pct = math.max(0, math.min(1, 1 - (now - s) / (e - s)))
+        return cname, pct, true, not notInterruptible
     end
     return nil
 end
