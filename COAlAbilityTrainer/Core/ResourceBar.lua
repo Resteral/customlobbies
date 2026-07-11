@@ -163,7 +163,7 @@ function CoAAT_ResourceBar.Update(current, maxVal, color)
 
     f._fill:SetWidth(w)
 
-    local classId = CoAAT_Engine and CoAAT_Engine.classId or "general"
+    local classId = CoAAT_Engine and CoAAT_Engine.GetClassId() or "general"
     local useCrystals = (classId == "reaper" or classId == "felsworn")
 
     if classId == "reaper" then

@@ -352,7 +352,7 @@ function CoAAT_CombatHUD.ApplyTheme(r, g, b, hex)
     local hud = _hud
     if not hud then return end
 
-    local classId = CoAAT_Engine and CoAAT_Engine.classId or "general"
+    local classId = CoAAT_Engine and CoAAT_Engine.GetClassId() or "general"
 
     if hud._classBG and hud._leftWing and hud._rightWing then
         if classId == "reaper" then
