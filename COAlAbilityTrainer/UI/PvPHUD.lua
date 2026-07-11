@@ -145,12 +145,26 @@ function CoAAT_PvPHUD.Build()
     f:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     f:RegisterEvent("PLAYER_FOCUS_CHANGED")
     f:RegisterEvent("PLAYER_TARGET_CHANGED")
+    f:RegisterEvent("PLAYER_ENTERING_WORLD")
+    f:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+    f._manualToggle = false
+
     f:SetScript("OnEvent", function(self, event, ...)
         if event == "COMBAT_LOG_EVENT_UNFILTERED" then
             CoAAT_PvPHUD.OnCLEU(...)
         elseif event == "PLAYER_FOCUS_CHANGED" or event == "PLAYER_TARGET_CHANGED" then
             CoAAT_PvPHUD.UpdateFocusCast()
             CoAAT_PvPHUD.UpdateDRDisplay()
+        elseif event == "PLAYER_ENTERING_WORLD" or event == "ZONE_CHANGED_NEW_AREA" then
+            local inInst, instType = IsInInstance()
+            if inInst and (instType == "pvp" or instType == "arena") then
+                self:Show()
+                CoAAT_PvPHUD.UpdateDRDisplay()
+            else
+                if not self._manualToggle then
+                    self:Hide()
+                end
+            end
         end
     end)
 
@@ -313,8 +327,10 @@ function CoAAT_PvPHUD.Toggle()
     end
     if _frame:IsShown() then
         _frame:Hide()
+        _frame._manualToggle = false
     else
         _frame:Show()
+        _frame._manualToggle = true
         CoAAT_PvPHUD.UpdateDRDisplay()
         print("|cff00ccff[CoAAT] PvP HUD Frame shown. Move by dragging from the header.|r")
     end

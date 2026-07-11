@@ -1,0 +1,52 @@
+{
+  "name": "roblox-perp",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "Scripts": {
+        "$path": "src/server"
+      }
+    },
+
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$path": "src/client"
+      }
+    },
+
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Shared": {
+        "$path": "src/shared"
+      }
+    },
+
+    "Workspace": {
+      "$className": "Workspace",
+
+      "WeedPlant": {
+        "$className": "Part",
+        "$properties": {
+          "Size": [3, 5, 3],
+          "Position": [0, 2.5, -15],
+          "Material": "SmoothPlastic",
+          "Color": [34, 100, 34],
+          "Anchored": true
+        },
+        "ProximityPrompt": {
+          "$className": "ProximityPrompt",
+          "$properties": {
+            "ActionText": "Harvest",
+            "ObjectText": "Weed Plant 🌿",
+            "HoldDuration": 0.5,
+            "MaxActivationDistance": 8,
+            "RequiresLineOfSight": false
+          }
+        }
+      }
+    }
+  }
+}

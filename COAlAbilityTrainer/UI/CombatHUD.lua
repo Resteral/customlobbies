@@ -131,7 +131,7 @@ function CoAAT_CombatHUD.Build()
     CoAAT_PlayerCard.Build(playerCardSection)
     CoAAT_CursorHUD.Build(hud)
     CoAAT_RotationHelper.Build(rotSection)
-    CoAAT_AuraDisplay.Build(auraSection)
+    -- CoAAT_AuraDisplay.Build(auraSection)
     CoAAT_ResourceBar.Build(resSection, 0, -6)
     CoAAT_CastingBar.Build(castSection)
     CoAAT_CooldownTracker.Build(cdSection)
@@ -318,7 +318,7 @@ function CoAAT_CombatHUD.OnClassChanged(classId, specId)
     local hud = _hud
     if not hud then return end
 
-    CoAAT_AuraDisplay.OnClassChanged(classId, specId)
+    -- CoAAT_AuraDisplay.OnClassChanged(classId, specId)
     CoAAT_CooldownTracker.OnClassChanged(classId, specId)
     CoAAT_ResourceBar.OnClassChanged(classId, specId)
     CoAAT_RotationHelper.OnClassChanged(classId, specId)

@@ -1,0 +1,5 @@
+# Rokit toolchain configuration
+# If you install Rokit in the future, running `rokit install` will download these tools.
+
+[tools]
+rojo = "rojo-rbx/rojo@7.7.0"
