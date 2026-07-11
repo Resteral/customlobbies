@@ -24,7 +24,7 @@ CoAAT_NameplateHUD = {}
 
 local _injected   = {}
 local _ticker     = 0
-local _TICK       = 0.08
+local _TICK       = 0.30
 local _controller = nil
 
 -- ─────────────────────────────────────────────────────────────
@@ -397,16 +397,19 @@ local CLASS_COLORS = {
 -- ─────────────────────────────────────────────────────────────
 local function IsNameplate(f)
     if not f or f:GetName() then return false end
-    for _, c in ipairs({ f:GetChildren() }) do
-        if c:GetObjectType() == "StatusBar" then return true end
+    if f._hpBar then return true end
+    local children = { f:GetChildren() }
+    for _, c in ipairs(children) do
+        if c:GetObjectType() == "StatusBar" then
+            f._hpBar = c
+            return true
+        end
     end
     return false
 end
 
 local function GetNPHealthBar(f)
-    for _, c in ipairs({ f:GetChildren() }) do
-        if c:GetObjectType() == "StatusBar" then return c end
-    end
+    return f._hpBar
 end
 
 local function GetSafeRegions(f)
@@ -890,7 +893,11 @@ local function ScanNameplates(dt)
                 end
 
                 if targetName then
-                    local npName = GetNPName(frame)
+                    local npName = frame._name
+                    if not npName then
+                        npName = GetNPName(frame)
+                        frame._name = npName
+                    end
                     if npName == targetName then
                         local hp = GetNPHealthBar(frame)
                         if hp then
@@ -927,6 +934,7 @@ local function ScanNameplates(dt)
         if not seen[frame] then
             HideOverlay(ov)
             _injected[frame] = nil
+            frame._name = nil
         end
     end
 end

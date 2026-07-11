@@ -88,40 +88,40 @@ local function StyleNameplate(frame)
     end
 end
 
-local function StyleAllNameplates()
-    local kids = { WorldFrame:GetChildren() }
-    for _, frame in ipairs(kids) do
-        if frame:IsShown() and not frame:GetName() then
-            local regions = GetSafeRegions(frame)
-            local isNameplate = false
-            for _, region in ipairs(regions) do
-                if region:GetObjectType() == "Texture" then
-                    local texPath = region:GetTexture()
-                    if texPath and (string.find(texPath, "Nameplate") or string.find(texPath, "TargetFrame")) then
-                        isNameplate = true
-                        break
-                    end
-                end
-            end
-            if isNameplate then
-                StyleNameplate(frame)
-            end
-        end
-    end
-end
+local cachedTargetNP = nil
 
 local function FindTargetNameplate()
     if not UnitExists("target") then return nil end
     local targetName = UnitName("target")
     if not targetName then return nil end
 
-    StyleAllNameplates()
+    -- Check if cache is still valid
+    if cachedTargetNP and cachedTargetNP:IsShown() then
+        local match = false
+        local regions = GetSafeRegions(cachedTargetNP)
+        for _, r in ipairs(regions) do
+            if r:GetObjectType() == "FontString" and r:GetText() == targetName then
+                match = true
+                break
+            end
+        end
+        if match then
+            return cachedTargetNP
+        end
+        cachedTargetNP = nil
+    end
 
+    -- Cache was not valid, let's scan WorldFrame children (once)
     local kids = { WorldFrame:GetChildren() }
     
-    -- Pass 1: Name matches AND target glow active (accurate target detection)
+    -- Pass 1: Look for exact name match AND target glow
     for _, frame in ipairs(kids) do
         if frame:IsShown() and not frame:GetName() then
+            -- Style if not already styled
+            if not frame.styledCoA then
+                StyleNameplate(frame)
+            end
+
             local nameMatches = false
             local isTargetGlow = false
             local regions = GetSafeRegions(frame)
@@ -141,39 +141,25 @@ local function FindTargetNameplate()
                 end
             end
             if nameMatches and isTargetGlow then
+                cachedTargetNP = frame
                 return frame
             end
         end
     end
 
-    -- Pass 2: Name matches AND alpha == 1.0 (WotLK target opacity)
-    for _, frame in ipairs(kids) do
-        if frame:IsShown() and not frame:GetName() then
-            local nameMatches = false
-            local regions = GetSafeRegions(frame)
-            for _, region in ipairs(regions) do
-                if region:GetObjectType() == "FontString" and region:GetText() == targetName then
-                    nameMatches = true
-                    break
-                end
-            end
-            if nameMatches and frame:GetAlpha() == 1.0 then
-                return frame
-            end
-        end
-    end
-
-    -- Pass 3: Fallback first matching name
+    -- Pass 2: Fallback to first matching name
     for _, frame in ipairs(kids) do
         if frame:IsShown() and not frame:GetName() then
             local regions = GetSafeRegions(frame)
             for _, region in ipairs(regions) do
                 if region:GetObjectType() == "FontString" and region:GetText() == targetName then
+                    cachedTargetNP = frame
                     return frame
                 end
             end
         end
     end
+
     return nil
 end
 
@@ -353,6 +339,7 @@ function CoAAT_PlayerCard.Build(parent)
 
     _frame:SetScript("OnEvent", function(self, event, unit, ...)
         if event == "PLAYER_TARGET_CHANGED" then
+            cachedTargetNP = nil
             CoAAT_PlayerCard.UpdateTarget()
         elseif unit == "target" then
             if event == "UNIT_AURA" then

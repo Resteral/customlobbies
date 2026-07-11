@@ -307,14 +307,17 @@ end
 -- ─────────────────────────────────────────────────────────────
 -- Tick Update
 -- ─────────────────────────────────────────────────────────────
+local drTicker = 0
 function CoAAT_PvPHUD.OnUpdate(dt)
     CoAAT_PvPHUD.UpdateFocusCast()
 
-    -- Periodically update DR timers
-    local now = GetTime()
-    local targetGUID = UnitGUID("target")
-    if targetGUID and activeDRs[targetGUID] then
-        CoAAT_PvPHUD.UpdateDRDisplay()
+    drTicker = drTicker + dt
+    if drTicker >= 0.15 then
+        drTicker = 0
+        local targetGUID = UnitGUID("target")
+        if targetGUID and activeDRs[targetGUID] then
+            CoAAT_PvPHUD.UpdateDRDisplay()
+        end
     end
 end
 
