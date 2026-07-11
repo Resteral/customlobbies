@@ -20,12 +20,19 @@ local DR_CATEGORIES = {
     -- Stuns
     ["Kidney Shot"] = "stun", ["Cheap Shot"] = "stun", ["Hammer of Justice"] = "stun",
     ["Bash"] = "stun", ["Intercept"] = "stun", ["Shadowfury"] = "stun", ["Fel Stun"] = "stun",
+    ["Shockwave"] = "stun", ["Concussive Blow"] = "stun", ["Gnaw"] = "stun", ["Charge Stun"] = "stun",
     -- Fears
-    ["Fear"] = "fear", ["Psychic Scream"] = "fear", ["Howl of Terror"] = "fear", ["Death Coil"] = "fear",
+    ["Fear"] = "fear", ["Psychic Scream"] = "fear", ["Howl of Terror"] = "fear",
+    ["Death Coil"] = "fear", ["Seduction"] = "fear", ["Intimidating Shout"] = "fear",
     -- Incapacitates / Poly
-    ["Polymorph"] = "incap", ["Freezing Trap"] = "incap", ["Repentance"] = "incap", ["Gouge"] = "incap",
+    ["Polymorph"] = "incap", ["Freezing Trap"] = "incap", ["Repentance"] = "incap",
+    ["Gouge"] = "incap", ["Sap"] = "incap", ["Wyvern Sting"] = "incap", ["Hex"] = "incap",
+    ["Hunger"] = "incap", ["Slayer Cleave"] = "incap",
     -- Silences
-    ["Silence"] = "silence", ["Counterspell"] = "silence", ["Spell Lock"] = "silence", ["Strangulate"] = "silence",
+    ["Silence"] = "silence", ["Counterspell"] = "silence", ["Spell Lock"] = "silence",
+    ["Strangulate"] = "silence", ["Garrote - Silence"] = "silence", ["Shield of the Righteous"] = "silence",
+    -- Disorients / Cyclones
+    ["Cyclone"] = "disorient", ["Banish"] = "disorient", ["Blind"] = "disorient", ["Scatter Shot"] = "disorient",
 }
 
 -- Dangerous PvP casts to alert
@@ -34,6 +41,7 @@ local DANGEROUS_SPELLS = {
     ["Chaos Bolt"] = true, ["Lava Burst"] = true, ["Aimed Shot"] = true,
     ["Pyroblast"] = true, ["Greater Heal"] = true, ["Divine Light"] = true,
     ["Penance"] = true, ["Hex"] = true, ["Vampiric Touch"] = true,
+    ["Banish"] = true, ["Wyvern Sting"] = true, ["Repentance"] = true,
 }
 
 -- Trinket spells
@@ -126,6 +134,13 @@ function CoAAT_PvPHUD.Build()
     alertBanner:SetText("")
     f._alertBanner = alertBanner
 
+    -- Purge/Dispel Alert String
+    local dispelAlert = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    dispelAlert:SetPoint("BOTTOM", f, "BOTTOM", 0, 10)
+    dispelAlert:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+    dispelAlert:SetText("")
+    f._dispelAlert = dispelAlert
+
     -- Border lines (soft purple accent)
     f._borderLines = {}
     local function MakeLine(p1, p2, w, h)
@@ -214,7 +229,7 @@ function CoAAT_PvPHUD.OnCLEU(...)
     local ts, event, _, srcGUID, srcName, _, _, destGUID, destName, _, _, spellId, spellName = ...
     local now = GetTime()
 
-    -- 1. CC Applied: track DR
+    -- 1. CC Applied: track DR & alert on friendly CC
     if event == "SPELL_AURA_APPLIED" and DR_CATEGORIES[spellName] then
         local cat = DR_CATEGORIES[spellName]
         if not activeDRs[destGUID] then activeDRs[destGUID] = {} end
@@ -226,6 +241,15 @@ function CoAAT_PvPHUD.OnCLEU(...)
 
         if destGUID == UnitGUID("target") or destGUID == UnitGUID("focus") then
             CoAAT_PvPHUD.UpdateDRDisplay()
+        end
+
+        -- Teammate CC Alert
+        if destGUID ~= UnitGUID("player") and (destName and (UnitInParty(destName) or UnitInRaid(destName))) then
+            if _frame and _frame._alertBanner then
+                _frame._alertBanner:SetText(string.format("|cffff2222⚠ TEAM CC:|r %s is |cffffaa00%s|r!", destName, spellName))
+                PlaySound("RaidWarning")
+                UIFrameFadeOut(_frame._alertBanner, 3.0, 1.0, 0)
+            end
         end
     end
 
@@ -288,6 +312,7 @@ function CoAAT_PvPHUD.UpdateDRDisplay()
                 if cat == "fear" then tex = "Interface\\Icons\\Spell_Shadow_Possession"
                 elseif cat == "incap" then tex = "Interface\\Icons\\Spell_Nature_Polymorph"
                 elseif cat == "silence" then tex = "Interface\\Icons\\Spell_Shadow_Silence"
+                elseif cat == "disorient" then tex = "Interface\\Icons\\Spell_Nature_Cyclone"
                 end
                 
                 slot.tex:SetTexture(tex)
@@ -317,6 +342,36 @@ function CoAAT_PvPHUD.OnUpdate(dt)
         local targetGUID = UnitGUID("target")
         if targetGUID and activeDRs[targetGUID] then
             CoAAT_PvPHUD.UpdateDRDisplay()
+        end
+
+        -- Scan target and focus for purgeable or high-value PvP buffs
+        local f = _frame
+        if f and f._dispelAlert then
+            local purgeBuffs = {
+                ["Innervate"] = true, ["Divine Plea"] = true, ["Power Infusion"] = true,
+                ["Hand of Protection"] = true, ["Avenging Wrath"] = true, ["Ice Barrier"] = true,
+                ["Presence of Mind"] = true, ["Predatory Swiftness"] = true, ["Nature's Swiftness"] = true,
+                ["Bloodlust"] = true, ["Heroism"] = true, ["Divine Shield"] = true,
+                ["Ice Block"] = true, ["Deterrence"] = true, ["Lichborne"] = true
+            }
+            local activePurges = {}
+            for _, unit in ipairs({"target", "focus"}) do
+                if UnitExists(unit) and UnitCanAttack("player", unit) then
+                    for i = 1, 40 do
+                        local name, _, _, _, _, _, _, _, isStealable = UnitBuff(unit, i)
+                        if not name then break end
+                        if isStealable or purgeBuffs[name] then
+                            local labelColor = (name == "Divine Shield" or name == "Ice Block" or name == "Deterrence") and "|cffff2222" or "|cff00ffaa"
+                            table.insert(activePurges, string.format("%s%s|r (%s)", labelColor, name, unit))
+                        end
+                    end
+                end
+            end
+            if #activePurges > 0 then
+                f._dispelAlert:SetText(string.format("⚔ PURGE: %s ⚔", table.concat(activePurges, ", ")))
+            else
+                f._dispelAlert:SetText("")
+            end
         end
     end
 end
