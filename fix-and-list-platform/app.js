@@ -3633,16 +3633,16 @@ function handleSendTour(event) {
 // Campaign templates
 const CAMPAIGN_TEMPLATES = {
     expired: {
-        subject: "Is your property at {Address} still on the market? Invest in our skills to create Capital.",
-        body: "Hi there,\n\nI noticed your listing at {Address} expired on the market. In today's market, 78% of active buyers pass on homes needing repairs or dated cosmetics (paint, floors, kitchens).\n\nWith Revitalize, you can invest in our skills to create Capital. Under our 50/50 payment split terms, we construct the improvements you need to secure top dollar, deferring half the cost to sale closing. We'll handle everything from planning to vetted contractor dispatches.\n\nBest regards,\nRevitalize Listing Team"
+        subject: "Is your property at {Address} still on the market? Invest in our Skills to create Capital.",
+        body: "Hi there,\n\nI noticed your listing at {Address} expired on the market. In today's market, 78% of active buyers pass on homes needing repairs or dated cosmetics (paint, floors, kitchens).\n\nWith Revitalize, you can invest in our Skills to create Capital. Under our 50/50 payment split terms, we construct the improvements you need to secure top dollar, deferring half the cost to sale closing. We'll handle everything from planning to vetted contractor dispatches.\n\nBest regards,\nRevitalize Listing Team"
     },
     upgrade: {
-        subject: "Invest in our skills to create Capital at {Address}.",
-        body: "Hi there,\n\nAre you planning to list your home but worried about how to prepare it? Invest in our skills to create Capital.\n\nWe specialize in preparing homes to capture maximum equity under a 50/50 payment split model (50% upfront, 50% deferred to closing). Let's unlock your true home valuation.\n\nBest regards,\nRevitalize Listing Team"
+        subject: "Invest in our Skills to create Capital at {Address}.",
+        body: "Hi there,\n\nAre you planning to list your home but worried about how to prepare it? Invest in our Skills to create Capital.\n\nWe specialize in preparing homes to capture maximum equity under a 50/50 payment split model (50% upfront, 50% deferred to closing). Let's unlock your true home valuation.\n\nBest regards,\nRevitalize Listing Team"
     },
     addition: {
-        subject: "Adding square footage to {Address} - Invest in our skills to create Capital.",
-        body: "Hi there,\n\nDid you know adding a bathroom or extending your living area yields up to 150% ROI at closing? Invest in our skills to create Capital.\n\nWe provide advanced custom additions and upgrades with a 50/50 payment split before listing your home. Let us design a custom plan to attract premium offers.\n\nBest regards,\nRevitalize Listing Team"
+        subject: "Adding square footage to {Address} - Invest in our Skills to create Capital.",
+        body: "Hi there,\n\nDid you know adding a bathroom or extending your living area yields up to 150% ROI at closing? Invest in our Skills to create Capital.\n\nWe provide advanced custom additions and upgrades with a 50/50 payment split before listing your home. Let us design a custom plan to attract premium offers.\n\nBest regards,\nRevitalize Listing Team"
     }
 };
 
