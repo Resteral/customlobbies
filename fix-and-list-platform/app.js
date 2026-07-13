@@ -144,67 +144,112 @@ let sigMode = 'draw';
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     // Load leads
-    const savedLeads = localStorage.getItem('revitalize_leads');
-    if (savedLeads) {
-        leads = JSON.parse(savedLeads);
-    } else {
+    try {
+        const savedLeads = localStorage.getItem('revitalize_leads');
+        if (savedLeads) {
+            leads = JSON.parse(savedLeads);
+        } else {
+            leads = [];
+            saveLeadsToStorage();
+        }
+    } catch (e) {
+        console.error("Leads parse error, resetting...", e);
         leads = [];
         saveLeadsToStorage();
     }
 
     // Load Contractors
-    const savedContractors = localStorage.getItem('revitalize_contractors');
-    if (savedContractors) {
-        contractors = JSON.parse(savedContractors);
-    } else {
+    try {
+        const savedContractors = localStorage.getItem('revitalize_contractors');
+        if (savedContractors) {
+            contractors = JSON.parse(savedContractors);
+        } else {
+            contractors = [];
+            saveContractorsToStorage();
+        }
+    } catch (e) {
+        console.error("Contractors parse error, resetting...", e);
         contractors = [];
         saveContractorsToStorage();
     }
 
     // Load Comps
-    const savedComps = localStorage.getItem('revitalize_comps');
-    if (savedComps) {
-        comps = JSON.parse(savedComps);
-    } else {
+    try {
+        const savedComps = localStorage.getItem('revitalize_comps');
+        if (savedComps) {
+            comps = JSON.parse(savedComps);
+        } else {
+            comps = [];
+            saveCompsToStorage();
+        }
+    } catch (e) {
+        console.error("Comps parse error, resetting...", e);
         comps = [];
         saveCompsToStorage();
     }
 
     // Load Prospects
-    const savedProspects = localStorage.getItem('revitalize_prospects');
-    if (savedProspects) {
-        prospects = JSON.parse(savedProspects);
-    } else {
+    try {
+        const savedProspects = localStorage.getItem('revitalize_prospects');
+        if (savedProspects) {
+            prospects = JSON.parse(savedProspects);
+        } else {
+            prospects = [];
+            saveProspectsToStorage();
+        }
+    } catch (e) {
+        console.error("Prospects parse error, resetting...", e);
         prospects = [];
         saveProspectsToStorage();
     }
 
     // Load Ad Campaigns
-    const savedAdCampaigns = localStorage.getItem('revitalize_ad_campaigns');
-    if (savedAdCampaigns) {
-        adCampaigns = JSON.parse(savedAdCampaigns);
-    } else {
+    try {
+        const savedAdCampaigns = localStorage.getItem('revitalize_ad_campaigns');
+        if (savedAdCampaigns) {
+            adCampaigns = JSON.parse(savedAdCampaigns);
+        } else {
+            adCampaigns = [];
+            saveAdCampaignsToStorage();
+        }
+    } catch (e) {
+        console.error("Ad campaigns parse error, resetting...", e);
         adCampaigns = [];
         saveAdCampaignsToStorage();
     }
 
     // Load Email Settings & Logs
-    const savedEmailSettings = localStorage.getItem('revitalize_email_settings');
-    if (savedEmailSettings) emailSettings = JSON.parse(savedEmailSettings);
+    try {
+        const savedEmailSettings = localStorage.getItem('revitalize_email_settings');
+        if (savedEmailSettings) emailSettings = JSON.parse(savedEmailSettings);
+    } catch (e) {
+        console.error("Email settings parse error:", e);
+    }
     
-    const savedEmailLogs = localStorage.getItem('revitalize_email_logs');
-    if (savedEmailLogs) {
-        emailLogs = JSON.parse(savedEmailLogs);
-    } else {
+    try {
+        const savedEmailLogs = localStorage.getItem('revitalize_email_logs');
+        if (savedEmailLogs) {
+            emailLogs = JSON.parse(savedEmailLogs);
+        } else {
+            emailLogs = [];
+            localStorage.setItem('revitalize_email_logs', JSON.stringify(emailLogs));
+        }
+    } catch (e) {
+        console.error("Email logs parse error, resetting...", e);
         emailLogs = [];
         localStorage.setItem('revitalize_email_logs', JSON.stringify(emailLogs));
     }
 
     // Load API Settings
-    const savedApiSettings = localStorage.getItem('revitalize_api_settings');
-    if (savedApiSettings) {
-        apiSettings = JSON.parse(savedApiSettings);
-    } else {
+    try {
+        const savedApiSettings = localStorage.getItem('revitalize_api_settings');
+        if (savedApiSettings) {
+            apiSettings = JSON.parse(savedApiSettings);
+        } else {
+            localStorage.setItem('revitalize_api_settings', JSON.stringify(apiSettings));
+        }
+    } catch (e) {
+        console.error("API settings parse error, resetting defaults...", e);
         localStorage.setItem('revitalize_api_settings', JSON.stringify(apiSettings));
     }
 
