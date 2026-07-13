@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revitalize | Premium Fix-and-List Platform</title>
+    <!-- Google Fonts: Inter & Great Vibes for script signature -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-logo">
+            <i data-lucide="home" class="logo-icon"></i>
+            <span class="logo-text">Revitalize<span class="accent-dot">.</span></span>
+        </div>
+        <nav class="header-nav">
+            <button id="btn-portal" class="nav-tab active" onclick="switchView('portal')">
+                <i data-lucide="user"></i> Homeowner Portal
+            </button>
+            <button id="btn-dashboard" class="nav-tab" onclick="switchView('dashboard')">
+                <i data-lucide="layout-dashboard"></i> Agent Dashboard
+            </button>
+        </nav>
+    </header>
+
+    <main class="app-content">
+        <!-- ================= HOMEOWNER PORTAL VIEW ================= -->
+        <section id="view-portal" class="view-section active">
+            <div class="hero-section">
+                <div class="hero-badge">Renovate Now • Pay At Closing • Sell For More</div>
+                <h1 class="hero-title">Unlock Your Home's <span class="text-gradient">True Market Value</span></h1>
+                <p class="hero-subtitle">We invest our capital to renovate your home, discount the costs, and handle the listing. You pay nothing upfront, sell for top dollar, and keep the added profit.</p>
+            </div>
+
+            <!-- Before/After Slider & Calculator Grid -->
+            <div class="portal-grid">
+                <!-- Visual Renovation Impact Slider -->
+                <div class="glass-card visual-slider-card">
+                    <div class="card-header">
+                        <i data-lucide="image" class="accent-text"></i>
+                        <h2>Before & After Transformation</h2>
+                        <span class="badge">Drag Slider to Reveal</span>
+                    </div>
+                    <div class="card-body slider-body">
+                        <div class="ba-slider-container" id="ba-slider-container">
+                            <!-- After Image/Graphic -->
+                            <div class="ba-image after-view">
+                                <div class="mock-kitchen modern-kitchen">
+                                    <div class="ceiling-lights-glow"></div>
+                                    <div class="cabinets white-cabinets">
+                                        <div class="cabinet-door"></div>
+                                        <div class="cabinet-door"></div>
+                                        <div class="cabinet-door"></div>
+                                    </div>
+                                    <div class="counter quartz-counter">
+                                        <div class="faucet modern-faucet"></div>
+                                        <div class="backsplash marble-tile"></div>
+                                    </div>
+                                    <div class="appliances stainless-appliances">
+                                        <div class="stove smart-stove"></div>
+                                    </div>
+                                    <div class="badge-overlay after-badge">AFTER REVITALIZE</div>
+                                </div>
+                            </div>
+                            <!-- Before Image/Graphic -->
+                            <div class="ba-image before-view" id="before-view-pane">
+                                <div class="mock-kitchen dated-kitchen">
+                                    <div class="cabinets wood-cabinets">
+                                        <div class="cabinet-door"></div>
+                                        <div class="cabinet-door"></div>
+                                        <div class="cabinet-door"></div>
+                                    </div>
+                                    <div class="counter laminate-counter">
+                                        <div class="faucet old-faucet"></div>
+                                    </div>
+                                    <div class="appliances old-appliances">
+                                        <div class="stove dated-stove"></div>
+                                    </div>
+                                    <div class="badge-overlay before-badge">BEFORE</div>
+                                </div>
+                            </div>
+                            <!-- Drag Handle -->
+                            <div class="ba-handle" id="ba-handle">
+                                <div class="handle-line"></div>
+                                <div class="handle-button"><i data-lucide="chevrons-left-right"></i></div>
+                                <div class="handle-line"></div>
+                            </div>
+                        </div>
+                        <div class="slider-desc">
+                            <p>Drag the slider to see how cosmetic upgrades like quartz countertops, marble tile backsplashes, and contemporary finishes elevate market appeal.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROI Calculator -->
+                <div class="glass-card calculator-card">
+                    <div class="card-header">
+                        <i data-lucide="calculator" class="accent-text"></i>
+                        <h2>Equity & Profit Estimator</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <div class="label-wrapper">
+                                <label for="input-as-is">Estimated As-Is Value</label>
+                                <span class="slider-val" id="val-as-is">$350,000</span>
+                            </div>
+                            <input type="range" id="input-as-is" min="150000" max="1000000" step="10000" value="350000" oninput="calculateROI()">
+                            <div class="range-limits">
+                                <span>$150k</span>
+                                <span>$1M</span>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="label-wrapper">
+                                <label for="select-rehab">Renovation Level</label>
+                            </div>
+                            <select id="select-rehab" onchange="calculateROI()">
+                                <option value="cosmetic">Cosmetic Refresh (Paint, Landscaping, Lights) - ~$15k</option>
+                                <option value="standard" selected>Standard Upgrade (Kitchen, Bathrooms, Flooring) - ~$40k</option>
+                                <option value="premium">Premium Overhaul (Full Kitchen/Bath, HVAC, Modern Styling) - ~$75k</option>
+                            </select>
+                        </div>
+
+                        <div class="calculator-results">
+                            <div class="result-row total-arv">
+                                <span>Projected New Value (ARV)</span>
+                                <span class="valHighlight" id="calc-arv">$440,000</span>
+                            </div>
+                            <div class="results-grid">
+                                <div class="mini-result">
+                                    <span class="label">Discounted Rehab Cost</span>
+                                    <span class="value" id="calc-rehab-cost">$40,000</span>
+                                </div>
+                                <div class="mini-result">
+                                    <span class="label">As-Is Sale Net Cash</span>
+                                    <span class="value text-muted" id="calc-asis-net">$329,000</span>
+                                </div>
+                                <div class="mini-result">
+                                    <span class="label">Revitalize Sale Net Cash</span>
+                                    <span class="value text-success" id="calc-revitalize-net">$373,600</span>
+                                </div>
+                                <div class="mini-result highlighted-profit">
+                                    <span class="label">Your Extra Profit Lift</span>
+                                    <span class="value glow-text" id="calc-extra-profit">+$44,600</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onboarding & Lookup Split Column Layout -->
+            <div class="portal-grid" style="margin-bottom: 5rem;">
+                <!-- Intake Form -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <i data-lucide="sparkles" class="accent-text"></i>
+                        <h2>List Your Property & Request Proposal</h2>
+                    </div>
+                    <form id="signup-form" onsubmit="handleSignup(event)" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                            <div class="form-group">
+                                <label for="homeowner-name">Full Name</label>
+                                <input type="text" id="homeowner-name" placeholder="John Doe" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="homeowner-phone">Phone Number</label>
+                                <input type="tel" id="homeowner-phone" placeholder="(555) 000-0000" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="homeowner-email">Email Address</label>
+                            <input type="email" id="homeowner-email" placeholder="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="property-address">Property Address</label>
+                            <input type="text" id="property-address" placeholder="123 Main St, Anytown" required>
+                        </div>
+
+                        <!-- Explain what work is needed section -->
+                        <div class="form-group">
+                            <label>What renovations do you need? (Select all that apply)</label>
+                            <div class="renovation-chips" id="renovation-chips" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem;">
+                                <div class="renovation-chip" id="chip-kitchen" onclick="toggleIntakeExplainer('kitchen')">
+                                    <i data-lucide="chef-hat"></i> Kitchen
+                                </div>
+                                <div class="renovation-chip" id="chip-bathroom" onclick="toggleIntakeExplainer('bathroom')">
+                                    <i data-lucide="bath"></i> Bathroom
+                                </div>
+                                <div class="renovation-chip" id="chip-flooring" onclick="toggleIntakeExplainer('flooring')">
+                                    <i data-lucide="layers"></i> Flooring
+                                </div>
+                                <div class="renovation-chip" id="chip-paint" onclick="toggleIntakeExplainer('paint')">
+                                    <i data-lucide="paint-bucket"></i> Paint
+                                </div>
+                                <div class="renovation-chip" id="chip-landscaping" onclick="toggleIntakeExplainer('landscaping')">
+                                    <i data-lucide="flower"></i> Landscaping
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Work Explanation Text Areas -->
+                        <div id="intake-explainers-container" style="display:flex; flex-direction:column; gap:0.75rem;">
+                            <div class="intake-explainer-box" id="intake-explain-kitchen" style="display:none;">
+                                <label for="explain-kitchen-text" style="font-size:0.8rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Explain Kitchen renovations needed:</label>
+                                <textarea id="explain-kitchen-text" rows="2" placeholder="e.g. Countertops are old laminate, cabinet doors are scratched, faucet leaks..."></textarea>
+                            </div>
+                            <div class="intake-explainer-box" id="intake-explain-bathroom" style="display:none;">
+                                <label for="explain-bathroom-text" style="font-size:0.8rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Explain Bathroom renovations needed:</label>
+                                <textarea id="explain-bathroom-text" rows="2" placeholder="e.g. Master shower tile moldy, vanity cabinet outdated..."></textarea>
+                            </div>
+                            <div class="intake-explainer-box" id="intake-explain-flooring" style="display:none;">
+                                <label for="explain-flooring-text" style="font-size:0.8rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Explain Flooring work needed:</label>
+                                <textarea id="explain-flooring-text" rows="2" placeholder="e.g. Stained carpets in bedrooms, click-lock hardwood in hallway..."></textarea>
+                            </div>
+                            <div class="intake-explainer-box" id="intake-explain-paint" style="display:none;">
+                                <label for="explain-paint-text" style="font-size:0.8rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Explain Painting work needed:</label>
+                                <textarea id="explain-paint-text" rows="2" placeholder="e.g. Off-white walls in living room, exterior trims repainted..."></textarea>
+                            </div>
+                            <div class="intake-explainer-box" id="intake-explain-landscaping" style="display:none;">
+                                <label for="explain-landscaping-text" style="font-size:0.8rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Explain Landscaping work needed:</label>
+                                <textarea id="explain-landscaping-text" rows="2" placeholder="e.g. Trim Oak trees, lay dark mulch in front beds, plant hydrangeas..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="property-notes">Other General Repairs / Condition Notes</label>
+                            <textarea id="property-notes" rows="2" placeholder="Describe any other repairs needed (e.g. HVAC serving, roof shingle patch)..."></textarea>
+                        </div>
+                        <div class="form-check-group">
+                            <input type="checkbox" id="allow-emails-checkbox" checked>
+                            <label for="allow-emails-checkbox">Subscribe to automated email alerts (updates on property valuation, contractor dispatches, and active listing statuses).</label>
+                        </div>
+                        <button type="submit" class="btn-primary" style="margin-top:0.5rem; padding: 0.85rem;">
+                            <span>Get My Discounted Rehab Quote</span>
+                            <i data-lucide="arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Client Project Dashboard Lookup -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <i data-lucide="search" class="accent-text"></i>
+                        <h2>Track My Active Property</h2>
+                    </div>
+                    <div class="card-body" style="display:flex; flex-direction:column; gap:1.25rem;">
+                        <p class="section-desc">Already listed with us? Enter your property address below to view your contractor dispatch schedule, construction progress timelines, and digital contract proposal.</p>
+                        <div class="form-group">
+                            <label for="client-lookup-address">Property Address</label>
+                            <input type="text" id="client-lookup-address" placeholder="Enter listed address (e.g., 882 Whispering Pines Dr)...">
+                        </div>
+                        <button class="btn-primary" onclick="handleClientLookup()" style="padding:0.85rem; width:100%;">
+                            <span>Open Client Portal</span>
+                            <i data-lucide="layout"></i>
+                        </button>
+                        <div class="text-muted" style="font-size:0.75rem; text-align:center;">
+                            Try looking up: <strong style="color:var(--text-primary); cursor:pointer;" onclick="fillLookupDemo('882 Whispering Pines Dr')">882 Whispering Pines Dr</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Success Stories -->
+            <div class="features-section">
+                <div class="section-title-wrapper">
+                    <h2>Recent Real Estate Success Stories</h2>
+                    <p>Actual homeowner payouts achieved through Revitalize. Click cards to view case study details.</p>
+                </div>
+                <div class="success-stories-grid">
+                    <div class="story-card" onclick="openCaseStudyModal('prop-1-story')" style="cursor:pointer;">
+                        <div class="story-header">
+                            <h4>458 Pinewood Dr</h4>
+                            <span class="badge success">Closed in 14 Days</span>
+                        </div>
+                        <div class="story-metrics">
+                            <div class="metric">
+                                <span class="label">Rehab Invested</span>
+                                <span class="val">$38,000</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">As-Is Valuation</span>
+                                <span class="val">$290,000</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Sold Price</span>
+                                <span class="val text-success">$395,000</span>
+                            </div>
+                        </div>
+                        <div class="story-footer">
+                            <span>Owner Extra Profit:</span>
+                            <span class="highlight text-gradient font-bold">+$43,300</span>
+                        </div>
+                    </div>
+                    <div class="story-card" onclick="openCaseStudyModal('prop-2-story')" style="cursor:pointer;">
+                        <div class="story-header">
+                            <h4>12 North Ridge Rd</h4>
+                            <span class="badge success">Closed in 21 Days</span>
+                        </div>
+                        <div class="story-metrics">
+                            <div class="metric">
+                                <span class="label">Rehab Invested</span>
+                                <span class="val">$72,000</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">As-Is Valuation</span>
+                                <span class="val">$580,000</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Sold Price</span>
+                                <span class="val text-success">$745,000</span>
+                            </div>
+                        </div>
+                        <div class="story-footer">
+                            <span>Owner Extra Profit:</span>
+                            <span class="highlight text-gradient font-bold">+$48,300</span>
+                        </div>
+                    </div>
+                    <div class="story-card" onclick="openCaseStudyModal('prop-3-story')" style="cursor:pointer;">
+                        <div class="story-header">
+                            <h4>912 Cherry Blossom Ln</h4>
+                            <span class="badge success">Closed in 9 Days</span>
+                        </div>
+                        <div class="story-metrics">
+                            <div class="metric">
+                                <span class="label">Rehab Invested</span>
+                                <span class="val">$14,500</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">As-Is Valuation</span>
+                                <span class="val">$215,000</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Sold Price</span>
+                                <span class="val text-success">$265,000</span>
+                            </div>
+                        </div>
+                        <div class="story-footer">
+                            <span>Owner Extra Profit:</span>
+                            <span class="highlight text-gradient font-bold">+$22,400</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= AGENT PIPELINE DASHBOARD VIEW ================= -->
+        <section id="view-dashboard" class="view-section">
+            <div class="dashboard-topbar">
+                <div class="dash-welcome">
+                    <h1>Agent & Rehab Pipeline</h1>
+                    <p>Track listings, manage property renovations, and dispatch contracts.</p>
+                </div>
+                <div class="stats-ribbon">
+                    <div class="stat-pill">
+                        <span class="label">Active Leads</span>
+                        <span class="value" id="stat-active-leads">0</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="label">Avg Profit Lift</span>
+                        <span class="value text-success">+$42.5k</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="label">Rehabs Underway</span>
+                        <span class="value text-warning" id="stat-active-rehabs">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-tabs">
+                <button class="dash-tab active" id="tab-btn-pipeline" onclick="switchDashSubTab('pipeline')">
+                    <i data-lucide="columns"></i> Pipeline Board
+                </button>
+                <button class="dash-tab" id="tab-btn-map" onclick="switchDashSubTab('map')">
+                    <i data-lucide="map"></i> Properties Near Me
+                </button>
+                <button class="dash-tab" id="tab-btn-contractors" onclick="switchDashSubTab('contractors')">
+                    <i data-lucide="users"></i> Contractors Hub
+                </button>
+                <button class="dash-tab" id="tab-btn-emails" onclick="switchDashSubTab('emails')">
+                    <i data-lucide="mail"></i> Email Automations
+                </button>
+                <button class="dash-tab" id="tab-btn-analytics" onclick="switchDashSubTab('analytics')">
+                    <i data-lucide="bar-chart-3"></i> Analytics & KPI
+                </button>
+            </div>
+
+            <!-- DASHBOARD SUBTAB: PIPELINE BOARD -->
+            <div id="dash-tab-pipeline" class="dash-subview active">
+                <div class="pipeline-board" id="pipeline-board">
+                    <!-- Columns dynamically populated -->
+                </div>
+            </div>
+
+            <!-- DASHBOARD SUBTAB: PROPERTIES MAP -->
+            <div id="dash-tab-map" class="dash-subview">
+                <div class="map-view-grid">
+                    <div class="glass-card map-container-card">
+                        <div class="map-header">
+                            <i data-lucide="map-pin" class="accent-text"></i>
+                            <h3>Visual Radius Map</h3>
+                            <span class="badge">Mock Local Neighborhood Radar</span>
+                        </div>
+                        <div class="mock-map" id="mock-map">
+                            <!-- SVG Grid & Pins -->
+                        </div>
+                    </div>
+
+                    <div class="glass-card list-container-card">
+                        <div class="list-header">
+                            <h3>Prospects in Your Area</h3>
+                            <p>Distressed properties or high-potential fix-and-lists.</p>
+                            <!-- Address Search Bar -->
+                            <div class="map-search-bar" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                <input type="text" id="map-search-input" placeholder="Search address to drop pin..." style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                <button class="btn-primary" onclick="handleMapAddressSearch()" style="padding: 0.5rem 1rem; font-size: 0.85rem;"><i data-lucide="search" style="width:14px;height:14px;"></i></button>
+                            </div>
+                        </div>
+                        <div class="prospects-list" id="prospects-list">
+                            <!-- Prospect items -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DASHBOARD SUBTAB: CONTRACTORS HUB -->
+            <div id="dash-tab-contractors" class="dash-subview">
+                <div class="contractors-grid-controls">
+                    <h3>Vetted Contractor Directory</h3>
+                    <button class="btn-primary" onclick="showAddContractorModal()"><i data-lucide="plus-circle"></i> Add Contractor</button>
+                </div>
+                <div class="contractors-grid" id="contractors-grid">
+                    <!-- Contractor cards populated by app.js -->
+                </div>
+            </div>
+
+            <!-- DASHBOARD SUBTAB: EMAIL AUTOMATIONS -->
+            <div id="dash-tab-emails" class="dash-subview">
+                <div class="emails-layout">
+                    <!-- Templates and Toggles -->
+                    <div class="glass-card templates-card">
+                        <div class="card-header">
+                            <i data-lucide="settings" class="accent-text"></i>
+                            <h3>Automated Email Alerts</h3>
+                        </div>
+                        <div class="card-body settings-body">
+                            <div class="setting-toggle-row">
+                                <div class="toggle-desc">
+                                    <h4>Auto Lead Intake Email</h4>
+                                    <p>Send calculation details and onboarding confirmation upon website registration.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="chk-auto-intake" checked onchange="saveEmailSettings()">
+                                    <span class="slider-switch round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-toggle-row">
+                                <div class="toggle-desc">
+                                    <h4>Auto Renovations Email</h4>
+                                    <p>Send dispatch notice to the homeowner when contractors are assigned and rehab commences.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="chk-auto-rehab" checked onchange="saveEmailSettings()">
+                                    <span class="slider-switch round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-toggle-row">
+                                <div class="toggle-desc">
+                                    <h4>Auto Contract Update Email</h4>
+                                    <p>Send contract proposals automatically when moving cards into the 'Agreement Sent' column.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="chk-auto-contract" checked onchange="saveEmailSettings()">
+                                    <span class="slider-switch round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Outbound Email Log -->
+                    <div class="glass-card logs-card">
+                        <div class="card-header">
+                            <i data-lucide="history" class="accent-text"></i>
+                            <h3>Outbound Communication Log</h3>
+                            <button class="btn-secondary btn-sm-clear" onclick="clearEmailLogs()">Clear Logs</button>
+                        </div>
+                        <div class="card-body log-list" id="email-log-list">
+                            <!-- Logs dynamically loaded -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DASHBOARD SUBTAB: ANALYTICS & KPI -->
+            <div id="dash-tab-analytics" class="dash-subview">
+                <div class="analytics-grid-kpis">
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-header">
+                            <span class="label">Total Capital Outlaid</span>
+                            <i data-lucide="banknote" class="kpi-icon text-warning"></i>
+                        </div>
+                        <div class="value" id="kpi-capital-outlaid">$0</div>
+                        <div class="kpi-footer">Renovation funds advanced</div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-header">
+                            <span class="label">Projected Commission Revenue</span>
+                            <i data-lucide="badge-percent" class="kpi-icon text-gradient"></i>
+                        </div>
+                        <div class="value" id="kpi-projected-commission">$0</div>
+                        <div class="kpi-footer">Brokerage receivables (ARV-based)</div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-header">
+                            <span class="label">Total Active Portfolio ARV</span>
+                            <i data-lucide="landmark" class="kpi-icon text-success"></i>
+                        </div>
+                        <div class="value" id="kpi-portfolio-value">$0</div>
+                        <div class="kpi-footer">Combined listing values</div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-header">
+                            <span class="label">Avg Homeowner Equity Lift</span>
+                            <i data-lucide="trending-up" class="kpi-icon text-success"></i>
+                        </div>
+                        <div class="value">+$43,500</div>
+                        <div class="kpi-footer">Increased payout per client</div>
+                    </div>
+                </div>
+
+                <div class="analytics-charts-row">
+                    <!-- SVG Donut Chart -->
+                    <div class="glass-card chart-card-large">
+                        <div class="card-header">
+                            <h3>Pipeline Stage Distribution</h3>
+                        </div>
+                        <div class="card-body chart-body-flex">
+                            <div class="svg-chart-container" id="analytics-donut-container"></div>
+                            <div class="chart-legend" id="analytics-donut-legend"></div>
+                        </div>
+                    </div>
+
+                    <!-- SVG Bar Chart -->
+                    <div class="glass-card chart-card-large">
+                        <div class="card-header">
+                            <h3>Monthly Pipeline Growth (2026)</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="svg-chart-container" id="analytics-bar-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= LEAD DETAIL & REHAB BUILDER DRAWER ================= -->
+    <div id="detail-drawer" class="drawer-overlay">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <div>
+                    <h2 id="drawer-address">123 Main St</h2>
+                    <p id="drawer-owner">John Doe • (555) 000-0000</p>
+                </div>
+                <button class="btn-close" onclick="closeDrawer()"><i data-lucide="x"></i></button>
+            </div>
+
+            <div class="drawer-body">
+                <!-- Navigation within Drawer -->
+                <div class="drawer-nav">
+                    <button id="btn-draw-financials" class="drawer-tab active" onclick="switchDrawerTab('financials')">Scope & Analysis</button>
+                    <button id="btn-draw-settlement" class="drawer-tab" onclick="switchDrawerTab('settlement')">Settlement Sheet</button>
+                    <button id="btn-draw-invoices" class="drawer-tab" onclick="switchDrawerTab('invoices')">Contractor Invoices</button>
+                    <button id="btn-draw-mls" class="drawer-tab" onclick="switchDrawerTab('mls')">MLS Listing</button>
+                    <button id="btn-draw-contract" class="drawer-tab" onclick="switchDrawerTab('contract')">Listing Contract</button>
+                    <button id="btn-draw-flyer" class="drawer-tab" onclick="switchDrawerTab('flyer')">Seller Proposal Flyer</button>
+                    <button id="btn-draw-slides" class="drawer-tab" onclick="switchDrawerTab('slides')">Listing Presentation</button>
+                </div>
+
+                <!-- Drawer Content Section 1: Financials & Scope -->
+                <div id="drawer-tab-financials" class="drawer-subview active">
+                    <div class="drawer-grid">
+                        <!-- Left Column: Scope & Timeline -->
+                        <div class="drawer-left-col">
+                            <!-- Client Explanations Card -->
+                            <div class="sub-card" id="drawer-client-explanations-card" style="margin-bottom: 1.5rem; border-color: rgba(245, 158, 11, 0.25); background: rgba(245, 158, 11, 0.02); display:none;">
+                                <h3 style="display:flex; align-items:center; gap:0.5rem; color:var(--warning);">
+                                    <i data-lucide="message-square"></i> Client Work Explanations
+                                </h3>
+                                <p class="section-desc" style="margin-bottom: 0.75rem;">Specific repair requests entered by the homeowner.</p>
+                                <div id="drawer-client-explanations-list" style="display:flex; flex-direction:column; gap:0.75rem;">
+                                    <!-- Dynamic elements -->
+                                </div>
+                            </div>
+
+                            <!-- Renovation Scope Builder -->
+                            <div class="sub-card">
+                                <h3>Renovation Scope Builder</h3>
+                                <p class="section-desc">Toggle trades, estimate wholesale costs, and assign dispatched contractors.</p>
+                                <div class="scope-builder-list" id="scope-builder-list">
+                                    <!-- Checkboxes will be rendered here -->
+                                </div>
+                            </div>
+
+                            <!-- Construction Milestones Tracker -->
+                            <div class="sub-card rehab-tracker-card" id="drawer-rehab-tracker" style="margin-top: 1.5rem;">
+                                <h3>Rehab Progress Tracker</h3>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="rehab-progress-fill" style="width: 0%;"></div>
+                                </div>
+                                <p class="section-desc" id="rehab-progress-text">Progress: 0% complete</p>
+                                <div class="milestones-checklist" id="milestones-checklist">
+                                    <!-- Checkboxes rendered by app.js -->
+                                </div>
+                            </div>
+
+                            <!-- Rehab Photo Stream Gallery -->
+                            <div class="sub-card rehab-tracker-card" id="drawer-rehab-gallery" style="margin-top: 1.5rem;">
+                                <h3>Renovation Photo Stream</h3>
+                                <p class="section-desc">Visual timeline documenting project evolution.</p>
+                                <div class="prospects-list" id="photo-stream-grid" style="overflow-y:visible;">
+                                    <!-- Dynamic CSS photo blocks -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Ledger & Comps -->
+                        <div class="drawer-left-col">
+                            <div class="sub-card ledger-card">
+                                <h3>Financial Breakdown</h3>
+                                <div class="ledger-rows">
+                                    <div class="ledger-row">
+                                        <span>Current As-Is Value ($)</span>
+                                        <input type="number" id="lead-as-is" oninput="updateDrawerCalculations()">
+                                    </div>
+                                    <div class="ledger-row">
+                                        <span>Renovation Cost (Retail)</span>
+                                        <span id="lead-retail-rehab">$0</span>
+                                    </div>
+                                    <div class="ledger-row highlighted-row">
+                                        <span>Renovation Cost (Discounted)</span>
+                                        <span id="lead-discounted-rehab" class="text-gradient font-bold">$0</span>
+                                    </div>
+                                    <div class="ledger-row">
+                                        <span>Projected New ARV ($)</span>
+                                        <input type="number" id="lead-arv" oninput="updateDrawerCalculations()">
+                                    </div>
+                                    <div class="ledger-row">
+                                        <span>Target Commission (%)</span>
+                                        <input type="number" id="lead-commission" min="1" max="10" step="0.5" value="6" oninput="updateDrawerCalculations()">
+                                    </div>
+                                    <hr class="ledger-divider">
+                                    <div class="ledger-row final-row">
+                                        <span>Estimated Owner Net Cash</span>
+                                        <span id="lead-final-payout" class="text-success">$0</span>
+                                    </div>
+                                    <div class="ledger-row final-row">
+                                        <span>Homeowner Profit Lift</span>
+                                        <span id="lead-profit-lift" class="text-gradient">$0</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comps Selector -->
+                            <div class="sub-card" style="margin-top: 1.5rem;">
+                                <h3>Local Comparable Sales (Comps)</h3>
+                                <p class="section-desc">Check up to 3 sales to append to proposal documents.</p>
+                                <div style="display:grid; grid-template-columns: 1.15fr 1fr; gap:1rem;">
+                                    <div class="scope-builder-list" id="comps-checklist-grid">
+                                        <!-- Populated by app.js -->
+                                    </div>
+                                    <!-- Interactive Radar Map -->
+                                    <div style="border:1px solid var(--border-color); border-radius:var(--radius-md); background:rgba(0,0,0,0.25); overflow:hidden; position:relative; height:220px; display:flex; flex-direction:column;">
+                                        <div style="padding:0.4rem 0.75rem; border-bottom:1px solid var(--border-color); background:rgba(255,255,255,0.02); font-size:0.65rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); display:flex; align-items:center; gap:0.25rem;">
+                                            <i data-lucide="radar" style="width:12px; height:12px; color:var(--primary);"></i> Comps Radar
+                                        </div>
+                                        <div style="flex-grow:1; position:relative; background:#080a14;" id="comps-radar-canvas-container">
+                                            <!-- SVG rendered dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Drawer Content Section 1B: Settlement Sheet -->
+                <div id="drawer-tab-settlement" class="drawer-subview">
+                    <div class="contract-container">
+                        <div class="contract-meta">
+                            <h3>Projected Escrow Settlement Statement</h3>
+                            <p>HUD-1 Estimator detailing transactional cash adjustments, advanced renovation reimbursements, escrow fees, and final net proceeds at closing.</p>
+                        </div>
+                        <div class="flyer-paper" id="settlement-paper">
+                            <!-- Generated HUD-1 Settlement Table -->
+                        </div>
+                        <div class="contract-actions">
+                            <button class="btn-secondary" onclick="emailSettlement()"><i data-lucide="mail"></i> Email Statement</button>
+                            <button class="btn-primary" onclick="printContract('settlement-paper')"><i data-lucide="printer"></i> Print Statement</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawer Content Section 1C: Contractor Invoices -->
+                <div id="drawer-tab-invoices" class="drawer-subview">
+                    <div class="contract-container">
+                        <div class="contract-meta">
+                            <h3>Vetted Contractor Closing Invoices</h3>
+                            <p>Itemized bills submitted by dispatched trades. Funded interest-free by Revitalize and reimbursed by escrow at closing.</p>
+                        </div>
+                        <div id="drawer-invoices-list" style="display:flex; flex-direction:column; gap:1.25rem;">
+                            <!-- Invoices receipt UIs rendered dynamically by app.js -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawer Content Section 1D: MLS Listing -->
+                <div id="drawer-tab-mls" class="drawer-subview">
+                    <div class="drawer-grid">
+                        <!-- Left: Listing info & Copywriter -->
+                        <div class="drawer-left-col">
+                            <div class="sub-card">
+                                <h3>MLS Active Listing Builder</h3>
+                                <p class="section-desc">Create your listing description and active list pricing parameters.</p>
+                                <div style="display:flex; flex-direction:column; gap:1.25rem;">
+                                    <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                                        <div class="form-group">
+                                            <label for="mls-list-price">Active List Price ($)</label>
+                                            <input type="number" id="mls-list-price" oninput="syncMLSPriceToARV()">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="mls-id-display">MLS ID Reference</label>
+                                            <input type="text" id="mls-id-display" readonly style="background:rgba(255,255,255,0.01); color:var(--text-muted);">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="mls-description-text">Public Remarks / Listing Description</label>
+                                        <textarea id="mls-description-text" rows="5" placeholder="Generate copywriting below or write custom remarks..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Copywriting Assistant -->
+                            <div class="sub-card" style="margin-top:1.5rem;">
+                                <h3 style="display:flex; align-items:center; gap:0.5rem; color:var(--primary);">
+                                    <i data-lucide="sparkles"></i> AI Copywriting Assistant
+                                </h3>
+                                <p class="section-desc">Select branding keywords to compile into a professional listing description.</p>
+                                <div class="form-group">
+                                    <div class="renovation-chips" id="mls-copy-chips" style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+                                        <div class="renovation-chip" id="chip-kw-chef" onclick="toggleCopyKeyword('chef')">Chef's Kitchen</div>
+                                        <div class="renovation-chip" id="chip-kw-quartz" onclick="toggleCopyKeyword('quartz')">Quartz Countertops</div>
+                                        <div class="renovation-chip" id="chip-kw-spa" onclick="toggleCopyKeyword('spa')">Spa-Like Bathrooms</div>
+                                        <div class="renovation-chip" id="chip-kw-open" onclick="toggleCopyKeyword('open')">Open-Concept Living</div>
+                                        <div class="renovation-chip" id="chip-kw-land" onclick="toggleCopyKeyword('land')">Lush Landscaping</div>
+                                        <div class="renovation-chip" id="chip-kw-turnkey" onclick="toggleCopyKeyword('turnkey')">Turnkey Ready</div>
+                                    </div>
+                                </div>
+                                <button class="btn-primary" onclick="generateMLSDescription()" style="width:100%; margin-top:0.5rem;">
+                                    <i data-lucide="wand2"></i> Generate Listing Description
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right: MLS Syndication -->
+                        <div class="drawer-left-col">
+                            <div class="sub-card ledger-card">
+                                <h3>Syndication & Portal Publishing</h3>
+                                <p class="section-desc">Syndicate property updates to Zillow, Realtor.com, Redfin, and local MLS boards.</p>
+                                
+                                <div id="syndicate-progress-container" style="display:none; margin-bottom:1.5rem;">
+                                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:700; margin-bottom:0.4rem;">
+                                        <span id="syndicate-step-text" style="color:var(--warning);">Preparing feed...</span>
+                                        <span id="syndicate-pct-text">0%</span>
+                                    </div>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar-fill" id="syndicate-progress-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <div id="syndicate-status-card" style="border: 1px solid var(--border-color); background: rgba(0,0,0,0.15); padding:1rem; border-radius:6px; margin-bottom:1.5rem; display:flex; flex-direction:column; gap:0.5rem;">
+                                    <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                                        <span>MLS Status:</span>
+                                        <strong id="mls-status-badge" style="color:var(--text-muted);">NOT SYNDICATED</strong>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                                        <span>Last Published:</span>
+                                        <span id="mls-last-pub" style="color:var(--text-muted);">N/A</span>
+                                    </div>
+                                </div>
+
+                                <button class="btn-primary" id="btn-syndicate-mls" onclick="simulateSyndication()" style="width:100%;">
+                                    <i data-lucide="rss"></i> Syndicate to Zillow & MLS
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawer Content Section 2: Listing Contract -->
+                <div id="drawer-tab-contract" class="drawer-subview">
+                    <div class="contract-container">
+                        <div class="contract-meta">
+                            <h3>Exclusive Renovation and Listing Agreement</h3>
+                            <p>This legally-binding summary binds the owner's listing commitment in exchange for interest-free, discounted rehabilitation funding reimbursed at sale closing.</p>
+                        </div>
+                        <div class="contract-paper" id="contract-paper">
+                            <!-- Generated Contract Document -->
+                        </div>
+                        <div class="contract-actions">
+                            <button class="btn-primary" id="btn-esign-contract" onclick="openESignModal()"><i data-lucide="pen-tool"></i> Sign Agreement</button>
+                            <button class="btn-secondary" onclick="emailAgreement()"><i data-lucide="mail"></i> Email Contract</button>
+                            <button class="btn-secondary" onclick="printContract('contract-paper')"><i data-lucide="printer"></i> Print Agreement</button>
+                            <button class="btn-primary" onclick="copyContract('contract-paper')"><i data-lucide="copy"></i> Copy Text</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawer Content Section 3: Seller Proposal Flyer -->
+                <div id="drawer-tab-flyer" class="drawer-subview">
+                    <div class="contract-container">
+                        <div class="contract-meta">
+                            <h3>Seller Presentation Flyer</h3>
+                            <p>A marketing flyer outlining the financial advantages of listing with Revitalize. Print this out to deliver during property visits.</p>
+                        </div>
+                        <div class="flyer-paper" id="flyer-paper">
+                            <!-- Generated Flyer details -->
+                        </div>
+                        <div class="contract-actions">
+                            <button class="btn-secondary" onclick="emailFlyer()"><i data-lucide="mail"></i> Email Flyer</button>
+                            <button class="btn-primary" onclick="printContract('flyer-paper')"><i data-lucide="printer"></i> Print Flyer</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawer Content Section 4: Interactive Listing Slide Deck -->
+                <div id="drawer-tab-slides" class="drawer-subview">
+                    <div class="drawer-grid">
+                        
+                        <!-- Left Column: Slideshow Viewport -->
+                        <div class="drawer-left-col">
+                            <div class="slideshow-outer-container" id="slideshow-outer-container">
+                                <div class="slideshow-viewport" id="slideshow-viewport">
+                                    
+                                    <!-- Slide 1: Cover -->
+                                    <div class="presentation-slide active" id="slide-pane-1">
+                                        <div class="slide-cover-layout">
+                                            <div class="slide-badge">Exclusive Pitch Deck</div>
+                                            <h1 id="slide-cover-address" style="color:white; font-size:2.25rem; font-weight:800;">882 Whispering Pines Dr</h1>
+                                            <p style="color:var(--text-muted); font-size:1.1rem; margin-top:0.5rem;" id="slide-cover-owner">Homeowner Listing Proposal</p>
+                                            <div style="margin-top:4rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:1rem; font-size:0.8rem; color:var(--text-muted);" id="slide-cover-footer">
+                                                Presented by Revitalize Realty Brokerage
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Slide 2: Condition Analysis -->
+                                    <div class="presentation-slide" id="slide-pane-2">
+                                        <div class="slide-content-layout">
+                                            <h2>Curb Appeal & Value Comparison</h2>
+                                            <p>Cosmetic issues and dated finishes hold back listing potential. Modernizing key areas captures a higher tier of buyers.</p>
+                                            <div class="slide-visual-grid" style="display:grid; grid-template-columns: 1.2fr 1fr; gap:1.5rem; margin-top:1rem;">
+                                                <div class="mini-slide-block">
+                                                    <span class="label">Typical Buyer Impact</span>
+                                                    <ul style="padding-left:1rem; font-size:0.85rem; color:var(--text-muted);">
+                                                        <li>Dated kitchens turn away 78% of active buyers.</li>
+                                                        <li>Cosmetic upgrades return up to 150% ROI at sale.</li>
+                                                        <li>Revitalize funds 100% of these upgrades upfront.</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="mini-slide-block stats-highlight" style="background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.1); border-radius:8px; padding:1.25rem; text-align:center;">
+                                                    <span class="label" style="color:var(--success); font-size:0.75rem; text-transform:uppercase;">Target Value Lift</span>
+                                                    <div style="font-size:2rem; font-weight:800; margin-top:0.5rem;" id="slide-stat-lift">+$44,600</div>
+                                                    <span style="font-size:0.8rem; color:var(--text-muted);">In Added Net Profit</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Slide 3: Upgrade Scope -->
+                                    <div class="presentation-slide" id="slide-pane-3">
+                                        <div class="slide-content-layout">
+                                            <h2>Your Proposed Upgrades</h2>
+                                            <p>Selected renovation scopes tailored to maximize buyer emotional appeal and list valuation.</p>
+                                            <div class="slide-scopes-list" id="slide-scopes-list" style="margin-top: 1rem; display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                                <!-- Dynamic scope bullets -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Slide 4: Financial Ledger -->
+                                    <div class="presentation-slide" id="slide-pane-4">
+                                        <div class="slide-content-layout">
+                                            <h2>Equity & Payout Projections</h2>
+                                            <p>Here is your estimated net proceeds comparison after advanced renovations.</p>
+                                            <div class="slide-financials-grid" style="display:grid; grid-template-columns: 1.1fr 1fr; gap:2rem; margin-top:1rem;">
+                                                <div class="mini-slide-block">
+                                                    <h4 style="color:white; margin-bottom:0.75rem; font-size:1rem;">Proceeds Comparison</h4>
+                                                    <div style="display:flex; justify-content:space-between; font-size:0.9rem; padding:0.4rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                                                        <span>As-Is Net Payout</span>
+                                                        <strong id="slide-fin-asis">$0</strong>
+                                                    </div>
+                                                    <div style="display:flex; justify-content:space-between; font-size:0.9rem; padding:0.4rem 0; color:var(--success);">
+                                                        <span>Revitalize Net Payout</span>
+                                                        <strong id="slide-fin-revitalize">$0</strong>
+                                                    </div>
+                                                    <div style="display:flex; justify-content:space-between; font-size:0.9rem; padding:0.4rem 0; font-weight:700; border-top:1px solid rgba(255,255,255,0.1); margin-top:0.5rem; color:var(--success);">
+                                                        <span>Extra Profit Lift</span>
+                                                        <strong id="slide-fin-lift">+$0</strong>
+                                                    </div>
+                                                </div>
+                                                <div class="mini-slide-block" id="slide-chart-holder" style="display:flex; justify-content:center; align-items:center;">
+                                                    <!-- SVG Chart inside slides -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Slide 5: Road to Listing -->
+                                    <div class="presentation-slide" id="slide-pane-5">
+                                        <div class="slide-content-layout">
+                                            <h2>The Step-by-Step Action Plan</h2>
+                                            <p>We handle everything from start to finish, ensuring a seamless listing transition.</p>
+                                            <div class="slide-road-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; margin-top:1.5rem;">
+                                                <div class="mini-slide-block" style="background:rgba(255,255,255,0.02); border:1px solid var(--border-color); padding:1rem; border-radius:6px;">
+                                                    <div style="color:var(--primary); font-weight:800; font-size:1.25rem;">01</div>
+                                                    <h4 style="color:white; font-size:0.9rem; margin:0.25rem 0;">E-Sign Agreement</h4>
+                                                    <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0;">Approve digital proposal to lock advanced funding.</p>
+                                                </div>
+                                                <div class="mini-slide-block" style="background:rgba(255,255,255,0.02); border:1px solid var(--border-color); padding:1rem; border-radius:6px;">
+                                                    <div style="color:var(--warning); font-weight:800; font-size:1.25rem;">02</div>
+                                                    <h4 style="color:white; font-size:0.9rem; margin:0.25rem 0;">Contractor Rehab</h4>
+                                                    <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0;">We complete structural and cosmetic improvements.</p>
+                                                </div>
+                                                <div class="mini-slide-block" style="background:rgba(255,255,255,0.02); border:1px solid var(--border-color); padding:1rem; border-radius:6px;">
+                                                    <div style="color:var(--success); font-weight:800; font-size:1.25rem;">03</div>
+                                                    <h4 style="color:white; font-size:0.9rem; margin:0.25rem 0;">MLS Active Sale</h4>
+                                                    <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0;">We market the home, close top dollar, and reimburse rehab.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!-- Slide Navigation Footer -->
+                                <div class="slideshow-controls-footer">
+                                    <button class="btn-secondary btn-sm-clear" onclick="navigateSlide(-1)" style="margin-left:0; padding:0.4rem 0.85rem;"><i data-lucide="chevron-left"></i> Previous</button>
+                                    <div class="slide-indicators-dots" id="slide-indicators-dots">
+                                        <!-- Indicators -->
+                                    </div>
+                                    <button class="btn-primary btn-sm-clear" onclick="navigateSlide(1)" style="padding:0.4rem 0.85rem;">Next <i data-lucide="chevron-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Pitch Deck Customizer -->
+                        <div class="drawer-left-col">
+                            <div class="sub-card">
+                                <h3>Pitch Deck Customizer</h3>
+                                <p class="section-desc">Personalize presentation parameters and theme colors for your homeowner pitch.</p>
+                                <div style="display:flex; flex-direction:column; gap:1.25rem;">
+                                    <div class="form-group">
+                                        <label for="slide-theme-select">Presentation Design Theme</label>
+                                        <select id="slide-theme-select" onchange="changePresentationTheme()">
+                                            <option value="classic">Classic Dark (Carbon & Violet)</option>
+                                            <option value="navy">Elegant Navy (Ocean Blue & Gold)</option>
+                                            <option value="forest">Emerald Forest (Rich Greens & Mint)</option>
+                                            <option value="sunset">Sunset Amber (Deep Orange & Bronze)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="slide-custom-title">Custom Cover Title</label>
+                                        <input type="text" id="slide-custom-title" onkeyup="syncDeckCustomizations()" placeholder="e.g. Stunning Revitalized Estate...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="slide-custom-subtitle">Custom Cover Subtitle</label>
+                                        <input type="text" id="slide-custom-subtitle" onkeyup="syncDeckCustomizations()" placeholder="e.g. Homeowner Listing Proposal...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="slide-custom-footer">Custom Presenter Info</label>
+                                        <input type="text" id="slide-custom-footer" onkeyup="syncDeckCustomizations()" placeholder="e.g. Presented by Revitalize Realty Brokerage...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div></div>
+
+            </div>
+
+            <div class="drawer-footer">
+                <div class="pipeline-actions">
+                    <label for="lead-stage-select">Move Stage:</label>
+                    <select id="lead-stage-select" onchange="changeLeadStage()">
+                        <!-- Dynamic options -->
+                    </select>
+                </div>
+                <button class="btn-danger" onclick="deleteCurrentLead()">Delete Lead</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ADD CONTRACTOR MODAL ================= -->
+    <div id="contractor-modal" class="drawer-overlay">
+        <div class="drawer-content mini-modal">
+            <div class="drawer-header">
+                <h2>Add Vetted Contractor</h2>
+                <button class="btn-close" onclick="closeContractorModal()"><i data-lucide="x"></i></button>
+            </div>
+            <form id="contractor-form" onsubmit="handleAddContractor(event)">
+                <div class="drawer-body">
+                    <div class="form-group">
+                        <label for="con-name">Contractor / Company Name</label>
+                        <input type="text" id="con-name" placeholder="Apex Painting" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="con-trade">Specialty Trade</label>
+                        <select id="con-trade">
+                            <option value="Paint">Interior & Exterior Paint</option>
+                            <option value="Landscaping">Landscaping & Curb Appeal</option>
+                            <option value="Flooring">Flooring Upgrade</option>
+                            <option value="Kitchen">Kitchen Remodel</option>
+                            <option value="Bathroom">Bathroom Upgrades</option>
+                            <option value="Roof">Roof & Siding Repairs</option>
+                            <option value="HVAC">HVAC & Mechanicals</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="con-rating">Rating (1 to 5 Stars)</label>
+                        <input type="number" id="con-rating" min="1" max="5" value="5" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="con-phone">Contact Phone</label>
+                        <input type="tel" id="con-phone" placeholder="(555) 123-4567" required>
+                    </div>
+                </div>
+                <div class="drawer-footer">
+                    <button type="button" class="btn-secondary" onclick="closeContractorModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Contractor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= E-SIGNATURE MODAL ================= -->
+    <div id="esign-modal" class="drawer-overlay">
+        <div class="drawer-content mini-modal signature-modal-content">
+            <div class="drawer-header">
+                <h2>Sign Exclusive Agreement</h2>
+                <button class="btn-close" onclick="closeESignModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="drawer-body">
+                <div class="drawer-nav" style="margin-bottom: 1rem;">
+                    <button id="tab-sig-draw" class="drawer-tab active" onclick="switchSignatureMode('draw')">Draw Signature</button>
+                    <button id="tab-sig-type" class="drawer-tab" onclick="switchSignatureMode('type')">Type Signature</button>
+                </div>
+                
+                <!-- Draw Signature -->
+                <div id="sig-mode-draw" class="sig-mode-view active">
+                    <div class="canvas-wrapper">
+                        <canvas id="sig-canvas" width="418" height="150"></canvas>
+                    </div>
+                    <button class="btn-secondary btn-sm-clear" onclick="clearSigCanvas()" style="margin-top:0.75rem;"><i data-lucide="rotate-ccw"></i> Clear Canvas</button>
+                </div>
+                
+                <!-- Type Signature -->
+                <div id="sig-mode-type" class="sig-mode-view">
+                    <div class="form-group">
+                        <label for="sig-type-input">Type Full Name</label>
+                        <input type="text" id="sig-type-input" placeholder="Type your name..." oninput="updateTypedSignature()">
+                    </div>
+                    <div class="typed-sig-preview-box">
+                        <div id="typed-sig-preview">John Doe</div>
+                    </div>
+                </div>
+
+                <div class="form-check-group" style="margin-top: 1.5rem;">
+                    <input type="checkbox" id="chk-esign-consent">
+                    <label for="chk-esign-consent" style="font-size:0.8rem;">I agree that this electronic signature represents my legally-binding intent to execute the Exclusive Listing & Rehab Agreement.</label>
+                </div>
+            </div>
+            <div class="drawer-footer">
+                <button type="button" class="btn-secondary" onclick="closeESignModal()">Cancel</button>
+                <button class="btn-primary" onclick="submitESignature()">Sign & Execute</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= CLIENT PROJECT PORTAL MODAL ================= -->
+    <div id="client-portal-modal" class="drawer-overlay">
+        <div class="drawer-content client-portal-content">
+            <div class="drawer-header">
+                <div>
+                    <h2 id="client-draw-address">882 Whispering Pines Dr</h2>
+                    <p id="client-draw-owner">Eleanor Vance • Homeowner Project Dashboard</p>
+                </div>
+                <button class="btn-close" onclick="closeClientPortal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div class="drawer-body">
+                <!-- Status steps tracker -->
+                <div class="client-status-steps" id="client-status-steps">
+                    <!-- Dynamic status steps -->
+                </div>
+
+                <!-- Financial banner specs -->
+                <div class="client-financial-banner">
+                    <div class="banner-stat">
+                        <span class="label">Target Sale ARV</span>
+                        <span class="val" id="client-stat-arv">$0</span>
+                    </div>
+                    <div class="banner-stat">
+                        <span class="label">Rehab Advances (Zero Interest)</span>
+                        <span class="val" id="client-stat-rehab">$0</span>
+                    </div>
+                    <div class="banner-stat">
+                        <span class="label">Estimated Net Payout</span>
+                        <span class="val text-success" id="client-stat-payout">$0</span>
+                    </div>
+                </div>
+
+                <!-- Portal Info Split -->
+                <div class="client-portal-layout">
+                    <!-- Left: Timeline & E-Sign alert -->
+                    <div class="client-layout-column">
+                        <!-- Client E-Sign prompt callout -->
+                        <div class="client-esign-prompt" id="client-esign-prompt" style="display:none;">
+                            <div class="esign-prompt-header">
+                                <i data-lucide="file-signature" class="warning-icon"></i>
+                                <h4>Listing Agreement Awaiting Signature</h4>
+                            </div>
+                            <p>We have drafted your custom renovation package and Exclusive Right to Sell contract. Execute digitally now to authorize our vetting contractors to begin scheduling site demolition.</p>
+                            <button class="btn-primary" onclick="launchClientESign()"><i data-lucide="pen-tool"></i> View & Execute Agreement</button>
+                        </div>
+
+                        <!-- Progress timeline checklists -->
+                        <div class="sub-card" id="client-rehab-card">
+                            <h3>Construction Checklist & Status</h3>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="client-progress-fill" style="width: 0%;"></div>
+                            </div>
+                            <p class="section-desc" id="client-progress-text">Progress: 0% complete</p>
+                            <div class="milestones-checklist read-only-timeline" id="client-milestones-list">
+                                <!-- Nested read-only items -->
+                        <!-- Client Settlement Statement -->
+                        <div class="sub-card" id="client-settlement-card" style="margin-top: 1.5rem; display:none;">
+                            <h3>Projected Closing Statement (HUD-1)</h3>
+                            <p class="section-desc">Estimated escrow debit/credit adjustments and your net closing proceeds.</p>
+                            <div class="flyer-paper" id="client-settlement-paper" style="padding: 1.25rem; font-size: 0.8rem; background: #080a14; border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-md);">
+                                <!-- Dynamically loaded settlement -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Photo Stream & Team dispatches -->
+                    <div class="client-layout-column">
+                        <!-- Photo gallery -->
+                        <div class="sub-card">
+                            <h3>Renovation Photo Stream</h3>
+                            <p class="section-desc">Real-time milestones from site supervisor logs.</p>
+                            <div class="photo-stream-grid" id="client-photo-grid"></div>
+                        </div>
+
+                        <!-- Active contractors -->
+                        <div class="sub-card" style="margin-top:1.5rem;">
+                            <h3>Your Assigned Team</h3>
+                            <p class="section-desc">Vetted local subcontractors assigned to your active scopes.</p>
+                            <div class="client-contractors-list" id="client-contractors-list">
+                                <!-- Contractor rows -->
+                            </div>
+                        </div>
+
+                        <!-- Client Contractor Invoices -->
+                        <div class="sub-card" id="client-invoices-card" style="margin-top: 1.5rem; display:none;">
+                            <h3>Your Contractor Billing Receipts</h3>
+                            <p class="section-desc">Itemized receipts submitted by dispatched trade networks, settled at closing.</p>
+                            <div id="client-invoices-list" style="display:flex; flex-direction:column; gap:1rem;">
+                                <!-- Dynamic receipts -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= CASE STUDY DETAIL MODAL ================= -->
+    <div id="case-study-modal" class="drawer-overlay">
+        <div class="drawer-content mini-modal case-study-content">
+            <div class="drawer-header">
+                <h2 id="cs-title">458 Pinewood Dr Case Study</h2>
+                <button class="btn-close" onclick="closeCaseStudyModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="drawer-body" id="case-study-body">
+                <!-- Case study contents -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">Lead successfully created!</div>
+
+    <script src="app.js"></script>
+</body>
+</html>

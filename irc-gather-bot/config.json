@@ -1,0 +1,10 @@
+{
+  "server": "irc.libera.chat",
+  "port": 6667,
+  "nick": "GatherBot",
+  "user": "gatherbot",
+  "realname": "Gather Queue Bot",
+  "channel": "#TuGZH",
+  "queueLimit": 8,
+  "reconnectInterval": 5000
+}
