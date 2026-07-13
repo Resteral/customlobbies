@@ -1161,7 +1161,7 @@ function showMapTooltip(prop, inPipeline, left, top) {
 
     tooltip.innerHTML = `
         <h4>${prop.address}</h4>
-        <p>Est. ARV: $${prop.targetARV.toLocaleString()}<br>Owner: ${prop.owner}</p>
+        <p>Est. ARV: $${(prop.targetARV || 0).toLocaleString()}<br>Owner: ${prop.owner}</p>
         ${btnHtml}
     `;
     lucide.createIcons();
@@ -1184,7 +1184,7 @@ function renderProspectsList() {
         item.innerHTML = `
             <div class="prospect-info">
                 <h4>${prop.address}</h4>
-                <p>Owner: ${prop.owner} • As-Is: $${prop.asIsValue.toLocaleString()} • Goal: $${prop.targetARV.toLocaleString()}</p>
+                <p>Owner: ${prop.owner} • As-Is: $${(prop.asIsValue || 0).toLocaleString()} • Goal: $${(prop.targetARV || 0).toLocaleString()}</p>
             </div>
             ${btnHtml}
         `;
@@ -3973,7 +3973,7 @@ function renderAdCampaigns() {
         tr.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
         tr.innerHTML = `
             <td style="padding:0.6rem; display:flex; align-items:center; gap:4px; text-transform:capitalize;">
-                <i data-lucide="${ad.channel === 'google' ? 'search' : ad.channel}" style="width:12px; height:12px; color:var(--primary);"></i>
+                <i data-lucide="${ad.channel === 'google' ? 'search' : (ad.channel === 'facebook' ? 'share-2' : 'camera')}" style="width:12px; height:12px; color:var(--primary);"></i>
                 <span>${ad.channel}</span>
             </td>
             <td style="padding:0.6rem;">$${ad.budget}/day</td>
