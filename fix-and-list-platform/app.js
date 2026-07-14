@@ -5942,12 +5942,14 @@ function openDirectMessageModal(bizId, bizName) {
 
     const modal = document.getElementById('direct-message-modal');
     modal.style.display = 'flex';
+    setTimeout(() => { modal.classList.add('active'); }, 10);
     lucide.createIcons();
 }
 
 function closeDirectMessageModal() {
     const modal = document.getElementById('direct-message-modal');
-    modal.style.display = 'none';
+    modal.classList.remove('active');
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
 }
 
 function renderDirectChatHistory(chat) {
@@ -6141,12 +6143,14 @@ function openPlaceBidModal(requestId) {
 
     const modal = document.getElementById('place-bid-modal');
     modal.style.display = 'flex';
+    setTimeout(() => { modal.classList.add('active'); }, 10);
     lucide.createIcons();
 }
 
 function closePlaceBidModal() {
     const modal = document.getElementById('place-bid-modal');
-    modal.style.display = 'none';
+    modal.classList.remove('active');
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
 }
 
 function handleBidSubmit(event) {
@@ -6389,19 +6393,25 @@ function openAuthModal() {
     if (bizSelect) {
         bizSelect.innerHTML = '';
         laborBusinesses.forEach(biz => {
-            const opt = document.createElement('option');
-            opt.value = biz.id;
-            opt.innerText = biz.name;
-            bizSelect.appendChild(opt);
+            if (biz && biz.id && biz.name) {
+                const opt = document.createElement('option');
+                opt.value = biz.id;
+                opt.innerText = biz.name;
+                bizSelect.appendChild(opt);
+            }
         });
     }
 
-    document.getElementById('auth-modal').style.display = 'flex';
+    const modal = document.getElementById('auth-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => { modal.classList.add('active'); }, 10);
     lucide.createIcons();
 }
 
 function closeAuthModal() {
-    document.getElementById('auth-modal').style.display = 'none';
+    const modal = document.getElementById('auth-modal');
+    modal.classList.remove('active');
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
 }
 
 function setAuthTab(tab) {
@@ -6436,13 +6446,44 @@ function onAuthRoleChange() {
 
 async function handleAuthSubmit(event) {
     event.preventDefault();
-    const email = document.getElementById('auth-email').value.trim();
-    const password = document.getElementById('auth-password').value;
-    const name = document.getElementById('auth-name').value.trim();
-    const role = document.getElementById('auth-role').value;
-    const bizId = document.getElementById('auth-biz-select').value;
+    const email = (document.getElementById('auth-email').value || '').trim();
+    const password = document.getElementById('auth-password').value || '';
+    const name = (document.getElementById('auth-name').value || '').trim();
+    const role = document.getElementById('auth-role').value || 'homeowner';
+    const bizId = document.getElementById('auth-biz-select').value || '';
 
     if (authActiveTab === 'signin') {
+        // Sandbox Local Fallback Auth checked FIRST for instant responsiveness!
+        let accounts = [];
+        try {
+            const savedAccs = localStorage.getItem('revitalize_accounts');
+            if (savedAccs) accounts = JSON.parse(savedAccs);
+        } catch (e) { console.error(e); }
+
+        const match = accounts.find(a => a.email && a.email.toLowerCase() === email.toLowerCase() && a.password === password);
+        if (match) {
+            currentUser = {
+                email: match.email,
+                name: match.name,
+                role: match.role,
+                bizId: match.bizId
+            };
+            localStorage.setItem('revitalize_current_user', JSON.stringify(currentUser));
+            showToast(`Welcome back, ${currentUser.name}! (Sandbox Profile)`);
+            closeAuthModal();
+            renderAuthHeaderStatus();
+            if (currentView === 'utool') renderUtoolDashboard();
+            
+            // Asynchronously sync to Supabase in the background if configured
+            if (supabaseClient) {
+                supabaseClient.auth.signInWithPassword({ email, password }).then(({ error }) => {
+                    if (!error) console.log("Supabase background auth synced.");
+                }).catch(err => console.warn("Supabase background auth sync warning:", err));
+            }
+            return;
+        }
+
+        // If local check failed, attempt Supabase auth
         if (supabaseClient) {
             try {
                 showToast("Connecting to Supabase...");
@@ -6492,29 +6533,7 @@ async function handleAuthSubmit(event) {
             }
         }
 
-        // Sandbox Local Fallback Auth
-        let accounts = [];
-        try {
-            const savedAccs = localStorage.getItem('revitalize_accounts');
-            if (savedAccs) accounts = JSON.parse(savedAccs);
-        } catch (e) { console.error(e); }
-
-        const match = accounts.find(a => a.email && a.email.toLowerCase() === email.toLowerCase() && a.password === password);
-        if (match) {
-            currentUser = {
-                email: match.email,
-                name: match.name,
-                role: match.role,
-                bizId: match.bizId
-            };
-            localStorage.setItem('revitalize_current_user', JSON.stringify(currentUser));
-            showToast(`Welcome back, ${currentUser.name}! (Sandbox Sandbox Profile)`);
-            closeAuthModal();
-            renderAuthHeaderStatus();
-            if (currentView === 'utool') renderUtoolDashboard();
-        } else {
-            showToast("Invalid credentials. Please register first.");
-        }
+        showToast("Invalid credentials. Please register first.");
     } else {
         // Register Account
         if (supabaseClient) {
@@ -6640,12 +6659,16 @@ function openContractBuilderFromChat() {
     document.getElementById('contract-sig-owner').value = '';
     document.getElementById('contract-sig-biz').value = '';
 
-    document.getElementById('contract-builder-modal').style.display = 'flex';
+    const modal = document.getElementById('contract-builder-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => { modal.classList.add('active'); }, 10);
     lucide.createIcons();
 }
 
 function closeContractBuilderModal() {
-    document.getElementById('contract-builder-modal').style.display = 'none';
+    const modal = document.getElementById('contract-builder-modal');
+    modal.classList.remove('active');
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
 }
 
 function handleStapleContract(event) {
@@ -6708,11 +6731,15 @@ function handleStapleContract(event) {
 function openContractFulfillModal(leadId) {
     document.getElementById('fulfill-lead-id').value = leadId;
     document.getElementById('fulfill-after-photo').value = '';
-    document.getElementById('contract-fulfill-modal').style.display = 'flex';
+    const modal = document.getElementById('contract-fulfill-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => { modal.classList.add('active'); }, 10);
 }
 
 function closeContractFulfillModal() {
-    document.getElementById('contract-fulfill-modal').style.display = 'none';
+    const modal = document.getElementById('contract-fulfill-modal');
+    modal.classList.remove('active');
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
 }
 
 function handleFulfillContractSubmit(event) {
@@ -6851,14 +6878,18 @@ function renderUtoolDigitalContract(lead) {
 
 // ================= MANUAL JOB CREATION SYSTEM =================
 function openCreateJobManualModal() {
-    document.getElementById('utool-create-job-modal').style.display = 'flex';
+    const drawer = document.getElementById('utool-create-job-modal');
+    drawer.style.display = 'flex';
+    setTimeout(() => { drawer.classList.add('active'); }, 10);
     // Prefill a dummy photo URL if empty
     document.getElementById('utool-manual-photo').value = 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=400&q=80';
     lucide.createIcons();
 }
 
 function closeCreateJobManualModal() {
-    document.getElementById('utool-create-job-modal').style.display = 'none';
+    const drawer = document.getElementById('utool-create-job-modal');
+    drawer.classList.remove('active');
+    setTimeout(() => { drawer.style.display = 'none'; }, 300);
 }
 
 function handleCreateJobManualSubmit(event) {
