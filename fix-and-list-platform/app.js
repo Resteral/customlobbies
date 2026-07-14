@@ -142,7 +142,7 @@ let apiSettings = {
     adsProvider: 'webhook',
     adsWebhook: 'https://hook.us2.make.com/pr1l0jvjtuto0qikljvjkrr82jtttmz1',
     supabaseUrl: 'https://qlludfnlvqdalaztkenk.supabase.co',
-    supabaseKey: ''
+    supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFsbHVkZm5sdnFkYWxhenRrZW5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5ODU1NzQsImV4cCI6MjA5OTU2MTU3NH0.ZldXZuI6iVHEY5xgGw2HzUbTNDYuP1M6BCA0EqCCIJU'
 };
 let currentSelectedLeadId = null;
 let currentSlideIdx = 1;
@@ -445,6 +445,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!apiSettings.supabaseUrl) {
         apiSettings.supabaseUrl = 'https://qlludfnlvqdalaztkenk.supabase.co';
+    }
+    if (!apiSettings.supabaseKey) {
+        apiSettings.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFsbHVkZm5sdnFkYWxhenRrZW5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5ODU1NzQsImV4cCI6MjA5OTU2MTU3NH0.ZldXZuI6iVHEY5xgGw2HzUbTNDYuP1M6BCA0EqCCIJU';
     }
 
     document.getElementById('api-email-provider').value = apiSettings.emailProvider || 'webhook';
