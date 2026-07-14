@@ -449,6 +449,36 @@
                                 <input type="text" id="map-search-input" placeholder="Search address to drop pin..." style="padding: 0.5rem 1rem; font-size: 0.85rem;">
                                 <button class="btn-primary" onclick="handleMapAddressSearch()" style="padding: 0.5rem 1rem; font-size: 0.85rem;"><i data-lucide="search" style="width:14px;height:14px;"></i></button>
                             </div>
+
+                            <!-- Automated Listing Finder Filters -->
+                            <div class="automated-finder-panel" style="margin-top: 1rem; padding: 0.75rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 6px; display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div style="font-size: 0.75rem; font-weight: 700; color: var(--warning); display: flex; align-items: center; gap: 0.25rem;">
+                                    <i data-lucide="scan" style="width: 14px; height: 14px;"></i> Automated Listing Finder
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                    <div class="form-group" style="margin:0;">
+                                        <label for="filter-distance" style="font-size:0.65rem; color:var(--text-muted); margin-bottom:0.25rem; display:block;">Max Distance</label>
+                                        <select id="filter-distance" style="background:rgba(0,0,0,0.2); color:white; border:1px solid var(--border-color); border-radius:4px; padding:0.35rem; font-size:0.75rem; width:100%; box-sizing:border-box;">
+                                            <option value="1">Within 1 Mile</option>
+                                            <option value="5" selected>Within 5 Miles</option>
+                                            <option value="10">Within 10 Miles</option>
+                                            <option value="25">Within 25 Miles</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin:0;">
+                                        <label for="filter-stale-dom" style="font-size:0.65rem; color:var(--text-muted); margin-bottom:0.25rem; display:block;">Stale Duration (DOM)</label>
+                                        <select id="filter-stale-dom" style="background:rgba(0,0,0,0.2); color:white; border:1px solid var(--border-color); border-radius:4px; padding:0.35rem; font-size:0.75rem; width:100%; box-sizing:border-box;">
+                                            <option value="all">All Days on Market</option>
+                                            <option value="stale">Stale (DOM > 90 Days)</option>
+                                            <option value="motivated">Motivated (DOM > 180 Days)</option>
+                                            <option value="expired">Expired Listings Only</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button class="btn-secondary btn-sm" onclick="autoScanForListings()" style="width: 100%; font-size: 0.75rem; padding: 0.4rem; color:white;">
+                                    <i data-lucide="refresh-cw"></i> Auto-Scan Neighborhood Radar
+                                </button>
+                            </div>
                         </div>
                         <div class="prospects-list" id="prospects-list">
                             <!-- Prospect items -->
@@ -1552,6 +1582,6 @@
     <!-- Notification Toast -->
     <div id="toast" class="toast">Lead successfully created!</div>
 
-    <script src="app.js?v=21"></script>
+    <script src="app.js?v=22"></script>
 </body>
 </html>

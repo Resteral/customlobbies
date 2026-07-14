@@ -1028,7 +1028,10 @@ function showMapTooltip(prop, inPipeline, left, top) {
 
     tooltip.innerHTML = `
         <h4>${prop.address}</h4>
-        <p>Est. ARV: $${(prop.targetARV || 0).toLocaleString()}<br>Owner: ${prop.owner}</p>
+        <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:0.4rem;">
+            Distance: ${prop.distance || '2.4'} mi • ${prop.dom ? `${prop.dom} DOM` : 'New Listing'}<br>
+            Est. ARV: $${(prop.targetARV || 0).toLocaleString()}<br>Owner: ${prop.owner}
+        </p>
         ${btnHtml}
     `;
     lucide.createIcons();
@@ -1048,10 +1051,19 @@ function renderProspectsList() {
             ? `<button class="added"><i data-lucide="check"></i> Added</button>`
             : `<button onclick="importProspectToLead('${prop.id}')"><i data-lucide="plus"></i> Import</button>`;
 
+        const domTag = prop.dom 
+            ? `<span style="font-size:0.6rem; padding:0.1rem 0.3rem; border-radius:4px; margin-left:0.5rem; background:${prop.dom > 180 ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)'}; color:${prop.dom > 180 ? 'var(--danger)' : 'var(--warning)'}; border:1px solid ${prop.dom > 180 ? 'rgba(239,68,68,0.3)' : 'rgba(245,158,11,0.3)'};">${prop.dom} DOM</span>`
+            : '';
+
         item.innerHTML = `
             <div class="prospect-info">
-                <h4>${prop.address}</h4>
-                <p>Owner: ${prop.owner} • As-Is: $${(prop.asIsValue || 0).toLocaleString()} • Goal: $${(prop.targetARV || 0).toLocaleString()}</p>
+                <h4 style="display:flex; align-items:center; margin:0; font-size:0.85rem; font-weight:700;">
+                    <span>${prop.address}</span>
+                    ${domTag}
+                </h4>
+                <p style="margin:0.2rem 0 0 0; font-size:0.75rem; color:var(--text-muted);">
+                    Dist: ${prop.distance || '2.4'} mi • Owner: ${prop.owner} • As-Is: $${(prop.asIsValue || 0).toLocaleString()} • ARV: $${(prop.targetARV || 0).toLocaleString()}
+                </p>
             </div>
             ${btnHtml}
         `;
@@ -4304,4 +4316,65 @@ function onDripTargetChange() {
 
     // Refresh email preview address
     updateCampaignTemplatePreview();
+}
+
+function autoScanForListings() {
+    const distVal = parseInt(document.getElementById('filter-distance').value) || 5;
+    const staleVal = document.getElementById('filter-stale-dom').value || 'all';
+
+    showToast("Scanning local neighborhood radar...");
+
+    const streets = ['Oak Ridge Rd', 'Pinecrest Dr', 'Sunset Boulevard', 'Magnolia Ave', 'Valley View Dr', 'Maple Ave', 'Chestnut Hill', 'Shadow Lane'];
+    const owners = ['William Wright', 'Charlotte Hughes', 'Arthur Pendragon', 'Diana Prince', 'Bruce Wayne', 'Alice Smith', 'Bob Johnson', 'Clara Barton'];
+    
+    prospects = [];
+
+    const count = 5 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < count; i++) {
+        const maxOffset = distVal === 1 ? 8 : (distVal === 5 ? 18 : (distVal === 10 ? 28 : 38));
+        const offsetX = Math.round((Math.random() * 2 - 1) * maxOffset);
+        const offsetY = Math.round((Math.random() * 2 - 1) * maxOffset);
+        
+        const coordX = Math.max(15, Math.min(85, 50 + offsetX));
+        const coordY = Math.max(15, Math.min(85, 50 + offsetY));
+
+        const address = `${Math.floor(100 + Math.random() * 899)} ${streets[Math.floor(Math.random() * streets.length)]}`;
+        const owner = owners[Math.floor(Math.random() * owners.length)];
+
+        let dom = 0;
+        if (staleVal === 'all') {
+            dom = Math.floor(5 + Math.random() * 260);
+        } else if (staleVal === 'stale') {
+            dom = Math.floor(91 + Math.random() * 89);
+        } else if (staleVal === 'motivated') {
+            dom = Math.floor(181 + Math.random() * 120);
+        } else if (staleVal === 'expired') {
+            dom = Math.floor(180 + Math.random() * 180);
+        }
+
+        const distance = (Math.random() * distVal).toFixed(1);
+
+        const newProp = {
+            id: `prop-auto-${Date.now()}-${i}`,
+            address: address,
+            owner: owner,
+            phone: '(555) 789-0123',
+            email: `${owner.toLowerCase().replace(' ', '.')}@email.com`,
+            asIsValue: Math.floor(200 + Math.random() * 180) * 1000,
+            targetARV: Math.floor(300 + Math.random() * 220) * 1000,
+            notes: dom > 180 ? 'Seller highly motivated due to high Days on Market.' : 'Stale property with renovation potential.',
+            coords: { x: coordX, y: coordY },
+            hotLevel: dom > 180 ? 'hot' : (dom > 90 ? 'warm' : 'cold'),
+            dom: dom,
+            distance: parseFloat(distance)
+        };
+
+        prospects.push(newProp);
+    }
+
+    saveProspectsToStorage();
+    renderMockMap();
+    renderProspectsList();
+
+    showToast(`Radar Scan Complete! Found ${count} motivated houses.`);
 }
