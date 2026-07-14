@@ -12,31 +12,40 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- Supabase JS Client SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="app-header">
-        <div class="header-logo">
-            <i data-lucide="home" class="logo-icon"></i>
-            <span class="logo-text">Revitalize<span class="accent-dot">.</span></span>
+    <header class="app-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; padding: 1rem 2rem;">
+        <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+            <div class="header-logo" style="cursor:pointer;" onclick="switchView('portal')">
+                <i data-lucide="home" class="logo-icon"></i>
+                <span class="logo-text">Revitalize<span class="accent-dot">.</span></span>
+            </div>
+            <nav class="header-nav" style="margin-left: 1rem;">
+                <button id="btn-portal" class="nav-tab active" onclick="switchView('portal')">
+                    <i data-lucide="user"></i> Homeowner Portal
+                </button>
+                <button id="btn-market" class="nav-tab" onclick="switchView('market')">
+                    <i data-lucide="shopping-bag"></i> Browse Listings
+                </button>
+                <button id="btn-labor" class="nav-tab" onclick="switchView('labor')">
+                    <i data-lucide="users"></i> Browse Labor
+                </button>
+                <button id="btn-utool" class="nav-tab" onclick="switchView('utool')">
+                    <i data-lucide="wrench"></i> UTool Workforce
+                </button>
+                <button id="btn-dashboard" class="nav-tab" onclick="switchView('dashboard')">
+                    <i data-lucide="layout-dashboard"></i> Agent Dashboard
+                </button>
+            </nav>
         </div>
-        <nav class="header-nav">
-            <button id="btn-portal" class="nav-tab active" onclick="switchView('portal')">
-                <i data-lucide="user"></i> Homeowner Portal
-            </button>
-            <button id="btn-market" class="nav-tab" onclick="switchView('market')">
-                <i data-lucide="shopping-bag"></i> Browse Listings
-            </button>
-            <button id="btn-labor" class="nav-tab" onclick="switchView('labor')">
-                <i data-lucide="users"></i> Browse Labor
-            </button>
-            <button id="btn-utool" class="nav-tab" onclick="switchView('utool')">
-                <i data-lucide="wrench"></i> UTool Workforce
-            </button>
-            <button id="btn-dashboard" class="nav-tab" onclick="switchView('dashboard')">
-                <i data-lucide="layout-dashboard"></i> Agent Dashboard
-            </button>
-        </nav>
+        
+        <!-- Auth Status Bar -->
+        <div id="auth-status-container" style="display:flex; align-items:center; gap:0.75rem;">
+            <button class="btn-primary" onclick="openAuthModal()" style="font-size:0.75rem; padding:0.4rem 0.8rem; display:flex; align-items:center; gap:4px;"><i data-lucide="log-in" style="width:14px;height:14px;"></i> Sign In</button>
+        </div>
     </header>
 
     <main class="app-content">
@@ -738,6 +747,11 @@
                             </div>
                         </div>
 
+                        <!-- Active Digital Contract Status -->
+                        <div id="utool-digital-contract-container" style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border-color); display:flex; flex-direction:column; gap:0.5rem;">
+                            <!-- Dynamically loaded digital contract info -->
+                        </div>
+
                         <!-- Offline contract generation -->
                         <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border-color); display:flex; flex-direction:column; gap:0.5rem;">
                             <h4 style="font-size:0.8rem; font-weight:700; color:white; margin:0;">Offline Contracting</h4>
@@ -1083,7 +1097,20 @@
                                     </div>
                                 </div>
 
-                                <button class="btn-secondary btn-sm" onclick="saveApiSettings()" style="width:100%;">
+                                <!-- Supabase Database Settings -->
+                                <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; margin-top: 1rem; display:flex; flex-direction:column; gap:0.75rem;">
+                                    <h4 style="margin:0; font-size:0.8rem; font-weight:700; color:white; display:flex; align-items:center; gap:4px;"><i data-lucide="database" style="width:14px;height:14px;color:var(--success);"></i> Supabase Backend Connection</h4>
+                                    <div class="form-group">
+                                        <label for="api-supabase-url">Supabase Project URL</label>
+                                        <input type="url" id="api-supabase-url" placeholder="https://xxxxxxxx.supabase.co" style="background:rgba(255,255,255,0.01); color:white; border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; font-size:0.8rem; width:100%; box-sizing:border-box;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="api-supabase-key">Supabase Anon Key</label>
+                                        <input type="password" id="api-supabase-key" placeholder="eyJhbGciOi..." style="background:rgba(255,255,255,0.01); color:white; border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; font-size:0.8rem; width:100%; box-sizing:border-box;">
+                                    </div>
+                                </div>
+
+                                <button class="btn-secondary btn-sm" onclick="saveApiSettings()" style="width:100%; margin-top: 1rem;">
                                     <i data-lucide="save"></i> Save API Credentials
                                 </button>
                                 <button class="btn-primary btn-sm" onclick="sendTestWebhookPayload()" style="width:100%; margin-top:0.5rem; background:var(--warning); border-color:var(--warning); color:white;">
@@ -2019,6 +2046,12 @@
                         <button class="btn-secondary btn-sm" onclick="simulateContractorReply()" style="font-size:0.65rem; padding:0.2rem 0.5rem; color:white; display:flex; align-items:center; gap:2px;"><i data-lucide="reply" style="width:10px;height:10px;"></i> Sim Contractor Response</button>
                     </div>
 
+                    <!-- Cooperative Agreement Action -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; background:rgba(16,185,129,0.05); padding:0.5rem; border:1px solid rgba(16,185,129,0.2); border-radius:4px;">
+                        <span style="font-size:0.7rem; color:var(--success); font-weight:700;">Project Agreement:</span>
+                        <button class="btn-primary btn-sm" onclick="openContractBuilderFromChat()" style="font-size:0.65rem; padding:0.2rem 0.5rem; display:flex; align-items:center; gap:2px;"><i data-lucide="file-signature" style="width:10px;height:10px;"></i> Cooperate on Contract</button>
+                    </div>
+
                     <!-- Messaging typing bar -->
                     <div style="display:flex; gap:0.5rem;">
                         <input type="text" id="dm-typing-input" placeholder="Type your message here..." style="flex-grow:1; padding:0.4rem; font-size:0.8rem; background:rgba(0,0,0,0.3); color:white; border:1px solid var(--border-color); border-radius:4px;" onkeydown="if(event.key==='Enter') sendDirectMessage()">
@@ -2072,9 +2105,166 @@
         </div>
     </div>
 
+    <!-- ================= AUTHENTICATION MODAL ================= -->
+    <div id="auth-modal" class="drawer-overlay" style="display:none; align-items:center; justify-content:center; z-index:2000;">
+        <div class="drawer-content mini-modal" style="max-width:400px; width:95%; padding:1.5rem;">
+            <div class="drawer-header" style="padding-bottom:0.75rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+                <h2 id="auth-modal-title">Sign In to Revitalize</h2>
+                <button class="btn-close" onclick="closeAuthModal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <!-- Tab switches -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:1rem; margin-bottom:1rem;">
+                <button id="auth-tab-signin" class="btn-primary" onclick="setAuthTab('signin')" style="padding:0.4rem; font-size:0.75rem; width:100%;">Sign In</button>
+                <button id="auth-tab-register" class="btn-secondary" onclick="setAuthTab('register')" style="padding:0.4rem; font-size:0.75rem; width:100%; color:white;">Register</button>
+            </div>
+
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                    <div class="form-group">
+                        <label for="auth-email">Email Address</label>
+                        <input type="email" id="auth-email" required placeholder="name@email.com" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                    </div>
+                    <div class="form-group">
+                        <label for="auth-password">Password</label>
+                        <input type="password" id="auth-password" required placeholder="••••••••" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                    </div>
+
+                    <!-- Register fields -->
+                    <div id="auth-register-only" style="display:none; flex-direction:column; gap:0.75rem;">
+                        <div class="form-group">
+                            <label for="auth-name">Your Full Name</label>
+                            <input type="text" id="auth-name" placeholder="John Doe" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                        </div>
+                        <div class="form-group">
+                            <label for="auth-role">I am a...</label>
+                            <select id="auth-role" onchange="onAuthRoleChange()" style="background:rgba(0,0,0,0.3); color:white; border:1px solid var(--border-color); padding:0.4rem; border-radius:4px; font-size:0.8rem; width:100%; box-sizing:border-box;">
+                                <option value="homeowner">Homeowner (Looking for work)</option>
+                                <option value="contractor">Contractor / Trade Business (Bidding & Working)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="auth-biz-select-group" style="display:none;">
+                            <label for="auth-biz-select">Link to Directory Business Profile</label>
+                            <select id="auth-biz-select" style="background:rgba(0,0,0,0.3); color:white; border:1px solid var(--border-color); padding:0.4rem; border-radius:4px; font-size:0.8rem; width:100%; box-sizing:border-box;">
+                                <!-- Dynamically loaded businesses -->
+                            </select>
+                            <p style="font-size:0.6rem; color:var(--text-muted); margin-top:0.25rem;">Choose an existing business profile, or register a new business under Browse Labor first.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:1.25rem;">
+                    <button type="submit" class="btn-primary" style="width:100%; padding:0.6rem;" id="auth-btn-submit">Sign In</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= CONTRACT BUILDER MODAL ================= -->
+    <div id="contract-builder-modal" class="drawer-overlay" style="display:none; align-items:center; justify-content:center; z-index:2000;">
+        <div class="drawer-content mini-modal" style="max-width:500px; width:95%; max-height:90vh; overflow-y:auto; padding:1.5rem;">
+            <div class="drawer-header" style="padding-bottom:0.75rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+                <h2>Create Digital Project Contract</h2>
+                <button class="btn-close" onclick="closeContractBuilderModal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <form id="contract-builder-form" onsubmit="handleStapleContract(event)">
+                <input type="hidden" id="contract-lead-id">
+                <input type="hidden" id="contract-bid-id">
+                
+                <div class="drawer-body" style="display:flex; flex-direction:column; gap:0.75rem; margin-top:1rem;">
+                    <p style="font-size:0.75rem; color:var(--text-muted); margin:0;" id="contract-summary-label">Cooperative Agreement Builder</p>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                        <div class="form-group">
+                            <label>Homeowner Client</label>
+                            <input type="text" id="contract-client-name" readonly style="background:rgba(255,255,255,0.03); color:var(--text-muted);">
+                        </div>
+                        <div class="form-group">
+                            <label>Contractor Business</label>
+                            <input type="text" id="contract-biz-name" readonly style="background:rgba(255,255,255,0.03); color:var(--text-muted);">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Property Address</label>
+                        <input type="text" id="contract-address" readonly style="background:rgba(255,255,255,0.03); color:var(--text-muted); width:100%; box-sizing:border-box;">
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                        <div class="form-group">
+                            <label for="contract-agreed-budget">Agreed Budget ($ USD)</label>
+                            <input type="number" id="contract-agreed-budget" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-agreed-days">Completion Days</label>
+                            <input type="number" id="contract-agreed-days" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contract-before-photo">Before Photo (Image URL) <span style="color:var(--danger);">*</span></label>
+                        <input type="url" id="contract-before-photo" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contract-scope-details">Specific Scope / Legal Terms</label>
+                        <textarea id="contract-scope-details" rows="3" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white; font-family:inherit;"></textarea>
+                    </div>
+
+                    <!-- Signature Box -->
+                    <div style="background:rgba(245,158,11,0.02); border:1px solid rgba(245,158,11,0.2); border-radius:4px; padding:0.75rem; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.5rem;">
+                        <span style="font-size:0.7rem; color:#f59e0b; font-weight:700;">Cooperative Digital Signatures Required:</span>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                            <div class="form-group">
+                                <label for="contract-sig-owner">Homeowner Signature</label>
+                                <input type="text" id="contract-sig-owner" placeholder="Type name to sign" required style="font-family:'Great Vibes', cursive; font-size:1.1rem; width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                            </div>
+                            <div class="form-group">
+                                <label for="contract-sig-biz">Contractor Signature</label>
+                                <input type="text" id="contract-sig-biz" placeholder="Type name to sign" required style="font-family:'Great Vibes', cursive; font-size:1.1rem; width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer-footer" style="margin-top:1.25rem;">
+                    <button type="submit" class="btn-primary" style="width:100%;">Staple & Save Contract</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= CONTRACT FULFILL / COMPLETION MODAL ================= -->
+    <div id="contract-fulfill-modal" class="drawer-overlay" style="display:none; align-items:center; justify-content:center; z-index:2000;">
+        <div class="drawer-content mini-modal" style="max-width:400px; width:95%; padding:1.5rem;">
+            <div class="drawer-header" style="padding-bottom:0.75rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+                <h2>Mark Job Completed</h2>
+                <button class="btn-close" onclick="closeContractFulfillModal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <form id="contract-fulfill-form" onsubmit="handleFulfillContractSubmit(event)">
+                <input type="hidden" id="fulfill-lead-id">
+                
+                <div class="drawer-body" style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem;">
+                    <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">Upload the finished product photo to conclude the agreement, sign-off on the contract, and add the before-after showcase to your public profile.</p>
+                    
+                    <div class="form-group">
+                        <label for="fulfill-after-photo">After Photo (Finished Product Image URL) <span style="color:var(--danger);">*</span></label>
+                        <input type="url" id="fulfill-after-photo" required placeholder="Paste a link to the finished work photo..." style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                    </div>
+                </div>
+
+                <div class="drawer-footer" style="margin-top:1.5rem;">
+                    <button type="submit" class="btn-primary" style="width:100%;">Conclude & Fulfill Agreement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Notification Toast -->
     <div id="toast" class="toast">Lead successfully created!</div>
 
-    <script src="app.js?v=30"></script>
+    <script src="app.js?v=31"></script>
 </body>
 </html>

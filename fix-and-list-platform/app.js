@@ -124,6 +124,8 @@ let adCampaigns = [];
 let emailLogs = [];
 let laborBusinesses = [];
 let contractorChats = [];
+let currentUser = null;
+let supabaseClient = null;
 let liveMarketListings = [];
 let workRequests = [];
 let crewAllocations = {};
@@ -138,7 +140,9 @@ let apiSettings = {
     emailjsTemplate: '',
     emailWebhook: 'https://hook.us2.make.com/pr1l0jvjtuto0qikljvjkrr82jtttmz1',
     adsProvider: 'webhook',
-    adsWebhook: 'https://hook.us2.make.com/pr1l0jvjtuto0qikljvjkrr82jtttmz1'
+    adsWebhook: 'https://hook.us2.make.com/pr1l0jvjtuto0qikljvjkrr82jtttmz1',
+    supabaseUrl: '',
+    supabaseKey: ''
 };
 let currentSelectedLeadId = null;
 let currentSlideIdx = 1;
@@ -446,8 +450,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('api-email-webhook-url').value = apiSettings.emailWebhook || 'https://hook.us2.make.com/pr1l0jvjtuto0qikljvjkrr82jtttmz1';
     document.getElementById('api-ads-provider').value = apiSettings.adsProvider || 'webhook';
     document.getElementById('api-ads-webhook-url').value = apiSettings.adsWebhook || 'https://hook.us2.make.com/pr1l0jvjtuto0qikljvjkrr82jtttmz1';
+    document.getElementById('api-supabase-url').value = apiSettings.supabaseUrl || '';
+    document.getElementById('api-supabase-key').value = apiSettings.supabaseKey || '';
     
     toggleApiFields();
+
+    if (apiSettings.supabaseUrl && apiSettings.supabaseKey && typeof supabase !== 'undefined') {
+        try {
+            supabaseClient = supabase.createClient(apiSettings.supabaseUrl, apiSettings.supabaseKey);
+            console.log("Supabase client initialized successfully!");
+        } catch (e) {
+            console.error("Supabase init error:", e);
+        }
+    }
 
     if (apiSettings.emailProvider === 'emailjs' && apiSettings.emailjsPublic) {
         if (typeof emailjs !== 'undefined') {
@@ -459,6 +474,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('chk-auto-intake').checked = emailSettings.autoIntake;
     document.getElementById('chk-auto-rehab').checked = emailSettings.autoRehab;
     document.getElementById('chk-auto-contract').checked = emailSettings.autoContract;
+
+    // Load auth user
+    try {
+        const savedUser = localStorage.getItem('revitalize_current_user');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+        }
+    } catch (e) {
+        console.error("Auth user parse error:", e);
+    }
+    renderAuthHeaderStatus();
 
     // Initialize UI features
     lucide.createIcons();
@@ -4467,9 +4493,16 @@ function saveApiSettings() {
     apiSettings.emailWebhook = document.getElementById('api-email-webhook-url').value.trim();
     apiSettings.adsProvider = document.getElementById('api-ads-provider').value;
     apiSettings.adsWebhook = document.getElementById('api-ads-webhook-url').value.trim();
+    apiSettings.supabaseUrl = document.getElementById('api-supabase-url').value.trim();
+    apiSettings.supabaseKey = document.getElementById('api-supabase-key').value.trim();
 
     localStorage.setItem('revitalize_api_settings', JSON.stringify(apiSettings));
     
+    // Initialize/Re-initialize client if values provided
+    if (apiSettings.supabaseUrl && apiSettings.supabaseKey && typeof supabase !== 'undefined') {
+        supabaseClient = supabase.createClient(apiSettings.supabaseUrl, apiSettings.supabaseKey);
+    }
+
     if (apiSettings.emailProvider === 'emailjs' && apiSettings.emailjsPublic) {
         if (typeof emailjs !== 'undefined') {
             emailjs.init({ publicKey: apiSettings.emailjsPublic });
@@ -4899,6 +4932,41 @@ function renderLaborDirectory() {
             reviewsListHtml = '<p style="font-size:0.75rem; color:var(--text-muted); margin:0.5rem 0 0 0;">No reviews yet. Be the first to leave one!</p>';
         }
 
+        // Transformations list
+        let transformationsHtml = '';
+        if (biz.transformations && biz.transformations.length > 0) {
+            transformationsHtml = `
+                <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
+                    <h5 style="margin:0 0 0.5rem 0; font-size:0.8rem; font-weight:700; color:white; display:flex; align-items:center; gap:4px;"><i data-lucide="sparkles" style="width:12px;height:12px;color:var(--warning);"></i> Before & After Transformations</h5>
+                    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                        ${biz.transformations.map(t => `
+                            <div style="background:rgba(0,0,0,0.25); border:1px solid var(--border-color); border-radius:4px; padding:0.6rem; font-size:0.75rem;">
+                                <div style="font-weight:700; color:white; margin-bottom:0.4rem;">${t.address}</div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.4rem;">
+                                    <div>
+                                        <div style="font-size:0.6rem; color:var(--text-muted); margin-bottom:0.15rem; text-transform:uppercase;">Before</div>
+                                        <div style="height:90px; border-radius:4px; overflow:hidden; border:1px solid rgba(255,255,255,0.05);" onclick="openImageWindow('${t.before}')">
+                                            <img src="${t.before}" style="width:100%; height:100%; object-fit:cover;">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size:0.6rem; color:var(--success); margin-bottom:0.15rem; text-transform:uppercase;">After (Completed)</div>
+                                        <div style="height:90px; border-radius:4px; overflow:hidden; border:1px solid rgba(255,255,255,0.05);" onclick="openImageWindow('${t.after}')">
+                                            <img src="${t.after}" style="width:100%; height:100%; object-fit:cover;">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="color:var(--text-muted); font-size:0.65rem; display:flex; justify-content:space-between; opacity:0.8;">
+                                    <span>Budget: <strong>$${t.budget.toLocaleString()}</strong></span>
+                                    <span>Completed: <strong>${t.completedDate}</strong></span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
         item.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem;">
                 <div>
@@ -4939,6 +5007,9 @@ function renderLaborDirectory() {
                         ${reviewsListHtml}
                     </div>
                 </div>
+
+                <!-- Before & After Transformations Showcase -->
+                ${transformationsHtml}
 
                 <!-- Post Review Mini Form -->
                 <div style="background:rgba(255,255,255,0.01); border:1px solid var(--border-color); border-radius:4px; padding:0.75rem; margin-top:0.5rem;">
@@ -5413,6 +5484,9 @@ function renderUtoolDashboard() {
 
     // Auto scroll chat to bottom
     chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Render digital contract status panel
+    renderUtoolDigitalContract(lead);
 
     lucide.createIcons();
 }
@@ -6152,4 +6226,460 @@ function acceptContractorBid(leadId, bidIdx) {
 
     renderClientBids(lead);
     showToast(`Bid accepted! ${bid.contractorName} assigned to project team.`);
+}
+
+// ================= USER AUTHENTICATION & LOGIN LOGIC =================
+let authActiveTab = 'signin';
+
+function openAuthModal() {
+    authActiveTab = 'signin';
+    document.getElementById('auth-modal-title').innerText = "Sign In to Revitalize";
+    document.getElementById('auth-register-only').style.display = 'none';
+    document.getElementById('auth-btn-submit').innerText = "Sign In";
+    
+    document.getElementById('auth-tab-signin').className = 'btn-primary';
+    document.getElementById('auth-tab-register').className = 'btn-secondary';
+    document.getElementById('auth-tab-register').style.color = 'white';
+
+    // Populate contractor directory select list
+    const bizSelect = document.getElementById('auth-biz-select');
+    if (bizSelect) {
+        bizSelect.innerHTML = '';
+        laborBusinesses.forEach(biz => {
+            const opt = document.createElement('option');
+            opt.value = biz.id;
+            opt.innerText = biz.name;
+            bizSelect.appendChild(opt);
+        });
+    }
+
+    document.getElementById('auth-modal').style.display = 'flex';
+    lucide.createIcons();
+}
+
+function closeAuthModal() {
+    document.getElementById('auth-modal').style.display = 'none';
+}
+
+function setAuthTab(tab) {
+    authActiveTab = tab;
+    if (tab === 'signin') {
+        document.getElementById('auth-modal-title').innerText = "Sign In to Revitalize";
+        document.getElementById('auth-register-only').style.display = 'none';
+        document.getElementById('auth-btn-submit').innerText = "Sign In";
+        document.getElementById('auth-tab-signin').className = 'btn-primary';
+        document.getElementById('auth-tab-register').className = 'btn-secondary';
+        document.getElementById('auth-tab-register').style.color = 'white';
+    } else {
+        document.getElementById('auth-modal-title').innerText = "Register New Account";
+        document.getElementById('auth-register-only').style.display = 'flex';
+        document.getElementById('auth-btn-submit').innerText = "Create Account";
+        document.getElementById('auth-tab-signin').className = 'btn-secondary';
+        document.getElementById('auth-tab-signin').style.color = 'white';
+        document.getElementById('auth-tab-register').className = 'btn-primary';
+        onAuthRoleChange();
+    }
+}
+
+function onAuthRoleChange() {
+    const role = document.getElementById('auth-role').value;
+    const group = document.getElementById('auth-biz-select-group');
+    if (role === 'contractor') {
+        group.style.display = 'block';
+    } else {
+        group.style.display = 'none';
+    }
+}
+
+async function handleAuthSubmit(event) {
+    event.preventDefault();
+    const email = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const name = document.getElementById('auth-name').value.trim();
+    const role = document.getElementById('auth-role').value;
+    const bizId = document.getElementById('auth-biz-select').value;
+
+    if (authActiveTab === 'signin') {
+        if (supabaseClient) {
+            try {
+                showToast("Connecting to Supabase...");
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+
+                // Load user profile metadata
+                currentUser = {
+                    email: data.user.email,
+                    name: data.user.user_metadata.name || data.user.email,
+                    role: data.user.user_metadata.role || 'homeowner',
+                    bizId: data.user.user_metadata.bizId || ''
+                };
+                localStorage.setItem('revitalize_current_user', JSON.stringify(currentUser));
+                showToast(`Welcome back, ${currentUser.name}! (Connected to Supabase)`);
+                closeAuthModal();
+                renderAuthHeaderStatus();
+                if (currentView === 'utool') renderUtoolDashboard();
+                return;
+            } catch (e) {
+                console.error("Supabase signin error:", e.message);
+                showToast(`Supabase Error: ${e.message}`);
+            }
+        }
+
+        // Sandbox Local Fallback Auth
+        let accounts = [];
+        try {
+            const savedAccs = localStorage.getItem('revitalize_accounts');
+            if (savedAccs) accounts = JSON.parse(savedAccs);
+        } catch (e) { console.error(e); }
+
+        const match = accounts.find(a => a.email.toLowerCase() === email.toLowerCase() && a.password === password);
+        if (match) {
+            currentUser = {
+                email: match.email,
+                name: match.name,
+                role: match.role,
+                bizId: match.bizId
+            };
+            localStorage.setItem('revitalize_current_user', JSON.stringify(currentUser));
+            showToast(`Welcome back, ${currentUser.name}! (Sandbox Sandbox Profile)`);
+            closeAuthModal();
+            renderAuthHeaderStatus();
+            if (currentView === 'utool') renderUtoolDashboard();
+        } else {
+            showToast("Invalid credentials. Please register first.");
+        }
+    } else {
+        // Register Account
+        if (supabaseClient) {
+            try {
+                showToast("Registering user on Supabase...");
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { name, role, bizId }
+                    }
+                });
+                if (error) throw error;
+
+                currentUser = { email, name, role, bizId };
+                localStorage.setItem('revitalize_current_user', JSON.stringify(currentUser));
+                showToast(`Registration successful, welcome ${name}!`);
+                closeAuthModal();
+                renderAuthHeaderStatus();
+                if (currentView === 'utool') renderUtoolDashboard();
+                return;
+            } catch (e) {
+                console.error("Supabase signup error:", e.message);
+                showToast(`Supabase Error: ${e.message}`);
+            }
+        }
+
+        // Sandbox Fallback Registration
+        let accounts = [];
+        try {
+            const savedAccs = localStorage.getItem('revitalize_accounts');
+            if (savedAccs) accounts = JSON.parse(savedAccs);
+        } catch (e) { console.error(e); }
+
+        if (accounts.some(a => a.email.toLowerCase() === email.toLowerCase())) {
+            showToast("Account already exists with this email!");
+            return;
+        }
+
+        const newAccount = { email, password, name, role, bizId };
+        accounts.push(newAccount);
+        localStorage.setItem('revitalize_accounts', JSON.stringify(accounts));
+
+        currentUser = { email, name, role, bizId };
+        localStorage.setItem('revitalize_current_user', JSON.stringify(currentUser));
+        
+        showToast(`Account created successfully! Welcome ${name}.`);
+        closeAuthModal();
+        renderAuthHeaderStatus();
+        if (currentView === 'utool') renderUtoolDashboard();
+    }
+}
+
+function handleSignOut() {
+    if (supabaseClient) {
+        supabaseClient.auth.signOut().catch(err => console.error(err));
+    }
+    currentUser = null;
+    localStorage.removeItem('revitalize_current_user');
+    showToast("Signed out successfully.");
+    renderAuthHeaderStatus();
+    if (currentView === 'utool') renderUtoolDashboard();
+}
+
+function renderAuthHeaderStatus() {
+    const container = document.getElementById('auth-status-container');
+    if (!container) return;
+
+    if (currentUser) {
+        let label = currentUser.role === 'contractor' ? 'Contractor' : 'Homeowner';
+        container.innerHTML = `
+            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600; display:inline-block; border-right:1px solid rgba(255,255,255,0.08); padding-right:0.75rem; margin-right:0.25rem;">
+                <span class="text-gradient">${label}</span>: ${currentUser.name}
+            </span>
+            <button class="btn-secondary" onclick="handleSignOut()" style="padding:0.3rem 0.6rem; font-size:0.7rem; color:white; display:flex; align-items:center; gap:2px; background:rgba(255,255,255,0.02); border-color:var(--border-color);">
+                <i data-lucide="log-out" style="width:12px;height:12px;"></i> Sign Out
+            </button>
+        `;
+    } else {
+        container.innerHTML = `
+            <button class="btn-primary" onclick="openAuthModal()" style="font-size:0.75rem; padding:0.4rem 0.8rem; display:flex; align-items:center; gap:4px;"><i data-lucide="log-in" style="width:14px;height:14px;"></i> Sign In</button>
+        `;
+    }
+    lucide.createIcons();
+}
+
+
+// ================= COOPERATIVE DIGITAL CONTRACT SYSTEM =================
+function openContractBuilderFromChat() {
+    if (!currentUser) {
+        showToast("Please sign in first to generate a binding project contract!");
+        openAuthModal();
+        return;
+    }
+
+    const chat = contractorChats.find(c => c.bizId === activeMessageBizId);
+    if (!chat) {
+        showToast("No active conversation found to build terms.");
+        return;
+    }
+
+    // Attempt to locate a matching project lead for this consumer
+    const clientEmail = currentUser ? currentUser.email : (localStorage.getItem('revitalize_consumer_email') || '');
+    let lead = leads.find(l => l.email.toLowerCase() === clientEmail.toLowerCase()) || leads[0];
+
+    if (!lead) {
+        showToast("No active homeowner project found. List your house on the portal first!");
+        return;
+    }
+
+    document.getElementById('contract-lead-id').value = lead.id;
+    document.getElementById('contract-client-name').value = lead.name;
+    document.getElementById('contract-biz-name').value = chat.bizName;
+    document.getElementById('contract-address').value = lead.address;
+
+    // Suggest budget based on ARV spread
+    const spread = Math.round(lead.targetARV - lead.asIsValue);
+    document.getElementById('contract-agreed-budget').value = spread > 5000 ? Math.round(spread * 0.7) : 35000;
+    document.getElementById('contract-agreed-days').value = 30;
+
+    // Load before photo
+    document.getElementById('contract-before-photo').value = lead.photoUrl || 'https://images.unsplash.com/photo-1581094288338-2314dddb7eed?auto=format&fit=crop&w=400&q=80';
+    document.getElementById('contract-scope-details').value = `This agreement mandates that ${chat.bizName} will perform general trade repairs and renovation work at the property of ${lead.name} located at ${lead.address}.\n\nPayments are assigned and settled at transaction closing. All works require full photo verification.`;
+
+    document.getElementById('contract-sig-owner').value = '';
+    document.getElementById('contract-sig-biz').value = '';
+
+    document.getElementById('contract-builder-modal').style.display = 'flex';
+    lucide.createIcons();
+}
+
+function closeContractBuilderModal() {
+    document.getElementById('contract-builder-modal').style.display = 'none';
+}
+
+function handleStapleContract(event) {
+    event.preventDefault();
+    const leadId = document.getElementById('contract-lead-id').value;
+    const clientName = document.getElementById('contract-client-name').value;
+    const bizName = document.getElementById('contract-biz-name').value;
+    const address = document.getElementById('contract-address').value;
+    const budget = parseInt(document.getElementById('contract-agreed-budget').value) || 0;
+    const days = parseInt(document.getElementById('contract-agreed-days').value) || 1;
+    const beforePhoto = document.getElementById('contract-before-photo').value.trim();
+    const scopeDetails = document.getElementById('contract-scope-details').value.trim();
+    const sigOwner = document.getElementById('contract-sig-owner').value.trim();
+    const sigBiz = document.getElementById('contract-sig-biz').value.trim();
+
+    if (!sigOwner || !sigBiz) {
+        showToast("Both parties must sign the contract to staple!");
+        return;
+    }
+
+    const lead = leads.find(l => l.id === leadId);
+    if (!lead) return;
+
+    const contract = {
+        id: `contract-${Date.now()}`,
+        leadId: leadId,
+        contractorId: activeMessageBizId,
+        contractorName: bizName,
+        clientName: clientName,
+        address: address,
+        budget: budget,
+        days: days,
+        beforePhoto: beforePhoto,
+        scopeDetails: scopeDetails,
+        sigOwner: sigOwner,
+        sigBiz: sigBiz,
+        status: 'signed',
+        timestamp: new Date().toLocaleString()
+    };
+
+    // Staple contract to project lead
+    lead.contract = contract;
+    lead.stage = 'rehab'; // Progress to Active Rehab stage!
+    saveLeadsToStorage();
+
+    // Persist to Supabase if client active
+    if (supabaseClient) {
+        supabaseClient.from('contracts').insert([contract]).then(({ data, error }) => {
+            if (error) console.error("Supabase save contract error:", error.message);
+            else console.log("Stapled to Supabase successfully!");
+        });
+    }
+
+    closeContractBuilderModal();
+    closeDirectMessageModal();
+    showToast("Digital contract successfully signed & stapled to project!");
+    renderUtoolDashboard();
+}
+
+function openContractFulfillModal(leadId) {
+    document.getElementById('fulfill-lead-id').value = leadId;
+    document.getElementById('fulfill-after-photo').value = '';
+    document.getElementById('contract-fulfill-modal').style.display = 'flex';
+}
+
+function closeContractFulfillModal() {
+    document.getElementById('contract-fulfill-modal').style.display = 'none';
+}
+
+function handleFulfillContractSubmit(event) {
+    event.preventDefault();
+    const leadId = document.getElementById('fulfill-lead-id').value;
+    const afterPhoto = document.getElementById('fulfill-after-photo').value.trim();
+
+    if (!afterPhoto) {
+        showToast("Please enter the finished product photo URL!");
+        return;
+    }
+
+    const lead = leads.find(l => l.id === leadId);
+    if (!lead || !lead.contract) return;
+
+    const c = lead.contract;
+    c.status = 'completed';
+    c.afterPhoto = afterPhoto;
+    
+    lead.stage = 'listed'; // Conclude rehab and advance to MLS listings!
+    saveLeadsToStorage();
+
+    // Populate Before & After project transformation on contractor showcase profile
+    const biz = laborBusinesses.find(b => b.id === c.contractorId);
+    if (biz) {
+        if (!biz.transformations) biz.transformations = [];
+        biz.transformations.push({
+            address: c.address,
+            before: c.beforePhoto,
+            after: afterPhoto,
+            budget: c.budget,
+            days: c.days,
+            completedDate: new Date().toLocaleDateString()
+        });
+        localStorage.setItem('revitalize_labor_businesses', JSON.stringify(laborBusinesses));
+    }
+
+    // Save update to Supabase
+    if (supabaseClient) {
+        supabaseClient.from('contracts')
+            .update({ status: 'completed', afterPhoto: afterPhoto })
+            .eq('id', c.id)
+            .then(({ error }) => {
+                if (error) console.error("Supabase contract complete update error:", error.message);
+            });
+    }
+
+    closeContractFulfillModal();
+    showToast(`Project concluded! Before & After showcase registered to your directory profile.`);
+    
+    renderUtoolDashboard();
+    renderLaborDirectory();
+}
+
+function renderUtoolDigitalContract(lead) {
+    const container = document.getElementById('utool-digital-contract-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!lead || !lead.contract) {
+        container.innerHTML = `
+            <h4 style="font-size:0.8rem; font-weight:700; color:white; margin:0;">Active Digital Contract</h4>
+            <p style="font-size:0.7rem; color:var(--text-muted); margin:0;">No digital contract has been stapled to this project yet. Cooperate in chat to build one.</p>
+        `;
+        return;
+    }
+
+    const c = lead.contract;
+    const isCompleted = c.status === 'completed';
+
+    let actionBtnHtml = '';
+    if (!isCompleted) {
+        const isCurrentContractor = currentUser && currentUser.role === 'contractor' && currentUser.bizId === c.contractorId;
+        if (isCurrentContractor) {
+            actionBtnHtml = `
+                <button class="btn-primary" onclick="openContractFulfillModal('${lead.id}')" style="width:100%; font-size:0.75rem; padding:0.4rem; display:flex; align-items:center; justify-content:center; gap:0.25rem;">
+                    <i data-lucide="check-square"></i> Mark Completed & Upload After Photo
+                </button>
+            `;
+        } else {
+            actionBtnHtml = `
+                <div style="background:rgba(245,158,11,0.05); border:1px solid rgba(245,158,11,0.2); border-radius:4px; padding:0.5rem; font-size:0.65rem; color:#f59e0b; line-height:1.2;">
+                    🔒 To complete this job, sign in as contractor <strong>${c.contractorName}</strong>.
+                </div>
+            `;
+        }
+    } else {
+        actionBtnHtml = `
+            <div style="background:rgba(16,185,129,0.15); color:var(--success); border:1px solid rgba(16,185,129,0.3); font-size:0.7rem; padding:0.4rem; border-radius:4px; text-align:center; font-weight:700;">
+                ✓ Contract Fulfilled & Concluded
+            </div>
+        `;
+    }
+
+    container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+            <h4 style="font-size:0.8rem; font-weight:700; color:white; margin:0;">Stapled Digital Contract</h4>
+            <span class="badge ${isCompleted ? 'success' : 'warning'}" style="font-size:0.6rem; text-transform:uppercase; padding:0.15rem 0.35rem;">${c.status}</span>
+        </div>
+        <div style="background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.6rem; font-size:0.7rem; display:flex; flex-direction:column; gap:0.4rem;">
+            <div>Contractor: <strong>${c.contractorName}</strong></div>
+            <div>Agreed Budget: <strong>$${c.budget.toLocaleString()}</strong></div>
+            <div>Agreed Timeline: <strong>${c.days} Days</strong></div>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; margin-top:0.25rem;">
+                <div>
+                    <span style="font-size:0.55rem; color:var(--text-muted); display:block; margin-bottom:0.15rem; text-transform:uppercase;">Before</span>
+                    <div style="height:60px; border-radius:4px; overflow:hidden; border:1px solid rgba(255,255,255,0.05); cursor:pointer;" onclick="openImageWindow('${c.beforePhoto}')">
+                        <img src="${c.beforePhoto}" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                </div>
+                <div>
+                    <span style="font-size:0.55rem; color:var(--success); display:block; margin-bottom:0.15rem; text-transform:uppercase;">After</span>
+                    ${c.afterPhoto ? `
+                    <div style="height:60px; border-radius:4px; overflow:hidden; border:1px solid rgba(255,255,255,0.05); cursor:pointer;" onclick="openImageWindow('${c.afterPhoto}')">
+                        <img src="${c.afterPhoto}" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    ` : `
+                    <div style="height:60px; border-radius:4px; background:rgba(255,255,255,0.02); border:1px dashed var(--border-color); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:0.55rem;">
+                        Pending
+                    </div>
+                    `}
+                </div>
+            </div>
+            
+            <div style="border-top:1px solid rgba(255,255,255,0.03); padding-top:0.4rem; font-size:0.65rem; color:var(--text-muted); text-align:center;">
+                Signatures: <i>${c.sigOwner}</i> & <i>${c.sigBiz}</i>
+            </div>
+        </div>
+        <div style="margin-top:0.25rem;">
+            ${actionBtnHtml}
+        </div>
+    `;
+    lucide.createIcons();
 }
