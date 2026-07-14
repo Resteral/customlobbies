@@ -1166,9 +1166,77 @@ function handleMapAddressSearch() {
     const address = input.value.trim();
     if (!address) return;
 
+    showToast("Querying real geocoder database...");
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(address)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (!data || data.length === 0) {
+                showToast("Address not found in real geocoder database. Trying fallback...");
+                dropMockAddressPin(address);
+                return;
+            }
+
+            const item = data[0];
+            const realAddress = item.display_name.split(',').slice(0, 3).join(',');
+            const lat = parseFloat(item.lat);
+            const lon = parseFloat(item.lon);
+
+            let anchor = JSON.parse(localStorage.getItem('revitalize_map_anchor'));
+            if (!anchor) {
+                anchor = { lat: lat, lon: lon };
+                localStorage.setItem('revitalize_map_anchor', JSON.stringify(anchor));
+            }
+
+            const latOffset = lat - anchor.lat;
+            const lonOffset = lon - anchor.lon;
+
+            const gridX = Math.max(15, Math.min(85, Math.round(50 + (lonOffset * 600))));
+            const gridY = Math.max(15, Math.min(85, Math.round(50 - (latOffset * 600))));
+
+            const owners = ['William Wright', 'Charlotte Hughes', 'Arthur Pendragon', 'Diana Prince', 'Bruce Wayne'];
+            const ownerName = owners[Math.floor(Math.random() * owners.length)];
+
+            const asIs = Math.round(180 + Math.random() * 200) * 1000;
+            const arv = Math.round(asIs * 1.35);
+
+            const newProspect = {
+                id: `prop-real-${Date.now()}`,
+                address: realAddress,
+                owner: ownerName,
+                phone: '(555) 789-0123',
+                email: `${ownerName.toLowerCase().replace(' ', '.')}@email.com`,
+                asIsValue: asIs,
+                targetARV: arv,
+                notes: `Located via OSM Geocoder (Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)})`,
+                coords: { x: gridX, y: gridY },
+                hotLevel: 'hot',
+                dom: Math.floor(10 + Math.random() * 150),
+                distance: parseFloat((Math.sqrt(latOffset * latOffset + lonOffset * lonOffset) * 69).toFixed(1))
+            };
+
+            prospects.push(newProspect);
+            saveProspectsToStorage();
+            input.value = '';
+
+            renderMockMap();
+            renderProspectsList();
+            showToast(`Real address loaded: ${realAddress}`);
+
+            setTimeout(() => {
+                const pin = document.querySelector(`.map-marker[style*="left: ${gridX}%"][style*="top: ${gridY}%"]`);
+                if (pin) pin.click();
+            }, 400);
+        })
+        .catch(err => {
+            console.error("Geocoder fetch error:", err);
+            dropMockAddressPin(address);
+        });
+}
+
+function dropMockAddressPin(address) {
     const randomX = Math.round(15 + Math.random() * 70);
     const randomY = Math.round(15 + Math.random() * 70);
-    
     const owners = ['William Wright', 'Charlotte Hughes', 'Arthur Pendragon', 'Diana Prince', 'Bruce Wayne'];
     const ownerName = owners[Math.floor(Math.random() * owners.length)];
 
@@ -1180,22 +1248,20 @@ function handleMapAddressSearch() {
         email: `${ownerName.toLowerCase().replace(' ', '.')}@email.com`,
         asIsValue: 340000,
         targetARV: 430000,
-        notes: 'Discovered through custom radius map address search.',
+        notes: 'Discovered through fallback radius map address search.',
         coords: { x: randomX, y: randomY },
-        hotLevel: 'warm'
+        hotLevel: 'warm',
+        dom: 65,
+        distance: 2.1
     };
 
     prospects.push(newProspect);
-    input.value = '';
+    saveProspectsToStorage();
+    document.getElementById('map-search-input').value = '';
 
     renderMockMap();
     renderProspectsList();
-    showToast(`Custom pin dropped on Map for: ${address}`);
-
-    setTimeout(() => {
-        const pin = document.querySelector(`.map-marker[style*="left: ${randomX}%"][style*="top: ${randomY}%"]`);
-        if (pin) pin.click();
-    }, 400);
+    showToast(`Custom fallback pin dropped for: ${address}`);
 }
 
 function showMapTooltip(prop, inPipeline, left, top) {
@@ -4503,62 +4569,118 @@ function onDripTargetChange() {
 function autoScanForListings() {
     const distVal = parseInt(document.getElementById('filter-distance').value) || 5;
     const staleVal = document.getElementById('filter-stale-dom').value || 'all';
+    const searchQuery = document.getElementById('map-search-input').value.trim() || "Whispering Pines";
 
-    showToast("Scanning local neighborhood radar...");
+    showToast("Scanning real-world neighborhood radar...");
 
-    const streets = ['Oak Ridge Rd', 'Pinecrest Dr', 'Sunset Boulevard', 'Magnolia Ave', 'Valley View Dr', 'Maple Ave', 'Chestnut Hill', 'Shadow Lane'];
-    const owners = ['William Wright', 'Charlotte Hughes', 'Arthur Pendragon', 'Diana Prince', 'Bruce Wayne', 'Alice Smith', 'Bob Johnson', 'Clara Barton'];
-    
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=10&q=${encodeURIComponent(searchQuery)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (!data || data.length === 0) {
+                showToast("No neighborhood found. Scanning fallback radar...");
+                runMockRadarScan(distVal, staleVal);
+                return;
+            }
+
+            const anchorLat = parseFloat(data[0].lat);
+            const anchorLon = parseFloat(data[0].lon);
+            localStorage.setItem('revitalize_map_anchor', JSON.stringify({ lat: anchorLat, lon: anchorLon }));
+
+            prospects = [];
+            const owners = ['William Wright', 'Charlotte Hughes', 'Arthur Pendragon', 'Diana Prince', 'Bruce Wayne', 'Alice Smith', 'Bob Johnson', 'Clara Barton'];
+
+            data.forEach((item, i) => {
+                const lat = parseFloat(item.lat);
+                const lon = parseFloat(item.lon);
+                const address = item.display_name.split(',').slice(0, 2).join(',');
+
+                const latOffset = lat - anchorLat;
+                const lonOffset = lon - anchorLon;
+
+                const gridX = Math.max(15, Math.min(85, Math.round(50 + (lonOffset * 400))));
+                const gridY = Math.max(15, Math.min(85, Math.round(50 - (latOffset * 400))));
+
+                const owner = owners[Math.floor(Math.random() * owners.length)];
+
+                let dom = 0;
+                if (staleVal === 'all') {
+                    dom = Math.floor(5 + Math.random() * 260);
+                } else if (staleVal === 'stale') {
+                    dom = Math.floor(91 + Math.random() * 89);
+                } else if (staleVal === 'motivated') {
+                    dom = Math.floor(181 + Math.random() * 120);
+                } else if (staleVal === 'expired') {
+                    dom = Math.floor(180 + Math.random() * 180);
+                }
+
+                const distance = parseFloat((Math.sqrt(latOffset * latOffset + lonOffset * lonOffset) * 69).toFixed(1));
+
+                const asIs = Math.round(180 + Math.random() * 220) * 1000;
+                const arv = Math.round(asIs * 1.35);
+
+                const newProp = {
+                    id: `prop-auto-${Date.now()}-${i}`,
+                    address: address,
+                    owner: owner,
+                    phone: '(555) 789-0123',
+                    email: `${owner.toLowerCase().replace(' ', '.')}@email.com`,
+                    asIsValue: asIs,
+                    targetARV: arv,
+                    notes: `Motivated listing loaded from real geocoder data.`,
+                    coords: { x: gridX, y: gridY },
+                    hotLevel: dom > 180 ? 'hot' : (dom > 90 ? 'warm' : 'cold'),
+                    dom: dom,
+                    distance: distance || 0.4
+                };
+
+                prospects.push(newProp);
+            });
+
+            saveProspectsToStorage();
+            renderMockMap();
+            renderProspectsList();
+            showToast(`Radar Scan Complete! Loaded ${prospects.length} real locations.`);
+        })
+        .catch(err => {
+            console.error("Radar scan error:", err);
+            runMockRadarScan(distVal, staleVal);
+        });
+}
+
+function runMockRadarScan(distVal, staleVal) {
+    const streets = ['Oak Ridge Rd', 'Pinecrest Dr', 'Sunset Boulevard', 'Magnolia Ave', 'Valley View Dr'];
+    const owners = ['William Wright', 'Charlotte Hughes', 'Arthur Pendragon', 'Diana Prince'];
     prospects = [];
 
-    const count = 5 + Math.floor(Math.random() * 3);
+    const count = 5;
     for (let i = 0; i < count; i++) {
-        const maxOffset = distVal === 1 ? 8 : (distVal === 5 ? 18 : (distVal === 10 ? 28 : 38));
-        const offsetX = Math.round((Math.random() * 2 - 1) * maxOffset);
-        const offsetY = Math.round((Math.random() * 2 - 1) * maxOffset);
-        
-        const coordX = Math.max(15, Math.min(85, 50 + offsetX));
-        const coordY = Math.max(15, Math.min(85, 50 + offsetY));
-
+        const randomX = Math.round(15 + Math.random() * 70);
+        const randomY = Math.round(15 + Math.random() * 70);
         const address = `${Math.floor(100 + Math.random() * 899)} ${streets[Math.floor(Math.random() * streets.length)]}`;
         const owner = owners[Math.floor(Math.random() * owners.length)];
 
-        let dom = 0;
-        if (staleVal === 'all') {
-            dom = Math.floor(5 + Math.random() * 260);
-        } else if (staleVal === 'stale') {
-            dom = Math.floor(91 + Math.random() * 89);
-        } else if (staleVal === 'motivated') {
-            dom = Math.floor(181 + Math.random() * 120);
-        } else if (staleVal === 'expired') {
-            dom = Math.floor(180 + Math.random() * 180);
-        }
+        let dom = staleVal === 'all' ? 45 : (staleVal === 'stale' ? 110 : 210);
 
-        const distance = (Math.random() * distVal).toFixed(1);
-
-        const newProp = {
-            id: `prop-auto-${Date.now()}-${i}`,
+        prospects.push({
+            id: `prop-mock-scan-${Date.now()}-${i}`,
             address: address,
             owner: owner,
             phone: '(555) 789-0123',
             email: `${owner.toLowerCase().replace(' ', '.')}@email.com`,
-            asIsValue: Math.floor(200 + Math.random() * 180) * 1000,
-            targetARV: Math.floor(300 + Math.random() * 220) * 1000,
-            notes: dom > 180 ? 'Seller highly motivated due to high Days on Market.' : 'Stale property with renovation potential.',
-            coords: { x: coordX, y: coordY },
-            hotLevel: dom > 180 ? 'hot' : (dom > 90 ? 'warm' : 'cold'),
+            asIsValue: 240000,
+            targetARV: 330000,
+            notes: 'Mock fallback listing.',
+            coords: { x: randomX, y: randomY },
+            hotLevel: 'warm',
             dom: dom,
-            distance: parseFloat(distance)
-        };
-
-        prospects.push(newProp);
+            distance: 1.5
+        });
     }
 
     saveProspectsToStorage();
     renderMockMap();
     renderProspectsList();
-
-    showToast(`Radar Scan Complete! Found ${count} motivated houses.`);
+    showToast(`Radar Scan Complete! Found fallback houses.`);
 }
 
 // ================= LABOR & TRADES MARKETPLACE =================
