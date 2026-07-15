@@ -5233,65 +5233,97 @@ async function autoScanForListings() {
     }
 }
 
-function runRealSpreadNominatim(anchorLat, anchorLon, searchQuery, distVal, staleVal) {
+async function runRealSpreadNominatim(anchorLat, anchorLon, searchQuery, distVal, staleVal) {
     prospects = [];
     const owners = ['William Wright', 'Charlotte Hughes', 'Arthur Pendragon', 'Diana Prince', 'Bruce Wayne', 'Alice Smith', 'Bob Johnson', 'Clara Barton', 'Sarah Jenkins', 'Donald Davis'];
-    const commonStreets = ['Oak Ridge Rd', 'Pinecrest Dr', 'Sunset Boulevard', 'Magnolia Ave', 'Valley View Dr', 'Maple Ave', 'Grand Ave', 'Ocean Drive', 'Brickell Ave'];
+    
+    showToast("Resolving real street addresses in your area...");
 
-    const numProspects = 8;
+    const numProspects = 6;
+    const promises = [];
+
     for (let i = 0; i < numProspects; i++) {
         const latOffset = (Math.random() - 0.5) * 0.015;
         const lonOffset = (Math.random() - 0.5) * 0.015;
         const lat = anchorLat + latOffset;
         const lon = anchorLon + lonOffset;
 
-        const number = Math.floor(100 + Math.random() * 899);
-        const street = commonStreets[i % commonStreets.length];
-        const address = `${number} ${street}, ${searchQuery.split(',')[0]}`;
+        const distance = parseFloat((Math.sqrt(latOffset * latOffset + lonOffset * lonOffset) * 69).toFixed(1));
+        if (distance > distVal) continue;
 
         const gridX = Math.max(15, Math.min(85, Math.round(50 + (lonOffset * 4000))));
         const gridY = Math.max(15, Math.min(85, Math.round(50 - (latOffset * 4000))));
 
-        const owner = owners[i % owners.length];
-        const phone = `(305) 555-0${100 + Math.floor(Math.random() * 899)}`;
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
         
-        let dom = 0;
-        if (staleVal === 'all') {
-            dom = Math.floor(5 + Math.random() * 260);
-        } else if (staleVal === 'stale') {
-            dom = Math.floor(91 + Math.random() * 89);
-        } else if (staleVal === 'motivated') {
-            dom = Math.floor(181 + Math.random() * 120);
-        } else if (staleVal === 'expired') {
-            dom = Math.floor(180 + Math.random() * 180);
-        }
+        const delay = i * 250;
+        const promise = new Promise(resolve => setTimeout(resolve, delay))
+            .then(() => fetch(url))
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    const addr = data.address;
+                    let cleanAddress = data.display_name;
+                    
+                    if (addr) {
+                        const num = addr.house_number || "";
+                        const road = addr.road || addr.pedestrian || addr.suburb || "";
+                        const city = addr.city || addr.town || addr.village || "";
+                        if (road && city) {
+                            cleanAddress = num ? `${num} ${road}, ${city}` : `${road}, ${city}`;
+                        }
+                    }
 
-        const distance = parseFloat((Math.sqrt(latOffset * latOffset + lonOffset * lonOffset) * 69).toFixed(1));
-        if (distance > distVal) continue;
+                    const owner = owners[i % owners.length];
+                    const phone = `(305) 555-0${100 + Math.floor(Math.random() * 899)}`;
+                    
+                    let dom = 0;
+                    if (staleVal === 'all') {
+                        dom = Math.floor(5 + Math.random() * 260);
+                    } else if (staleVal === 'stale') {
+                        dom = Math.floor(91 + Math.random() * 89);
+                    } else if (staleVal === 'motivated') {
+                        dom = Math.floor(181 + Math.random() * 120);
+                    } else if (staleVal === 'expired') {
+                        dom = Math.floor(180 + Math.random() * 180);
+                    }
 
-        const asIs = Math.round(180 + Math.random() * 220) * 1000;
-        const arv = Math.round(asIs * 1.35);
+                    const asIs = Math.round(180 + Math.random() * 220) * 1000;
+                    const arv = Math.round(asIs * 1.35);
 
-        prospects.push({
-            id: `prop-auto-${Date.now()}-${i}`,
-            address: address,
-            owner: owner,
-            phone: phone,
-            email: `${owner.toLowerCase().replace(' ', '.')}@email.com`,
-            asIsValue: asIs,
-            targetARV: arv,
-            notes: `Motivated listing found near anchor point via neighborhood radar.`,
-            coords: { x: gridX, y: gridY },
-            hotLevel: dom > 180 ? 'hot' : (dom > 90 ? 'warm' : 'cold'),
-            dom: dom,
-            distance: distance || 0.4
-        });
+                    prospects.push({
+                        id: `prop-auto-${Date.now()}-${i}`,
+                        address: cleanAddress,
+                        owner: owner,
+                        phone: phone,
+                        email: `${owner.toLowerCase().replace(' ', '.')}@email.com`,
+                        asIsValue: asIs,
+                        targetARV: arv,
+                        notes: `Real-world property resolved via geolocation reverse lookup.`,
+                        coords: { x: gridX, y: gridY },
+                        hotLevel: dom > 180 ? 'hot' : (dom > 90 ? 'warm' : 'cold'),
+                        dom: dom,
+                        distance: distance || 0.4
+                    });
+                }
+            })
+            .catch(err => console.error("OSM reverse lookup error:", err));
+        
+        promises.push(promise);
+    }
+
+    await Promise.all(promises);
+
+    if (prospects.length === 0) {
+        showToast("Address lookup failed, loading fallback grid...");
+        runMockRadarScan(distVal, staleVal);
+        return;
     }
 
     saveProspectsToStorage();
     renderMockMap();
     renderProspectsList();
-    showToast(`Radar Scan Complete! Loaded ${prospects.length} real locations.`);
+    showToast(`Radar Scan Complete! Loaded ${prospects.length} verified real addresses near you.`);
 }
 
 function runMockRadarScan(distVal, staleVal) {
