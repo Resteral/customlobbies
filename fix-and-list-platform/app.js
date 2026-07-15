@@ -1222,7 +1222,7 @@ function handleMapAddressSearch() {
 
     showToast("Querying real geocoder database...");
 
-    fetch(`https://corsproxy.io/?https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(address)}`)
+    fetch('/api/proxy?url=' + encodeURIComponent(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(address)}`))
         .then(res => res.json())
         .then(data => {
             if (!data || data.length === 0) {
@@ -4090,7 +4090,7 @@ async function fetchLiveMarketListings(customQuery) {
         }
 
         try {
-            const res = await fetch('https://corsproxy.io/?https://api.realestateapi.com/v2/MLSSearch', {
+            const res = await fetch('/api/proxy?url=' + encodeURIComponent('https://api.realestateapi.com/v2/MLSSearch'), {
                 method: 'POST',
                 headers: {
                     "accept": "application/json",
@@ -4149,7 +4149,7 @@ async function fetchLiveMarketListings(customQuery) {
     }
 
     // Geocode the city center (Fallback to geocoded OSM listings)
-    fetch(`https://corsproxy.io/?https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(query)}`)
+    fetch('/api/proxy?url=' + encodeURIComponent(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(query)}`))
         .then(res => res.json())
         .then(data => {
             if (!data || data.length === 0) {
@@ -4950,7 +4950,7 @@ async function autoScanForListings() {
     // Override with custom typed search query if entered
     if (searchQuery) {
         try {
-            const nominatimRes = await fetch(`https://corsproxy.io/?https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(searchQuery)}`);
+            const nominatimRes = await fetch('/api/proxy?url=' + encodeURIComponent(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(searchQuery)}`));
             const nominatimData = await nominatimRes.json();
             if (nominatimData && nominatimData.length > 0) {
                 anchorLat = parseFloat(nominatimData[0].lat);
@@ -4985,7 +4985,7 @@ async function autoScanForListings() {
                 andFilters.push({ "longitude": { "gte": anchorLon - delta, "lte": anchorLon + delta } });
             }
 
-            const res = await fetch('https://corsproxy.io/?https://api.realestateapi.com/v2/PropertySearch', {
+            const res = await fetch('/api/proxy?url=' + encodeURIComponent('https://api.realestateapi.com/v2/PropertySearch'), {
                 method: 'POST',
                 headers: {
                     "accept": "application/json",
@@ -5078,7 +5078,7 @@ async function runRealSpreadNominatim(anchorLat, anchorLon, searchQuery, distVal
     const maxLon = anchorLon + delta;
 
     // Fetch roads inside bounding box in a single bulk request (100% rate-limit proof)
-    const url = `https://corsproxy.io/?https://nominatim.openstreetmap.org/search?format=json&limit=15&bounded=1&viewbox=${minLon},${maxLat},${maxLon},${minLat}&q=road`;
+    const url = '/api/proxy?url=' + encodeURIComponent(`https://nominatim.openstreetmap.org/search?format=json&limit=15&bounded=1&viewbox=${minLon},${maxLat},${maxLon},${minLat}&q=road`);
 
     try {
         const res = await fetch(url);
@@ -7576,7 +7576,7 @@ function detectUserLocation() {
                 
                 // Reverse-geocode to get the city name for the inputs
                 try {
-                    const res = await fetch(`https://corsproxy.io/?https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                    const res = await fetch('/api/proxy?url=' + encodeURIComponent(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`));
                     if (res.ok) {
                         const data = await res.json();
                         if (data && data.address) {
