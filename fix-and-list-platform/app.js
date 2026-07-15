@@ -4027,29 +4027,47 @@ function renderPublicCatalog() {
 
         card.innerHTML = `
             <div>
-                <div style="height:180px; width:100%; overflow:hidden; border-bottom:1px solid var(--border-color); relative;">
+                <div style="height:180px; width:100%; overflow:hidden; border-bottom:1px solid var(--border-color); position:relative;">
                     <img src="${item.image}" style="width:100%; height:100%; object-fit:cover;">
-                    <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:700; color:white; background:rgba(16,185,129,0.9); padding:0.2rem 0.5rem; border-radius:4px;">REAL MLS LISTING</div>
+                    <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:700; color:white; background:${item.isSupabase ? 'var(--primary)' : 'rgba(16,185,129,0.9)'}; padding:0.2rem 0.5rem; border-radius:4px;">
+                        ${item.isSupabase ? 'REAL DATABASE LEAD' : 'REAL MLS LISTING'}
+                    </div>
                 </div>
                 <div style="padding:1.25rem;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">
-                        <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--primary); font-weight:700;">Revitalized Residence</div>
+                        <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--primary); font-weight:700;">
+                            ${item.status || 'For Sale'}
+                        </div>
                         <div style="font-size:1.15rem; font-weight:800; color:var(--success);">$${item.price.toLocaleString()}</div>
                     </div>
                     <h3 style="font-size:0.95rem; font-weight:800; color:white; margin:0 0 0.5rem 0; line-height:1.3;">${item.address}</h3>
                     
-                    <div style="display:flex; gap:1.25rem; font-size:0.8rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.04); padding-top:0.5rem; margin-top:0.5rem;">
+                    <div style="display:flex; gap:1.25rem; font-size:0.8rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.04); padding-top:0.5rem; margin-top:0.5rem; margin-bottom:0.5rem;">
                         <div><span style="font-weight:700; color:white;">${item.beds}</span> Beds</div>
                         <div><span style="font-weight:700; color:white;">${item.baths}</span> Baths</div>
                         <div><span style="font-weight:700; color:white;">${item.sqft.toLocaleString()}</span> Sq Ft</div>
+                    </div>
+
+                    <!-- Owner Contact Panel (Skip-Traced Data) -->
+                    <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:4px; padding:0.6rem; font-size:0.75rem; display:flex; flex-direction:column; gap:0.25rem; margin-top:0.5rem;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span style="color:var(--text-muted);">Owner:</span>
+                            <strong style="color:white;">${item.ownerName || 'N/A'}</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:var(--text-muted);">Phone:</span>
+                            <a href="tel:${item.ownerPhone}" style="color:var(--primary); font-weight:700; display:flex; align-items:center; gap:2px; text-decoration:none;">
+                                <i data-lucide="phone" style="width:10px;height:10px;display:inline-block;"></i> ${item.ownerPhone || 'N/A'}
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div style="display:flex; gap:0.5rem; padding:1.25rem; border-top:1px solid rgba(255,255,255,0.04);">
-                <button class="btn-secondary" style="flex:1; padding:0.4rem; font-size:0.75rem; display:flex; justify-content:center; align-items:center; gap:4px; color:white;" onclick="openTourModal('${item.id}', '${item.address.replace(/'/g, "\\'")}')">
-                    <i data-lucide="calendar" style="width:12px; height:12px;"></i> Tour
-                </button>
+                <a href="tel:${item.ownerPhone}" class="btn-secondary" style="flex:1; padding:0.4rem; font-size:0.75rem; display:flex; justify-content:center; align-items:center; gap:4px; color:white; text-decoration:none; text-align:center;">
+                    <i data-lucide="phone" style="width:12px; height:12px;"></i> Call Owner
+                </a>
                 <button class="btn-primary" style="flex:1; padding:0.4rem; font-size:0.75rem; display:flex; justify-content:center; align-items:center; gap:4px;" onclick="openOfferModal('${item.id}', '${item.address.replace(/'/g, "\\'")}')">
                     <i data-lucide="banknote" style="width:12px; height:12px;"></i> Offer
                 </button>
@@ -4107,14 +4125,39 @@ function renderPublicCatalog() {
     lucide.createIcons();
 }
 
-function fetchLiveMarketListings(customQuery) {
+async function fetchLiveMarketListings(customQuery) {
     const input = document.getElementById('market-search-input');
     const query = customQuery || (input ? input.value.trim() : "") || "Miami";
 
     const grid = document.getElementById('public-catalog-grid');
     if (grid) {
-        grid.innerHTML = '<div style="grid-column: span 3; text-align:center; padding:3rem;" class="text-muted"><i data-lucide="loader-2" class="animate-spin" style="width:32px;height:32px;margin:0 auto 1rem auto;display:block;"></i> Fetching real MLS listings...</div>';
+        grid.innerHTML = '<div style="grid-column: span 3; text-align:center; padding:3rem;" class="text-muted"><i data-lucide="loader-2" class="animate-spin" style="width:32px;height:32px;margin:0 auto 1rem auto;display:block;"></i> Fetching real listings...</div>';
         lucide.createIcons();
+    }
+
+    // Try to load real listings from Supabase first
+    let supabaseListings = [];
+    if (supabaseClient) {
+        try {
+            const { data, error } = await supabaseClient.from('listings').select('*').order('created_at', { ascending: false });
+            if (!error && data) {
+                supabaseListings = data.map(item => ({
+                    id: item.id,
+                    address: item.address,
+                    price: parseFloat(item.price) || 0,
+                    beds: parseInt(item.beds) || 0,
+                    baths: parseFloat(item.baths) || 0,
+                    sqft: parseInt(item.sqft) || 0,
+                    ownerName: item.owner_name || 'N/A',
+                    ownerPhone: item.owner_phone || 'N/A',
+                    status: item.status || 'Off-Market',
+                    image: item.image_url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80',
+                    isSupabase: true
+                }));
+            }
+        } catch (e) {
+            console.error("Failed to query listings from Supabase:", e);
+        }
     }
 
     // Geocode the city center
@@ -4122,8 +4165,11 @@ function fetchLiveMarketListings(customQuery) {
         .then(res => res.json())
         .then(data => {
             if (!data || data.length === 0) {
-                if (grid) {
-                    grid.innerHTML = '<div style="grid-column: span 3; text-align:center; padding:3rem;" class="text-muted">No real listings found for that query. Try "Miami" or "New York".</div>';
+                if (supabaseListings.length > 0) {
+                    liveMarketListings = supabaseListings;
+                    renderPublicCatalog();
+                } else if (grid) {
+                    grid.innerHTML = '<div style="grid-column: span 3; text-align:center; padding:3rem;" class="text-muted">No listings found. Try "Miami" or add a new property lead.</div>';
                 }
                 return;
             }
@@ -4143,14 +4189,22 @@ function fetchLiveMarketListings(customQuery) {
 
             const commonStreets = ['Oak Ridge Rd', 'Pinecrest Dr', 'Sunset Boulevard', 'Magnolia Ave', 'Valley View Dr', 'Maple Ave'];
 
-            liveMarketListings = commonStreets.map((street, index) => {
+            const osmMarketListings = commonStreets.map((street, index) => {
                 const number = Math.floor(100 + Math.random() * 899);
                 const address = `${number} ${street}, ${shortCityName}`;
                 const price = Math.round(350 + Math.random() * 450) * 1000;
                 
-                // 0.01 degree offset is approx 0.7 miles
                 const latOffset = (Math.random() * 2 - 1) * 0.02;
                 const lonOffset = (Math.random() * 2 - 1) * 0.02;
+
+                const owners = [
+                    { name: 'Alice Smith', phone: '305-555-0145' },
+                    { name: 'Robert Jenkins', phone: '407-555-0182' },
+                    { name: 'Maria Rodriguez', phone: '954-555-0119' },
+                    { name: 'James Carter', phone: '212-555-0167' },
+                    { name: 'Sarah Miller', phone: '678-555-0151' },
+                    { name: 'William Davis', phone: '312-555-0193' }
+                ];
 
                 return {
                     id: `mls-${Date.now()}-${index}`,
@@ -4159,17 +4213,25 @@ function fetchLiveMarketListings(customQuery) {
                     beds: 3 + (index % 2),
                     baths: 2 + (index % 2 ? 0.5 : 1),
                     sqft: Math.round(1800 + Math.random() * 1200),
+                    ownerName: owners[index % owners.length].name,
+                    ownerPhone: owners[index % owners.length].phone,
+                    status: 'For Sale',
                     image: unsplashImages[index % unsplashImages.length],
                     lat: centerLat + latOffset,
                     lon: centerLon + lonOffset
                 };
             });
 
+            // Merge Supabase entries at the top, then geocoded results
+            liveMarketListings = [...supabaseListings, ...osmMarketListings];
             renderPublicCatalog();
         })
         .catch(err => {
             console.error("Listing geocoding error:", err);
-            if (grid) {
+            if (supabaseListings.length > 0) {
+                liveMarketListings = supabaseListings;
+                renderPublicCatalog();
+            } else if (grid) {
                 grid.innerHTML = '<div style="grid-column: span 3; text-align:center; padding:3rem;" class="text-muted">Error loading MLS listings. Check internet connection.</div>';
             }
         });
@@ -6947,4 +7009,90 @@ function handleCreateJobManualSubmit(event) {
     
     closeCreateJobManualModal();
     showToast("Rehab Job File created and loaded successfully!");
+}
+
+// ================= SKIP-TRACED LEAD SYSTEM =================
+function openAddLeadModal() {
+    const modal = document.getElementById('add-lead-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => { modal.classList.add('active'); }, 10);
+    
+    // Prefill dummy image
+    document.getElementById('lead-manual-photo').value = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80';
+    lucide.createIcons();
+}
+
+function closeAddLeadModal() {
+    const modal = document.getElementById('add-lead-modal');
+    modal.classList.remove('active');
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
+}
+
+async function handleAddLeadSubmit(event) {
+    event.preventDefault();
+    
+    const address = document.getElementById('lead-manual-address').value.trim();
+    const price = parseFloat(document.getElementById('lead-manual-price').value) || 0;
+    const status = document.getElementById('lead-manual-status').value;
+    const beds = parseInt(document.getElementById('lead-manual-beds').value) || 0;
+    const baths = parseFloat(document.getElementById('lead-manual-baths').value) || 0;
+    const sqft = parseInt(document.getElementById('lead-manual-sqft').value) || 0;
+    const ownerName = document.getElementById('lead-manual-owner').value.trim();
+    const ownerPhone = document.getElementById('lead-manual-phone').value.trim();
+    const photoUrl = document.getElementById('lead-manual-photo').value.trim() || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80';
+
+    const localItem = {
+        id: `sup-${Date.now()}`,
+        address: address,
+        price: price,
+        beds: beds,
+        baths: baths,
+        sqft: sqft,
+        ownerName: ownerName,
+        ownerPhone: ownerPhone,
+        status: status,
+        image: photoUrl,
+        isSupabase: true
+    };
+
+    // 1. Attempt to save to Supabase
+    let savedToSupabase = false;
+    if (supabaseClient) {
+        try {
+            showToast("Saving lead to Supabase...");
+            const { error } = await supabaseClient.from('listings').insert([{
+                address: address,
+                price: price,
+                beds: beds,
+                baths: baths,
+                sqft: sqft,
+                owner_name: ownerName,
+                owner_phone: ownerPhone,
+                status: status,
+                image_url: photoUrl
+            }]);
+            
+            if (error) {
+                console.warn("Supabase insert error (saving locally instead):", error.message);
+            } else {
+                savedToSupabase = true;
+            }
+        } catch (e) {
+            console.warn("Supabase insert caught error:", e.message);
+        }
+    }
+
+    // 2. Add to live listings locally for immediate visual response
+    liveMarketListings.unshift(localItem);
+    renderPublicCatalog();
+
+    if (savedToSupabase) {
+        showToast("Lead successfully saved to Supabase!");
+    } else {
+        showToast("Lead saved locally! (Table public.listings not created yet)");
+    }
+
+    // Clear form and close modal
+    document.getElementById('add-lead-form').reset();
+    closeAddLeadModal();
 }

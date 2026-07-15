@@ -400,9 +400,10 @@
                     </div>
                     
                     <!-- Real-World Listings Search Bar -->
-                    <div style="display:flex; gap:0.5rem; width:100%; max-width:400px;">
-                        <input type="text" id="market-search-input" placeholder="Search city / zip for active homes..." style="padding:0.4rem 0.8rem; font-size:0.8rem; background:rgba(0,0,0,0.3); color:white; border:1px solid var(--border-color); border-radius:4px; flex-grow:1; box-sizing:border-box;">
+                    <div style="display:flex; gap:0.5rem; width:100%; max-width:550px; flex-wrap:wrap; justify-content:flex-end;">
+                        <input type="text" id="market-search-input" placeholder="Search city / zip for active homes..." style="padding:0.4rem 0.8rem; font-size:0.8rem; background:rgba(0,0,0,0.3); color:white; border:1px solid var(--border-color); border-radius:4px; flex-grow:1; box-sizing:border-box; min-width:180px;">
                         <button class="btn-primary" onclick="fetchLiveMarketListings()" style="padding:0.4rem 1rem; font-size:0.8rem; display:flex; align-items:center; gap:0.25rem;"><i data-lucide="search" style="width:12px;height:12px;"></i> Search MLS</button>
+                        <button class="btn-secondary" onclick="openAddLeadModal()" style="padding:0.4rem 1rem; font-size:0.8rem; display:flex; align-items:center; gap:0.25rem; color:white;"><i data-lucide="plus" style="width:12px;height:12px;"></i> Add Lead</button>
                     </div>
                 </div>
                 <div class="catalog-grid" id="public-catalog-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:2rem;">
@@ -2343,9 +2344,78 @@
         </div>
     </div>
 
+    <!-- ================= ADD LEAD MODAL ================= -->
+    <div id="add-lead-modal" class="drawer-overlay" style="display:none; align-items:center; justify-content:center; z-index:2000;">
+        <div class="drawer-content mini-modal" style="max-width:500px; width:95%; max-height:90vh; overflow-y:auto; padding:1.5rem;">
+            <div class="drawer-header" style="padding-bottom:0.75rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+                <h2>Add Real Estate Lead / Skip-Traced Property</h2>
+                <button class="btn-close" onclick="closeAddLeadModal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <form id="add-lead-form" onsubmit="handleAddLeadSubmit(event)">
+                <div class="drawer-body" style="display:flex; flex-direction:column; gap:0.75rem; margin-top:1rem;">
+                    <div class="form-group">
+                        <label for="lead-manual-address">Property Address <span style="color:var(--danger);">*</span></label>
+                        <input type="text" id="lead-manual-address" required placeholder="e.g. 104 Pinecrest Dr, Miami FL" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                        <div class="form-group">
+                            <label for="lead-manual-price">Price / Estimated Value ($ USD) <span style="color:var(--danger);">*</span></label>
+                            <input type="number" id="lead-manual-price" required placeholder="e.g. 295000" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                        </div>
+                        <div class="form-group">
+                            <label for="lead-manual-status">Property Status</label>
+                            <select id="lead-manual-status" style="background:rgba(0,0,0,0.3); color:white; border:1px solid var(--border-color); padding:0.4rem; border-radius:4px; font-size:0.8rem; width:100%; box-sizing:border-box;">
+                                <option value="Off-Market" selected>Off-Market (Skip-Traced)</option>
+                                <option value="For Sale">For Sale</option>
+                                <option value="Under Contract">Under Contract</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.4rem;">
+                        <div class="form-group">
+                            <label for="lead-manual-beds">Beds <span style="color:var(--danger);">*</span></label>
+                            <input type="number" id="lead-manual-beds" required placeholder="3" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                        </div>
+                        <div class="form-group">
+                            <label for="lead-manual-baths">Baths <span style="color:var(--danger);">*</span></label>
+                            <input type="number" step="0.5" id="lead-manual-baths" required placeholder="2" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                        </div>
+                        <div class="form-group">
+                            <label for="lead-manual-sqft">Sq Ft <span style="color:var(--danger);">*</span></label>
+                            <input type="number" id="lead-manual-sqft" required placeholder="1450" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                        <div class="form-group">
+                            <label for="lead-manual-owner">Owner Full Name <span style="color:var(--danger);">*</span></label>
+                            <input type="text" id="lead-manual-owner" required placeholder="e.g. Sean Miller" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                        </div>
+                        <div class="form-group">
+                            <label for="lead-manual-phone">Owner Phone Number <span style="color:var(--danger);">*</span></label>
+                            <input type="tel" id="lead-manual-phone" required placeholder="e.g. 305-555-0199" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lead-manual-photo">Property Image URL</label>
+                        <input type="url" id="lead-manual-photo" placeholder="https://images.unsplash.com/..." style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:4px; padding:0.4rem; color:white;">
+                    </div>
+                </div>
+
+                <div class="drawer-footer" style="margin-top:1.5rem;">
+                    <button type="submit" class="btn-primary" style="width:100%;">Save Property Lead to Database</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Notification Toast -->
     <div id="toast" class="toast">Lead successfully created!</div>
 
-    <script src="app.js?v=35"></script>
+    <script src="app.js?v=36"></script>
 </body>
 </html>
