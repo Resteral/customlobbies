@@ -4261,32 +4261,40 @@ async function fetchLiveMarketListings(customQuery) {
         }
     }
 
-    // Try to load real listings from RentCast if API Key is configured
-    const rentCastApiKey = localStorage.getItem('revitalize_rentcast_api_key') || 'WALTSCARPENTRY-878b-f4a6-ad00-b59dd151bd4b';
-    if (rentCastApiKey) {
-        let url = `https://api.rentcast.io/v1/listings/active?limit=12&status=For%20Sale`;
+    // Try to load real listings from RealEstateAPI if API Key is configured
+    const realEstateApiKey = localStorage.getItem('revitalize_rentcast_api_key') || 'WALTSCARPENTRY-878b-f4a6-ad00-b59dd151bd4b';
+    if (realEstateApiKey) {
         const isZip = /^\d{5}$/.test(query);
+        let requestBody = {
+            "size": 12,
+            "active": true,
+            "include_photos": true
+        };
+
         if (isZip) {
-            url += `&zipCode=${query}`;
+            requestBody.zip = query;
         } else {
             const parts = query.split(',');
-            const city = parts[0].trim();
-            const state = parts[1] ? parts[1].trim() : 'FL';
-            url += `&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}`;
+            requestBody.city = parts[0].trim();
+            requestBody.state = parts[1] ? parts[1].trim() : 'FL';
         }
 
         try {
-            const res = await fetch(url, {
+            const res = await fetch('https://api.realestateapi.com/v2/MLSSearch', {
+                method: 'POST',
                 headers: {
                     "accept": "application/json",
-                    "X-Api-Key": rentCastApiKey
-                }
+                    "content-type": "application/json",
+                    "x-api-key": realEstateApiKey
+                },
+                body: JSON.stringify(requestBody)
             });
+
             if (res.ok) {
                 const data = await res.json();
-                if (data && data.length > 0) {
-                    const rentCastListings = data.map((item, index) => {
-                        const price = item.price || 350000;
+                if (data && data.results && data.results.length > 0) {
+                    const realEstateListings = data.results.map((item, index) => {
+                        const price = item.mlsListingPrice || 350000;
                         const beds = item.beds || 3;
                         const baths = item.baths || 2;
                         const sqft = item.sqFt || 1500;
@@ -4302,8 +4310,8 @@ async function fetchLiveMarketListings(customQuery) {
                         const owner = owners[index % owners.length];
 
                         return {
-                            id: item.id || `rc-${Date.now()}-${index}`,
-                            address: item.formattedAddress || item.addressLine1,
+                            id: item.id || `re-${Date.now()}-${index}`,
+                            address: item.address.full || `${item.address.street}, ${item.address.city}, ${item.address.state}`,
                             price: price,
                             beds: beds,
                             baths: baths,
@@ -4311,22 +4319,22 @@ async function fetchLiveMarketListings(customQuery) {
                             ownerName: owner.name,
                             ownerPhone: owner.phone,
                             status: 'For Sale',
-                            image: (item.imageUrls && item.imageUrls.length > 0) ? item.imageUrls[0] : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80',
+                            image: (item.photos && item.photos.length > 0) ? item.photos[0] : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80',
                             isSupabase: false,
-                            isRentCast: true
+                            isRealEstateAPI: true
                         };
                     });
                     
-                    liveMarketListings = [...homeownerListings, ...supabaseListings, ...rentCastListings];
+                    liveMarketListings = [...homeownerListings, ...supabaseListings, ...realEstateListings];
                     renderPublicCatalog();
-                    showToast(`Loaded ${rentCastListings.length} live listings from RentCast!`);
+                    showToast(`Loaded ${realEstateListings.length} live listings from RealEstateAPI!`);
                     return;
                 }
             } else {
-                console.warn("RentCast API returned error status:", res.status);
+                console.warn("RealEstateAPI returned error status:", res.status);
             }
         } catch (e) {
-            console.error("RentCast API error:", e);
+            console.error("RealEstateAPI error:", e);
         }
     }
 
@@ -5145,39 +5153,48 @@ async function autoScanForListings() {
     }
 
     try {
-        const rentCastApiKey = localStorage.getItem('revitalize_rentcast_api_key') || 'WALTSCARPENTRY-878b-f4a6-ad00-b59dd151bd4b';
-        if (rentCastApiKey) {
-            showToast("Querying RentCast database for real listings...");
-            let url = `https://api.rentcast.io/v1/listings/active?limit=15&status=For%20Sale`;
+        const realEstateApiKey = localStorage.getItem('revitalize_rentcast_api_key') || 'WALTSCARPENTRY-878b-f4a6-ad00-b59dd151bd4b';
+        if (realEstateApiKey) {
+            showToast("Querying RealEstateAPI database for real prospects...");
+            
+            let andFilters = [];
             const isZip = /^\d{5}$/.test(searchQuery);
             if (isZip) {
-                url += `&zipCode=${searchQuery}`;
+                andFilters.push({ "zip": searchQuery });
             } else if (searchQuery !== "Detected Location") {
                 const parts = searchQuery.split(',');
                 const city = parts[0].trim();
                 const state = parts[1] ? parts[1].trim() : 'FL';
-                url += `&city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}`;
+                andFilters.push({ "city": city });
+                andFilters.push({ "state": state });
             } else {
-                // If it is detected location coordinate, we query RentCast using lat & lon coordinates!
-                url += `&latitude=${anchorLat}&longitude=${anchorLon}&radius=${distVal}`;
+                const delta = 0.035;
+                andFilters.push({ "latitude": { "gte": anchorLat - delta, "lte": anchorLat + delta } });
+                andFilters.push({ "longitude": { "gte": anchorLon - delta, "lte": anchorLon + delta } });
             }
 
-            const rcRes = await fetch(url, {
+            const res = await fetch('https://api.realestateapi.com/v2/PropertySearch', {
+                method: 'POST',
                 headers: {
                     "accept": "application/json",
-                    "X-Api-Key": rentCastApiKey
-                }
+                    "content-type": "application/json",
+                    "x-api-key": realEstateApiKey
+                },
+                body: JSON.stringify({
+                    "size": 15,
+                    "and": andFilters
+                })
             });
 
-            if (rcRes.ok) {
-                const rcData = await rcRes.json();
-                if (rcData && rcData.length > 0) {
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.results && data.results.length > 0) {
                     prospects = [];
                     const owners = ['William Wright', 'Charlotte Hughes', 'Arthur Pendragon', 'Diana Prince', 'Bruce Wayne', 'Alice Smith', 'Bob Johnson', 'Clara Barton', 'Sarah Jenkins', 'Donald Davis'];
 
-                    rcData.forEach((item, index) => {
-                        const lat = item.latitude || (anchorLat + (Math.random() - 0.5) * 0.015);
-                        const lon = item.longitude || (anchorLon + (Math.random() - 0.5) * 0.015);
+                    data.results.forEach((item, index) => {
+                        const lat = parseFloat(item.latitude) || (anchorLat + (Math.random() - 0.5) * 0.015);
+                        const lon = parseFloat(item.longitude) || (anchorLon + (Math.random() - 0.5) * 0.015);
                         
                         const latOffset = lat - anchorLat;
                         const lonOffset = lon - anchorLon;
@@ -5185,7 +5202,7 @@ async function autoScanForListings() {
                         const gridX = Math.max(15, Math.min(85, Math.round(50 + (lonOffset * 4000))));
                         const gridY = Math.max(15, Math.min(85, Math.round(50 - (latOffset * 4000))));
 
-                        const dom = item.daysOnMarket || Math.floor(5 + Math.random() * 260);
+                        const dom = Math.floor(5 + Math.random() * 260);
 
                         if (staleVal === 'stale' && dom <= 90) return;
                         if (staleVal === 'motivated' && dom <= 180) return;
@@ -5196,18 +5213,20 @@ async function autoScanForListings() {
                         const owner = owners[index % owners.length];
                         const phone = `(305) 555-0${100 + Math.floor(Math.random() * 899)}`;
 
-                        const asIs = item.price || 350000;
-                        const arv = Math.round(asIs * 1.25);
+                        const cleanAddress = item.address.formattedAddress || `${item.address.house || ''} ${item.address.street || ''}, ${item.address.city || ''}`;
+
+                        const asIs = 350000;
+                        const arv = 440000;
 
                         prospects.push({
                             id: `prop-auto-${Date.now()}-${index}`,
-                            address: item.formattedAddress || item.addressLine1,
+                            address: cleanAddress,
                             owner: owner,
                             phone: phone,
                             email: `${owner.toLowerCase().replace(' ', '.')}@email.com`,
                             asIsValue: asIs,
                             targetARV: arv,
-                            notes: `Beds: ${item.beds || 3} • Baths: ${item.baths || 2} • SqFt: ${item.sqFt || 1500}`,
+                            notes: `Real property resolved via RealEstateAPI.com database. APN: ${item.apn || 'N/A'}`,
                             coords: { x: gridX, y: gridY },
                             hotLevel: dom > 180 ? 'hot' : (dom > 90 ? 'warm' : 'cold'),
                             dom: dom,
@@ -5218,7 +5237,7 @@ async function autoScanForListings() {
                     saveProspectsToStorage();
                     renderMockMap();
                     renderProspectsList();
-                    showToast(`Radar Scan Complete! Loaded ${prospects.length} real listings.`);
+                    showToast(`Radar Scan Complete! Loaded ${prospects.length} real properties.`);
                     return;
                 }
             }
