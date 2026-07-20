@@ -140,7 +140,34 @@ let appState = {
       matches: [{ round: 'Finals', teamA: 'Team Slayer', teamB: 'Team Ghost', scoreA: 4, scoreB: 5 }]
     }
   ],
-  activeTournamentId: null
+  activeTournamentId: null,
+  forumFilter: 'all',
+  forumPosts: [
+    {
+      id: 'POST-SEED1',
+      author: 'Resteral.TV',
+      title: '📈 How to raise ELO in Zealot Hockey quickly',
+      content: 'Make sure you always communicate defender swaps. 4v4 Hockey requires clean passing channels and rotating to cover open spaces when your teammate commits to a shot. Streaks are crucial!',
+      category: 'hockey',
+      createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
+    },
+    {
+      id: 'POST-SEED2',
+      author: 'Slayer',
+      title: '🧜 Arkheron Team Compositions',
+      content: 'Leodin is strong for fast rotations, but make sure your team has a Voidcollapse setup wizard (like Edani) for magic damage. Relic setups really matter here.',
+      category: 'arkheron',
+      createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
+    },
+    {
+      id: 'POST-SEED3',
+      author: 'Ghost',
+      title: '🛡️ Zealot Mod Scrim tonight!',
+      content: 'Creating a lobby around 7 PM EST. Join custom room LOB-SCRIM. We need 6 players for a solid serpentine draft. All skill levels welcome!',
+      category: 'zealot',
+      createdAt: new Date(Date.now() - 3600000 * 48).toISOString()
+    }
+  ]
 };
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -188,6 +215,8 @@ function switchTab(tabId) {
     renderProfilesTab();
   } else if (tabId === 'tournaments') {
     renderTournamentsTab();
+  } else if (tabId === 'forums') {
+    renderForumsTab();
   }
 }
 
@@ -1920,35 +1949,127 @@ function renderTournamentsTab() {
         </div>
       `;
     }
-  } 
-  else if (t.status === 'progress' || t.status === 'complete') {
-    displayStatus.style.background = t.status === 'progress' ? '#fb923c' : '#fbbf24';
-    signupActions.innerHTML = t.status === 'complete' ? `<button class="btn btn-secondary" onclick="appState.tournaments = appState.tournaments.filter(x => x.id !== '${t.id}'); appState.activeTournamentId = null; renderTournamentsTab();">Remove Tournament</button>` : '';
+  }
+}
 
-    const matchesHtml = t.matches.length > 0 ? `
-      <div style="display: flex; gap: 20px; align-items: center; justify-content: center; padding: 20px 0; background: #18191c; border-radius: 6px; border: 1px solid var(--db-border);">
-        <div style="border: 1.5px solid #fbbf24; background: var(--dc-bg-chat); border-radius: 6px; padding: 12px; width: 220px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 0 12px rgba(251,191,36,0.12);">
-          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; color: ${t.matches[0].scoreA > t.matches[0].scoreB ? '#fbbf24' : 'white'};">
-            <span>👑 ${t.matches[0].teamA}</span>
-            <span>${t.matches[0].scoreA}</span>
+// ==========================================
+// COMMUNITY FORUMS LOGIC
+// ==========================================
+
+function submitForumPost() {
+  const titleInput = document.getElementById('forum-title-input');
+  const catSelect = document.getElementById('forum-category-input');
+  const contentInput = document.getElementById('forum-content-input');
+
+  const title = titleInput.value.trim();
+  const category = catSelect.value;
+  const content = contentInput.value.trim();
+
+  if (!title || !content) {
+    showToast("Please fill in both the title and message!", "warning");
+    return;
+  }
+
+  const newPost = {
+    id: 'POST-' + Math.random().toString(36).substr(2, 5).toUpperCase(),
+    author: appState.currentUser,
+    title,
+    content,
+    category,
+    createdAt: new Date().toISOString()
+  };
+
+  appState.forumPosts.push(newPost);
+  
+  titleInput.value = '';
+  contentInput.value = '';
+
+  showToast("Forum post published!", "success");
+  renderForumsTab();
+}
+
+function filterForumCategory(category) {
+  appState.forumFilter = category;
+  renderForumsTab();
+}
+
+function navigateToAuthorProfile(authorName) {
+  const user = players.find(p => p.username === authorName);
+  if (user) {
+    switchTab('profiles');
+    
+    setTimeout(() => {
+      const cards = document.getElementById('profiles-list-container').children;
+      for (let card of cards) {
+        if (card.innerHTML.includes(authorName)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.transform = 'scale(1.05)';
+          card.style.transition = 'all 0.3s ease';
+          setTimeout(() => { card.style.transform = 'scale(1)'; }, 1500);
+          break;
+        }
+      }
+    }, 150);
+  }
+}
+
+function renderForumsTab() {
+  const feedContainer = document.getElementById('forum-posts-feed-container');
+  if (!feedContainer) return;
+
+  const filter = appState.forumFilter;
+  const filteredPosts = appState.forumPosts.filter(p => filter === 'all' || p.category === filter);
+
+  const sorted = [...filteredPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  if (sorted.length === 0) {
+    feedContainer.innerHTML = `
+      <div style="text-align: center; color: var(--dc-text-muted); padding: 40px 0;">
+        <span style="font-size: 2.5rem; display: block; margin-bottom: 8px;">📡</span>
+        No posts inside this category. Be the first to start a discussion!
+      </div>
+    `;
+    return;
+  }
+
+  feedContainer.innerHTML = sorted.map(post => {
+    const author = players.find(p => p.username === post.author) || {
+      username: post.author,
+      avatar: '👤',
+      color: '#7c3aed',
+      games: { arkheron: { elo: 1000 }, hockey: { elo: 1000 }, zealot: { elo: 1000 } }
+    };
+
+    const dateStr = new Date(post.createdAt).toLocaleDateString() + ' ' + new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    const arkElo = author.games.arkheron?.elo || 1000;
+    const hockElo = author.games.hockey?.elo || 1000;
+    const zealElo = author.games.zealot?.elo || 1000;
+    const avgElo = Math.round((arkElo + hockElo + zealElo) / 3);
+
+    return `
+      <div class="db-card" style="padding: 16px; border-left: 4px solid ${author.color || '#7c3aed'}; background: var(--dc-bg-sidebar); display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.5rem;">${author.avatar || '👤'}</span>
+            <div>
+              <div onclick="navigateToAuthorProfile('${author.username}')" style="font-weight: bold; color: white; cursor: pointer; text-decoration: underline; font-size: 0.95rem;">
+                ${author.username}
+              </div>
+              <div style="font-size: 0.75rem; color: var(--dc-text-muted);">Avg MMR: <strong style="color: #a78bfa;">${avgElo}</strong> • Posted on ${dateStr}</div>
+            </div>
           </div>
-          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; color: ${t.matches[0].scoreB > t.matches[0].scoreA ? '#fbbf24' : 'white'}; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 6px;">
-            <span>👑 ${t.matches[0].teamB}</span>
-            <span>${t.matches[0].scoreB}</span>
-          </div>
+          <span style="font-size: 0.75rem; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 12px; border: 1px solid var(--db-border); color: white;">
+            #${post.category.toUpperCase()}
+          </span>
+        </div>
+        <div style="font-weight: bold; font-size: 1.1rem; color: white; margin-top: 4px;">
+          ${post.title}
+        </div>
+        <div style="font-size: 0.85rem; color: var(--dc-text-muted); line-height: 1.5; white-space: pre-wrap;">
+          ${post.content}
         </div>
       </div>
-    ` : `
-      <div style="text-align: center; color: var(--dc-text-muted); padding: 30px 0;">
-        Simulating bracket matches...
-      </div>
     `;
-
-    content.innerHTML = `
-      <div>
-        <div style="font-weight: bold; color: white; margin-bottom: 8px; font-size: 1rem; text-align: center;">🏆 Tournament Bracket & Championship Match</div>
-        ${matchesHtml}
-      </div>
-    `;
-  }
+  }).join('');
 }

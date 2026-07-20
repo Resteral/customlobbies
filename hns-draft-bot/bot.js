@@ -1284,6 +1284,74 @@ client.on('messageCreate', async (message) => {
     activeTournament.currentBidding.highestBidder = username;
     message.channel.send(`📈 **${username}** bid **${amount}** credits on **${activeTournament.currentBidding.player}**!`);
   }
+
+  // 32. COMMUNITY POSTS
+  else if (command === 'post') {
+    const parts = argument.trim().split(' ');
+    const cat = parts[0]?.toLowerCase();
+    const categories = ['general', 'arkheron', 'zealot', 'hockey'];
+    
+    let category = 'general';
+    let contentStr = argument.trim();
+    
+    if (categories.includes(cat)) {
+      category = cat;
+      contentStr = parts.slice(1).join(' ');
+    }
+
+    if (!contentStr) {
+      return message.reply("⚠️ Please provide a post title and content (e.g. `-post general How to play Arkheron | Some tips...`). Use `|` to separate title from message.");
+    }
+
+    const splitIdx = contentStr.indexOf('|');
+    let title = contentStr;
+    let content = "";
+    if (splitIdx !== -1) {
+      title = contentStr.substring(0, splitIdx).trim();
+      content = contentStr.substring(splitIdx + 1).trim();
+    }
+
+    if (!title) {
+      return message.reply("⚠️ Post title cannot be empty!");
+    }
+
+    playersDb.forumPosts = playersDb.forumPosts || [];
+    const newPost = {
+      id: 'POST-' + Math.random().toString(36).substr(2, 5).toUpperCase(),
+      author: username,
+      title,
+      content: content || "No content body.",
+      category,
+      createdAt: new Date().toISOString()
+    };
+    playersDb.forumPosts.push(newPost);
+    saveDb();
+
+    const embed = new EmbedBuilder()
+      .setTitle(`💬 Forum Post Created: ${title}`)
+      .setDescription(`**Author:** ${username}\n**Category:** \`${category.toUpperCase()}\`\n\n${content}`)
+      .setColor('#38bdf8')
+      .setFooter({ text: `Post ID: ${newPost.id}` });
+    message.channel.send({ embeds: [embed] });
+  }
+
+  // 33. VIEW POSTS
+  else if (command === 'posts') {
+    const cat = argument.trim().toLowerCase() || 'general';
+    playersDb.forumPosts = playersDb.forumPosts || [];
+    
+    const filtered = playersDb.forumPosts.filter(p => p.category === cat).slice(-5).reverse();
+    if (filtered.length === 0) {
+      return message.reply(`📡 No posts found in category \`${cat.toUpperCase()}\`. Create one with \`-post ${cat} Title | Content\`.`);
+    }
+
+    const list = filtered.map(p => `• **${p.title}** by *${p.author}* (ID: \`${p.id}\`)`).join('\n');
+    const embed = new EmbedBuilder()
+      .setTitle(`💬 Recent Posts inside ${cat.toUpperCase()}`)
+      .setDescription(list)
+      .setColor('#38bdf8');
+    message.channel.send({ embeds: [embed] });
+  }
 });
 
 const token = process.env.DISCORD_BOT_TOKEN;

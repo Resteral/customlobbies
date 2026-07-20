@@ -26,6 +26,9 @@
         <button class="tab-btn" id="tab-btn-profiles" onclick="switchTab('profiles')">
           <span>👤</span> Profiles
         </button>
+        <button class="tab-btn" id="tab-btn-forums" onclick="switchTab('forums')">
+          <span>💬</span> Forums
+        </button>
         <button class="tab-btn" id="tab-btn-tournaments" onclick="switchTab('tournaments')">
           <span>🏆</span> Tournaments
         </button>
@@ -415,6 +418,61 @@
               <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🏆</span>
               Select a game and start a new tournament signup pool above, or trigger the automated Monthly League simulation.
             </div>
+          </div>
+        </div>
+
+      </div>
+    <!-- TAB 4: COMMUNITY FORUMS -->
+    <section class="tab-pane" id="pane-forums">
+      <div style="max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 300px 1fr; gap: 20px;">
+        
+        <!-- Left Sidebar: Submit Post & Filters -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Submit Post Card -->
+          <div class="db-card" style="padding: 16px;">
+            <div class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">✍️ Create Forum Post</div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">POST TITLE</label>
+                <input type="text" id="forum-title-input" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. Tips for Zealot 4v4">
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">CATEGORY</label>
+                <select id="forum-category-input" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;">
+                  <option value="general">💬 General</option>
+                  <option value="arkheron">🧜 Arkheron</option>
+                  <option value="hockey">🏒 Zealot Hockey</option>
+                  <option value="zealot">🛡️ Zealot Mod</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">MESSAGE</label>
+                <textarea id="forum-content-input" rows="5" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white; resize: none;" placeholder="Discuss strategy, look for groups, or share scrim codes..."></textarea>
+              </div>
+              <button class="btn btn-primary" onclick="submitForumPost()" style="width: 100%; margin-top: 4px;">🚀 Publish Post</button>
+            </div>
+          </div>
+
+          <!-- Category filter list -->
+          <div class="db-card" style="padding: 16px;">
+            <div class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">📁 Categories</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button class="btn btn-secondary" onclick="filterForumCategory('all')" style="width: 100%; text-align: left; justify-content: flex-start;">🌍 Show All Discussions</button>
+              <button class="btn btn-secondary" onclick="filterForumCategory('general')" style="width: 100%; text-align: left; justify-content: flex-start;">💬 General Chat</button>
+              <button class="btn btn-secondary" onclick="filterForumCategory('arkheron')" style="width: 100%; text-align: left; justify-content: flex-start;">🧜 Arkheron Mod</button>
+              <button class="btn btn-secondary" onclick="filterForumCategory('hockey')" style="width: 100%; text-align: left; justify-content: flex-start;">🏒 Zealot Hockey</button>
+              <button class="btn btn-secondary" onclick="filterForumCategory('zealot')" style="width: 100%; text-align: left; justify-content: flex-start;">🛡️ Zealot Mod</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Pane: Live Discussions Feed -->
+        <div class="db-card" style="padding: 16px; min-height: 480px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="card-title" style="font-size: 1.2rem; border-bottom: 1px solid var(--db-border); padding-bottom: 12px;">
+            📢 Community Discussion Board
+          </div>
+          <div id="forum-posts-feed-container" style="display: flex; flex-direction: column; gap: 16px;">
+            <!-- Rendered dynamically -->
           </div>
         </div>
 
