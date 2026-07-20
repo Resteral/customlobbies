@@ -177,6 +177,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!p.ingameName) p.ingameName = p.username;
     if (!p.registeredAt) p.registeredAt = new Date().toLocaleDateString();
     if (!p.color) p.color = '#7c3aed';
+    if (!p.role) p.role = 'Flex';
 
     if (!p.steamHex) {
       let hashStr = p.username.toLowerCase();
@@ -910,7 +911,7 @@ function triggerDraftStart(game) {
     fields: [
       { title: '🟢 Team Alpha Captain', val: `${capA.username} (MMR: ${capA.games[game].elo})` },
       { title: '🔵 Team Beta Captain', val: `${capB.username} (MMR: ${capB.games[game].elo})` },
-      { title: '👥 Selection Pool', val: appState.draft.pool.map((p, idx) => `${idx+1}. **${p}** (MMR: ${players.find(pl=>pl.username===p)?.games[game].elo})`).join('\n'), fullwidth: true }
+      { title: '👥 Selection Pool', val: appState.draft.pool.map((p, idx) => `${idx+1}. **${p}** (MMR: ${players.find(pl=>pl.username===p)?.games[game].elo} - Role: ${players.find(pl=>pl.username===p)?.role || 'Flex'})`).join('\n'), fullwidth: true }
     ]
   };
   
@@ -1135,21 +1136,21 @@ function updateDraftArenaUI() {
 
   ctList.innerHTML = '';
   activeDraft.teams.teamA.players.forEach(pName => {
-    const p = players.find(pl => pl.username === pName) || { avatar: '👤', elo: 1000 };
-    ctList.innerHTML += `<div class="drafted-player-card"><span>${p.avatar}</span><strong>${p.username}</strong></div>`;
+    const p = players.find(pl => pl.username === pName) || { avatar: '👤', elo: 1000, role: 'Flex' };
+    ctList.innerHTML += `<div class="drafted-player-card"><span>${p.avatar}</span><strong>${p.username} (${p.role || 'Flex'})</strong></div>`;
   });
 
   tList.innerHTML = '';
   activeDraft.teams.teamB.players.forEach(pName => {
-    const p = players.find(pl => pl.username === pName) || { avatar: '👤', elo: 1000 };
-    tList.innerHTML += `<div class="drafted-player-card"><span>${p.avatar}</span><strong>${p.username}</strong></div>`;
+    const p = players.find(pl => pl.username === pName) || { avatar: '👤', elo: 1000, role: 'Flex' };
+    tList.innerHTML += `<div class="drafted-player-card"><span>${p.avatar}</span><strong>${p.username} (${p.role || 'Flex'})</strong></div>`;
   });
 
   const poolGrid = document.getElementById('draft-pool-grid');
   poolGrid.innerHTML = '';
 
   activeDraft.pool.forEach((pName, idx) => {
-    const p = players.find(pl => pl.username === pName) || { avatar: '👤', elo: 1000 };
+    const p = players.find(pl => pl.username === pName) || { avatar: '👤', elo: 1000, role: 'Flex' };
     const isOurTurn = (activeCapName === appState.currentUser);
     const cardClass = isOurTurn ? 'pool-player-card' : 'pool-player-card disabled';
     const clickHandler = isOurTurn ? `onclick="simulateCommand('-pick ${idx+1}')"` : '';
@@ -1159,7 +1160,7 @@ function updateDraftArenaUI() {
         <div style="font-size:0.65rem; position:absolute; top:4px; left:6px; color:var(--dc-text-muted); font-weight:800;">#${idx+1}</div>
         <div class="pool-player-avatar">${p.avatar}</div>
         <span class="pool-player-name">${p.username}</span>
-        <span class="pool-player-elo" style="font-size:0.65rem;">MMR: ${p.games[activeDraft.game].elo}</span>
+        <span class="pool-player-elo" style="font-size:0.65rem;">MMR: ${p.games[activeDraft.game].elo} • Role: ${p.role || 'Flex'}</span>
       </div>
     `;
   });
@@ -1424,6 +1425,7 @@ function renderProfilesTab() {
     document.getElementById('prof-edit-bio').value = me.bio || 'Competitive Custom Lobbies player.';
     document.getElementById('prof-edit-color').value = me.color || '#7c3aed';
     document.getElementById('prof-edit-color-hex').value = me.color || '#7c3aed';
+    document.getElementById('prof-edit-role').value = me.role || 'Flex';
   }
 
   // Render profiles list of all players
@@ -1450,7 +1452,12 @@ function renderProfilesTab() {
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 1.5rem;">${p.avatar || '👤'}</span>
           <div>
-            <div style="font-weight: bold; font-size: 0.9rem; color: white;">${p.username}</div>
+            <div style="font-weight: bold; font-size: 0.9rem; color: white;">
+              ${p.username}
+              <span style="font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 12px; margin-left: 6px; border: 1.5px solid var(--db-border); color: #c084fc;">
+                ${p.role || 'Flex'}
+              </span>
+            </div>
             <div style="font-size: 0.75rem; color: var(--dc-text-muted);">In-game: <span style="color: #a78bfa;">${p.ingameName || p.username}</span></div>
             <div style="font-size: 0.65rem; color: var(--dc-text-muted); font-family: monospace;">Hex: <span style="color: #e9d5ff;">${p.steamHex || 'Not set'}</span></div>
           </div>
@@ -1475,6 +1482,7 @@ function saveUserProfile() {
   const ingameInput = document.getElementById('prof-edit-ingame').value.trim();
   const steamHexInput = document.getElementById('prof-edit-steamhex').value.trim();
   const colorInput = document.getElementById('prof-edit-color').value.trim();
+  const roleInput = document.getElementById('prof-edit-role').value;
 
   const me = players.find(p => p.username === appState.currentUser);
   if (me) {
@@ -1493,6 +1501,7 @@ function saveUserProfile() {
     me.bio = bioInput || 'Competitive Custom Lobbies player.';
     me.ingameName = ingameInput || me.username;
     me.color = colorInput || '#7c3aed';
+    me.role = roleInput || 'Flex';
     
     // Sync current user's profile inside client
     renderProfilesTab();

@@ -118,6 +118,10 @@ function registerPlayer(username) {
     playersDb[username].warnings = [];
   }
 
+  if (!playersDb[username].role) {
+    playersDb[username].role = "Flex";
+  }
+
   saveDb();
 }
 
@@ -427,6 +431,33 @@ client.on('messageCreate', async (message) => {
     const capB = lobbyPlayers[1].username;
     const restPlayers = lobbyPlayers.slice(2).map(p => p.username);
 
+    // Assign "Captain" Discord role to the designated captains
+    let captainRole = message.guild.roles.cache.find(r => r.name === 'Captain');
+    if (!captainRole) {
+      try {
+        captainRole = await message.guild.roles.create({
+          name: 'Captain',
+          color: '#eab308',
+          reason: 'For custom lobbies draft captains'
+        });
+      } catch (err) {
+        console.error("Could not create Captain role:", err);
+      }
+    }
+
+    if (captainRole) {
+      try {
+        const memberA = message.guild.members.cache.find(m => m.user.username.toLowerCase() === capA.toLowerCase());
+        const memberB = message.guild.members.cache.find(m => m.user.username.toLowerCase() === capB.toLowerCase());
+        
+        if (memberA) await memberA.roles.add(captainRole);
+        if (memberB) await memberB.roles.add(captainRole);
+        message.channel.send(`👑 **Captain** role assigned to **${capA}** and **${capB}**!`);
+      } catch (err) {
+        console.error("Could not assign Captain role:", err);
+      }
+    }
+
     const pickSequence = game === 'hockey' ? ['B', 'A', 'A', 'B', 'B', 'A'] : ['B', 'A', 'A', 'B'];
 
     activeDrafts[game] = {
@@ -520,8 +551,21 @@ client.on('messageCreate', async (message) => {
         .setFooter({ text: 'Connect info sent to captains' });
       targetChannel.send({ embeds: [embed] });
 
-      // Clean up temporary voice channels after 2 minutes
+      // Clean up temporary voice channels and strip Captain roles after 2 minutes
       setTimeout(() => {
+        // Strip Captain roles from captains
+        activeDraft.captains.forEach(async (capName) => {
+          try {
+            const member = message.guild.members.cache.find(m => m.user.username.toLowerCase() === capName.toLowerCase());
+            const captainRole = message.guild.roles.cache.find(r => r.name === 'Captain');
+            if (member && captainRole) {
+              await member.roles.remove(captainRole);
+            }
+          } catch (err) {
+            console.error(`Failed to remove Captain role from ${capName}:`, err);
+          }
+        });
+
         activeDraft.voiceChannels.forEach(async (vcId) => {
           try {
             const vc = message.guild.channels.cache.get(vcId);
@@ -905,6 +949,7 @@ client.on('messageCreate', async (message) => {
         { name: '🔗 Linked In-Game Account', value: `\`${p.ingameName || 'Not linked. Use -register'}\``, inline: true },
         { name: '📅 Joined Club', value: `\`${p.registeredAt || 'Today'}\``, inline: true },
         { name: '⚙️ Steam Hex ID', value: `\`${p.steamHex || 'Not set. Use -steamhex'}\``, inline: true },
+        { name: '👤 Preferred Role', value: `\`${p.role || 'Flex'}\``, inline: true },
         { name: '🚨 Scrim Status', value: wText, inline: true },
         { name: '🧜 Arkheron Rating', value: `MMR: **${p.games.arkheron?.elo || 1000}** | W/L: **${p.games.arkheron?.wins}-${p.games.arkheron?.losses}**`, inline: false },
         { name: '🏒 Zealot Hockey Rating', value: `MMR: **${p.games.hockey?.elo || 1000}** | W/L: **${p.games.hockey?.wins}-${p.games.hockey?.losses}**`, inline: false },
@@ -1063,6 +1108,18 @@ client.on('messageCreate', async (message) => {
     playersDb[username].color = hex;
     saveDb();
     message.reply(`✅ Profile card color code updated to: **${hex}**`);
+  }
+
+  // 27.5 SET PREFERRED ROLE
+  else if (command === 'setrole' || command === 'role') {
+    const roleVal = argument.trim();
+    if (!roleVal) {
+      return message.reply("⚠️ Please specify a role to set (e.g. `-setrole Goalie`, `-setrole Tank`, `-setrole Flex`).");
+    }
+
+    playersDb[username].role = roleVal;
+    saveDb();
+    message.reply(`✅ Preferred gameplay role updated to: **${roleVal}**`);
   }
 
   // 28. SET STEAM HEX ID
