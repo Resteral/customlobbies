@@ -8,3 +8,5 @@ node_modules/
 dist/
 .system_generated/
 *.log
+**/.env
+hns-draft-bot/node_modules/

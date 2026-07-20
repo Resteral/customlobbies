@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Lobbies ELO Matchmaker & Character Draft Bot</title>
+  <meta name="description" content="Simulate competitive Arkheron custom rooms, serpentine character drafting, ELO progression graphs, and player ELO rankings inside a recreated Discord interface.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header>
+    <div class="container header-inner">
+      <a href="#" class="logo" onclick="switchTab('simulator'); return false;" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+        <img src="banner.png" alt="Custom Lobbies Logo" style="height: 44px; border-radius: 6px; border: 1px solid rgba(124,58,237,0.3); box-shadow: 0 0 12px rgba(124,58,237,0.2);">
+      </a>
+      
+      <div class="header-nav">
+        <button class="tab-btn active" id="tab-btn-simulator" onclick="switchTab('simulator')">
+          <span>🎮</span> Lobbies
+        </button>
+        <button class="tab-btn" id="tab-btn-leaderboard" onclick="switchTab('leaderboard')">
+          <span>🏆</span> Leaderboard
+        </button>
+        <button class="tab-btn" id="tab-btn-profiles" onclick="switchTab('profiles')">
+          <span>👤</span> Profiles
+        </button>
+        <button class="tab-btn" id="tab-btn-tournaments" onclick="switchTab('tournaments')">
+          <span>🏆</span> Tournaments
+        </button>
+        <button class="tab-btn" id="tab-btn-code" onclick="switchTab('code')">
+          <span>💻</span> Bot Source Code
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="container">
+
+    <!-- TAB 1: INTERACTIVE DISCORD SIMULATOR -->
+    <section class="tab-pane active" id="pane-simulator">
+      <div class="workspace-grid">
+        
+        <!-- Left: Recreated Discord Client -->
+        <div class="discord-client">
+          <!-- Servers list column -->
+          <div class="dc-servers-bar">
+            <div class="dc-server-icon active" title="Custom Lobbies">CL</div>
+            <div class="dc-server-sep"></div>
+            <div class="dc-server-icon" style="font-size:1rem;" title="Add a server">+</div>
+          </div>
+
+          <!-- Channels list column -->
+          <div class="dc-channels-bar">
+            <div class="dc-server-title">Custom Lobbies Club</div>
+            <div class="dc-channels-list">
+              <div class="dc-category-title">Text Channels</div>
+              <a href="#" id="channel-btn-arkheron" class="dc-channel-item active" onclick="selectSimulatedChannel('arkheron'); return false;">
+                <span>#</span> arkheron-lobby
+              </a>
+              <a href="#" id="channel-btn-zealot" class="dc-channel-item" onclick="selectSimulatedChannel('zealot'); return false;">
+                <span>#</span> zealot-lobby
+              </a>
+              <a href="#" id="channel-btn-hockey" class="dc-channel-item" onclick="selectSimulatedChannel('hockey'); return false;">
+                <span>#</span> hockey-lobby
+              </a>
+
+              <div class="dc-category-title" style="margin-top:12px;">Voice Channels</div>
+              <div class="dc-channel-item" style="cursor:default;">
+                <span>🔊</span> Lobby Room (<span id="vc-waiting-count">0</span>)
+              </div>
+              <div class="dc-voice-users" id="vc-waiting-users">
+                <!-- VC waiting room list -->
+              </div>
+
+              <div class="dc-channel-item" style="cursor:default;">
+                <span>🔊</span> Team Alpha (<span id="vc-ct-count">0</span>)
+              </div>
+              <div class="dc-voice-users" id="vc-ct-users">
+                <!-- VC Alpha list -->
+              </div>
+
+              <div class="dc-channel-item" style="cursor:default;">
+                <span>🔊</span> Team Beta (<span id="vc-t-count">0</span>)
+              </div>
+              <div class="dc-voice-users" id="vc-t-users">
+                <!-- VC Beta list -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat window column -->
+          <div class="dc-chat-area">
+            <div class="dc-chat-header">
+              <span class="dc-channel-title"># arkheron-lobby</span> <span style="color:var(--dc-text-muted); font-size:0.8rem; font-weight:normal;">| Welcome to the matchmaking desk!</span>
+            </div>
+            
+            <div class="dc-messages-container" id="chat-messages">
+              <!-- Recreated bot welcome embeds -->
+              <div class="dc-msg">
+                <div class="dc-msg-avatar" style="background-color:#7c3aed;">🔮</div>
+                <div class="dc-msg-content">
+                  <div class="dc-msg-header">
+                    <span class="dc-msg-username" style="color:#8b5cf6;">TheBot</span>
+                    <span class="dc-msg-botbadge" style="background:#7c3aed;">BOT</span>
+                    <span class="dc-msg-time">Today at 12:00 AM</span>
+                  </div>
+                  <div class="dc-msg-text">Welcome to Custom Lobbies Manager!</div>
+                  <div class="dc-embed" style="border-left-color: #8b5cf6;">
+                    <div class="dc-embed-title">🔮 Custom Lobbies MMR Command Reference</div>
+                    <div class="dc-embed-desc">Use the chat field below to write commands, or click the dashboard shortcuts on the right side.</div>
+                    <div class="dc-embed-fields">
+                      <div class="dc-embed-field">
+                        <span class="dc-embed-field-title">-stats [player]</span>
+                        <span class="dc-embed-field-val">View player MMR, K/D, and builds</span>
+                      </div>
+                      <div class="dc-embed-field">
+                        <span class="dc-embed-field-title">-compare [player]</span>
+                        <span class="dc-embed-field-val">Compare ELO and expected win odds</span>
+                      </div>
+                      <div class="dc-embed-field">
+                        <span class="dc-embed-field-title">-elochart [player]</span>
+                        <span class="dc-embed-field-val">Plot ELO history as a trend line graph</span>
+                      </div>
+                      <div class="dc-embed-field">
+                        <span class="dc-embed-field-title">-lobby [size]</span>
+                        <span class="dc-embed-field-val">Create custom lobbies for 3, 6, or 9 players</span>
+                      </div>
+                      <div class="dc-embed-field">
+                        <span class="dc-embed-field-title">-draft</span>
+                        <span class="dc-embed-field-val">Start serpentine character drafting (needs 6 players)</span>
+                      </div>
+                      <div class="dc-embed-field">
+                        <span class="dc-embed-field-title">-build [eternal]</span>
+                        <span class="dc-embed-field-val">Lookup relic set recommendations & skills</span>
+                      </div>
+                      <div class="dc-embed-field">
+                        <span class="dc-embed-field-title">-eternals</span>
+                        <span class="dc-embed-field-val">List available playable characters</span>
+                      </div>
+                      <div class="dc-embed-field">
+                        <span class="dc-embed-field-title">!addbots</span>
+                        <span class="dc-embed-field-val">Fill lobby instantly with 6 test players</span>
+                      </div>
+                    </div>
+                    <div class="dc-embed-footer">Developed for Arkheron Competitive Matchmaking • Antigravity AI</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat input form -->
+            <div class="dc-chat-input-container">
+              <form id="chat-form" onsubmit="handleSendChat(event)">
+                <div class="dc-chat-input-wrapper">
+                  <input type="text" class="dc-chat-input" id="chat-input-field" placeholder="Message #ascension-lobby (try -j or -lobby)..." autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Visual Arena Dashboard -->
+        <div class="dashboard-arena">
+          
+          <!-- Queue Status Card -->
+          <div class="db-card">
+            <div class="card-title">
+              <span>👥 Match Queue Status</span>
+              <span id="queue-count-badge" class="badge" style="background-color:var(--dc-brand); font-size:0.75rem; padding: 0.25rem 0.5rem;">0/6 Players</span>
+            </div>
+            
+            <div class="lobby-controls">
+              <button class="btn btn-primary" onclick="simulateCommand('-j')">🙋 Join Queue (-j)</button>
+              <button class="btn btn-secondary" onclick="simulateCommand('-l')">🏃 Leave Queue (-l)</button>
+              <button class="btn btn-primary" style="background-color:var(--dc-yellow); color:black;" onclick="simulateCommand('-draft')">⚔️ Start Draft (-draft)</button>
+              <button class="btn btn-success" onclick="simulateCommand('!addbots')">🤖 Add Bots</button>
+            </div>
+
+            <!-- Extra Shortcuts -->
+            <div class="lobby-controls" style="margin-top: 8px; border-top: 1px solid var(--db-border); padding-top: 8px; justify-content: flex-start; gap: 6px;">
+              <button class="btn btn-secondary" style="font-size:0.7rem; padding:4px 8px;" onclick="simulateCommand('-eternals')">🧜 Eternals</button>
+              <button class="btn btn-secondary" style="font-size:0.7rem; padding:4px 8px;" onclick="simulateCommand('-relics')">📦 Relics</button>
+              <button class="btn btn-secondary" style="font-size:0.7rem; padding:4px 8px;" onclick="simulateCommand('-build Leodin')">🧝 Build: Leodin</button>
+              <button class="btn btn-secondary" style="font-size:0.7rem; padding:4px 8px;" onclick="simulateCommand('-lobby 9')">🎮 Custom Royale</button>
+            </div>
+
+            <div class="queue-progress-box">
+              <div class="queue-label-row">
+                <span style="color:var(--dc-text-muted);">Match Readiness (Min 6 players for 3v3)</span>
+                <span id="queue-ratio-text">0%</span>
+              </div>
+              <div class="queue-bar-bg">
+                <div class="queue-bar-fill" id="queue-progress-bar" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Drafting Phase Card -->
+          <div class="db-card" id="draft-arena-card" style="display: none;">
+            <div class="card-title">
+              <span>⚔️ Live Serpentine Character Draft</span>
+              <span class="badge" style="background-color:var(--dc-yellow); color:black; font-size:0.75rem; padding: 0.25rem 0.5rem;" id="draft-turn-badge">Captain Turn</span>
+            </div>
+
+            <div class="draft-layout">
+              <!-- Team Alpha -->
+              <div class="draft-team-col">
+                <div class="draft-team-header team-ct" id="team-ct-title" style="background:var(--dc-text-link);">Team Alpha</div>
+                <div class="draft-team-list" id="team-ct-list">
+                  <!-- Team Alpha drafted Eternals -->
+                </div>
+              </div>
+
+              <!-- Center Drafting Pool -->
+              <div class="draft-pool-col">
+                <div class="draft-status-indicator" id="draft-instructions">SELECT AN ETERNAL TO DRAFT</div>
+                <div class="pool-grid" id="draft-pool-grid">
+                  <!-- Clickable drafting pool -->
+                </div>
+              </div>
+
+              <!-- Team Beta -->
+              <div class="draft-team-col">
+                <div class="draft-team-header team-t" id="team-t-title" style="background:var(--dc-yellow); color:black;">Team Beta</div>
+                <div class="draft-team-list" id="team-t-list">
+                  <!-- Team Beta drafted Eternals -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Match Simulator Card -->
+          <div class="db-card" id="match-simulator-card" style="display: none;">
+            <div class="card-title">
+              <span>🏟️ Simulated Match Feed</span>
+              <span id="match-map-badge" class="badge" style="background-color:var(--db-secondary); font-size:0.75rem; padding: 0.25rem 0.5rem;">Ascension Arena</span>
+            </div>
+
+            <div class="match-arena-layout">
+              <div class="match-scores-row">
+                <div class="team-score-box">
+                  <span class="team-score-name" style="color:var(--dc-text-link);" id="ms-ct-name">Team Alpha</span>
+                  <span class="team-score-val" id="ms-ct-score" style="color:var(--dc-text-link);">0</span>
+                </div>
+                <span class="score-divider">:</span>
+                <div class="team-score-box">
+                  <span class="team-score-name" style="color:var(--dc-yellow);" id="ms-t-name">Team Beta</span>
+                  <span class="team-score-val" id="ms-t-score" style="color:var(--dc-yellow);">0</span>
+                </div>
+              </div>
+
+              <div class="match-logs-box" id="match-logs-box">
+                <!-- Log entries -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: RANKINGS LEADERBOARD -->
+    <section class="tab-pane" id="pane-leaderboard">
+      <div style="max-width:960px; margin:0 auto;" class="db-card">
+        <div class="card-title" style="margin-bottom:0.5rem;">
+          <span>🏆 Custom Lobbies Leaderboard</span>
+          <span style="font-size:0.8rem; font-weight:normal; color:var(--dc-text-muted);">Refreshes instantly upon match completions</span>
+        </div>
+        <p style="font-size:0.9rem; color:var(--dc-text-muted); margin-bottom:1.5rem; line-height:1.5;">
+          ELO rating updates dynamically based on Ascension Arena outcomes. Base ELO is 1000. Winning matches adjusts ratings and appends trends.
+        </p>
+
+        <!-- Game Selector Toggle -->
+        <div style="display:flex; gap:8px; margin-bottom:1.5rem;">
+          <button class="tab-btn" onclick="selectActiveGame('arkheron')" style="padding:6px 12px; font-size:0.8rem; height:auto; background:var(--db-sidebar-bg);">Arkheron</button>
+          <button class="tab-btn" onclick="selectActiveGame('zealot')" style="padding:6px 12px; font-size:0.8rem; height:auto; background:var(--db-sidebar-bg);">Zealot</button>
+          <button class="tab-btn" onclick="selectActiveGame('hockey')" style="padding:6px 12px; font-size:0.8rem; height:auto; background:var(--db-sidebar-bg);">Zealot Hockey</button>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;">
+            <thead>
+              <tr style="border-bottom:2px solid var(--db-border); color:white; font-family:var(--font-display); font-weight:700;">
+                <th style="padding:12px 8px; width:80px;">Rank</th>
+                <th style="padding:12px 8px;">Player</th>
+                <th style="padding:12px 8px; width:150px;">Tier</th>
+                <th style="padding:12px 8px; width:120px;">ELO Rating</th>
+                <th style="padding:12px 8px; width:150px; text-align:center;">W / L Record</th>
+                <th style="padding:12px 8px; width:120px; text-align:right;">Win Ratio</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-table-body">
+              <!-- Dynamically populated from JS state -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: PLAYER PROFILES -->
+    <section class="tab-pane" id="pane-profiles">
+      <div style="max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 320px 1fr; gap: 20px;">
+        
+        <!-- Profile Editor Column -->
+        <div class="db-card" style="padding: 16px;">
+          <div class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">👤 Edit Your Profile</div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">AVATAR EMOJI</label>
+              <input type="text" id="prof-edit-avatar" value="🛡️" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. 🦊">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">LINKED IN-GAME NAME</label>
+              <input type="text" id="prof-edit-ingame" value="Resteral.TV" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. Resteral.TV">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">STEAM HEX ID</label>
+              <input type="text" id="prof-edit-steamhex" value="11000011a2b3c4d" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. 11000011a2b3c4d">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">PROFILE EMBED COLOR</label>
+              <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                <input type="color" id="prof-edit-color" value="#7c3aed" style="width: 40px; height: 36px; padding: 0; border: none; border-radius: 4px; background: none; cursor: pointer;" oninput="document.getElementById('prof-edit-color-hex').value = this.value">
+                <input type="text" id="prof-edit-color-hex" value="#7c3aed" style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. #7c3aed" oninput="if(/^#[0-9A-F]{6}$/i.test(this.value)) document.getElementById('prof-edit-color').value = this.value">
+              </div>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">PROFILE BIO</label>
+              <textarea id="prof-edit-bio" rows="4" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white; resize: none;" placeholder="Tell the lobby about yourself...">Apex player looking for scrims.</textarea>
+            </div>
+            <button class="btn btn-primary" onclick="saveUserProfile()" style="width: 100%; margin-top: 4px;">💾 Save Changes</button>
+          </div>
+        </div>
+
+        <!-- Registered Profiles Column -->
+        <div class="db-card" style="padding: 16px;">
+          <div class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">👥 Registered Players & MMR Profiles</div>
+          <p style="font-size: 0.8rem; color: var(--dc-text-muted); margin-bottom: 16px;">
+            Linked accounts playing competitive custom games for MMR rating points. Click a player to see their full profile.
+          </p>
+          <div id="profiles-list-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+            <!-- Rendered dynamically from app.js -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 5: TOURNAMENTS SECTION -->
+    <section class="tab-pane" id="pane-tournaments">
+      <div style="max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 320px 1fr; gap: 20px;">
+        
+        <!-- Tournament Setup Controls (Left Column) -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Setup Card -->
+          <div class="db-card" style="padding: 16px;">
+            <div class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">🏆 Setup Tournament</div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">SELECT GAME</label>
+                <select id="tourney-select-game" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;">
+                  <option value="arkheron">Arkheron</option>
+                  <option value="hockey">Zealot Hockey</option>
+                  <option value="zealot">Zealot Mod</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">DRAFT METHOD</label>
+                <select id="tourney-select-type" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;">
+                  <option value="snake">Snake (Serpentine Draft)</option>
+                  <option value="auction">Auction (Points Bidding)</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" onclick="initCustomTournament()" style="width: 100%; margin-top: 4px;">🚀 Start Tournament signup</button>
+            </div>
+          </div>
+
+          <!-- Auto Monthly League Card -->
+          <div class="db-card" style="padding: 16px;">
+            <div class="card-title" style="font-size: 1.1rem; margin-bottom: 8px;">📅 Monthly League</div>
+            <p style="font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 12px;">
+              Automatically gathers the top MMR players to act as team Captains, drafts pools, and simulates the competitive monthly brackets.
+            </p>
+            <button class="btn btn-secondary" onclick="simulateMonthlyLeague()" style="width: 100%;">⚡ Run Monthly Cup</button>
+          </div>
+
+          <!-- Tournaments List Card -->
+          <div class="db-card" style="padding: 16px;">
+            <div class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">🏆 Tournaments Hub</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto;" id="tourney-list-cards">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Bracket and Draft Hub (Right Column) -->
+        <div class="db-card" style="padding: 16px; min-height: 480px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--db-border); padding-bottom: 12px;">
+            <div>
+              <div class="card-title" style="font-size: 1.2rem; margin-bottom: 4px;" id="tourney-display-name">No Active Tournament</div>
+              <span class="status-badge" id="tourney-display-status" style="background: var(--dc-bg-sidebar); border: 1px solid var(--db-border); color: var(--dc-text-muted); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">INACTIVE</span>
+            </div>
+            <div style="display: flex; gap: 8px;" id="tourney-signup-actions">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Tournament Panel Content -->
+          <div id="tourney-panel-content" style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+            <div style="text-align: center; color: var(--dc-text-muted); padding: 40px 0;">
+              <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🏆</span>
+              Select a game and start a new tournament signup pool above, or trigger the automated Monthly League simulation.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 3: BOT SOURCE CODE EXPORTER -->
+    <section class="tab-pane" id="pane-code">
+      <div class="code-viewer-layout">
+        
+        <!-- Files Sidebar selectors -->
+        <div class="code-sidebar">
+          <button class="code-file-btn active" id="code-btn-bot" onclick="viewCodeFile('bot')">
+            <span>📄</span> bot.js
+          </button>
+          <button class="code-file-btn" id="code-btn-pkg" onclick="viewCodeFile('pkg')">
+            <span>📦</span> package.json
+          </button>
+          <button class="code-file-btn" id="code-btn-readme" onclick="viewCodeFile('readme')">
+            <span>📘</span> README.md
+          </button>
+        </div>
+
+        <!-- Code Block Container -->
+        <div class="db-card code-content-card">
+          <div class="code-content-header">
+            <span class="code-filename" id="code-display-filename">bot.js</span>
+            <button class="btn btn-secondary" onclick="copySourceCode()" style="font-size:0.75rem; padding: 0.35rem 0.75rem;">📋 Copy Code</button>
+          </div>
+          <pre class="code-pre-container"><code class="code-block" id="code-display-block"></code></pre>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>Custom Lobbies Discord Draft Bot Simulator - Pair Programmed with Antigravity AI.</p>
+      <p style="font-size:0.7rem; color:var(--dc-text-muted); margin-top:0.4rem;">
+        Recreates standard features of Arkheron serpentine drafting systems. Free to deploy using the export tab.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Client Script -->
+  <script src="app.js"></script>
+</body>
+</html>

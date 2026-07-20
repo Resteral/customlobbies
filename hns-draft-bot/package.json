@@ -1,0 +1,15 @@
+{
+  "name": "custom-lobbies",
+  "version": "1.0.0",
+  "description": "Discord MMR lobby queue and 2v2 team drafting bot for HNS",
+  "main": "bot.js",
+  "dependencies": {
+    "discord.js": "^14.15.2",
+    "dotenv": "^16.4.5"
+  },
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "author": "Antigravity Pair",
+  "license": "MIT"
+}
