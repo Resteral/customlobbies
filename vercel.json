@@ -1,0 +1,12 @@
+{
+  "cleanUrls": true,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "styles.css", "use": "@vercel/static" },
+    { "src": "app.js", "use": "@vercel/static" },
+    { "src": "banner.png", "use": "@vercel/static" },
+    { "src": "bot.js", "use": "@vercel/static" },
+    { "src": "package.json", "use": "@vercel/static" },
+    { "src": "README.md", "use": "@vercel/static" }
+  ]
+}
