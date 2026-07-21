@@ -1935,6 +1935,16 @@ function renderProfilesTab() {
     const hasVip = p.unlockedRewards && p.unlockedRewards.includes('badge-vip') ? '👑 ' : '';
     const hasChal = p.unlockedRewards && p.unlockedRewards.includes('badge-chal') ? '🚀 ' : '';
 
+    const activeTourneys = appState.tournaments.filter(t => t.pool && t.pool.includes(p.username));
+    let tourneyHtml = '';
+    if (activeTourneys.length > 0) {
+      tourneyHtml = `
+        <div style="font-size: 0.7rem; color: #38bdf8; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; margin-top: 4px;">
+          <strong>🏆 Tournaments:</strong> ${activeTourneys.map(t => t.name).join(', ')}
+        </div>
+      `;
+    }
+
     return `
       <div class="db-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px; border-radius: 6px; position: relative; ${cardStyle}">
         ${wBadge}
@@ -1954,6 +1964,7 @@ function renderProfilesTab() {
         <div style="font-style: italic; font-size: 0.8rem; color: var(--dc-text-muted); border-top: 1px solid var(--db-border); padding-top: 6px; min-height: 38px;">
           "${p.bio || 'Competitive Custom Lobbies player.'}"
           ${wReasonsHtml}
+          ${tourneyHtml}
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: white; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px;">
           <span>🧜 Ark: <strong>${p.games.arkheron?.elo || 1000}</strong></span>
