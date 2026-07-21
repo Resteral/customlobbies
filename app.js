@@ -546,6 +546,18 @@ function switchTab(tabId) {
   document.querySelectorAll('main .tab-pane').forEach(pane => pane.classList.remove('active'));
   document.getElementById(`pane-${tabId}`).classList.add('active');
 
+  const rightPanel = document.querySelector('.portal-right-panel');
+  const gridContainer = document.querySelector('.global-portal-grid');
+  if (rightPanel && gridContainer) {
+    if (tabId === 'simulator') {
+      rightPanel.style.display = 'block';
+      gridContainer.style.gridTemplateColumns = '1fr 480px';
+    } else {
+      rightPanel.style.display = 'none';
+      gridContainer.style.gridTemplateColumns = '1fr';
+    }
+  }
+
   appState.currentTab = tabId;
   if (tabId === 'profiles') {
     renderProfilesTab();
