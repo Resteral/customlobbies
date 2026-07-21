@@ -208,8 +208,8 @@
           <button class="tab-btn" id="tab-btn-casino" onclick="switchTab('casino')">
             <span>🎰</span> Casino & Shop
           </button>
-          <button class="tab-btn" id="tab-btn-clicker" onclick="switchTab('clicker')">
-            <span>🏃</span> Runner Clicker
+          <button class="tab-btn" id="tab-btn-clicker" onclick="window.open('clicker.html','_blank')" title="Opens in new tab">
+            <span>🏃</span> Runner Clicker ↗
           </button>
           <button class="tab-btn" id="tab-btn-code" onclick="switchTab('code')">
             <span>💻</span> Bot Source
@@ -413,6 +413,136 @@
               <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--dc-text-muted);">
                 Welcome to the official repository of the Arkheron competitive mod. Browse hero abilities, recommended item builds, and register for active tourneys.
               </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⚔️ FACEIT-STYLE MATCHMAKING QUEUE -->
+        <div class="db-card" id="arkheron-queue-card" style="padding: 24px; border: 1px solid rgba(139,92,246,0.25); border-top: 3.5px solid #8b5cf6; position: relative; overflow: hidden;">
+
+          <!-- background pulse rings (decorative) -->
+          <div id="ark-queue-rings" style="display:none; position:absolute; inset:0; pointer-events:none; overflow:hidden;">
+            <div class="ark-ring" style="--sz:200px; --op:0.12; top:50%; left:50%; margin:-100px 0 0 -100px;"></div>
+            <div class="ark-ring" style="--sz:340px; --op:0.07; top:50%; left:50%; margin:-170px 0 0 -170px; animation-delay:0.5s;"></div>
+            <div class="ark-ring" style="--sz:480px; --op:0.04; top:50%; left:50%; margin:-240px 0 0 -240px; animation-delay:1s;"></div>
+          </div>
+
+          <div style="position:relative; z-index:2;">
+            <!-- IDLE STATE -->
+            <div id="ark-queue-idle">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+                <div>
+                  <div style="font-family:var(--font-display); font-size:1.2rem; font-weight:800; color:white; display:flex; align-items:center; gap:8px;">
+                    ⚔️ Arkheron Ranked Queue
+                    <span class="badge" style="background:rgba(139,92,246,0.25); color:#a78bfa; font-size:0.6rem; border:1px solid rgba(139,92,246,0.4);">6v6 DRAFT</span>
+                  </div>
+                  <div style="font-size:0.78rem; color:var(--dc-text-muted); margin-top:4px;">
+                    Join the pool — we'll find 11 opponents and auto-draft teams.
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:0.7rem; color:var(--dc-text-muted);">Players in queue</div>
+                  <div id="ark-queue-count" style="font-family:var(--font-display); font-size:2rem; font-weight:900; color:#8b5cf6; line-height:1;">0</div>
+                </div>
+              </div>
+
+              <!-- ELO & rank display -->
+              <div style="display:flex; align-items:center; gap:14px; padding:12px 16px; background:rgba(0,0,0,0.25); border-radius:10px; border:1px solid var(--db-border); margin-bottom:16px;">
+                <span style="font-size:2rem;" id="ark-rank-emoji">🥉</span>
+                <div style="flex:1;">
+                  <div style="font-size:0.7rem; color:var(--dc-text-muted); text-transform:uppercase; letter-spacing:.5px;">Your Rank</div>
+                  <div id="ark-rank-label" style="font-family:var(--font-display); font-weight:800; font-size:1rem; color:white;">Bronze I</div>
+                  <div id="ark-rank-elo" style="font-size:0.72rem; color:#a78bfa;">1000 MMR</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:0.7rem; color:var(--dc-text-muted);">Est. wait</div>
+                  <div id="ark-est-wait" style="font-family:var(--font-display); font-weight:700; color:#fbbf24; font-size:0.9rem;">~45s</div>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="ark-find-match-btn" onclick="arkQueueJoin()" style="width:100%; margin:0; padding:14px; font-family:var(--font-display); font-size:1rem; font-weight:800; letter-spacing:.5px; background:linear-gradient(135deg,#8b5cf6,#06b6d4); border:none; position:relative; overflow:hidden;">
+                <span class="land-btn-shine"></span>
+                ⚔️ Find Match
+              </button>
+            </div>
+
+            <!-- SEARCHING STATE -->
+            <div id="ark-queue-searching" style="display:none; text-align:center;">
+              <div class="ark-search-spinner" style="margin:0 auto 16px;"></div>
+              <div style="font-family:var(--font-display); font-size:1.1rem; font-weight:800; color:white; margin-bottom:4px;">Searching for Match…</div>
+              <div style="font-size:0.78rem; color:var(--dc-text-muted); margin-bottom:14px;">Finding <strong style="color:white;">11 opponents</strong> near your ELO</div>
+
+              <div style="display:flex; justify-content:center; gap:24px; margin-bottom:18px; font-size:0.78rem;">
+                <div style="text-align:center;">
+                  <div style="color:var(--dc-text-muted);">In Queue</div>
+                  <div id="ark-search-count" style="font-family:var(--font-display); font-weight:800; font-size:1.4rem; color:#8b5cf6;">1</div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="color:var(--dc-text-muted);">Elapsed</div>
+                  <div id="ark-search-elapsed" style="font-family:var(--font-display); font-weight:800; font-size:1.4rem; color:#fbbf24;">0:00</div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="color:var(--dc-text-muted);">Region</div>
+                  <div style="font-family:var(--font-display); font-weight:800; font-size:1.4rem; color:#10b981;">NA-E</div>
+                </div>
+              </div>
+
+              <!-- simulated player join feed -->
+              <div id="ark-queue-feed" style="text-align:left; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid var(--db-border); padding:10px; max-height:90px; overflow:hidden; margin-bottom:14px; font-size:0.72rem; display:flex; flex-direction:column; gap:4px;"></div>
+
+              <button class="btn btn-secondary" onclick="arkQueueLeave()" style="margin:0; width:100%; font-size:0.8rem; padding:10px;">✕ Cancel Search</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- MATCH FOUND POPUP OVERLAY                                     -->
+        <!-- ============================================================ -->
+        <div id="ark-match-found-overlay" style="display:none; position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center;">
+          <div id="ark-match-found-card" style="background:linear-gradient(135deg,#0f1015 0%,#1a1040 100%); border:2px solid #8b5cf6; border-radius:20px; padding:36px; max-width:460px; width:90%; text-align:center; box-shadow:0 0 80px rgba(139,92,246,0.4), 0 20px 60px rgba(0,0,0,0.8); position:relative; overflow:hidden; animation:mf-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;">
+
+            <div class="ark-ring" style="--sz:500px; --op:0.06; top:50%; left:50%; margin:-250px 0 0 -250px; animation-delay:0s; position:absolute; pointer-events:none;"></div>
+
+            <div style="position:relative; z-index:2;">
+              <div style="font-size:3rem; margin-bottom:8px; animation:mf-bounce 0.6s 0.3s ease both;">⚔️</div>
+              <div style="font-family:var(--font-display); font-size:1.8rem; font-weight:900; color:white; letter-spacing:1px; margin-bottom:4px;">MATCH FOUND</div>
+              <div style="font-size:0.8rem; color:var(--dc-text-muted); margin-bottom:24px;">Arkheron Ranked · 6v6 Draft · Ascension Arena</div>
+
+              <!-- Teams preview -->
+              <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; margin-bottom:24px;">
+                <div id="mf-team-a" style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); border-radius:10px; padding:10px 8px;">
+                  <div style="font-size:0.65rem; color:#60a5fa; font-weight:700; text-transform:uppercase; margin-bottom:6px;">Team Alpha</div>
+                  <div id="mf-team-a-players" style="display:flex; flex-direction:column; gap:3px; font-size:0.72rem; color:white;"></div>
+                </div>
+                <div style="font-family:var(--font-display); font-weight:900; color:#8b5cf6; font-size:1.1rem;">VS</div>
+                <div id="mf-team-b" style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:10px 8px;">
+                  <div style="font-size:0.65rem; color:#fbbf24; font-weight:700; text-transform:uppercase; margin-bottom:6px;">Team Beta</div>
+                  <div id="mf-team-b-players" style="display:flex; flex-direction:column; gap:3px; font-size:0.72rem; color:white;"></div>
+                </div>
+              </div>
+
+              <!-- Accept timer ring -->
+              <div style="position:relative; width:80px; height:80px; margin:0 auto 20px;">
+                <svg style="position:absolute; inset:0; transform:rotate(-90deg);" width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(139,92,246,0.15)" stroke-width="6"/>
+                  <circle id="mf-timer-ring" cx="40" cy="40" r="34" fill="none" stroke="#8b5cf6" stroke-width="6"
+                    stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round"
+                    style="transition: stroke-dashoffset 1s linear;"/>
+                </svg>
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                  <span id="mf-timer-label" style="font-family:var(--font-display); font-size:1.5rem; font-weight:900; color:white;">30</span>
+                </div>
+              </div>
+
+              <div style="font-size:0.75rem; color:var(--dc-text-muted); margin-bottom:20px;">Accept within <strong style="color:white;">30 seconds</strong> or the match will be cancelled.</div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button class="btn btn-secondary" onclick="arkDeclineMatch()" style="margin:0; padding:12px; font-weight:700; border-color:rgba(244,63,94,0.4); color:#f43f5e; background:rgba(244,63,94,0.08);">✕ Decline</button>
+                <button class="btn btn-primary" id="mf-accept-btn" onclick="arkAcceptMatch()" style="margin:0; padding:12px; font-family:var(--font-display); font-weight:800; font-size:0.95rem; background:linear-gradient(135deg,#10b981,#06b6d4); border:none; position:relative; overflow:hidden;">
+                  <span class="land-btn-shine"></span>
+                  ✓ Accept
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1074,8 +1204,8 @@
           </div>
         </div>
       </div>
-    <!-- TAB 5.4 RUNNER CLICKER GAME -->
-    <section class="tab-pane" id="pane-clicker">
+    <!-- Runner Clicker moved to clicker.html (opens in new tab) -->
+    <section class="tab-pane" id="pane-clicker" style="display:none;"><!-- moved to clicker.html -->
       <div style="max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr 380px; gap: 20px;">
         
         <!-- Left: Clicker Arena & Character Store -->

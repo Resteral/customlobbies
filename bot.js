@@ -688,47 +688,6 @@ client.on('messageCreate', async (message) => {
     }
   }
 
-// ==========================================
-// ⏱️ AFK DRAFT TIMER HELPERS
-// ==========================================
-
-const AFK_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
-
-function startDraftAfkTimer(game, channel) {
-  // Clear any existing timer first
-  cancelDraftAfkTimer(game);
-
-  if (!activeDrafts[game]) return;
-
-  activeDrafts[game].afkTimer = setTimeout(async () => {
-    if (!activeDrafts[game]) return;
-
-    const draft = activeDrafts[game];
-    const currentTurn = draft.pickSequence[draft.pickIdx];
-    const afkCap = currentTurn === 'A' ? draft.teams.teamA.captain : draft.teams.teamB.captain;
-
-    try {
-      await channel.send(
-        `⏱️ **AFK Draft Cancelled — ${game.toUpperCase()}**\n` +
-        `Captain **${afkCap}** did not make a pick within **3 minutes**.\n` +
-        `The draft has been cancelled. All players have been released back to the queue.`
-      );
-    } catch (err) {
-      console.error('Failed to send AFK cancellation message:', err);
-    }
-
-    cancelDraftAfkTimer(game);
-    delete activeDrafts[game];
-  }, AFK_TIMEOUT_MS);
-}
-
-function cancelDraftAfkTimer(game) {
-  if (activeDrafts[game]?.afkTimer) {
-    clearTimeout(activeDrafts[game].afkTimer);
-    activeDrafts[game].afkTimer = null;
-  }
-}
-
   // 8. STATS
   else if (command === 'stats') {
     const parts = argument.trim().split(/ +/);
@@ -1688,6 +1647,42 @@ function cancelDraftAfkTimer(game) {
     message.channel.send({ embeds: [embed] });
   }
 });
+
+// ==========================================
+// ⏱️ AFK DRAFT TIMER HELPERS
+// ==========================================
+
+const AFK_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
+
+function startDraftAfkTimer(game, channel) {
+  cancelDraftAfkTimer(game);
+  if (!activeDrafts[game]) return;
+
+  activeDrafts[game].afkTimer = setTimeout(async () => {
+    if (!activeDrafts[game]) return;
+    const draft = activeDrafts[game];
+    const currentTurn = draft.pickSequence[draft.pickIdx];
+    const afkCap = currentTurn === 'A' ? draft.teams.teamA.captain : draft.teams.teamB.captain;
+    try {
+      await channel.send(
+        `⏱️ **AFK Draft Cancelled — ${game.toUpperCase()}**\n` +
+        `Captain **${afkCap}** did not make a pick within **3 minutes**.\n` +
+        `The draft has been cancelled. All players have been released back to the queue.`
+      );
+    } catch (err) {
+      console.error('Failed to send AFK cancellation message:', err);
+    }
+    cancelDraftAfkTimer(game);
+    delete activeDrafts[game];
+  }, AFK_TIMEOUT_MS);
+}
+
+function cancelDraftAfkTimer(game) {
+  if (activeDrafts[game]?.afkTimer) {
+    clearTimeout(activeDrafts[game].afkTimer);
+    activeDrafts[game].afkTimer = null;
+  }
+}
 
 const token = process.env.DISCORD_BOT_TOKEN;
 if (!token || token === 'YOUR_DISCORD_BOT_TOKEN') {

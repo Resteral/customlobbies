@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🏃 Arena Runner Clicker — Custom Lobbies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --card: #11141c;
+      --border: rgba(255,255,255,0.07);
+      --purple: #8b5cf6;
+      --cyan: #06b6d4;
+      --green: #10b981;
+      --yellow: #fbbf24;
+      --red: #f43f5e;
+      --muted: rgba(255,255,255,0.45);
+      --font: 'Outfit', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: white;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ---- ANIMATED BG ---- */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(139,92,246,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 80% 70%, rgba(6,182,212,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    header {
+      width: 100%; max-width: 900px;
+      padding: 24px 20px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative; z-index: 1;
+    }
+
+    .logo-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo-row .site-name {
+      font-family: var(--font);
+      font-weight: 900; font-size: 1rem;
+      color: white; letter-spacing: .5px;
+    }
+    .logo-row .site-name span { color: var(--purple); }
+
+    .back-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .back-btn:hover { color: white; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); }
+
+    main {
+      width: 100%; max-width: 900px;
+      padding: 24px 20px 40px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      position: relative; z-index: 1;
+    }
+
+    @media (max-width: 680px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    /* ---- CARDS ---- */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .card-title {
+      font-family: var(--font);
+      font-weight: 800; font-size: 1.05rem;
+      color: white; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-sub {
+      font-size: 0.75rem; color: var(--muted);
+      margin-bottom: 16px; line-height: 1.5;
+    }
+
+    /* ---- CLICK ARENA ---- */
+    #click-arena {
+      height: 200px;
+      background: rgba(0,0,0,0.3);
+      border: 2px dashed rgba(255,255,255,0.07);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      position: relative; overflow: hidden;
+      margin-bottom: 18px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      user-select: none;
+    }
+    #click-arena:hover {
+      border-color: var(--purple);
+      box-shadow: 0 0 30px rgba(139,92,246,0.15);
+    }
+    #click-arena:active { transform: scale(0.98); }
+
+    .track-line {
+      position: absolute; left: 0; right: 0; height: 3px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    #runner-emoji {
+      font-size: 5rem;
+      animation: runner-bob 0.7s ease-in-out infinite;
+      display: inline-block; position: relative; z-index: 2;
+      filter: drop-shadow(0 0 12px rgba(139,92,246,0.5));
+    }
+    @keyframes runner-bob {
+      0%,100% { transform: translateY(0) scaleX(1); }
+      50%      { transform: translateY(-8px) scaleX(1.05); }
+    }
+
+    .click-burst {
+      position: absolute;
+      pointer-events: none;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--yellow);
+      animation: burst-fly 0.7s ease-out forwards;
+      z-index: 10;
+      font-family: var(--font);
+    }
+    @keyframes burst-fly {
+      0%   { transform: translateY(0) scale(0.6); opacity: 1; }
+      100% { transform: translateY(-55px) scale(1.2); opacity: 0; }
+    }
+
+    /* ---- PROGRESS BAR ---- */
+    .prog-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.72rem; color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .prog-track {
+      height: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 999px; overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--cyan));
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+    .prog-meta {
+      font-size: 0.68rem; color: var(--muted);
+      margin-top: 8px; text-align: center;
+    }
+    .prog-meta strong { color: var(--yellow); }
+
+    /* ---- SHOP ---- */
+    .shop-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .shop-item:last-child { margin-bottom: 0; }
+    .shop-item.owned { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
+    .shop-item.active { border-color: var(--purple); background: rgba(139,92,246,0.08); box-shadow: 0 0 14px rgba(139,92,246,0.1); }
+    .shop-emoji { font-size: 2rem; }
+    .shop-info { flex: 1; }
+    .shop-name { font-family: var(--font); font-weight: 700; font-size: 0.85rem; color: white; }
+    .shop-desc { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+    .shop-btn {
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-family: var(--font);
+      font-weight: 700; font-size: 0.75rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    .shop-btn.buy { background: var(--purple); color: white; }
+    .shop-btn.buy:hover { background: #7c3aed; transform: scale(1.04); }
+    .shop-btn.equip { background: rgba(255,255,255,0.08); color: var(--muted); border: 1px solid var(--border); }
+    .shop-btn.equip:hover { color: white; border-color: var(--purple); }
+    .shop-btn.active-lbl { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); cursor: default; }
+    .shop-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+    /* ---- INVENTORY ---- */
+    .inv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .inv-item {
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .inv-item:hover { border-color: var(--yellow); background: rgba(251,191,36,0.07); transform: translateY(-2px); }
+    .inv-item-emoji { font-size: 1.8rem; }
+    .inv-item-name { font-size: 0.68rem; color: white; font-weight: 600; margin-top: 4px; }
+    .inv-item-qty { font-size: 0.62rem; color: var(--muted); }
+    .inv-empty { text-align: center; color: var(--muted); font-size: 0.78rem; padding: 30px 0; }
+
+    /* ---- TRADE CARD ---- */
+    #trade-card {
+      margin-top: 12px;
+      background: rgba(202,138,4,0.08);
+      border: 1.5px solid rgba(202,138,4,0.3);
+      border-radius: 12px;
+      padding: 14px;
+      display: none;
+    }
+    .trade-title { font-family: var(--font); font-weight: 800; color: var(--yellow); margin-bottom: 6px; font-size: 0.9rem; }
+    .trade-body { font-size: 0.75rem; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+    .trade-btns { display: flex; gap: 8px; justify-content: flex-end; }
+    .trade-btn {
+      padding: 7px 16px;
+      border-radius: 7px;
+      font-family: var(--font);
+      font-weight: 700; font-size: 0.78rem;
+      cursor: pointer; border: none;
+    }
+    .trade-btn.accept { background: var(--yellow); color: black; }
+    .trade-btn.accept:hover { background: #f59e0b; }
+    .trade-btn.decline { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
+    .trade-btn.decline:hover { color: white; }
+
+    /* ---- COIN DISPLAY ---- */
+    #coin-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      background: rgba(251,191,36,0.1);
+      border: 1px solid rgba(251,191,36,0.2);
+      border-radius: 20px;
+      font-family: var(--font); font-weight: 800;
+      font-size: 0.9rem; color: var(--yellow);
+    }
+
+    /* ---- TOAST ---- */
+    #ck-toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #1e2030; border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 20px;
+      font-size: 0.82rem; color: white;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      opacity: 0; transform: translateY(10px);
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+    #ck-toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-row">
+    <span style="font-size:1.5rem;">🔱</span>
+    <div class="site-name">Custom<span>Lobbies</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="coin-bar">🪙 <span id="ck-coin-count">0</span> coins</div>
+    <a href="index.html" class="back-btn">← Back to Lobby</a>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: Arena + Shop -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+
+    <!-- Arena -->
+    <div class="card" style="border-top:3px solid var(--green);">
+      <div class="card-title">🏃 Arena Runner Clicker</div>
+      <div class="card-sub">Click your runner to earn Scrim Coins. Every 50 clicks drops a tradable loot item!</div>
+
+      <div id="click-arena" onclick="doClick(event)">
+        <div class="track-line" style="top:28%;"></div>
+        <div class="track-line" style="top:48%;"></div>
+        <div class="track-line" style="top:68%;"></div>
+        <span id="runner-emoji">🏃</span>
+      </div>
+
+      <div class="prog-label">
+        <span>Loot Drop Progress</span>
+        <span id="prog-text">0 / 50</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="prog-meta">Multiplier: <strong id="mult-text">1.0x</strong> &nbsp;·&nbsp; Coins per click: <strong id="cpc-text" style="color:white;">+1</strong></div>
+    </div>
+
+    <!-- Shop -->
+    <div class="card">
+      <div class="card-title">🛍️ Unlock Runners</div>
+      <div class="card-sub">Spend coins to unlock faster runners with better multipliers.</div>
+      <div id="shop-container"></div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: Inventory + Trade -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div class="card" style="flex:1;">
+      <div class="card-title">📦 Your Drops</div>
+      <div class="card-sub">Loot gathered from click loops — trade with bots for bonus coins!</div>
+      <div class="inv-grid" id="inv-grid">
+        <div class="inv-empty" style="grid-column:span 2;">No loot yet — start clicking!</div>
+      </div>
+
+      <div id="trade-card">
+        <div class="trade-title">🤝 Trade Proposal</div>
+        <div class="trade-body" id="trade-body"></div>
+        <div class="trade-btns">
+          <button class="trade-btn decline" onclick="declineTrade()">Decline</button>
+          <button class="trade-btn accept" onclick="acceptTrade()">Accept Trade</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="ck-toast"></div>
+
+<script>
+// ====================================================
+// 🏃 RUNNER CLICKER — Standalone
+// Shares coin balance with main site via localStorage
+// ====================================================
+
+const SHOP = [
+  { id: 'default', name: 'Classic Runner', emoji: '🏃', cost: 0,    mult: 1.0, desc: 'The OG. Steady coins.' },
+  { id: 'ninja',   name: 'Ninja Shadow',  emoji: '🥷', cost: 150,  mult: 1.5, desc: '1.5x coin speed.' },
+  { id: 'robot',   name: 'Mech Runner',   emoji: '🤖', cost: 400,  mult: 2.0, desc: '2x efficiency. No pain.' },
+  { id: 'ghost',   name: 'Phantom Sprint',emoji: '👻', cost: 900,  mult: 3.0, desc: 'Phase through the meta. 3x.' },
+  { id: 'dragon',  name: 'Dragon Dash',   emoji: '🐉', cost: 2000, mult: 5.0, desc: '5x — pure fire.' },
+];
+
+const LOOT_TABLE = [
+  { id: 'blade',   name: 'Scrim Blade',   emoji: '🗡️',  tradeVal: 60  },
+  { id: 'potion',  name: 'Speed Elixir',  emoji: '🧪',  tradeVal: 40  },
+  { id: 'orb',     name: 'Power Orb',     emoji: '🔮',  tradeVal: 80  },
+  { id: 'scroll',  name: 'Strat Scroll',  emoji: '📜',  tradeVal: 50  },
+  { id: 'crystal', name: 'Rank Crystal',  emoji: '💎',  tradeVal: 120 },
+  { id: 'chest',   name: 'Arena Chest',   emoji: '📦',  tradeVal: 200 },
+];
+
+let state = {
+  clicks: 0,
+  loopClicks: 0,
+  loopTarget: 50,
+  coins: 0,
+  activeRunner: 'default',
+  owned: ['default'],
+  inventory: [],
+  pendingTrade: null,
+};
+
+function loadState() {
+  // Sync coins with main site
+  const shared = parseInt(localStorage.getItem('custom_lobbies_coins') || '0');
+  const saved  = JSON.parse(localStorage.getItem('ck_state') || 'null');
+  if (saved) {
+    state = { ...state, ...saved };
+  }
+  state.coins = shared || state.coins || 0;
+  renderAll();
+}
+
+function saveState() {
+  localStorage.setItem('ck_state', JSON.stringify(state));
+  localStorage.setItem('custom_lobbies_coins', String(state.coins));
+  updateCoinBar();
+}
+
+function updateCoinBar() {
+  document.getElementById('ck-coin-count').textContent = state.coins;
+}
+
+// ---- Click handler ----
+function doClick(e) {
+  const runner = SHOP.find(r => r.id === state.activeRunner) || SHOP[0];
+  const earned = Math.max(1, Math.round(runner.mult));
+
+  state.coins += earned;
+  state.clicks++;
+  state.loopClicks++;
+
+  // Burst label
+  const arena = document.getElementById('click-arena');
+  const rect  = arena.getBoundingClientRect();
+  const burst = document.createElement('div');
+  burst.className = 'click-burst';
+  burst.textContent = `+${earned}🪙`;
+  burst.style.left = (e.clientX - rect.left - 20) + 'px';
+  burst.style.top  = (e.clientY - rect.top  - 20) + 'px';
+  arena.appendChild(burst);
+  setTimeout(() => burst.remove(), 750);
+
+  // Progress
+  if (state.loopClicks >= state.loopTarget) {
+    state.loopClicks = 0;
+    dropLoot();
+  }
+
+  updateProgress(runner);
+  saveState();
+}
+
+function updateProgress(runner) {
+  if (!runner) runner = SHOP.find(r => r.id === state.activeRunner) || SHOP[0];
+  const pct = (state.loopClicks / state.loopTarget) * 100;
+  document.getElementById('prog-fill').style.width  = pct + '%';
+  document.getElementById('prog-text').textContent  = `${state.loopClicks} / ${state.loopTarget}`;
+  document.getElementById('mult-text').textContent  = runner.mult.toFixed(1) + 'x';
+  document.getElementById('cpc-text').textContent   = '+' + Math.max(1, Math.round(runner.mult));
+  document.getElementById('runner-emoji').textContent = runner.emoji;
+}
+
+// ---- Loot drop ----
+function dropLoot() {
+  const item = LOOT_TABLE[Math.floor(Math.random() * LOOT_TABLE.length)];
+  const existing = state.inventory.find(i => i.id === item.id);
+  if (existing) existing.qty++;
+  else state.inventory.push({ ...item, qty: 1 });
+
+  toast(`${item.emoji} Loot drop: ${item.name}!`);
+  renderInventory();
+
+  // Random trade proposal
+  if (Math.random() < 0.6) {
+    setTimeout(triggerTrade, 1200);
+  }
+}
+
+// ---- Trade ----
+function triggerTrade() {
+  if (state.pendingTrade) return;
+  const tradeable = state.inventory.filter(i => i.qty > 0);
+  if (tradeable.length === 0) return;
+
+  const item  = tradeable[Math.floor(Math.random() * tradeable.length)];
+  const bonus = Math.floor(item.tradeVal * (0.9 + Math.random() * 0.4));
+  state.pendingTrade = { item, bonus };
+
+  document.getElementById('trade-body').innerHTML =
+    `A matchmaking bot offers <strong style="color:white;">${bonus} coins</strong> for your <strong style="color:white;">${item.emoji} ${item.name}</strong>. Accept?`;
+  document.getElementById('trade-card').style.display = 'block';
+}
+
+function acceptTrade() {
+  if (!state.pendingTrade) return;
+  const { item, bonus } = state.pendingTrade;
+  const inv = state.inventory.find(i => i.id === item.id);
+  if (inv) { inv.qty--; if (inv.qty <= 0) state.inventory = state.inventory.filter(i => i.qty > 0); }
+  state.coins += bonus;
+  state.pendingTrade = null;
+  document.getElementById('trade-card').style.display = 'none';
+  toast(`🤝 Trade accepted! +${bonus}🪙`);
+  renderInventory();
+  saveState();
+}
+
+function declineTrade() {
+  state.pendingTrade = null;
+  document.getElementById('trade-card').style.display = 'none';
+  toast('Trade declined.');
+}
+
+// ---- Shop ----
+function renderShop() {
+  const el = document.getElementById('shop-container');
+  el.innerHTML = SHOP.map(item => {
+    const owned  = state.owned.includes(item.id);
+    const active = state.activeRunner === item.id;
+    let btnHtml;
+    if (active) {
+      btnHtml = `<button class="shop-btn active-lbl">✓ Active</button>`;
+    } else if (owned) {
+      btnHtml = `<button class="shop-btn equip" onclick="equipRunner('${item.id}')">Equip</button>`;
+    } else {
+      const canAfford = state.coins >= item.cost;
+      btnHtml = `<button class="shop-btn buy" onclick="buyRunner('${item.id}')" ${canAfford ? '' : 'disabled'}>🪙 ${item.cost}</button>`;
+    }
+    return `
+      <div class="shop-item ${owned ? 'owned' : ''} ${active ? 'active' : ''}">
+        <span class="shop-emoji">${item.emoji}</span>
+        <div class="shop-info">
+          <div class="shop-name">${item.name}</div>
+          <div class="shop-desc">${item.desc}</div>
+        </div>
+        ${btnHtml}
+      </div>`;
+  }).join('');
+}
+
+function buyRunner(id) {
+  const item = SHOP.find(r => r.id === id);
+  if (!item || state.coins < item.cost) return toast('Not enough coins!');
+  state.coins -= item.cost;
+  state.owned.push(id);
+  equipRunner(id);
+  toast(`🎉 Unlocked ${item.name}!`);
+}
+
+function equipRunner(id) {
+  state.activeRunner = id;
+  renderAll();
+  saveState();
+}
+
+// ---- Inventory ----
+function renderInventory() {
+  const el = document.getElementById('inv-grid');
+  if (!state.inventory.length) {
+    el.innerHTML = `<div class="inv-empty" style="grid-column:span 2;">No loot yet — keep clicking!</div>`;
+    return;
+  }
+  el.innerHTML = state.inventory.map(item => `
+    <div class="inv-item">
+      <div class="inv-item-emoji">${item.emoji}</div>
+      <div class="inv-item-name">${item.name}</div>
+      <div class="inv-item-qty">x${item.qty}</div>
+    </div>`
+  ).join('');
+}
+
+function renderAll() {
+  const runner = SHOP.find(r => r.id === state.activeRunner) || SHOP[0];
+  updateProgress(runner);
+  renderShop();
+  renderInventory();
+  updateCoinBar();
+}
+
+// ---- Toast ----
+function toast(msg) {
+  const el = document.getElementById('ck-toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window._ckToast);
+  window._ckToast = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ---- Init ----
+loadState();
+</script>
+</body>
+</html>
