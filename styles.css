@@ -1057,3 +1057,27 @@ footer {
   border-color: var(--db-primary) !important;
 }
 
+/* 🏃 RUNNING GUY ANIMATION keyframes */
+@keyframes runner-bob {
+  0% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: translateY(-10px) rotate(-5deg) translateX(-5px);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+  }
+  75% {
+    transform: translateY(-10px) rotate(5deg) translateX(5px);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+  }
+}
+
+#runner-sprite-emoji {
+  animation: runner-bob 0.7s infinite ease-in-out;
+  display: inline-block;
+}
+

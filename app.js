@@ -2,7 +2,7 @@
 // CUSTOM LOBBIES MATCHMAKER PORTAL
 // ==========================================
 
-const GAMES = ['arkheron', 'hockey', 'zealot'];
+const GAMES = ['arkheron', 'cs', 'zealot'];
 
 // Web Audio API Sound Synthesizer for Lobby Notifications
 let audioCtx = null;
@@ -152,25 +152,31 @@ const SETS_METADATA = {
 
 // Static pool of mock players for testing and matchmaking simulation
 const MOCK_PLAYERS_POOL = [
-  { username: 'TofuShark', avatar: '🦊', games: { arkheron: { elo: 1050, wins: 5, losses: 3, kd: "1.25", eloHistory: [1000, 1020, 1050] }, hockey: { elo: 1000, wins: 2, losses: 2, kd: "1.00", eloHistory: [1000] }, zealot: { elo: 980, wins: 1, losses: 3, kd: "0.50", eloHistory: [1000, 980] } } },
-  { username: 'TowerGod', avatar: '👑', games: { arkheron: { elo: 1200, wins: 12, losses: 4, kd: "2.10", eloHistory: [1000, 1050, 1120, 1200] }, hockey: { elo: 1100, wins: 6, losses: 2, kd: "1.80", eloHistory: [1000, 1100] }, zealot: { elo: 1150, wins: 8, losses: 3, kd: "1.90", eloHistory: [1000, 1150] } } },
-  { username: 'Rynshi', avatar: '🥷', games: { arkheron: { elo: 950, wins: 2, losses: 6, kd: "0.60", eloHistory: [1000, 950] }, hockey: { elo: 1020, wins: 3, losses: 2, kd: "1.10", eloHistory: [1000, 1020] }, zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] } } },
-  { username: 'Dahla', avatar: '🧛', games: { arkheron: { elo: 1120, wins: 9, losses: 5, kd: "1.45", eloHistory: [1000, 1060, 1120] }, hockey: { elo: 980, wins: 1, losses: 4, kd: "0.40", eloHistory: [1000, 980] }, zealot: { elo: 1080, wins: 5, losses: 2, kd: "1.35", eloHistory: [1000, 1080] } } },
-  { username: 'Grimwold', avatar: '❄️', games: { arkheron: { elo: 1010, wins: 4, losses: 4, kd: "1.05", eloHistory: [1000, 1010] }, hockey: { elo: 1040, wins: 5, losses: 3, kd: "1.20", eloHistory: [1000, 1040] }, zealot: { elo: 1030, wins: 4, losses: 3, kd: "1.15", eloHistory: [1000, 1030] } } }
+  { username: 'TofuShark', avatar: '🦊', games: { arkheron: { elo: 1050, wins: 5, losses: 3, kd: "1.25", eloHistory: [1000, 1020, 1050] }, cs: { elo: 1000, wins: 2, losses: 2, kd: "1.00", eloHistory: [1000] }, zealot: { elo: 980, wins: 1, losses: 3, kd: "0.50", eloHistory: [1000, 980] } } },
+  { username: 'TowerGod', avatar: '👑', games: { arkheron: { elo: 1200, wins: 12, losses: 4, kd: "2.10", eloHistory: [1000, 1050, 1120, 1200] }, cs: { elo: 1100, wins: 6, losses: 2, kd: "1.80", eloHistory: [1000, 1100] }, zealot: { elo: 1150, wins: 8, losses: 3, kd: "1.90", eloHistory: [1000, 1150] } } },
+  { username: 'Rynshi', avatar: '🥷', games: { arkheron: { elo: 950, wins: 2, losses: 6, kd: "0.60", eloHistory: [1000, 950] }, cs: { elo: 1020, wins: 3, losses: 2, kd: "1.10", eloHistory: [1000, 1020] }, zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] } } },
+  { username: 'Dahla', avatar: '🧛', games: { arkheron: { elo: 1120, wins: 9, losses: 5, kd: "1.45", eloHistory: [1000, 1060, 1120] }, cs: { elo: 980, wins: 1, losses: 4, kd: "0.40", eloHistory: [1000, 980] }, zealot: { elo: 1080, wins: 5, losses: 2, kd: "1.35", eloHistory: [1000, 1080] } } },
+  { username: 'Grimwold', avatar: '❄️', games: { arkheron: { elo: 1010, wins: 4, losses: 4, kd: "1.05", eloHistory: [1000, 1010] }, cs: { elo: 1040, wins: 5, losses: 3, kd: "1.20", eloHistory: [1000, 1040] }, zealot: { elo: 1030, wins: 4, losses: 3, kd: "1.15", eloHistory: [1000, 1030] } } }
 ];
 
 // Clean starting database of competitive players (Current user only)
-let players = [
+let players = JSON.parse(localStorage.getItem('custom_lobbies_players')) || [
   {
     username: 'Resteral.TV',
     avatar: '🛡️',
+    coins: 500,
+    unlockedRewards: [],
     games: {
       arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      hockey: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
+      cs: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
       zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] }
     }
   }
 ];
+
+function savePlayersToStorage() {
+  localStorage.setItem('custom_lobbies_players', JSON.stringify(players));
+}
 
 let activeLobbies = {};
 let currentSelectedGame = 'arkheron'; // default selected game for UI display
@@ -193,12 +199,12 @@ function initSupabase() {
 let appState = {
   currentTab: 'simulator',
   currentUser: 'Resteral.TV',
-  activeChannel: 'arkheron', // active channel state inside portal: 'arkheron', 'zealot', 'hockey'
+  activeChannel: 'arkheron', // active channel state inside portal: 'arkheron', 'zealot', 'cs'
   queues: {
     arkheron: [],
-    hockey: [],
+    cs: [],
     zealot: []
-  }, 
+  },
   draft: {
     active: false,
     pool: [],      
@@ -223,14 +229,79 @@ let appState = {
   tournaments: [],
   activeTournamentId: null,
   forumFilter: 'all',
-  forumPosts: [],
+  forumPosts: JSON.parse(localStorage.getItem('custom_lobbies_forum_posts')) || [
+    {
+      id: 'POST-WELCOME',
+      author: 'Resteral.TV',
+      title: '👋 Welcome to the Custom Lobbies Club Forums!',
+      content: 'Hey guys, welcome to the official competitive hub! Set up your Discord, queue up for scrims, and check out the Monthly Cup schedules. Post any feedback or match requests here!',
+      category: 'general',
+      createdAt: new Date(Date.now() - 3600000 * 24 * 3).toISOString()
+    },
+    {
+      id: 'POST-CS',
+      author: 'TowerGod',
+      title: '🔫 CS 5v5 Matchmaking Guidelines & Strategy',
+      content: 'With the transition from Hockey to CS 5v5, remember that CS queues now require 10 players to start drafting. Make sure captains are designated by high MMR. Good luck in the arena!',
+      category: 'cs',
+      createdAt: new Date(Date.now() - 3600000 * 12).toISOString()
+    }
+  ],
   advertisedStreams: [
     {
-      id: 'STREAM-SEED',
+      id: 'STREAM-SEED-RESTER',
       author: 'Resteral.TV',
       platform: 'twitch',
-      url: 'https://twitch.tv/resteraltv',
+      url: 'https://twitch.tv/resteral',
       title: '🎥 Scrimming live on Arkheron custom lobbies! Join in.',
+      isLive: true
+    },
+    {
+      id: 'STREAM-TW-1',
+      author: 'Ninja',
+      platform: 'twitch',
+      url: 'https://twitch.tv/ninja',
+      title: '🎮 Arena Matchmaking Scrims & Battle Royale customs!',
+      isLive: true
+    },
+    {
+      id: 'STREAM-TW-2',
+      author: 'Shroud',
+      platform: 'twitch',
+      url: 'https://twitch.tv/shroud',
+      title: '🔫 Global Elite CS2 lobbies with viewers & pros!',
+      isLive: true
+    },
+    {
+      id: 'STREAM-TW-3',
+      author: 'xQc',
+      platform: 'twitch',
+      url: 'https://twitch.tv/xqc',
+      title: '🔥 Reacting to crazy CS draft highlights and scrim matches!',
+      isLive: true
+    },
+    {
+      id: 'STREAM-KK-1',
+      author: 'WestCOL',
+      platform: 'kick',
+      url: 'https://kick.com/westcol',
+      title: '🟢 5v5 Arena Showmatch and Coins Gamble matches!',
+      isLive: true
+    },
+    {
+      id: 'STREAM-KK-2',
+      author: 'AdinRoss',
+      platform: 'kick',
+      url: 'https://kick.com/adinross',
+      title: '🚀 Hosting 10,000 Coin CS matchmaking lobbies!',
+      isLive: true
+    },
+    {
+      id: 'STREAM-KK-3',
+      author: 'Amouranth',
+      platform: 'kick',
+      url: 'https://kick.com/amouranth',
+      title: '💬 Chatting and gaming with Custom Lobbies teams!',
       isLive: true
     }
   ],
@@ -246,6 +317,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!p.registeredAt) p.registeredAt = new Date().toLocaleDateString();
     if (!p.color) p.color = '#7c3aed';
     if (!p.role) p.role = 'Flex';
+    if (p.coins === undefined) p.coins = 500;
+    if (!p.unlockedRewards) p.unlockedRewards = [];
 
     if (!p.steamHex) {
       let hashStr = p.username.toLowerCase();
@@ -310,6 +383,8 @@ window.addEventListener('DOMContentLoaded', () => {
   updateVoiceChannelsUI();
   viewCodeFile('bot');
   renderStreamsList();
+  updateCoinsUI();
+  renderCalendar();
 });
 
 // Switch Tab
@@ -327,6 +402,14 @@ function switchTab(tabId) {
     renderTournamentsTab();
   } else if (tabId === 'forums') {
     renderForumsTab();
+  } else if (tabId === 'calendar') {
+    renderCalendar();
+  } else if (tabId === 'casino') {
+    updateCoinsUI();
+  } else if (tabId === 'clicker') {
+    renderClickerUI();
+  } else if (tabId === 'arkheron') {
+    renderArkheronTab();
   }
 }
 
@@ -527,7 +610,7 @@ function parseChatCommand(command, argument, senderUser) {
       appState.queues[game].push(senderUser);
       playSound('join'); // Play join blip
       const playerElo = players.find(p => p.username === senderUser)?.games[game]?.elo || 1000;
-      const limit = game === 'hockey' ? 8 : 6;
+      const limit = game === 'cs' ? 10 : 6;
       writeMessage('TheBot', true, `✅ **${senderUser}** (MMR: **${playerElo}**) joined the **${game.toUpperCase()}** queue! (${appState.queues[game].length}/${limit})`);
       updateQueueUI();
     }
@@ -545,7 +628,7 @@ function parseChatCommand(command, argument, senderUser) {
     } else {
       if (!appState.queues[game].includes(senderUser)) return writeMessage('TheBot', true, `⚠️ **${senderUser}**, you are not in the queue.`);
       appState.queues[game] = appState.queues[game].filter(p => p !== senderUser);
-      const limit = game === 'hockey' ? 8 : 6;
+      const limit = game === 'cs' ? 10 : 6;
       writeMessage('TheBot', true, `🏃 **${senderUser}** left the ${game.toUpperCase()} queue. (${appState.queues[game].length}/${limit})`);
       updateQueueUI();
     }
@@ -602,7 +685,7 @@ function parseChatCommand(command, argument, senderUser) {
       return;
     }
 
-    const requiredPlayers = game === 'hockey' ? 8 : 6;
+    const requiredPlayers = game === 'cs' ? 10 : 6;
     if (appState.queues[game].length < requiredPlayers) {
       writeMessage('TheBot', true, `⚠️ Cannot start draft. Need at least ${requiredPlayers} players in queue for a ${requiredPlayers/2}v${requiredPlayers/2} scrim. Type \`!addbots\` to fill.`);
       return;
@@ -632,7 +715,7 @@ function parseChatCommand(command, argument, senderUser) {
     const others = players.filter(p => p.username !== appState.currentUser);
     const shuffled = [...others].sort(() => 0.5 - Math.random());
     
-    const requiredPlayers = game === 'hockey' ? 8 : 6;
+    const requiredPlayers = game === 'cs' ? 10 : 6;
     while (appState.queues[game].length < requiredPlayers && shuffled.length > 0) {
       const candidate = shuffled.pop().username;
       if (!appState.queues[game].includes(candidate)) {
@@ -915,7 +998,7 @@ function parseChatCommand(command, argument, senderUser) {
             `🔗 **Linked In-Game Handle:** \`${p.ingameName || 'Not linked. Use -register'}\`\n` +
             `📅 **Joined Club:** \`${p.registeredAt || 'Today'}\`\n\n` +
             `🧜 **Arkheron:** MMR: **${p.games.arkheron?.elo || 1000}** (W/L: ${p.games.arkheron?.wins}-${p.games.arkheron?.losses})\n` +
-            `🏒 **Zealot Hockey:** MMR: **${p.games.hockey?.elo || 1000}** (W/L: ${p.games.hockey?.wins}-${p.games.hockey?.losses})\n` +
+            `🔫 **Counter-Strike (CS):** MMR: **${p.games.cs?.elo || 1000}** (W/L: ${p.games.cs?.wins}-${p.games.cs?.losses})\n` +
             `🛡️ **Zealot Mod:** MMR: **${p.games.zealot?.elo || 1000}** (W/L: ${p.games.zealot?.wins}-${p.games.zealot?.losses})`
     };
     writeMessage('TheBot', true, '', embed);
@@ -1006,7 +1089,11 @@ function triggerDraftStart(game) {
   appState.draft.game = game;
   playSound('match_found'); // Play sonar chime for match found
 
-  const requiredPlayers = game === 'hockey' ? 8 : 6;
+  if (appState.currentTab === 'casino') {
+    updateCoinsUI();
+  }
+
+  const requiredPlayers = game === 'cs' ? 10 : 6;
   const lobbyNames = appState.queues[game].slice(0, requiredPlayers);
   appState.queues[game] = appState.queues[game].slice(requiredPlayers);
   
@@ -1017,7 +1104,7 @@ function triggerDraftStart(game) {
   const capB = lobbyPlayers[1]; 
   const restPlayers = lobbyPlayers.slice(2).map(p => p.username);
 
-  const pickSequence = game === 'hockey' ? ['B', 'A', 'A', 'B', 'B', 'A'] : ['B', 'A', 'A', 'B'];
+  const pickSequence = game === 'cs' ? ['B', 'A', 'A', 'B', 'B', 'A', 'A', 'B'] : ['B', 'A', 'A', 'B'];
 
   appState.draft.captains = [capA, capB];
   appState.draft.pool = restPlayers;
@@ -1229,7 +1316,29 @@ function concludeMatch(alphaWon) {
     }
   });
 
+  savePlayersToStorage();
   renderLeaderboard();
+
+  // Process live wagers
+  if (typeof activeMatchBet !== 'undefined' && activeMatchBet) {
+    const me = players.find(p => p.username === appState.currentUser);
+    if (me) {
+      const won = (activeMatchBet.betOn === 'alpha' && alphaWon) || (activeMatchBet.betOn === 'beta' && !alphaWon);
+      if (won) {
+        const payout = activeMatchBet.amount * 2;
+        me.coins = (me.coins || 500) + payout;
+        savePlayersToStorage();
+        showToast(`🎰 Casino Pay Out: You won +${payout} Coins!`, "success");
+        writeMessage('TheBot', true, `🎰 **Casino Pay Out:** **${me.username}** won **${payout} Coins** by betting on the winning team!`);
+      } else {
+        showToast(`🎰 Casino Loss: Lost ${activeMatchBet.amount} Coins.`, "warning");
+      }
+    }
+    activeMatchBet = null;
+    if (appState.currentTab === 'casino') {
+      updateCoinsUI();
+    }
+  }
 
   const embed = {
     title: `🏆 Match Complete - Team ${winTeam.captain} Wins!`,
@@ -1252,7 +1361,7 @@ function updateQueueUI() {
   const ratioText = document.getElementById('queue-ratio-text');
   const progressBar = document.getElementById('queue-progress-bar');
   const count = appState.queues[game].length;
-  const limit = game === 'hockey' ? 8 : 6;
+  const limit = game === 'cs' ? 10 : 6;
   
   const indicatorHtml = count > 0 ? `<span class="queue-scanning-indicator" style="margin-right: 6px;"></span>` : '';
   countBadge.innerHTML = `${indicatorHtml}${count}/${limit} Players`;
@@ -1500,7 +1609,7 @@ const client = new Client({
 const DATABASE_FILE = './players_db.json';
 let playersDb = {};
 
-const GAMES = ['arkheron', 'hockey', 'zealot'];
+const GAMES = ['arkheron', 'cs', 'zealot'];
 
 if (fs.existsSync(DATABASE_FILE)) {
   playersDb = JSON.parse(fs.readFileSync(DATABASE_FILE, 'utf-8'));
@@ -1515,7 +1624,7 @@ function saveDb() {
 
 let queues = {
   arkheron: [],
-  hockey: [],
+  cs: [],
   zealot: []
 };
 let activeDrafts = {};
@@ -1544,7 +1653,7 @@ client.on('messageCreate', async (message) => {
   const channelName = message.channel.name?.toLowerCase() || '';
 
   if (channelName.includes('arkheron')) channelGame = 'arkheron';
-  else if (channelName.includes('hockey')) channelGame = 'hockey';
+  else if (channelName.includes('cs')) channelGame = 'cs';
   else if (channelName.includes('zealot')) channelGame = 'zealot';
 
   if (command === 'help') {
@@ -1601,14 +1710,27 @@ function renderProfilesTab() {
       `;
     }
 
+    const hasGoldTheme = p.unlockedRewards && p.unlockedRewards.includes('theme-gold');
+    const hasGreenTheme = p.unlockedRewards && p.unlockedRewards.includes('theme-green');
+    
+    let cardStyle = `border: 1.5px solid ${p.color || '#7c3aed'}; background: var(--dc-bg-chat); box-shadow: 0 0 10px ${p.color || '#7c3aed'}22;`;
+    if (hasGoldTheme) {
+      cardStyle = `border: 1.5px solid #fbbf24; background: #0f1015; box-shadow: 0 0 15px rgba(251,191,36,0.35);`;
+    } else if (hasGreenTheme) {
+      cardStyle = `border: 1.5px solid #10b981; background: var(--dc-bg-chat); box-shadow: 0 0 15px rgba(16,185,129,0.35);`;
+    }
+
+    const hasVip = p.unlockedRewards && p.unlockedRewards.includes('badge-vip') ? '👑 ' : '';
+    const hasChal = p.unlockedRewards && p.unlockedRewards.includes('badge-chal') ? '🚀 ' : '';
+
     return `
-      <div class="db-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px; border: 1.5px solid ${p.color || '#7c3aed'}; background: var(--dc-bg-chat); border-radius: 6px; position: relative; box-shadow: 0 0 10px ${p.color || '#7c3aed'}22;">
+      <div class="db-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px; border-radius: 6px; position: relative; ${cardStyle}">
         ${wBadge}
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 1.5rem;">${p.avatar || '👤'}</span>
           <div>
             <div style="font-weight: bold; font-size: 0.9rem; color: white;">
-              ${p.username}
+              ${hasVip}${hasChal}${p.username}
               <span style="font-size: 0.65rem; background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 12px; margin-left: 6px; border: 1.5px solid var(--db-border); color: #c084fc;">
                 ${p.role || 'Flex'}
               </span>
@@ -1623,7 +1745,7 @@ function renderProfilesTab() {
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: white; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px;">
           <span>🧜 Ark: <strong>${p.games.arkheron?.elo || 1000}</strong></span>
-          <span>🏒 Hock: <strong>${p.games.hockey?.elo || 1000}</strong></span>
+          <span>🔫 CS: <strong>${p.games.cs?.elo || 1000}</strong></span>
           <span>🛡️ Zea: <strong>${p.games.zealot?.elo || 1000}</strong></span>
         </div>
       </div>
@@ -1715,6 +1837,20 @@ function initCustomTournament() {
   appState.tournaments.push(newTourn);
   appState.activeTournamentId = newTourn.id;
 
+  if (typeof calendarEvents !== 'undefined') {
+    calendarEvents.push({
+      id: 'EV-TOUR-' + newTourn.id,
+      name: `🏆 Tournament: ${newTourn.name}`,
+      game: newTourn.game,
+      isTournament: true,
+      date: new Date().toISOString().split('T')[0]
+    });
+    saveCalendarEvents();
+    if (appState.currentTab === 'calendar') {
+      renderCalendar();
+    }
+  }
+
   showToast(`Tournament created for ${game.toUpperCase()}!`, 'success');
   renderTournamentsTab();
 }
@@ -1766,7 +1902,7 @@ function addMockSignups() {
   });
 
   const numTeams = t.numTeams || 2;
-  const playersPerTeam = t.game === 'hockey' ? 4 : 3;
+  const playersPerTeam = t.game === 'cs' ? 5 : 3;
   const requiredPlayers = numTeams * playersPerTeam;
 
   players.forEach(p => {
@@ -1803,7 +1939,7 @@ function startTourneyDraft() {
   }
 
   const numTeams = t.numTeams || 2;
-  const playersPerTeam = t.game === 'hockey' ? 4 : 3;
+  const playersPerTeam = t.game === 'cs' ? 5 : 3;
   const requiredPlayers = numTeams * playersPerTeam;
 
   if (t.pool.length < requiredPlayers) {
@@ -1898,7 +2034,7 @@ function buyTourneySalaryPlayer(player) {
   playSound('pick');
   showToast(`Purchased ${player} for ${salary} credits!`, "success");
 
-  const targetSize = t.game === 'hockey' ? 4 : 3;
+  const targetSize = t.game === 'cs' ? 5 : 3;
   const allTeamsFilled = t.captains.every(cap => t.teams[cap].length === targetSize);
 
   if (allTeamsFilled) {
@@ -1972,7 +2108,7 @@ function sellTourneyPlayer() {
   showToast(`SOLD! ${player} goes to Team ${winner} for ${cost} pts!`, "success");
   t.currentBidding = { player: null, highestBidder: null, highestBid: 0 };
 
-  const targetSize = t.game === 'hockey' ? 4 : 3;
+  const targetSize = t.game === 'cs' ? 5 : 3;
   const allTeamsFilled = t.captains.every(cap => t.teams[cap].length === targetSize);
 
   if (allTeamsFilled) {
@@ -2034,7 +2170,7 @@ function checkBotTourneyPick() {
             if (randomPlayer) nominateTourneyPlayer(randomPlayer);
           } else {
             const block = t.currentBidding;
-            const targetSize = t.game === 'hockey' ? 4 : 3;
+            const targetSize = t.game === 'cs' ? 5 : 3;
             const potentialBidders = t.captains.filter(c => 
               c !== block.highestBidder && 
               c !== appState.currentUser && 
@@ -2503,6 +2639,7 @@ function submitForumPost() {
   };
 
   appState.forumPosts.push(newPost);
+  localStorage.setItem('custom_lobbies_forum_posts', JSON.stringify(appState.forumPosts));
   
   titleInput.value = '';
   contentInput.value = '';
@@ -2560,15 +2697,15 @@ function renderForumsTab() {
       username: post.author,
       avatar: '👤',
       color: '#7c3aed',
-      games: { arkheron: { elo: 1000 }, hockey: { elo: 1000 }, zealot: { elo: 1000 } }
+      games: { arkheron: { elo: 1000 }, cs: { elo: 1000 }, zealot: { elo: 1000 } }
     };
 
     const dateStr = new Date(post.createdAt).toLocaleDateString() + ' ' + new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
     const arkElo = author.games.arkheron?.elo || 1000;
-    const hockElo = author.games.hockey?.elo || 1000;
+    const csElo = author.games.cs?.elo || 1000;
     const zealElo = author.games.zealot?.elo || 1000;
-    const avgElo = Math.round((arkElo + hockElo + zealElo) / 3);
+    const avgElo = Math.round((arkElo + csElo + zealElo) / 3);
 
     return `
       <div class="db-card" style="padding: 16px; border-left: 4px solid ${author.color || '#7c3aed'}; background: var(--dc-bg-sidebar); display: flex; flex-direction: column; gap: 10px;">
@@ -2610,7 +2747,11 @@ function toggleAdvertiseForm() {
   if (isHidden) {
     document.getElementById('stream-author-input').value = appState.currentUser;
     document.getElementById('stream-platform-input').value = 'twitch';
-    document.getElementById('stream-url-input').value = 'https://twitch.tv/' + appState.currentUser.toLowerCase().replace('.', '');
+    let defaultUrl = 'https://twitch.tv/' + appState.currentUser.toLowerCase().replace('.', '');
+    if (appState.currentUser.toLowerCase().includes('rester')) {
+      defaultUrl = 'https://twitch.tv/resteral';
+    }
+    document.getElementById('stream-url-input').value = defaultUrl;
     document.getElementById('stream-title-input').value = '🔴 Playing custom lobbies matchmaking scrims! Join in!';
   }
 }
@@ -2625,12 +2766,17 @@ function submitStreamAd() {
     showToast("Please fill in the streamer name and URL!", "warning");
     return;
   }
+
+  let finalUrl = url;
+  if (author.toLowerCase().includes('rester') || url.toLowerCase().includes('resteraltv')) {
+    finalUrl = 'https://twitch.tv/resteral';
+  }
   
   const newAd = {
     id: 'STREAM-' + Math.random().toString(36).substr(2, 5).toUpperCase(),
     author,
     platform,
-    url,
+    url: finalUrl,
     title,
     isLive: true
   };
@@ -2671,12 +2817,49 @@ function renderStreamsList() {
           </div>
           <div style="font-size:0.75rem; color:var(--dc-text-muted); text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width: 260px;">${s.title}</div>
         </div>
-        <a href="${s.url}" target="_blank" class="btn btn-secondary" style="font-size:0.75rem; padding:4px 8px; margin:0; display:flex; align-items:center; gap:4px; text-decoration:none; color:white;">
-          ${platformEmoji} Watch
-        </a>
+        <button onclick="watchStreamEmbedded('${s.id}')" class="btn btn-secondary" style="font-size:0.75rem; padding:4px 8px; margin:0; display:flex; align-items:center; gap:4px; color:white; cursor:pointer;">
+          ${platformEmoji} Watch Live
+        </button>
       </div>
     `;
   }).join('');
+}
+
+function watchStreamEmbedded(streamId) {
+  const list = appState.advertisedStreams || [];
+  const stream = list.find(s => s.id === streamId);
+  if (!stream) return;
+
+  const playerContainer = document.getElementById('live-stream-player-container');
+  const iframe = document.getElementById('live-stream-player-iframe');
+  if (!playerContainer || !iframe) return;
+
+  let embedUrl = '';
+  if (stream.platform === 'twitch') {
+    const channel = stream.url.substring(stream.url.lastIndexOf('/') + 1);
+    const parentDomain = window.location.hostname || 'localhost';
+    embedUrl = `https://player.twitch.tv/?channel=${channel}&parent=${parentDomain}&autoplay=true&muted=false`;
+  } else if (stream.platform === 'kick') {
+    const channel = stream.url.substring(stream.url.lastIndexOf('/') + 1);
+    embedUrl = `https://player.kick.com/${channel}`;
+  } else {
+    embedUrl = stream.url;
+  }
+
+  iframe.src = embedUrl;
+  playerContainer.style.display = 'block';
+  playerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  showToast(`Loading ${stream.author}'s live stream player...`, "success");
+}
+
+function closeEmbeddedStream() {
+  const playerContainer = document.getElementById('live-stream-player-container');
+  const iframe = document.getElementById('live-stream-player-iframe');
+  if (playerContainer && iframe) {
+    iframe.src = '';
+    playerContainer.style.display = 'none';
+    showToast("Embedded player closed.", "info");
+  }
 }
 
 // ==========================================
@@ -2693,7 +2876,7 @@ function openDiscordOAuthModal() {
   if (select) {
     select.innerHTML = players.map(p => `
       <option value="${p.username}" ${appState.currentUser === p.username ? 'selected' : ''}>
-        ${p.avatar || '👤'} ${p.username} (Avg ELO: ${Math.round(((p.games.arkheron?.elo || 1000) + (p.games.hockey?.elo || 1000) + (p.games.zealot?.elo || 1000)) / 3)})
+        ${p.avatar || '👤'} ${p.username} (Avg ELO: ${Math.round(((p.games.arkheron?.elo || 1000) + (p.games.cs?.elo || 1000) + (p.games.zealot?.elo || 1000)) / 3)})
       </option>
     `).join('');
   }
@@ -2863,7 +3046,7 @@ async function signInWithSupabaseEmail() {
         referralsCount: 0,
         games: {
           arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-          hockey: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
+          cs: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
           zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] }
         }
       };
@@ -2947,6 +3130,7 @@ function applyReferralCode(newUsername, code) {
     const referrer = players.find(p => p.username.toLowerCase() === referrerName.toLowerCase());
     if (referrer) {
       referrer.referralsCount = (referrer.referralsCount || 0) + 1;
+      referrer.coins = (referrer.coins || 500) + 150;
       GAMES.forEach(g => {
         if (referrer.games[g]) {
           referrer.games[g].elo += 15;
@@ -2955,7 +3139,8 @@ function applyReferralCode(newUsername, code) {
           }
         }
       });
-      showToast(`Referral code applied! Partner ${referrer.username} received +15 ELO!`, "success");
+      savePlayersToStorage();
+      showToast(`Referral code applied! Partner ${referrer.username} received +15 ELO & +150 Coins!`, "success");
       
       setTimeout(() => {
         const chatMsgContainer = document.getElementById('chat-messages');
@@ -3008,3 +3193,1485 @@ function signInWithDiscordOAuth() {
     openDiscordOAuthModal();
   }
 }
+
+// ==========================================
+// 📅 EVENT CALENDAR & TOURNAMENT INTERACTION
+// ==========================================
+let calendarDate = new Date();
+let calendarSelectedDate = new Date();
+
+// Load or seed events list
+let calendarEvents = JSON.parse(localStorage.getItem('custom_lobbies_calendar_events')) || [
+  {
+    id: 'EV-ARK-WEEKLY',
+    name: '🏆 Arkheron Weekly Tournament',
+    game: 'arkheron',
+    isTournament: true,
+    date: new Date().toISOString().split('T')[0] // today
+  },
+  {
+    id: 'EV-1',
+    name: '🏆 Counter-Strike 5v5 Monthly Cup Draft',
+    game: 'cs',
+    isTournament: true,
+    date: new Date(Date.now() + 86400000 * 4).toISOString().split('T')[0] // 4 days from now
+  },
+  {
+    id: 'EV-2',
+    name: '🧜 Arkheron Team Practice Scrim',
+    game: 'arkheron',
+    isTournament: false,
+    date: new Date(Date.now() + 86400000 * 1).toISOString().split('T')[0] // tomorrow
+  },
+  {
+    id: 'EV-3',
+    name: '🛡️ Zealot Mod Arena Matches',
+    game: 'zealot',
+    isTournament: false,
+    date: new Date(Date.now() + 86400000 * 6).toISOString().split('T')[0] // 6 days from now
+  }
+];
+
+function saveCalendarEvents() {
+  localStorage.setItem('custom_lobbies_calendar_events', JSON.stringify(calendarEvents));
+}
+
+function renderCalendar() {
+  const monthYearEl = document.getElementById('calendar-month-year');
+  const gridEl = document.getElementById('calendar-grid');
+  if (!monthYearEl || !gridEl) return;
+
+  const year = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  monthYearEl.textContent = `${monthNames[month]} ${year}`;
+
+  gridEl.innerHTML = '';
+
+  // First day of month
+  const firstDay = new Date(year, month, 1).getDay();
+  // Total days in month
+  const totalDays = new Date(year, month + 1, 0).getDate();
+
+  // Empty cells for days before the 1st
+  for (let i = 0; i < firstDay; i++) {
+    const emptyCell = document.createElement('div');
+    emptyCell.style.height = '64px';
+    gridEl.appendChild(emptyCell);
+  }
+
+  // Populate days
+  for (let day = 1; day <= totalDays; day++) {
+    const dayCell = document.createElement('div');
+    dayCell.className = 'calendar-day-cell';
+    dayCell.style.cssText = `
+      height: 64px;
+      border: 1px solid var(--db-border);
+      border-radius: 4px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      cursor: pointer;
+      background: var(--db-bg);
+      position: relative;
+      transition: all 0.2s ease;
+    `;
+
+    const dayNum = document.createElement('span');
+    dayNum.textContent = day;
+    dayNum.style.fontWeight = 'bold';
+    dayNum.style.fontSize = '0.85rem';
+    dayNum.style.color = 'white';
+    dayCell.appendChild(dayNum);
+
+    // Is this day selected?
+    const cellDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const selectedDateStr = calendarSelectedDate.toISOString().split('T')[0];
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    if (cellDateStr === selectedDateStr) {
+      dayCell.style.border = '2px solid #ca8a04';
+      dayCell.style.background = 'rgba(202, 138, 4, 0.1)';
+    } else if (cellDateStr === todayStr) {
+      dayCell.style.border = '2px solid var(--db-primary)';
+      dayCell.style.background = 'rgba(124, 58, 237, 0.1)';
+    }
+
+    // Check events on this day
+    const dayEvents = calendarEvents.filter(e => e.date === cellDateStr);
+    if (dayEvents.length > 0) {
+      const dotsContainer = document.createElement('div');
+      dotsContainer.style.display = 'flex';
+      dotsContainer.style.gap = '3px';
+      dotsContainer.style.marginTop = '4px';
+      
+      dayEvents.forEach(e => {
+        const dot = document.createElement('span');
+        dot.style.cssText = `
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          display: inline-block;
+        `;
+        if (e.game === 'cs') dot.style.background = '#10b981'; // Green for CS
+        else if (e.game === 'arkheron') dot.style.background = '#a78bfa'; // Purple for Arkheron
+        else dot.style.background = '#fbbf24'; // Yellow for Zealot
+        dotsContainer.appendChild(dot);
+      });
+      dayCell.appendChild(dotsContainer);
+    }
+
+    dayCell.onclick = () => {
+      calendarSelectedDate = new Date(year, month, day);
+      renderCalendar();
+      renderSelectedDayEvents();
+    };
+
+    gridEl.appendChild(dayCell);
+  }
+
+  renderSelectedDayEvents();
+}
+
+function prevMonth() {
+  calendarDate.setMonth(calendarDate.getMonth() - 1);
+  renderCalendar();
+}
+
+function nextMonth() {
+  calendarDate.setMonth(calendarDate.getMonth() + 1);
+  renderCalendar();
+}
+
+function renderSelectedDayEvents() {
+  const badgeEl = document.getElementById('calendar-selected-day-badge');
+  const containerEl = document.getElementById('calendar-day-events');
+  if (!badgeEl || !containerEl) return;
+
+  const dateStr = calendarSelectedDate.toISOString().split('T')[0];
+  badgeEl.textContent = dateStr;
+
+  const dayEvents = calendarEvents.filter(e => e.date === dateStr);
+  if (dayEvents.length === 0) {
+    containerEl.innerHTML = `
+      <div style="text-align: center; color: var(--dc-text-muted); font-size: 0.75rem; padding: 20px 0;">
+        No events scheduled for this date.
+      </div>
+    `;
+    return;
+  }
+
+  containerEl.innerHTML = dayEvents.map(e => {
+    let gameBadge = `<span class="badge" style="background:#ca8a04; font-size:0.6rem; padding:2px 4px; margin:0;">Zealot</span>`;
+    if (e.game === 'cs') gameBadge = `<span class="badge" style="background:#10b981; font-size:0.6rem; padding:2px 4px; margin:0;">CS 5v5</span>`;
+    else if (e.game === 'arkheron') gameBadge = `<span class="badge" style="background:#8b5cf6; font-size:0.6rem; padding:2px 4px; margin:0;">Arkheron</span>`;
+
+    const actionButton = e.isTournament 
+      ? `<button onclick="joinTournamentFromCalendar('${e.game}')" class="btn btn-primary" style="margin-top:8px; font-size:0.75rem; padding:6px 10px; width:100%; height:auto; background:linear-gradient(135deg, #8b5cf6, #7c3aed); border-color:#8b5cf6;">🏆 Join Tournament Pool & Play</button>`
+      : '';
+
+    return `
+      <div style="padding: 10px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); display: flex; flex-direction: column; gap: 4px; position: relative;">
+        <div style="font-weight: bold; font-size: 0.8rem; color: white; padding-right: 20px;">${e.name}</div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          ${gameBadge}
+          <span style="font-size:0.65rem; color: var(--dc-text-muted);">${e.isTournament ? 'Official Tournament' : 'Scrim Match'}</span>
+        </div>
+        ${actionButton}
+        <button onclick="deleteCalendarEvent('${e.id}')" style="position: absolute; top: 6px; right: 6px; background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem;" title="Cancel Event">🗑️</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function addNewCalendarEvent() {
+  const nameInput = document.getElementById('event-name-input');
+  const gameSelect = document.getElementById('event-game-select');
+  const dateInput = document.getElementById('event-date-input');
+
+  const name = nameInput.value.trim();
+  const game = gameSelect.value;
+  const date = dateInput.value;
+
+  if (!name || !date) {
+    showToast("Please fill in event name and date!", "warning");
+    return;
+  }
+
+  const newEvent = {
+    id: 'EV-' + Math.random().toString(36).substr(2, 5).toUpperCase(),
+    name,
+    game,
+    isTournament: name.toLowerCase().includes('tournament') || name.toLowerCase().includes('cup'),
+    date
+  };
+
+  calendarEvents.push(newEvent);
+  saveCalendarEvents();
+  nameInput.value = '';
+  dateInput.value = '';
+
+  showToast("Custom event scheduled!", "success");
+  renderCalendar();
+}
+
+function deleteCalendarEvent(id) {
+  calendarEvents = calendarEvents.filter(e => e.id !== id);
+  saveCalendarEvents();
+  showToast("Event cancelled successfully.", "info");
+  renderCalendar();
+}
+
+function joinTournamentFromCalendar(game) {
+  let t = appState.tournaments.find(tour => tour.game === game && tour.status !== 'complete');
+  if (!t) {
+    t = {
+      id: 'TOUR-' + Math.random().toString(36).substr(2, 5).toUpperCase(),
+      name: game === 'arkheron' ? 'Weekly Arkheron Championship' : 'Counter-Strike Open Cup',
+      game: game,
+      type: 'snake',
+      numTeams: 2,
+      isMonthly: false,
+      status: 'signup',
+      pool: [],
+      checkedIn: [],
+      captains: [],
+      teams: {},
+      budgets: {},
+      nominationTurn: null,
+      pickSequence: [],
+      pickIdx: 0,
+      currentBidding: { player: null, highestBidder: null, highestBid: 0, timer: null }
+    };
+    appState.tournaments.push(t);
+  }
+  appState.activeTournamentId = t.id;
+
+  if (!t.pool.includes(appState.currentUser)) {
+    t.pool.push(appState.currentUser);
+  }
+
+  showToast(`Joined the pool for ${t.name}!`, "success");
+  switchTab('tournaments');
+}
+
+// ==========================================
+// 🎰 COIN CASINO & PROFILE REWARDS SYSTEM
+// ==========================================
+let activeMatchBet = null;
+
+function updateCoinsUI() {
+  const me = players.find(p => p.username === appState.currentUser);
+  if (!me) return;
+
+  me.coins = me.coins || 500;
+  me.unlockedRewards = me.unlockedRewards || [];
+
+  const coinEl = document.getElementById('header-coins-amount');
+  if (coinEl) coinEl.textContent = me.coins;
+
+  // Update Shop Reward Buttons
+  const rewards = [
+    { id: 'theme-gold', btnId: 'shop-btn-theme-gold', cost: 500 },
+    { id: 'theme-green', btnId: 'shop-btn-theme-green', cost: 1000 },
+    { id: 'badge-vip', btnId: 'shop-btn-badge-vip', cost: 1200 },
+    { id: 'badge-chal', btnId: 'shop-btn-badge-chal', cost: 1800 }
+  ];
+
+  rewards.forEach(r => {
+    const btn = document.getElementById(r.btnId);
+    if (btn) {
+      if (me.unlockedRewards.includes(r.id)) {
+        btn.textContent = '✅ Unlocked';
+        btn.disabled = true;
+        btn.style.cssText = 'background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #10b981; font-size: 0.7rem; padding: 4px 8px; cursor: default;';
+      } else {
+        btn.textContent = `🪙 ${r.cost}`;
+        btn.disabled = false;
+        if (me.coins < r.cost) {
+          btn.style.cssText = 'background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #f87171; font-size: 0.7rem; padding: 4px 8px; cursor: pointer;';
+        } else {
+          btn.style.cssText = 'background: rgba(251, 191, 36, 0.15); border-color: #fbbf24; color: #fbbf24; font-size: 0.7rem; padding: 4px 8px; cursor: pointer;';
+        }
+      }
+    }
+  });
+
+  // Render live match betting widget
+  renderMatchBettingWidget();
+}
+
+function claimHourlyCoins() {
+  const me = players.find(p => p.username === appState.currentUser);
+  if (!me) return;
+
+  const now = Date.now();
+  const lastClaimed = parseInt(localStorage.getItem('coins_last_claimed') || '0');
+  const cooldown = 3600 * 1000; // 1 hour
+
+  if (now - lastClaimed < cooldown) {
+    const minLeft = Math.ceil((cooldown - (now - lastClaimed)) / 60000);
+    showToast(`Claim cooling down! Please wait ${minLeft} minutes.`, "warning");
+    return;
+  }
+
+  me.coins = (me.coins || 500) + 50;
+  localStorage.setItem('coins_last_claimed', String(now));
+  savePlayersToStorage();
+  showToast("Claimed +50 Free Scrim Coins! 🪙", "success");
+  updateCoinsUI();
+}
+
+function buyShopReward(rewardId, cost) {
+  const me = players.find(p => p.username === appState.currentUser);
+  if (!me) return;
+
+  me.coins = me.coins || 500;
+  me.unlockedRewards = me.unlockedRewards || [];
+
+  if (me.unlockedRewards.includes(rewardId)) return;
+
+  if (me.coins < cost) {
+    showToast("Insufficient Scrim Coins! Play matchmaking or Casino games.", "warning");
+    return;
+  }
+
+  me.coins -= cost;
+  me.unlockedRewards.push(rewardId);
+  
+  // Set theme colors directly if theme unlocked
+  if (rewardId === 'theme-gold') me.color = '#fbbf24';
+  if (rewardId === 'theme-green') me.color = '#10b981';
+
+  savePlayersToStorage();
+  showToast("Reward successfully unlocked!", "success");
+  updateCoinsUI();
+  renderProfilesTab();
+}
+
+function playCoinFlip() {
+  const choice = document.getElementById('coin-choice-select').value;
+  const betInput = document.getElementById('coin-bet-input');
+  const bet = parseInt(betInput.value);
+
+  const me = players.find(p => p.username === appState.currentUser);
+  if (!me) return;
+
+  me.coins = me.coins || 500;
+
+  if (isNaN(bet) || bet < 10) {
+    showToast("Minimum casino bet is 10 Coins!", "warning");
+    return;
+  }
+  if (bet > me.coins) {
+    showToast("Insufficient coins for this wager!", "warning");
+    return;
+  }
+
+  const coinVisual = document.getElementById('coin-visual');
+  coinVisual.style.transform = 'rotateY(1080deg)';
+  
+  setTimeout(() => {
+    const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
+    coinVisual.textContent = outcome === 'heads' ? '👑' : '🛡️';
+    coinVisual.style.transform = 'rotateY(0deg)';
+
+    if (outcome === choice) {
+      me.coins += bet;
+      showToast(`🎉 You Won +${bet} Coins! Coin landed on ${outcome.toUpperCase()}!`, "success");
+    } else {
+      me.coins -= bet;
+      showToast(`😢 You Lost -${bet} Coins. Coin landed on ${outcome.toUpperCase()}.`, "warning");
+    }
+
+    savePlayersToStorage();
+    updateCoinsUI();
+  }, 800);
+}
+
+function spinSlots() {
+  const me = players.find(p => p.username === appState.currentUser);
+  if (!me) return;
+
+  me.coins = me.coins || 500;
+  const spinCost = 50;
+
+  if (me.coins < spinCost) {
+    showToast("Slot spins cost 50 Coins! Claim daily wagers.", "warning");
+    return;
+  }
+
+  me.coins -= spinCost;
+
+  const symbols = ['🍒', '🍊', '🔔', '💎', '🍇', '⭐'];
+  const r1 = symbols[Math.floor(Math.random() * symbols.length)];
+  const r2 = symbols[Math.floor(Math.random() * symbols.length)];
+  const r3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+  const reel1 = document.getElementById('slot-reel-1');
+  const reel2 = document.getElementById('slot-reel-2');
+  const reel3 = document.getElementById('slot-reel-3');
+
+  // Spinning rotation illusion
+  reel1.textContent = '🌀';
+  reel2.textContent = '🌀';
+  reel3.textContent = '🌀';
+
+  setTimeout(() => {
+    reel1.textContent = r1;
+    reel2.textContent = r2;
+    reel3.textContent = r3;
+
+    if (r1 === r2 && r2 === r3) {
+      // Jackpot match 3
+      me.coins += 500;
+      showToast(`🎰 JACKPOT! Match 3: Won +500 Coins!`, "success");
+    } else if (r1 === r2 || r2 === r3 || r1 === r3) {
+      // Match 2
+      me.coins += 100;
+      showToast(`🎉 Lucky Spin! Match 2: Won +100 Coins!`, "success");
+    } else {
+      showToast("No matches. Better luck next spin!", "info");
+    }
+
+    savePlayersToStorage();
+    updateCoinsUI();
+  }, 600);
+}
+
+// ==========================================
+// ⚔️ LIVE MATCH BETTING
+// ==========================================
+function placeMatchBet(betOn, amount) {
+  const me = players.find(p => p.username === appState.currentUser);
+  if (!me) return showToast("Log in to place match wagers!", "warning");
+
+  me.coins = me.coins || 500;
+  if (activeMatchBet) return showToast("You already placed a bet on this scrim!", "warning");
+  if (isNaN(amount) || amount < 10) return showToast("Minimum bet is 10 Coins!", "warning");
+  if (amount > me.coins) return showToast("Insufficient balance for this bet!", "warning");
+
+  me.coins -= amount;
+  activeMatchBet = { betOn, amount };
+  
+  savePlayersToStorage();
+  showToast(`Bet of ${amount} coins successfully placed!`, "success");
+  updateCoinsUI();
+}
+
+function renderMatchBettingWidget() {
+  const container = document.getElementById('betting-scrim-container');
+  const badge = document.getElementById('betting-status-badge');
+  if (!container || !badge) return;
+
+  const isDraft = appState.draft && appState.draft.active;
+  const isMatch = appState.match && appState.match.active;
+
+  if (!isDraft && !isMatch) {
+    badge.textContent = 'NO MATCH';
+    badge.style.background = 'var(--dc-bg-sidebar)';
+    container.innerHTML = `
+      <div style="text-align: center; color: var(--dc-text-muted); font-size: 0.8rem; padding: 24px 0;">
+        📡 No active matchmaking drafts or scrims to bet on.<br>
+        <span style="font-size:0.7rem; color: #a78bfa;">Wagers become open once a queue fills and teams start drafting!</span>
+      </div>
+    `;
+    return;
+  }
+
+  badge.textContent = 'LIVE SCRIM';
+  badge.style.background = '#ca8a04';
+
+  const capA = appState.draft.captains[0];
+  const capB = appState.draft.captains[1];
+  const teamAPlayers = appState.draft.teams.teamA.players || [capA];
+  const teamBPlayers = appState.draft.teams.teamB.players || [capB];
+
+  if (activeMatchBet) {
+    const sideText = activeMatchBet.betOn === 'alpha' ? `Team ${capA} (Alpha)` : `Team ${capB} (Beta)`;
+    container.innerHTML = `
+      <div style="background: rgba(202,138,4,0.1); border: 1.5px dashed #ca8a04; border-radius: 6px; padding: 12px; text-align: center;">
+        <span style="font-size: 1.5rem; display:block; margin-bottom:4px;">🔒</span>
+        <strong>Bet Confirmed:</strong> Wagered <code style="color:#fbbf24; font-weight:bold;">${activeMatchBet.amount} Coins</code> on <strong>${sideText}</strong>.
+        <div style="font-size: 0.7rem; color: var(--dc-text-muted); margin-top: 6px;">Odds: 2.0x. Payout will resolve automatically when the simulation completes.</div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+        <div style="padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid var(--db-border);">
+          <div style="font-weight:bold; color: #a78bfa; margin-bottom:4px;">Team Alpha</div>
+          <div style="font-size:0.7rem; color: var(--dc-text-muted); line-height: 1.4;">
+            Captain: <strong>${capA}</strong><br>
+            Roster: ${teamAPlayers.join(', ')}
+          </div>
+          <button class="btn btn-primary" onclick="placeMatchBet('alpha', parseInt(document.getElementById('bet-scrim-amount-input').value))" style="width:100%; margin-top:8px; font-size:0.7rem; padding:4px; height:auto;">Bet Alpha</button>
+        </div>
+        <div style="padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid var(--db-border);">
+          <div style="font-weight:bold; color: #10b981; margin-bottom:4px;">Team Beta</div>
+          <div style="font-size:0.7rem; color: var(--dc-text-muted); line-height: 1.4;">
+            Captain: <strong>${capB}</strong><br>
+            Roster: ${teamBPlayers.join(', ')}
+          </div>
+          <button class="btn btn-primary" onclick="placeMatchBet('beta', parseInt(document.getElementById('bet-scrim-amount-input').value))" style="width:100%; margin-top:8px; font-size:0.7rem; padding:4px; height:auto; background:#10b981; border-color:#10b981;">Bet Beta</button>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; justify-content:center;">
+        <label style="font-size:0.75rem; font-weight:bold; color: white;">WAGER COINS:</label>
+        <input type="number" id="bet-scrim-amount-input" value="100" min="10" max="5000" style="width: 100px; padding: 4px 8px; border-radius: 4px; border:1px solid var(--db-border); background: var(--db-bg); color:white; font-size:0.8rem; font-weight:bold; text-align:center;">
+      </div>
+    `;
+  }
+}
+
+// ==========================================
+// 🔍 MULTI-GAME STATS SEARCH DESK
+// ==========================================
+function hashStringToInt(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash);
+}
+
+function searchPlayerMultiStats() {
+  const inputEl = document.getElementById('stats-lookup-search-input');
+  const gameSelect = document.getElementById('stats-lookup-game-select');
+  const resultEl = document.getElementById('stats-lookup-result');
+  if (!inputEl || !gameSelect || !resultEl) return;
+
+  const searchQuery = inputEl.value.trim();
+  const selectedGame = gameSelect.value;
+
+  if (!searchQuery) {
+    showToast("Please enter a player handle to search!", "warning");
+    return;
+  }
+
+  // Find local user or mock user details
+  let dbPlayer = players.find(p => p.username.toLowerCase() === searchQuery.toLowerCase()) || 
+                 MOCK_PLAYERS_POOL.find(p => p.username.toLowerCase() === searchQuery.toLowerCase());
+
+  const username = dbPlayer ? dbPlayer.username : searchQuery;
+  const avatar = dbPlayer ? (dbPlayer.avatar || '👤') : '👤';
+  const seed = hashStringToInt(username);
+
+  resultEl.style.display = 'block';
+
+  let htmlContent = '';
+
+  if (selectedGame === 'arkheron') {
+    const elo = dbPlayer ? (dbPlayer.games.arkheron?.elo || 1000) : (1000 + (seed % 350) - 100);
+    const wins = dbPlayer ? (dbPlayer.games.arkheron?.wins || 0) : (5 + (seed % 25));
+    const losses = dbPlayer ? (dbPlayer.games.arkheron?.losses || 0) : (5 + (seed % 20));
+    const winrate = wins + losses > 0 ? Math.round((wins / (wins + losses)) * 100) : 50;
+    const characters = ['Leodin', 'Valkyrie', 'Zealot Warrior', 'Tofu Defender', 'Ascended Mage'];
+    const favChar = characters[seed % characters.length];
+
+    htmlContent = `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.8rem;">${avatar}</span>
+          <div>
+            <h4 style="margin:0; font-size:1.05rem; color:white; text-align:left;">${username}</h4>
+            <span style="font-size:0.7rem; color:var(--dc-text-muted); display:block; text-align:left;">Arkheron Mod Desk</span>
+          </div>
+        </div>
+        <span class="badge" style="background:#8b5cf6; margin:0;">🧜 Arkheron Mod</span>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; align-items:center;">
+        <div style="text-align:center; padding:12px; background:rgba(0,0,0,0.2); border-radius:6px; border:1px solid rgba(255,255,255,0.04);">
+          <div style="font-size:0.7rem; color:var(--dc-text-muted); text-transform:uppercase; font-weight:bold;">Matchmaking ELO</div>
+          <div style="font-size:2rem; font-weight:800; color:#fbbf24; margin:4px 0;">${elo}</div>
+          <div style="font-size:0.7rem; color:var(--dc-text-muted);">Wins: ${wins} / Losses: ${losses}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem; text-align:left;">
+          <div>📊 **Win Rate:** <strong style="color:white;">${winrate}%</strong></div>
+          <div>🧝 **Main Hero:** <strong style="color:white;">${favChar}</strong></div>
+          <div>📈 **League Tier:** <strong style="color:#a78bfa;">${elo >= 1200 ? 'Ascended Gold' : (elo >= 1050 ? 'Elite Challenger' : 'Acolyte Arena')}</strong></div>
+        </div>
+      </div>
+    `;
+  }
+
+  else if (selectedGame === 'cs') {
+    const elo = dbPlayer ? (dbPlayer.games.cs?.elo || 1000) : (1000 + (seed % 450) - 150);
+    const wins = dbPlayer ? (dbPlayer.games.cs?.wins || 0) : (12 + (seed % 40));
+    const losses = dbPlayer ? (dbPlayer.games.cs?.losses || 0) : (10 + (seed % 35));
+    const winrate = wins + losses > 0 ? Math.round((wins / (wins + losses)) * 100) : 50;
+    
+    let rank = 'Gold Nova Master';
+    if (elo < 900) rank = 'Silver IV';
+    else if (elo >= 1050 && elo < 1200) rank = 'Legendary Eagle';
+    else if (elo >= 1200 && elo < 1350) rank = 'Supreme Master First Class';
+    else if (elo >= 1350) rank = '👑 Global Elite';
+
+    const weapons = ['AK-47', 'M4A4', 'AWP', 'Desert Eagle'];
+    const favWeapon = weapons[seed % weapons.length];
+    const kd = (1.0 + (seed % 80) / 100).toFixed(2);
+
+    htmlContent = `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.8rem;">${avatar}</span>
+          <div>
+            <h4 style="margin:0; font-size:1.05rem; color:white; text-align:left;">${username}</h4>
+            <span style="font-size:0.7rem; color:var(--dc-text-muted); display:block; text-align:left;">CS:GO / CS2 Portal</span>
+          </div>
+        </div>
+        <span class="badge" style="background:#10b981; margin:0;">🔫 CS 5v5 Scrims</span>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; align-items:center;">
+        <div style="text-align:center; padding:12px; background:rgba(0,0,0,0.2); border-radius:6px; border:1px solid rgba(255,255,255,0.04);">
+          <div style="font-size:0.7rem; color:var(--dc-text-muted); text-transform:uppercase; font-weight:bold;">CS ELO Rating</div>
+          <div style="font-size:2rem; font-weight:800; color:#10b981; margin:4px 0;">${elo}</div>
+          <div style="font-size:0.75rem; color:white; font-weight:bold;">${rank}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem; text-align:left;">
+          <div>📊 **Win Rate:** <strong style="color:white;">${winrate}%</strong> (W: ${wins} / L: ${losses})</div>
+          <div>🎯 **K/D Ratio:** <strong style="color:#10b981;">${kd}</strong></div>
+          <div>🔫 **Fav Weapon:** <strong style="color:white;">${favWeapon}</strong></div>
+        </div>
+      </div>
+    `;
+  }
+
+  else if (selectedGame === 'lol') {
+    const ranks = ['Gold III', 'Platinum II', 'Diamond IV', 'Master', 'Grandmaster', 'Challenger'];
+    const rank = ranks[seed % ranks.length];
+    const lp = (seed % 800) + 12;
+    const wins = (seed % 150) + 50;
+    const losses = (seed % 130) + 45;
+    const winrate = Math.round((wins / (wins + losses)) * 100);
+    const champs = ['Yasuo', 'Lee Sin', 'Jinx', 'Thresh', 'Ahri', 'Lux', 'Zed'];
+    const favChamp = champs[seed % champs.length];
+    const k = (2 + (seed % 8)).toFixed(1);
+    const d = (1 + (seed % 5)).toFixed(1);
+    const a = (4 + (seed % 10)).toFixed(1);
+
+    htmlContent = `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.8rem;">${avatar}</span>
+          <div>
+            <h4 style="margin:0; font-size:1.05rem; color:white; text-align:left;">${username}</h4>
+            <span style="font-size:0.7rem; color:var(--dc-text-muted); display:block; text-align:left;">Riot Games LoL API Desk</span>
+          </div>
+        </div>
+        <span class="badge" style="background:#3b82f6; margin:0;">🏆 League of Legends</span>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; align-items:center;">
+        <div style="text-align:center; padding:12px; background:rgba(0,0,0,0.2); border-radius:6px; border:1px solid rgba(255,255,255,0.04);">
+          <div style="font-size:0.7rem; color:var(--dc-text-muted); text-transform:uppercase; font-weight:bold;">Tier / LP</div>
+          <div style="font-size:1.3rem; font-weight:800; color:#3b82f6; margin:4px 0;">${rank}</div>
+          <div style="font-size:0.75rem; color:white; font-weight:bold;">${lp} LP</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem; text-align:left;">
+          <div>📊 **Win Rate:** <strong style="color:white;">${winrate}%</strong> (${wins}W / ${losses}L)</div>
+          <div>⚔️ **KDA Ratio:** <strong style="color:#60a5fa;">${k} / ${d} / ${a}</strong></div>
+          <div>🌸 **Fav Champ:** <strong style="color:white;">${favChamp}</strong></div>
+        </div>
+      </div>
+    `;
+  }
+
+  else if (selectedGame === 'dota') {
+    const ranks = ['Archon II', 'Legend IV', 'Ancient III', 'Divine V', 'Immortal #542', 'Immortal #82'];
+    const rank = ranks[seed % ranks.length];
+    const mmr = 3000 + (seed % 5000);
+    const winrate = 48 + (seed % 14);
+    const heroes = ['Pudge', 'Invoker', 'Shadow Fiend', 'Crystal Maiden', 'Rubick', 'Anti-Mage'];
+    const favHero = heroes[seed % heroes.length];
+
+    htmlContent = `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.8rem;">${avatar}</span>
+          <div>
+            <h4 style="margin:0; font-size:1.05rem; color:white; text-align:left;">${username}</h4>
+            <span style="font-size:0.7rem; color:var(--dc-text-muted); display:block; text-align:left;">Valve Steam Dota2 API desk</span>
+          </div>
+        </div>
+        <span class="badge" style="background:#f43f5e; margin:0;">⭐ Dota 2</span>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; align-items:center;">
+        <div style="text-align:center; padding:12px; background:rgba(0,0,0,0.2); border-radius:6px; border:1px solid rgba(255,255,255,0.04);">
+          <div style="font-size:0.7rem; color:var(--dc-text-muted); text-transform:uppercase; font-weight:bold;">Competitive Medal</div>
+          <div style="font-size:1.35rem; font-weight:800; color:#ef4444; margin:4px 0;">${rank}</div>
+          <div style="font-size:0.75rem; color:white; font-weight:bold;">${mmr} MMR</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem; text-align:left;">
+          <div>📊 **Win Rate:** <strong style="color:white;">${winrate}%</strong></div>
+          <div>🧙 **Most Picked Hero:** <strong style="color:white;">${favHero}</strong></div>
+          <div>🎮 **Match Quality:** <strong style="color:#f43f5e;">Ranked Roles</strong></div>
+        </div>
+      </div>
+    `;
+  }
+
+  else if (selectedGame === 'r6') {
+    const ranks = ['Silver I', 'Gold III', 'Platinum II', 'Diamond IV', 'Champion #89'];
+    const rank = ranks[seed % ranks.length];
+    const rp = (seed % 400) + 1200;
+    const kd = (0.8 + (seed % 90) / 100).toFixed(2);
+    const winrate = 47 + (seed % 16);
+    const attackers = ['Ash', 'Ace', 'Thermite', 'Buck'];
+    const defenders = ['Jäger', 'Lesion', 'Smoke', 'Wamai'];
+    const favAtk = attackers[seed % attackers.length];
+    const favDef = defenders[seed % defenders.length];
+
+    htmlContent = `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.8rem;">${avatar}</span>
+          <div>
+            <h4 style="margin:0; font-size:1.05rem; color:white; text-align:left;">${username}</h4>
+            <span style="font-size:0.7rem; color:var(--dc-text-muted); display:block; text-align:left;">Ubisoft Connect R6 Stats</span>
+          </div>
+        </div>
+        <span class="badge" style="background:#fbbf24; color:black; margin:0;">🛡️ R6 Siege</span>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; align-items:center;">
+        <div style="text-align:center; padding:12px; background:rgba(0,0,0,0.2); border-radius:6px; border:1px solid rgba(255,255,255,0.04);">
+          <div style="font-size:0.7rem; color:var(--dc-text-muted); text-transform:uppercase; font-weight:bold;">Rank Points</div>
+          <div style="font-size:1.4rem; font-weight:800; color:#fbbf24; margin:4px 0;">${rank}</div>
+          <div style="font-size:0.75rem; color:white; font-weight:bold;">${rp} RP</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem; text-align:left;">
+          <div>📊 **Win Rate:** <strong style="color:white;">${winrate}%</strong></div>
+          <div>🎯 **K/D Ratio:** <strong style="color:#fbbf24;">${kd}</strong></div>
+          <div>🔫 **Fav Ops:** <strong style="color:white;">${favAtk} / ${favDef}</strong></div>
+        </div>
+      </div>
+    `;
+  }
+
+}
+
+// ==========================================
+// 🏃 RUNNER CLICKER GAME ENGINE
+// ==========================================
+
+const RUNNER_SHOP = [
+  { id: 'runner-default', name: 'Default Sprinter', emoji: '🏃', multiplier: 1, cost: 0 },
+  { id: 'runner-ninja', name: 'Cybernetic Ninja', emoji: '🥷', multiplier: 2, cost: 200 },
+  { id: 'runner-gladiator', name: 'Golden Gladiator', emoji: '🛡️', multiplier: 5, cost: 600 },
+  { id: 'runner-astronaut', name: 'Cosmic Astronaut', emoji: '🚀', multiplier: 10, cost: 1500 },
+  { id: 'runner-hockey', name: 'Zealot Hockey Player', emoji: '🏒', multiplier: 25, cost: 4000 }
+];
+
+const LOOT_ITEMS = [
+  // Common (60% weight)
+  { id: 'item-water', name: 'Water Bottle', rarity: 'common', color: '#9ca3af', baseValue: 50 },
+  { id: 'item-band', name: 'Sweatband', rarity: 'common', color: '#9ca3af', baseValue: 50 },
+  { id: 'item-socks', name: 'Compression Socks', rarity: 'common', color: '#9ca3af', baseValue: 60 },
+  // Rare (25% weight)
+  { id: 'item-cleats', name: 'Track Cleats', rarity: 'rare', color: '#3b82f6', baseValue: 150 },
+  { id: 'item-gel', name: 'Energy Gel Pack', rarity: 'rare', color: '#3b82f6', baseValue: 150 },
+  { id: 'item-insoles', name: 'Carbon Insoles', rarity: 'rare', color: '#3b82f6', baseValue: 180 },
+  // Epic (12% weight)
+  { id: 'item-boots', name: 'Rocket Boots', rarity: 'epic', color: '#a78bfa', baseValue: 400 },
+  { id: 'item-jacket', name: 'Track Jacket', rarity: 'epic', color: '#a78bfa', baseValue: 400 },
+  // Legendary (3% weight)
+  { id: 'item-golden', name: 'Golden Shoes', rarity: 'legendary', color: '#fbbf24', baseValue: 1200 },
+  { id: 'item-chronos', name: 'Winged Sandals', rarity: 'legendary', color: '#fbbf24', baseValue: 1500 }
+];
+
+function getClickerState() {
+  let state = null;
+  try {
+    const raw = localStorage.getItem('custom_lobbies_clicker_state');
+    if (raw) state = JSON.parse(raw);
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (!state) {
+    state = {
+      clicks: 0,
+      clicksToDrop: 50,
+      activeRunner: 'runner-default',
+      unlockedRunners: ['runner-default'],
+      inventory: []
+    };
+  }
+  return state;
+}
+
+function saveClickerState(state) {
+  localStorage.setItem('custom_lobbies_clicker_state', JSON.stringify(state));
+}
+
+function clickRunnerCharacter() {
+  const state = getClickerState();
+  const runner = RUNNER_SHOP.find(r => r.id === state.activeRunner) || RUNNER_SHOP[0];
+  
+  // 1. Trigger Animation
+  const wrapper = document.getElementById('runner-sprite-wrapper');
+  if (wrapper) {
+    wrapper.style.transform = 'scale(0.8) rotate(-8deg)';
+    setTimeout(() => {
+      wrapper.style.transform = 'scale(1) rotate(0deg)';
+    }, 70);
+  }
+
+  // 2. Play synthesizer sound effect for running step
+  if (audioCtx) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(150 + Math.random() * 80, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.08);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.08);
+  }
+
+  // 3. Earn Coins
+  const coinsEarned = 1 * runner.multiplier;
+  const pl = players.find(p => p.username === appState.currentUser);
+  if (pl) {
+    pl.coins = (pl.coins || 0) + coinsEarned;
+    savePlayersToStorage();
+    updateCoinsUI();
+  }
+
+  // 4. Progress towards drop
+  state.clicks += runner.multiplier;
+  if (state.clicks >= state.clicksToDrop) {
+    state.clicks = 0;
+    
+    // Weighted drop
+    const roll = Math.random() * 100;
+    let selectedRarity = 'common';
+    if (roll < 3) selectedRarity = 'legendary';
+    else if (roll < 15) selectedRarity = 'epic';
+    else if (roll < 40) selectedRarity = 'rare';
+
+    const possible = LOOT_ITEMS.filter(item => item.rarity === selectedRarity);
+    const rolledItem = possible[Math.floor(Math.random() * possible.length)];
+    const dropped = {
+      ...rolledItem,
+      instanceId: 'DROP-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+      timestamp: new Date().toLocaleDateString()
+    };
+
+    state.inventory.push(dropped);
+    playSound('milestone');
+    
+    const rarityLabel = dropped.rarity.toUpperCase();
+    showToast(`🎉 LOOT DROP! Unlocked: [${rarityLabel}] ${dropped.name}!`, "success");
+    
+    // Send a message in Discord chat sidebar to make it feel alive!
+    writeMessage("LootBot", true, `🏃 **${appState.currentUser}** completed a clicker loop and dropped a **[${rarityLabel}] ${dropped.name}**!`, null);
+  }
+
+  saveClickerState(state);
+  renderClickerUI();
+}
+
+function renderClickerUI() {
+  const state = getClickerState();
+  const currentRunner = RUNNER_SHOP.find(r => r.id === state.activeRunner) || RUNNER_SHOP[0];
+
+  // Update target emoji
+  const emojiEl = document.getElementById('runner-sprite-emoji');
+  if (emojiEl) emojiEl.innerText = currentRunner.emoji;
+
+  // Update ratios
+  const ratioEl = document.getElementById('clicker-count-ratio');
+  if (ratioEl) ratioEl.innerText = `${state.clicks} / ${state.clicksToDrop}`;
+
+  const pctEl = document.getElementById('clicker-ratio-pct');
+  if (pctEl) {
+    const pct = Math.min(100, Math.round((state.clicks / state.clicksToDrop) * 100));
+    pctEl.innerText = `${pct}%`;
+    const bar = document.getElementById('clicker-drop-progress-bar');
+    if (bar) bar.style.width = `${pct}%`;
+  }
+
+  // Multiplier text
+  const multEl = document.getElementById('clicker-multiplier-text');
+  if (multEl) multEl.innerText = `${currentRunner.multiplier.toFixed(1)}x`;
+
+  const coinsTxt = document.getElementById('clicker-coins-text');
+  if (coinsTxt) coinsTxt.innerText = `+${currentRunner.multiplier}`;
+
+  // Render Runner Unlock Shop
+  const shopContainer = document.getElementById('clicker-shop-container');
+  const pl = players.find(p => p.username === appState.currentUser);
+  const userCoins = pl ? (pl.coins || 0) : 0;
+
+  if (shopContainer) {
+    shopContainer.innerHTML = RUNNER_SHOP.map(r => {
+      const isUnlocked = state.unlockedRunners.includes(r.id);
+      const isActive = state.activeRunner === r.id;
+      
+      let buttonHtml = '';
+      if (isActive) {
+        buttonHtml = `<button class="btn btn-secondary" style="font-size:0.75rem; padding:4px 8px; margin:0; cursor:default; background:rgba(16,185,129,0.1); border-color:#10b981; color:#10b981;">Equipped</button>`;
+      } else if (isUnlocked) {
+        buttonHtml = `<button class="btn btn-success" onclick="equipClickerRunner('${r.id}')" style="font-size:0.75rem; padding:4px 8px; margin:0;">Equip</button>`;
+      } else {
+        const canBuy = userCoins >= r.cost;
+        buttonHtml = `<button class="btn ${canBuy ? 'btn-primary' : 'btn-secondary'}" ${canBuy ? '' : 'disabled'} onclick="buyClickerRunner('${r.id}', ${r.cost})" style="font-size:0.75rem; padding:4px 8px; margin:0;">🪙 ${r.cost}</button>`;
+      }
+
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid var(--db-border); border-radius:6px; padding:10px 14px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.8rem;">${r.emoji}</span>
+            <div>
+              <strong style="color:white; font-size:0.8rem;">${r.name}</strong>
+              <div style="font-size:0.65rem; color:var(--dc-text-muted);">Multiplier: ${r.multiplier}x Earning Boost</div>
+            </div>
+          </div>
+          ${buttonHtml}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Render Inventory Drops Grid
+  const invGrid = document.getElementById('clicker-inventory-grid');
+  if (invGrid) {
+    if (state.inventory.length === 0) {
+      invGrid.style.display = 'block';
+      invGrid.innerHTML = `
+        <div style="text-align:center; color:var(--dc-text-muted); font-size:0.8rem; padding:40px 0;">
+          <span style="font-size:2rem; display:block; margin-bottom:8px;">🎒</span>
+          No drop cards collected yet. Click the running guy to fill the progress meter!
+        </div>
+      `;
+    } else {
+      invGrid.style.display = 'grid';
+      invGrid.innerHTML = state.inventory.map(item => {
+        return `
+          <div style="padding:10px; border-radius:6px; background:rgba(0,0,0,0.2); border:1.5px solid ${item.color}; display:flex; flex-direction:column; justify-content:space-between; align-items:center; text-align:center; gap:6px;">
+            <div style="font-weight:bold; font-size:0.75rem; color:white;">${item.name}</div>
+            <span style="font-size:0.55rem; padding:1px 4px; border-radius:3px; font-weight:bold; background:${item.color}; color:black; text-transform:uppercase;">${item.rarity}</span>
+            <button class="btn btn-primary" onclick="initiateClickerTrade('${item.instanceId}')" style="width:100%; font-size:0.65rem; padding:3px; margin:0; height:auto; background:#fbbf24; border-color:#fbbf24; color:black; font-weight:bold;">🤝 Trade</button>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+}
+
+function equipClickerRunner(runnerId) {
+  const state = getClickerState();
+  if (state.unlockedRunners.includes(runnerId)) {
+    state.activeRunner = runnerId;
+    saveClickerState(state);
+    playSound('click');
+    showToast("Runner equipped!", "success");
+    renderClickerUI();
+  }
+}
+
+function buyClickerRunner(runnerId, cost) {
+  const pl = players.find(p => p.username === appState.currentUser);
+  if (!pl || (pl.coins || 0) < cost) {
+    showToast("Not enough Scrim Coins!", "warning");
+    return;
+  }
+
+  const state = getClickerState();
+  if (!state.unlockedRunners.includes(runnerId)) {
+    pl.coins -= cost;
+    state.unlockedRunners.push(runnerId);
+    state.activeRunner = runnerId;
+    
+    savePlayersToStorage();
+    saveClickerState(state);
+    
+    playSound('milestone');
+    showToast("Successfully unlocked and equipped new runner!", "success");
+    updateCoinsUI();
+    renderClickerUI();
+  }
+}
+
+function initiateClickerTrade(instanceId) {
+  const state = getClickerState();
+  const item = state.inventory.find(i => i.instanceId === instanceId);
+  if (!item) return;
+
+  const tradeCard = document.getElementById('clicker-trade-card');
+  const detailsEl = document.getElementById('clicker-trade-details');
+  if (!tradeCard || !detailsEl) return;
+
+  // Select a random bot name to trade with
+  const botNames = ['Shroud', 'Ninja', 'Resteral.TV', 'Faker', 'Summit1g', 'LootGoblin', 'TowerGod'];
+  const activeBot = botNames[Math.floor(Math.random() * botNames.length)];
+  
+  // Calculate randomized bot coin offer (close to base value)
+  const multiplier = 0.85 + Math.random() * 0.35;
+  const offerCoins = Math.round(item.baseValue * multiplier);
+
+  appState.clickerTrade = {
+    instanceId: instanceId,
+    botName: activeBot,
+    offerAmount: offerCoins,
+    itemName: item.name
+  };
+
+  tradeCard.style.display = 'block';
+  detailsEl.innerHTML = `
+    🤖 <strong>${activeBot}</strong> wants to buy your <strong>${item.name}</strong>.<br>
+    Offer Amount: <strong style="color:#fbbf24;">🪙 ${offerCoins} Scrim Coins</strong>.<br>
+    Rarity: <span style="font-weight:bold; color:${item.color}; text-transform:uppercase;">${item.rarity}</span>
+  `;
+  playSound('match_found');
+}
+
+function acceptClickerTrade() {
+  const activeTrade = appState.clickerTrade;
+  if (!activeTrade) return;
+
+  const state = getClickerState();
+  const itemIndex = state.inventory.findIndex(i => i.instanceId === activeTrade.instanceId);
+  
+  if (itemIndex > -1) {
+    const item = state.inventory[itemIndex];
+    state.inventory.splice(itemIndex, 1);
+    
+    const pl = players.find(p => p.username === appState.currentUser);
+    if (pl) {
+      pl.coins = (pl.coins || 0) + activeTrade.offerAmount;
+      savePlayersToStorage();
+      updateCoinsUI();
+    }
+    
+    saveClickerState(state);
+    
+    // Hide Card
+    document.getElementById('clicker-trade-card').style.display = 'none';
+    appState.clickerTrade = null;
+    
+    playSound('milestone');
+    showToast(`Trade completed! Earned +${activeTrade.offerAmount} Coins.`, "success");
+    
+    // Post to persistent global Discord client sidebar!
+    writeMessage(activeTrade.botName, false, `🤝 Trade complete! Thanks for the **${activeTrade.itemName}**, ${appState.currentUser}. Clean transaction.`, null);
+    
+    renderClickerUI();
+  }
+}
+
+function declineClickerTrade() {
+  const activeTrade = appState.clickerTrade;
+  if (!activeTrade) return;
+
+  document.getElementById('clicker-trade-card').style.display = 'none';
+  appState.clickerTrade = null;
+  
+  playSound('click');
+  showToast("Trade proposal declined.", "info");
+
+  // Post to persistent Discord client sidebar!
+  writeMessage(activeTrade.botName, false, `Aw, maybe next time, ${appState.currentUser}! Let me know if you change your mind.`, null);
+}
+
+// ==========================================
+// 🔱 ARKHERON DEDICATED PAGE ENGINE
+// ==========================================
+
+let selectedArkheronHeroId = 'leodin';
+
+function renderArkheronTab() {
+  // 1. Hero Selection Grid
+  const gridContainer = document.getElementById('arkheron-hero-selection-grid');
+  if (gridContainer) {
+    gridContainer.innerHTML = ETERNALS.map(hero => {
+      const isSelected = hero.id === selectedArkheronHeroId;
+      return `
+        <button class="btn btn-secondary" onclick="selectArkheronCodexHero('${hero.id}')" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px 8px; gap:4px; height:auto; margin:0; background:${isSelected ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.02)'}; border: 1.5px solid ${isSelected ? '#8b5cf6' : 'var(--db-border)'}; box-shadow: ${isSelected ? '0 0 12px rgba(139,92,246,0.3)' : 'none'};">
+          <span style="font-size:1.8rem;">${hero.emoji}</span>
+          <strong style="color:white; font-size:0.8rem;">${hero.name}</strong>
+          <span style="font-size:0.65rem; color:var(--dc-text-muted);">${hero.role}</span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  // 2. Inspect Selected Hero Card
+  renderArkheronHeroInspectCard();
+
+  // 3. Relics List
+  const relicsContainer = document.getElementById('arkheron-relics-list');
+  if (relicsContainer) {
+    let relicsHtml = RELICS.map(r => {
+      return `
+        <div style="padding:10px; border-radius:6px; background:rgba(0,0,0,0.2); border:1px solid var(--db-border); text-align:left;">
+          <div style="font-weight:bold; color:#a78bfa; font-size:0.85rem; margin-bottom:2px;">${r.name}</div>
+          <div style="font-size:0.7rem; color:var(--dc-text-muted); margin-bottom:4px;">Set: <strong>${r.set}</strong> | Slot: ${r.slot}</div>
+          <div style="font-size:0.7rem; color:white;">Stats: HP +${r.stats.hp || 0}, AP +${r.stats.ap || 0}, Speed +${r.stats.speed || 0}</div>
+        </div>
+      `;
+    }).join('');
+
+    Object.entries(SETS_METADATA).forEach(([setName, bonus]) => {
+      relicsHtml += `
+        <div style="padding:10px; border-radius:6px; background:rgba(139,92,246,0.08); border:1.5px dashed #8b5cf6; text-align:left;">
+          <div style="font-weight:bold; color:#fbbf24; font-size:0.85rem; margin-bottom:2px;">🔮 ${setName} Set Bonus</div>
+          <div style="font-size:0.75rem; color:white;">${bonus}</div>
+        </div>
+      `;
+    });
+
+    relicsContainer.innerHTML = relicsHtml;
+  }
+
+  // 4. Update Tournament Pool Roster
+  renderArkheronPoolStatus();
+
+  // 5. Update Strategy & Builds Hub
+  updateArkheronStrategyView();
+}
+
+function selectArkheronCodexHero(heroId) {
+  selectedArkheronHeroId = heroId;
+  playSound('click');
+  renderArkheronTab();
+}
+
+function renderArkheronHeroInspectCard() {
+  const cardContainer = document.getElementById('arkheron-hero-inspect-card');
+  if (!cardContainer) return;
+
+  const hero = ETERNALS.find(h => h.id === selectedArkheronHeroId) || ETERNALS[0];
+  const setBonus = SETS_METADATA[hero.set] || 'Standard affinity.';
+
+  cardContainer.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; text-align:left;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:3rem; background:rgba(255,255,255,0.05); padding:8px 14px; border-radius:8px; border:1px solid var(--db-border);">${hero.emoji}</span>
+        <div>
+          <h3 style="margin:0; color:white; font-size:1.4rem;">${hero.name}</h3>
+          <div style="display:flex; gap:6px; margin-top:4px;">
+            <span class="badge" style="background:#8b5cf6; font-size:0.65rem; margin:0;">${hero.role}</span>
+            <span class="badge" style="background:#3b82f6; font-size:0.65rem; margin:0;">Set: ${hero.set}</span>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.7rem; color:var(--dc-text-muted); text-transform:uppercase; font-weight:bold;">Combat Ratings</div>
+        <div style="font-size:0.75rem; color:white; margin-top:2px;">
+          HP: <strong style="color:#10b981;">${hero.stats.hp}</strong> | 
+          SPD: <strong style="color:#fbbf24;">${hero.stats.speed}</strong> | 
+          DMG: <strong style="color:#f43f5e;">${hero.stats.damage}</strong>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:0.8rem; color:var(--dc-text-muted); line-height:1.5; margin-bottom:14px; text-align:left;">
+      ${hero.lore}
+    </p>
+    <div style="background:rgba(0,0,0,0.3); border-radius:6px; padding:12px; border:1px solid rgba(255,255,255,0.05); text-align:left; margin-bottom:10px;">
+      <div style="font-weight:bold; color:#a78bfa; font-size:0.85rem; margin-bottom:4px;">⚡ Signature Ability: ${hero.ability.name}</div>
+      <div style="font-size:0.75rem; color:white; line-height:1.4;">${hero.ability.desc}</div>
+    </div>
+    <div style="font-size:0.75rem; color:var(--dc-text-muted); text-align:left;">
+      🔮 <strong>Recommended Set Bonus:</strong> <span style="color:#a78bfa;">${setBonus}</span>
+    </div>
+  `;
+}
+
+function renderArkheronPoolStatus() {
+  const statusEl = document.getElementById('arkheron-signup-pool-status');
+  const rosterEl = document.getElementById('arkheron-signup-pool-roster');
+  if (!statusEl || !rosterEl) return;
+
+  // Find active Arkheron tournament or pool
+  let t = appState.tournaments.find(tourney => tourney.game === 'arkheron' && tourney.status === 'signup');
+  
+  if (!t) {
+    statusEl.innerHTML = `No active Arkheron tournament pool open. Click below to initiate the <strong>Arkheron Weekly Tournament</strong>!`;
+    rosterEl.innerHTML = `<span style="font-size:0.75rem; color:var(--dc-text-muted);">Pool is empty.</span>`;
+    return;
+  }
+
+  const registeredCount = t.pool.length;
+  const checkedInCount = (t.checkedIn || []).length;
+  statusEl.innerHTML = `Active Signup Pool: <strong style="color:white;">${registeredCount} registered</strong> (<strong style="color:#10b981;">${checkedInCount} checked in</strong>).`;
+
+  if (t.pool.length === 0) {
+    rosterEl.innerHTML = `<span style="font-size:0.75rem; color:var(--dc-text-muted);">Pool is empty.</span>`;
+  } else {
+    rosterEl.innerHTML = t.pool.map(username => {
+      const pl = players.find(p => p.username === username) || MOCK_PLAYERS_POOL.find(p => p.username === username);
+      const avatar = pl ? (pl.avatar || '👤') : '👤';
+      const isCheckedIn = (t.checkedIn || []).includes(username);
+      return `
+        <span style="font-size:0.7rem; padding:2px 8px; border-radius:12px; background:${isCheckedIn ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)'}; border:1px solid ${isCheckedIn ? '#10b981' : 'var(--db-border)'}; color:white; display:inline-flex; align-items:center; gap:4px;">
+          ${avatar} ${username} ${isCheckedIn ? '✅' : ''}
+        </span>
+      `;
+    }).join('');
+  }
+}
+
+function joinArkheronTournamentPool() {
+  // Ensure an Arkheron tournament exists
+  let t = appState.tournaments.find(tourney => tourney.game === 'arkheron' && tourney.status === 'signup');
+  
+  if (!t) {
+    // Create one
+    t = {
+      id: 'TOURNEY-ARKHERON-WEEKLY',
+      name: '🏆 Arkheron Weekly Tournament',
+      game: 'arkheron',
+      type: 'serpentine',
+      numTeams: 4,
+      status: 'signup',
+      pool: ['Resteral.TV', 'TofuShark', 'TowerGod', 'Dahla', 'Rynshi'],
+      checkedIn: ['Resteral.TV', 'TofuShark', 'TowerGod'],
+      teams: [],
+      matches: [],
+      createdAt: new Date().toISOString()
+    };
+    appState.tournaments.push(t);
+  }
+
+  if (!t.pool.includes(appState.currentUser)) {
+    t.pool.push(appState.currentUser);
+  }
+
+  t.checkedIn = t.checkedIn || [];
+  if (!t.checkedIn.includes(appState.currentUser)) {
+    t.checkedIn.push(appState.currentUser);
+  }
+
+  playSound('milestone');
+  showToast(`Successfully registered & checked into the Arkheron Tournament Pool!`, "success");
+  
+  // Post to persistent Discord sidebar chat
+  writeMessage("ArkheronBot", true, `🏆 **${appState.currentUser}** has joined the **Arkheron Weekly Tournament** signup pool!`, null);
+
+  renderArkheronTab();
+}
+
+// ==========================================
+// 🎯 ARKHERON BUILDS & STRATEGY ENGINE
+// ==========================================
+
+const ARKHERON_STRATEGIES = {
+  leodin: {
+    burst: {
+      name: "⚡ Gale-Blade Assassin",
+      relics: ["Crown of Hurricanes", "Tempest Edge", "Wind-Walker Boots"],
+      setAffinity: "Tempest (+12% Speed, Wind Trails)",
+      skillMax: "Max Q (Gale Slash) > E (Aero Reposition) > W (Wind Wall)",
+      statsTarget: "Speed: S+ | Attack Damage: 240 | CDR: 20%",
+      combos: "Q (Whirlwind Knockup) ➔ Auto Attack ➔ E (Dash behind) ➔ R (Windstorm Execution)",
+      scrimStrategy: "Role as split-pusher and backline diver. Wait for enemy Tank to engage before flanking squishy Mages.",
+      counters: "Strong against Edani & squishies. Weak against Karriv frontline CC."
+    },
+    sustain: {
+      name: "🩸 Sanguine Wind Duelist",
+      relics: ["Bloodthorn Daggers", "Vampiric Ring", "Tempest Crown"],
+      setAffinity: "Bloodthorn (+8% Lifesteal, Bleed)",
+      skillMax: "Max W (Sanguine Strike) > Q (Gale Slash) > E (Parry)",
+      statsTarget: "Lifesteal: 28% | Max HP: 2,800 | Attack Speed: 1.85/s",
+      combos: "W (Sanguine buff) ➔ Q (Engage) ➔ Sustained Auto Attacks ➔ E (Dodge heavy CC)",
+      scrimStrategy: "Excel in 1v2 skirmishes around Relic Shrines. Trade HP aggressively to out-sustain enemy bruisers.",
+      counters: "Strong against Dahla & Tanks. Weak against burst Mages like Edani."
+    },
+    tank: {
+      name: "🛡️ Hurricane Juggernaut",
+      relics: ["Solar Crest Shield", "Crown of Hurricanes", "Titan Cuirass"],
+      setAffinity: "Solar Flare (+25 Armor, +100 Max HP)",
+      skillMax: "Max E (Wind Shield) > Q (Whirlwind Knockup) > W (Taunt)",
+      statsTarget: "Max HP: 3,900 | Armor: 160 | Speed: A-",
+      combos: "E (Shield up) ➔ Flash In ➔ Q (AoE Knockup 3 enemies) ➔ Team cleans up",
+      scrimStrategy: "Primary engage initiator for 5v5 teamfights. Hold chokepoints and force enemy focus on you.",
+      counters: "Strong against physical assassins. Weak against armor-shredding relics."
+    }
+  },
+  rynshi: {
+    burst: {
+      name: "🥷 Shadow-Decoy One-Shot",
+      relics: ["Rift Scepter", "Crown of Hurricanes", "Void Dagger"],
+      setAffinity: "Voidbringer (+15% CDR) & Tempest",
+      skillMax: "Max Q (Aero Decoy) > W (Shadow Step) > E (Poison Blade)",
+      statsTarget: "AP: 310 | CDR: 35% | Movement Speed: S+",
+      combos: "W (Stealth behind target) ➔ Q (Place Decoy) ➔ Auto-Explode ➔ W (Recast to escape)",
+      scrimStrategy: "Infiltrate enemy backline during Objective fights. Eliminate high-value targets in < 1.5s.",
+      counters: "Strong against Edani & low-mobility ADCs. Weak against True Sight & Karriv CC."
+    },
+    sustain: {
+      name: "🩸 Venomous Shadow Stalker",
+      relics: ["Bloodthorn Daggers", "Shadow Cloak", "Agility Band"],
+      setAffinity: "Bloodthorn (+8% Lifesteal)",
+      skillMax: "Max E (Poison Blade) > Q (Decoy) > W (Shadow Step)",
+      statsTarget: "Attack Speed: 2.1/s | Lifesteal: 22% | Speed: S",
+      combos: "E (Apply Poison) ➔ Auto x3 ➔ Q (Decoy) ➔ Re-engage for execute",
+      scrimStrategy: "Kite enemies through narrow corridors. Use poison stack damage over time.",
+      counters: "Strong against single-target tanks. Weak against AoE burst spells."
+    },
+    tank: {
+      name: "🛡️ Illusory Tank Decoy",
+      relics: ["Solar Crest Shield", "Vessel of Souls", "Shadow Ward"],
+      setAffinity: "Solar Flare (+25 Armor)",
+      skillMax: "Max Q (Aero Decoy) > E (Disarm) > W (Shadow Step)",
+      statsTarget: "Max HP: 3,400 | Dodge Rate: 35% | CDR: 25%",
+      combos: "W (Stealth into choke) ➔ Q (Spawn Decoy) ➔ Force enemy ultimate spells on decoy",
+      scrimStrategy: "Bait enemy ultimate cooldowns using stealth and decoys before team fights begin.",
+      counters: "Strong against skill-shot reliant teams. Weak against point-and-click spells."
+    }
+  },
+  dahla: {
+    burst: {
+      name: "⚡ Blood-Burst Reaper",
+      relics: ["Bloodthorn Daggers", "Rift Scepter", "Executioner Ring"],
+      setAffinity: "Bloodthorn (+8% Lifesteal, Bleed)",
+      skillMax: "Max Q (Sanguine Fury) > E (Vampiric Bite) > W (Blood Dash)",
+      statsTarget: "Attack Damage: 270 | Lifesteal: 32% | Burst: S",
+      combos: "W (Blood Dash in) ➔ Q (Sanguine Fury) ➔ E (Vampiric Bite Execute)",
+      scrimStrategy: "Target low HP targets in team fights to reset Sanguine Fury duration endlessly.",
+      counters: "Strong against isolated targets. Weak against hard CC chains."
+    },
+    sustain: {
+      name: "🩸 Immortal Blood Lord",
+      relics: ["Bloodthorn Daggers", "Vessel of Souls", "Titan Cuirass"],
+      setAffinity: "Bloodthorn & Solar Flare Hybrid",
+      skillMax: "Max E (Vampiric Bite) > Q (Sanguine Fury) > W (Blood Shield)",
+      statsTarget: "Max HP: 4,100 | Lifesteal: 40% | Armor: 120",
+      combos: "Sustained auto-attacks in center of enemy team. Cast E on lowest HP enemy.",
+      scrimStrategy: "Become unkillable frontline bruiser. Stand in choke points and drain enemy team.",
+      counters: "Strong against teams without Anti-heal. Weak against Executioner debuffs."
+    },
+    tank: {
+      name: "🛡️ Crimson Fortress",
+      relics: ["Solar Crest Shield", "Titan Cuirass", "Bloodthorn Ring"],
+      setAffinity: "Solar Flare (+25 Armor, +100 Max HP)",
+      skillMax: "Max W (Blood Shield) > E (Bite) > Q (Fury)",
+      statsTarget: "Max HP: 4,500 | Armor: 180 | Magic Resist: 140",
+      combos: "W (Shield) ➔ Soak damage ➔ E (Heal back chunk) ➔ Body block skill shots",
+      scrimStrategy: "Peel for your team's carry. Eat enemy ultimate abilities.",
+      counters: "Strong against physical burst. Weak against percentage HP damage."
+    }
+  },
+  karriv: {
+    burst: {
+      name: "⚡ Sol-Blast Paladin",
+      relics: ["Crown of Hurricanes", "Sol Crest Shield", "Radiant Sword"],
+      setAffinity: "Solar Flare & Tempest",
+      skillMax: "Max Q (Sol Blast) > W (Shield Charge) > E (Holy Aura)",
+      statsTarget: "AP: 220 | Max HP: 3,200 | Burst: A+",
+      combos: "W (Charge in) ➔ Hold Shield ➔ Q (Release 150% Sol Blast) ➔ E (Holy Aura pulse)",
+      scrimStrategy: "Soak initial burst, then reflect massive AoE damage back into clustered enemies.",
+      counters: "Strong against predictable burst combos. Weak against ranged kiting."
+    },
+    sustain: {
+      name: "🩸 Radiant Redeemer",
+      relics: ["Solar Crest Shield", "Bloodthorn Ring", "Holy Chalice"],
+      setAffinity: "Solar Flare & Bloodthorn",
+      skillMax: "Max E (Holy Aura Heal) > Q (Sol Blast) > W (Charge)",
+      statsTarget: "Max HP: 3,800 | Team Healing: High | Armor: 140",
+      combos: "E (Maintain Aura) ➔ Body block for carries ➔ W (Knockback assassins)",
+      scrimStrategy: "Provide continuous aura healing to teammates while frontline tanking.",
+      counters: "Strong against poke compositions. Weak against heavy crowd control."
+    },
+    tank: {
+      name: "🛡️ Unyielding Bastion",
+      relics: ["Solar Crest Shield", "Titan Cuirass", "Vessel of Souls"],
+      setAffinity: "Solar Flare (+25 Armor, +100 Max HP)",
+      skillMax: "Max W (Shield Charge) > E (Holy Guard) > Q (Blast)",
+      statsTarget: "Max HP: 4,800 | Armor: 210 | Magic Resist: 160",
+      combos: "W (Charge in) ➔ E (Absorb) ➔ Body-block chokepoints ➔ Protect objectives",
+      scrimStrategy: "The ultimate frontline tank in Arkheron. Hold the Relic Shrine objective against all odds.",
+      counters: "Strong against all physical compositions. Weak against true damage."
+    }
+  },
+  edani: {
+    burst: {
+      name: "⚡ Singularity Nuke Wizard",
+      relics: ["Rift Scepter", "Voidbringer Crown", "Orb of Oblivion"],
+      setAffinity: "Voidbringer (+15% CDR, Gravity Anomaly)",
+      skillMax: "Max Q (Void Collapse) > W (Singularity Ray) > E (Phase Shift)",
+      statsTarget: "AP: 380 | CDR: 40% | Mana: 2,400",
+      combos: "Q (Void Collapse pull) ➔ W (Singularity Ray beam through pulled enemies) ➔ E (Phase out)",
+      scrimStrategy: "Wipe entire teams in objective chokepoints. Wait for Karriv/Leodin to clump enemies.",
+      counters: "Strong against clumped teams & low mobility tanks. Weak against Rynshi stealth."
+    },
+    sustain: {
+      name: "🩸 Rift Siphon Archmage",
+      relics: ["Rift Scepter", "Bloodthorn Ring", "Voidbringer Crown"],
+      setAffinity: "Voidbringer & Bloodthorn",
+      skillMax: "Max W (Singularity Ray) > Q (Void Collapse) > E (Shift)",
+      statsTarget: "AP: 290 | Spell Vamp: 20% | CDR: 30%",
+      combos: "Keep W ray active on enemy tanks ➔ Siphon health continuous beam",
+      scrimStrategy: "Provide constant DPS and spell vamp sustain during prolonged teamfights.",
+      counters: "Strong against low-range bruisers. Weak against long-range snipers."
+    },
+    tank: {
+      name: "🛡️ Void Barrier Controller",
+      relics: ["Rift Scepter", "Titan Cuirass", "Void Guard"],
+      setAffinity: "Voidbringer & Solar Flare",
+      skillMax: "Max E (Phase Shield) > Q (Void Collapse) > W (Ray)",
+      statsTarget: "Max HP: 3,500 | AP: 180 | Armor: 110",
+      combos: "Q (Zone control pull) ➔ E (Shield & Phase shift) ➔ Disrupt enemy backline",
+      scrimStrategy: "Zone denial. Prevent enemy carries from entering the Relic Shrine area.",
+      counters: "Strong against melee engage comps. Weak against hyper-carries with cleanse."
+    }
+  }
+};
+
+function updateArkheronStrategyView() {
+  const heroSelect = document.getElementById('arkheron-strategy-hero-select');
+  const presetSelect = document.getElementById('arkheron-strategy-preset-select');
+  const outputBox = document.getElementById('arkheron-strategy-output-box');
+  if (!heroSelect || !presetSelect || !outputBox) return;
+
+  const heroKey = heroSelect.value || 'leodin';
+  const presetKey = presetSelect.value || 'burst';
+
+  const heroData = ARKHERON_STRATEGIES[heroKey] || ARKHERON_STRATEGIES.leodin;
+  const strat = heroData[presetKey] || heroData.burst;
+
+  outputBox.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px;">
+      <h4 style="margin:0; font-size:1.1rem; color:#fbbf24; text-align:left;">${strat.name}</h4>
+      <span class="badge" style="background:#8b5cf6; margin:0;">${strat.setAffinity}</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px; text-align:left; font-size:0.75rem;">
+      <div style="background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:6px; border:1px solid var(--db-border);">
+        <strong style="color:white; display:block; margin-bottom:2px;">📦 CORE RELIC PATH:</strong>
+        <span style="color:#a78bfa;">${strat.relics.join(' ➔ ')}</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:6px; border:1px solid var(--db-border);">
+        <strong style="color:white; display:block; margin-bottom:2px;">🎯 TARGET STAT BENCHMARKS:</strong>
+        <span style="color:#10b981;">${strat.statsTarget}</span>
+      </div>
+    </div>
+
+    <div style="font-size:0.75rem; text-align:left; margin-bottom:10px;">
+      <strong style="color:white; display:block; margin-bottom:2px;">⚡ SKILL MAXING PRIORITY:</strong>
+      <span style="color:#fbbf24; font-weight:bold;">${strat.skillMax}</span>
+    </div>
+
+    <div style="background:rgba(139,92,246,0.08); border-left:3px solid #8b5cf6; padding:10px; border-radius:4px; text-align:left; margin-bottom:10px; font-size:0.75rem;">
+      <strong style="color:white; display:block; margin-bottom:2px;">⚔️ SCRIM TEAMFIGHT & COMBO EXECUTION:</strong>
+      <div style="color:#e2e8f0; margin-bottom:4px;"><strong>Combo:</strong> <code>${strat.combos}</code></div>
+      <div style="color:var(--dc-text-muted); line-height:1.4;">${strat.scrimStrategy}</div>
+    </div>
+
+    <div style="font-size:0.7rem; color:var(--dc-text-muted); text-align:left;">
+      🔄 <strong>Matchup Dynamics:</strong> <span style="color:white;">${strat.counters}</span>
+    </div>
+  `;
+}
+
+
