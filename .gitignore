@@ -1,12 +1,4 @@
-.vs/
-**/obj
-**/bin
-src/Properties/PublishProfiles/FolderProfile.pubxml.user
-src/Properties/PublishProfiles/FolderProfile.pubxml
-src/BlockMaker.csproj.user
 node_modules/
-dist/
+.env
 .system_generated/
 *.log
-**/.env
-custom-lobbies/node_modules/

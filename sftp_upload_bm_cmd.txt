@@ -1,4 +1,0 @@
-cd /game/csgo/addons/counterstrikesharp/plugins
-lcd C:/Users/Sean/Desktop/HNS_Server/game/csgo/addons/counterstrikesharp/plugins
-mput -r BlockMaker
-quit

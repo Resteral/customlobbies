@@ -1,3 +1,0 @@
-get game/csgo/addons/counterstrikesharp/logs/error.log
-get game/csgo/addons/counterstrikesharp/logs/server.log
-quit

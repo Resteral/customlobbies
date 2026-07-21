@@ -1,9 +1,0 @@
-cd game/csgo
-lcd C:/Users/Sean/Desktop/HNS_Server/game/csgo
-mkdir characters
-mput -r characters
-mkdir models
-mput -r models
-mkdir sound
-mput -r sound
-quit
