@@ -310,6 +310,38 @@ client.on('messageCreate', async (message) => {
     }
   }
 
+  // 3.5 ADD BOTS FOR TESTING
+  else if (command === 'addbots' || command === 'bots') {
+    const requiredPlayers = game === 'hockey' ? 8 : 6;
+    if (queues[game].length >= requiredPlayers) {
+      return message.reply(`⚠️ Queue is already full (${queues[game].length}/${requiredPlayers}). Type \`-draft\` to start the draft!`);
+    }
+
+    const botNamesPool = [
+      "BotTofu", "BotDahla", "BotRynshi", "BotGrimwold", "BotAlys", 
+      "BotSkylark", "BotTower", "BotVortex", "BotPhoenix", "BotApex"
+    ];
+
+    let addedCount = 0;
+    while (queues[game].length < requiredPlayers) {
+      const unusedBotName = botNamesPool.find(name => !queues[game].includes(name));
+      if (!unusedBotName) break;
+      
+      registerPlayer(unusedBotName);
+      queues[game].push(unusedBotName);
+      addedCount++;
+    }
+
+    const listHtml = queues[game].map(p => `• **${p}** (MMR: ${playersDb[p]?.games[game]?.elo || 1000})`).join('\n');
+    const embed = new EmbedBuilder()
+      .setTitle(`🤖 Added ${addedCount} Bots to ${game.toUpperCase()} Queue`)
+      .setDescription(`Matched queue with test players. Ready for scrimmage drafting!\n\n**Current Queue (${queues[game].length}/${requiredPlayers}):**\n${listHtml}`)
+      .setColor('#fbbf24')
+      .setFooter({ text: "Type -draft to start the serpentine draft!" });
+      
+    message.channel.send({ embeds: [embed] });
+  }
+
   // 4. LOBBY
   else if (command === 'lobby') {
     const parts = argument.trim().split(/ +/);
