@@ -2948,16 +2948,23 @@ function toggleAdvertiseForm() {
   if (!form) return;
   const isHidden = form.style.display === 'none';
   form.style.display = isHidden ? 'block' : 'none';
-  
+
   if (isHidden) {
+    const name = (appState.currentUser || 'yourchannel').toLowerCase().replace(/[^a-z0-9_]/g, '');
     document.getElementById('stream-author-input').value = appState.currentUser;
-    document.getElementById('stream-platform-input').value = 'twitch';
-    let defaultUrl = 'https://twitch.tv/' + appState.currentUser.toLowerCase().replace('.', '');
-    if (appState.currentUser.toLowerCase().includes('rester')) {
-      defaultUrl = 'https://twitch.tv/resteral';
-    }
-    document.getElementById('stream-url-input').value = defaultUrl;
-    document.getElementById('stream-title-input').value = '🔴 Playing custom lobbies matchmaking scrims! Join in!';
+    const platformSel = document.getElementById('stream-platform-input');
+    platformSel.value = 'kick';
+    document.getElementById('stream-url-input').value = `https://kick.com/${name}`;
+    document.getElementById('stream-url-input').placeholder = `https://kick.com/${name}`;
+    document.getElementById('stream-title-input').value = '🔴 Live Custom Lobbies scrims — come watch!';
+
+    // Update URL placeholder when platform changes
+    platformSel.onchange = function() {
+      const urlInput = document.getElementById('stream-url-input');
+      if (this.value === 'twitch')   { urlInput.placeholder = `https://twitch.tv/${name}`;  urlInput.value = `https://twitch.tv/${name}`; }
+      if (this.value === 'kick')     { urlInput.placeholder = `https://kick.com/${name}`;   urlInput.value = `https://kick.com/${name}`; }
+      if (this.value === 'youtube')  { urlInput.placeholder = `https://youtube.com/@${name}`; urlInput.value = `https://youtube.com/@${name}`; }
+    };
   }
 }
 
@@ -2965,35 +2972,37 @@ function submitStreamAd() {
   const author = document.getElementById('stream-author-input').value.trim();
   const platform = document.getElementById('stream-platform-input').value;
   const url = document.getElementById('stream-url-input').value.trim();
-  const title = document.getElementById('stream-title-input').value.trim() || 'Live Match Playroom Scrims!';
-  
+  const title = document.getElementById('stream-title-input').value.trim() || '🔴 Live Custom Lobbies scrims!';
+
   if (!author || !url) {
-    showToast("Please fill in the streamer name and URL!", "warning");
+    showToast('Please fill in the streamer name and URL!', 'warning');
     return;
   }
 
+  // Normalise URL — if they only typed a channel name, build the full URL
   let finalUrl = url;
-  if (author.toLowerCase().includes('rester') || url.toLowerCase().includes('resteraltv')) {
-    finalUrl = 'https://twitch.tv/resteral';
+  if (!url.startsWith('http')) {
+    if (platform === 'twitch')  finalUrl = `https://twitch.tv/${url}`;
+    if (platform === 'kick')    finalUrl = `https://kick.com/${url}`;
+    if (platform === 'youtube') finalUrl = `https://youtube.com/@${url}`;
   }
-  
+
   const newAd = {
     id: 'STREAM-' + Math.random().toString(36).substr(2, 5).toUpperCase(),
     author,
     platform,
     url: finalUrl,
     title,
-    isLive: true
+    isLive: true,
+    startedAt: Date.now(),
   };
-  
+
   appState.advertisedStreams = appState.advertisedStreams || [];
-  // Keep only unique streamers
   appState.advertisedStreams = appState.advertisedStreams.filter(s => s.author.toLowerCase() !== author.toLowerCase());
   appState.advertisedStreams.push(newAd);
-  
+
   playSound('match_found');
-  showToast("Your livestream advertisement is now LIVE!", "success");
-  
+  showToast(`✅ ${author} is now LIVE on ${platform.charAt(0).toUpperCase()+platform.slice(1)}!`, 'success');
   toggleAdvertiseForm();
   renderStreamsList();
 }
@@ -3001,32 +3010,71 @@ function submitStreamAd() {
 function renderStreamsList() {
   const container = document.getElementById('streams-list-container');
   if (!container) return;
-  
+
   const list = appState.advertisedStreams || [];
   if (list.length === 0) {
-    container.innerHTML = `<div style="text-align:center; color:var(--dc-text-muted); font-size:0.75rem; padding:12px 0;">No active streams promoted right now. Be the first to promote yours!</div>`;
+    container.innerHTML = `
+      <div style="text-align:center;padding:18px 0;">
+        <div style="font-size:1.5rem;margin-bottom:6px;">📡</div>
+        <div style="color:var(--dc-text-muted);font-size:0.78rem;">No streams live right now. Be the first!</div>
+      </div>`;
     return;
   }
-  
+
+  const PLATFORM_CFG = {
+    twitch:  { emoji: '', label: 'Twitch',  color: '#9146ff', bg: 'rgba(145,70,255,0.12)', border: 'rgba(145,70,255,0.3)' },
+    kick:    { emoji: '', label: 'Kick',    color: '#53fc18', bg: 'rgba(83,252,24,0.10)',  border: 'rgba(83,252,24,0.3)'  },
+    youtube: { emoji: '', label: 'YouTube', color: '#ff0000', bg: 'rgba(255,0,0,0.10)',    border: 'rgba(255,0,0,0.3)'    },
+  };
+
   container.innerHTML = list.map(s => {
-    const platformEmoji = s.platform === 'twitch' ? '🎮' : (s.platform === 'youtube' ? '🎥' : '🟢');
+    const cfg = PLATFORM_CFG[s.platform] || PLATFORM_CFG.twitch;
+    const elapsed = s.startedAt ? Math.floor((Date.now() - s.startedAt) / 60000) : 0;
+    const timeLabel = elapsed < 1 ? 'just started' : `${elapsed}m ago`;
     return `
-      <div class="stream-card" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border: 1px solid var(--db-border); border-radius:6px; padding:10px 14px;">
-        <div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-            <span class="live-badge" style="background:#ef4444; color:white; font-size:0.65rem; font-weight:bold; padding:2px 6px; border-radius:4px; display:inline-flex; align-items:center; gap:4px; font-style:normal; line-height:1;">
-              <span class="queue-scanning-indicator" style="width:6px; height:6px; background-color:white; margin:0;"></span> LIVE
-            </span>
-            <strong style="color:white; font-size:0.85rem;">${s.author}</strong>
-            <span style="font-size:0.7rem; color:var(--dc-text-muted); font-weight:normal; text-transform:uppercase;">#${s.platform}</span>
-          </div>
-          <div style="font-size:0.75rem; color:var(--dc-text-muted); text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width: 260px;">${s.title}</div>
+      <div style="display:flex;align-items:center;gap:12px;
+                  background:${cfg.bg};
+                  border:1px solid ${cfg.border};
+                  border-left:3px solid ${cfg.color};
+                  border-radius:8px;padding:10px 14px;
+                  transition:transform 0.15s ease;"
+           onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+
+        <!-- Platform badge -->
+        <div style="width:34px;height:34px;border-radius:8px;background:${cfg.color}22;
+                    border:1px solid ${cfg.color}44;display:flex;align-items:center;
+                    justify-content:center;font-size:1.1rem;flex-shrink:0;">
+          ${cfg.emoji}
         </div>
-        <button onclick="watchStreamEmbedded('${s.id}')" class="btn btn-secondary" style="font-size:0.75rem; padding:4px 8px; margin:0; display:flex; align-items:center; gap:4px; color:white; cursor:pointer;">
-          ${platformEmoji} Watch Live
+
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+            <span style="display:inline-flex;align-items:center;gap:3px;
+                         background:#ef4444;color:white;font-size:0.58rem;
+                         font-weight:800;padding:2px 5px;border-radius:3px;
+                         animation:neon-breathe 1.5s ease-in-out infinite;">
+              ● LIVE
+            </span>
+            <strong style="color:white;font-size:0.85rem;">${s.author}</strong>
+            <span style="font-size:0.62rem;color:${cfg.color};font-weight:700;">${cfg.label}</span>
+            <span style="font-size:0.6rem;color:var(--dc-text-muted);margin-left:auto;">${timeLabel}</span>
+          </div>
+          <div style="font-size:0.72rem;color:var(--dc-text-muted);
+                      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;">
+            ${s.title}
+          </div>
+        </div>
+
+        <button onclick="watchStreamEmbedded('${s.id}')"
+                style="flex-shrink:0;padding:6px 14px;border-radius:6px;
+                       background:${cfg.color};color:${s.platform==='kick'?'#000':'white'};
+                       border:none;font-weight:800;font-size:0.72rem;
+                       cursor:pointer;font-family:var(--font-display);
+                       transition:opacity 0.15s ease;"
+                onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          ▶ Watch
         </button>
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
