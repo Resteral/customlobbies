@@ -1081,3 +1081,350 @@ footer {
   display: inline-block;
 }
 
+/* ============================================================
+   🌌 CINEMATIC LANDING SCREEN
+   ============================================================ */
+
+#landing-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #05060d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+#landing-screen.land-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* particle canvas */
+#landing-particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ambient glow orbs */
+.land-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  opacity: 0.45;
+  animation: orb-drift 12s ease-in-out infinite alternate;
+}
+.land-orb-a {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(139,92,246,0.55), transparent 70%);
+  top: -120px; left: -120px;
+  animation-delay: 0s;
+}
+.land-orb-b {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(6,182,212,0.45), transparent 70%);
+  bottom: -100px; right: -80px;
+  animation-delay: -4s;
+}
+.land-orb-c {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(244,63,94,0.3), transparent 70%);
+  bottom: 20%; left: 10%;
+  animation-delay: -8s;
+}
+@keyframes orb-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(40px, 30px) scale(1.08); }
+}
+
+/* centre content */
+.land-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  text-align: center;
+  padding: 0 24px;
+  animation: land-fade-in 1s ease both;
+}
+@keyframes land-fade-in {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* logo */
+.land-logo-wrap {
+  position: relative;
+  width: 96px; height: 96px;
+  display: flex; align-items: center; justify-content: center;
+}
+.land-logo-img {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  object-fit: contain;
+  border: 2.5px solid rgba(139,92,246,0.6);
+  box-shadow: 0 0 30px rgba(139,92,246,0.55), 0 0 60px rgba(139,92,246,0.2);
+  animation: logo-pulse 3s ease-in-out infinite;
+}
+@keyframes logo-pulse {
+  0%,100% { box-shadow: 0 0 30px rgba(139,92,246,0.55), 0 0 60px rgba(139,92,246,0.2); }
+  50%      { box-shadow: 0 0 50px rgba(139,92,246,0.85), 0 0 100px rgba(139,92,246,0.35); }
+}
+.land-logo-ring {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(139,92,246,0.25);
+  animation: ring-spin 8s linear infinite;
+}
+.land-logo-ring::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: 50%;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px #8b5cf6;
+}
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* title */
+.land-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 3px;
+  line-height: 1;
+  animation: land-fade-in 1s 0.15s ease both;
+}
+.land-title-accent {
+  background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 50%, #f43f5e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200%;
+  animation: title-shimmer 4s linear infinite;
+}
+@keyframes title-shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.land-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.6;
+  animation: land-fade-in 1s 0.25s ease both;
+}
+.land-sub span { color: rgba(255,255,255,0.35); font-size: 0.85rem; }
+
+/* floating hero cards */
+.land-hero-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: land-fade-in 1s 0.4s ease both;
+}
+
+.land-hero-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  cursor: default;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  animation: card-float var(--delay, 0s) 3.5s ease-in-out infinite alternate;
+  animation-delay: var(--delay, 0s);
+}
+.land-hero-card:hover {
+  transform: translateY(-6px) scale(1.05);
+  border-color: rgba(139,92,246,0.4);
+  box-shadow: 0 12px 32px rgba(139,92,246,0.2);
+}
+.land-hero-card.lhc-featured {
+  border-color: rgba(139,92,246,0.5);
+  background: rgba(139,92,246,0.1);
+  box-shadow: 0 0 24px rgba(139,92,246,0.2);
+}
+@keyframes card-float {
+  from { transform: translateY(0px); }
+  to   { transform: translateY(-8px); }
+}
+.lhc-emoji { font-size: 1.8rem; line-height: 1; }
+.lhc-name  { font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; color: white; }
+.lhc-role  { font-size: 0.65rem; color: rgba(255,255,255,0.4); }
+
+/* CTA buttons */
+.land-cta-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: land-fade-in 1s 0.55s ease both;
+}
+
+.land-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 36px;
+  border-radius: 50px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.land-btn:hover  { transform: translateY(-3px) scale(1.03); }
+.land-btn:active { transform: scale(0.97); }
+
+.land-btn-primary {
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  color: #fff;
+  box-shadow: 0 6px 32px rgba(139,92,246,0.5), 0 2px 8px rgba(0,0,0,0.4);
+}
+.land-btn-primary:hover {
+  box-shadow: 0 12px 48px rgba(139,92,246,0.7), 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* sweep-shine effect */
+.land-btn-shine {
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+  animation: btn-shine 2.5s ease-in-out infinite;
+}
+@keyframes btn-shine {
+  0%   { left: -100%; }
+  50%  { left: 130%; }
+  100% { left: 130%; }
+}
+
+.land-btn-ghost {
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.7);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  box-shadow: none;
+}
+.land-btn-ghost:hover {
+  background: rgba(255,255,255,0.09);
+  color: #fff;
+  border-color: rgba(255,255,255,0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* live status pill */
+.land-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(35,165,90,0.12);
+  border: 1px solid rgba(35,165,90,0.3);
+  border-radius: 50px;
+  padding: 6px 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #4ade80;
+  letter-spacing: 0.5px;
+  animation: land-fade-in 1s 0.7s ease both;
+}
+.land-live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: live-pulse 1.4s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* wipe transition overlay */
+#land-wipe {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  transform: scaleX(0);
+  transform-origin: left;
+  z-index: 20;
+  pointer-events: none;
+}
+#land-wipe.wipe-go {
+  animation: land-wipe-anim 0.55s cubic-bezier(0.77,0,0.175,1) forwards;
+}
+@keyframes land-wipe-anim {
+  0%   { transform: scaleX(0); transform-origin: left; }
+  50%  { transform: scaleX(1); transform-origin: left; }
+  51%  { transform: scaleX(1); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+
+/* ============================================================
+   ✨ GLOBAL BUTTON UPGRADES
+   ============================================================ */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.12), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.45s ease;
+  pointer-events: none;
+}
+.btn:hover::after { left: 130%; }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: scale(0.97) translateY(0); }
+
+.btn-primary {
+  box-shadow: 0 4px 18px rgba(139,92,246,0.35);
+}
+.btn-primary:hover {
+  box-shadow: 0 8px 28px rgba(139,92,246,0.55);
+}
+
+.tab-btn {
+  position: relative;
+  overflow: hidden;
+}
+.tab-btn::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  width: 0; height: 2px;
+  background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: width 0.25s ease;
+}
+.tab-btn:hover::before,
+.tab-btn.active::before { width: 70%; }

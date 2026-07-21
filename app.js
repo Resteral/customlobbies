@@ -2,6 +2,116 @@
 // CUSTOM LOBBIES MATCHMAKER PORTAL
 // ==========================================
 
+// ==========================================
+// 🌌 LANDING SCREEN ENGINE
+// ==========================================
+
+function enterLobby() {
+  const btn = document.getElementById('land-enter-btn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+  const wipe = document.getElementById('land-wipe');
+  if (wipe) {
+    wipe.classList.add('wipe-go');
+    setTimeout(() => {
+      const ls = document.getElementById('landing-screen');
+      if (ls) ls.classList.add('land-hidden');
+      setTimeout(() => { if (ls) ls.style.display = 'none'; }, 700);
+    }, 280);
+  }
+  // Show the login screen in the middle of the wipe
+  setTimeout(() => {
+    const loginScr = document.getElementById('login-screen');
+    if (loginScr) loginScr.style.display = 'flex';
+  }, 200);
+}
+
+function enterLobbyGuest() {
+  const wipe = document.getElementById('land-wipe');
+  if (wipe) {
+    wipe.classList.add('wipe-go');
+    setTimeout(() => {
+      const ls = document.getElementById('landing-screen');
+      if (ls) ls.classList.add('land-hidden');
+      setTimeout(() => { if (ls) ls.style.display = 'none'; }, 700);
+      signInAsGuest();
+    }, 280);
+  }
+}
+
+// Particle system
+function initLandingParticles() {
+  const canvas = document.getElementById('landing-particles');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const PARTICLE_COUNT = 90;
+  const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.5 + 0.4,
+    dx: (Math.random() - 0.5) * 0.35,
+    dy: (Math.random() - 0.5) * 0.35,
+    alpha: Math.random() * 0.5 + 0.1,
+    color: Math.random() < 0.6 ? '139,92,246' : Math.random() < 0.5 ? '6,182,212' : '244,63,94',
+  }));
+
+  const CONNECTION_DIST = 130;
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < CONNECTION_DIST) {
+          const op = (1 - dist / CONNECTION_DIST) * 0.15;
+          ctx.strokeStyle = `rgba(139,92,246,${op})`;
+          ctx.lineWidth = 0.6;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw dots
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
+      ctx.fill();
+
+      p.x += p.dx;
+      p.y += p.dy;
+      if (p.x < 0 || p.x > canvas.width)  p.dx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+    });
+
+    if (!document.getElementById('landing-screen')?.classList.contains('land-hidden')) {
+      requestAnimationFrame(draw);
+    }
+  }
+  draw();
+}
+
+// Hide the login screen until the user enters from the landing page
+document.addEventListener('DOMContentLoaded', () => {
+  const loginScr = document.getElementById('login-screen');
+  if (loginScr) loginScr.style.display = 'none';
+  initLandingParticles();
+});
+
 const GAMES = ['arkheron', 'cs', 'zealot'];
 
 // Web Audio API Sound Synthesizer for Lobby Notifications
