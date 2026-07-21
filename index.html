@@ -339,6 +339,17 @@
               </div>
             </div>
           </div>
+          
+          <!-- Scrim Betting Card (Moved from Casino) -->
+          <div class="db-card" style="margin-top: 1rem; padding: 20px; border-bottom: 2.5px solid #ca8a04;">
+            <div class="card-title" style="font-size: 1.2rem; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+              <span style="display:flex; align-items:center; gap:8px;">⚔️ Live Scrim Match Betting</span>
+              <span class="badge" id="betting-status-badge" style="margin: 0; background: var(--dc-bg-sidebar); border: 1px solid var(--db-border); color: var(--dc-text-muted); font-size: 0.7rem;">NO MATCH</span>
+            </div>
+            <div id="betting-scrim-container" style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: var(--dc-text-muted);">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
 
           <!-- Live Stream Directory Card -->
           <div class="db-card" style="margin-top: 1rem; border-top: 3.5px solid var(--dc-red);">
@@ -1077,17 +1088,6 @@
       <div style="max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr 360px; gap: 20px;">
         <!-- Left: Casino Games -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
-          <!-- Scrim Betting Card -->
-          <div class="db-card" style="padding: 20px; border-bottom: 2.5px solid #ca8a04;">
-            <div class="card-title" style="font-size: 1.2rem; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
-              <span style="display:flex; align-items:center; gap:8px;">⚔️ Live Scrim Match Betting</span>
-              <span class="badge" id="betting-status-badge" style="margin: 0; background: var(--dc-bg-sidebar); border: 1px solid var(--db-border); color: var(--dc-text-muted); font-size: 0.7rem;">NO MATCH</span>
-            </div>
-            <div id="betting-scrim-container" style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: var(--dc-text-muted);">
-              <!-- Populated dynamically -->
-            </div>
-          </div>
-
           <!-- Coinflip Card -->
           <div class="db-card" style="padding: 20px;">
             <div class="card-title" style="font-size: 1.2rem; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
