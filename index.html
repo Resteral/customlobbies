@@ -212,7 +212,10 @@
             <span>🏃</span> Runner Clicker ↗
           </button>
           <button class="tab-btn" id="tab-btn-code" onclick="switchTab('code')">
-            <span>💻</span> Bot Source
+            <span>⚙️</span> Bot Source
+          </button>
+          <button class="tab-btn" id="tab-btn-admin" onclick="switchTab('admin')" style="display: none; border: 1px solid rgba(244,63,94,0.3); background: rgba(244,63,94,0.05); color: #f43f5e;">
+            <span>👑</span> Admin Panel
           </button>
         </div>
 
@@ -1365,6 +1368,47 @@
           <pre class="code-pre-container"><code class="code-block" id="code-display-block"></code></pre>
         </div>
 
+      </div>
+    </section>
+
+    <!-- ADMIN PANEL -->
+    <section class="tab-pane" id="pane-admin">
+      <div class="db-card" style="margin-bottom: 24px;">
+        <h2 class="card-title"><span>👑</span> Admin Dashboard</h2>
+        <p style="color: var(--dc-text-muted); font-size: 0.85rem; margin-bottom: 24px;">Welcome to the master control panel. You can manage live tournaments and global calendar events from here.</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <!-- Tournament Manager -->
+          <div>
+            <h3 style="font-size: 1rem; color: white; border-bottom: 1px solid var(--db-border); padding-bottom: 8px; margin-bottom: 16px;">Tournament Manager</h3>
+            <div id="admin-tournaments-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 8px;">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+          
+          <!-- Calendar Manager -->
+          <div>
+            <h3 style="font-size: 1rem; color: white; border-bottom: 1px solid var(--db-border); padding-bottom: 8px; margin-bottom: 16px;">Calendar Manager</h3>
+            <div style="background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; border: 1px solid var(--db-border); margin-bottom: 16px;">
+              <h4 style="color: white; font-size: 0.85rem; margin-bottom: 12px;">Schedule New Event</h4>
+              <input type="text" id="admin-event-name" class="dc-chat-input" placeholder="Event Name (e.g., Friday Night Scrims)" style="margin-bottom: 8px; width: 100%;">
+              <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <select id="admin-event-game" class="dc-chat-input" style="flex: 1;">
+                  <option value="arkheron">Arkheron</option>
+                  <option value="cs">CS 5v5</option>
+                  <option value="zealot">Zealot</option>
+                </select>
+                <input type="date" id="admin-event-date" class="dc-chat-input" style="flex: 1;">
+              </div>
+              <button class="btn btn-primary" style="width: 100%; padding: 8px;" onclick="adminCreateEvent()">➕ Add to Calendar</button>
+            </div>
+            
+            <h4 style="color: var(--dc-text-muted); font-size: 0.8rem; margin-bottom: 8px;">Upcoming Events</h4>
+            <div id="admin-events-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right: 8px;">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 

@@ -323,6 +323,8 @@ function initSupabase() {
            const loginScr = document.getElementById('login-screen');
            if (loginScr) loginScr.style.display = 'none';
            
+           checkAdminStatus();
+           
            playSound('match_found');
            showToast(`Welcome back, ${username}!`, "success");
            
@@ -559,6 +561,8 @@ function switchTab(tabId) {
     renderClickerUI();
   } else if (tabId === 'arkheron') {
     renderArkheronTab();
+  } else if (tabId === 'admin') {
+    renderAdminTab();
   }
 }
 
@@ -665,6 +669,9 @@ function renderLeaderboard() {
         </div>`;
     }).join('');
 
+    // View Profile Button
+    const viewProfileBtn = `<button onclick="viewPlayerProfile('${p.username}')" class="btn btn-outline" style="width: 100%; margin-top: 8px; font-size: 0.75rem; border-color: rgba(139,92,246,0.3); color: #8b5cf6;">View Full Profile</button>`;
+
     return `
       <tr id="lb-row-${rowId}"
           onclick="toggleLbExpand('${rowId}')"
@@ -720,6 +727,7 @@ function renderLeaderboard() {
             </div>
             <div style="font-size:0.7rem;color:var(--dc-text-muted);margin-bottom:8px;text-transform:uppercase;font-weight:700;letter-spacing:.5px;">All Games</div>
             ${allGames}
+            ${viewProfileBtn}
           </div>
         </td>
       </tr>`;
@@ -737,6 +745,25 @@ function toggleLbExpand(rowId) {
   // Close all others
   document.querySelectorAll('[id^="lb-expand-"]').forEach(r => r.style.display = 'none');
   if (!isOpen) row.style.display = 'table-row';
+}
+
+function viewPlayerProfile(username) {
+  switchTab('community');
+  
+  // Wait a tick for the DOM to render the profiles
+  setTimeout(() => {
+    const cardId = `profile-card-${username.replace(/\\W/g, '')}`;
+    const card = document.getElementById(cardId);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.style.boxShadow = '0 0 30px rgba(139, 92, 246, 0.8)';
+      card.style.transform = 'scale(1.02)';
+      setTimeout(() => {
+        card.style.boxShadow = 'none';
+        card.style.transform = 'none';
+      }, 2000);
+    }
+  }, 50);
 }
 
 
@@ -3428,9 +3455,22 @@ function signInAsGuest() {
   const loginScr = document.getElementById('login-screen');
   if (loginScr) loginScr.style.display = 'none';
   
+  checkAdminStatus();
+  
   playSound('join');
   showToast("Signed in as Guest.", "info");
   renderLeaderboard();
+}
+
+function checkAdminStatus() {
+  const adminNames = ['Resteral.TV', 'Sean'];
+  const nameLower = (appState.currentUser || '').toLowerCase();
+  appState.isAdmin = adminNames.includes(appState.currentUser) || nameLower.includes('.admin');
+  
+  const adminBtn = document.getElementById('tab-btn-admin');
+  if (adminBtn) {
+    adminBtn.style.display = appState.isAdmin ? 'block' : 'none';
+  }
 }
 
 function applyReferralCode(newUsername, code) {
@@ -3735,7 +3775,116 @@ function deleteCalendarEvent(id) {
   saveCalendarEvents();
   showToast("Event cancelled successfully.", "info");
   renderCalendar();
+  if (appState.currentTab === 'admin') renderAdminTab();
 }
+
+function adminCreateEvent() {
+  const name = document.getElementById('admin-event-name').value.trim();
+  const game = document.getElementById('admin-event-game').value;
+  const dateStr = document.getElementById('admin-event-date').value;
+  
+  if (!name || !dateStr) {
+    showToast("Please fill in all event details.", "warning");
+    return;
+  }
+  
+  const newEvent = {
+    id: Date.now().toString(),
+    name,
+    game,
+    isTournament: name.toLowerCase().includes('tournament') || name.toLowerCase().includes('cup') || name.toLowerCase().includes('scrim'),
+    date: dateStr
+  };
+  
+  calendarEvents.push(newEvent);
+  saveCalendarEvents();
+  
+  document.getElementById('admin-event-name').value = '';
+  document.getElementById('admin-event-date').value = '';
+  showToast("Event added to calendar!", "success");
+  
+  renderAdminTab();
+  renderCalendar();
+}
+
+function adminDeleteTournament(id) {
+  appState.tournaments = appState.tournaments.filter(t => t.id !== id);
+  showToast("Tournament deleted.", "info");
+  renderAdminTab();
+  if (appState.currentTab === 'tournaments') renderTournamentsTab();
+}
+
+function adminAdvanceTournament(id) {
+  const t = appState.tournaments.find(tour => tour.id === id);
+  if (!t) return;
+  
+  if (t.status === 'signup') {
+    t.status = 'draft';
+    showToast(`Tournament "${t.name}" moved to Draft Phase!`, 'info');
+  } else if (t.status === 'draft') {
+    t.status = 'active';
+    showToast(`Tournament "${t.name}" moved to Active Matches!`, 'info');
+  } else if (t.status === 'active') {
+    t.status = 'complete';
+    showToast(`Tournament "${t.name}" is now Complete!`, 'success');
+  }
+  renderAdminTab();
+  if (appState.currentTab === 'tournaments') renderTournamentsTab();
+}
+
+function renderAdminTab() {
+  const tourneyList = document.getElementById('admin-tournaments-list');
+  const eventsList = document.getElementById('admin-events-list');
+  if (!tourneyList || !eventsList) return;
+  
+  // Render Tournaments
+  if (appState.tournaments.length === 0) {
+    tourneyList.innerHTML = `<div style="color:var(--dc-text-muted); font-size:0.8rem; text-align:center;">No tournaments in database.</div>`;
+  } else {
+    tourneyList.innerHTML = appState.tournaments.map(t => {
+      let statusColor = '#94a3b8';
+      if (t.status === 'signup') statusColor = '#3b82f6';
+      if (t.status === 'draft') statusColor = '#f59e0b';
+      if (t.status === 'active') statusColor = '#10b981';
+      
+      const poolCount = (t.pool || []).length;
+      
+      return `
+        <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid var(--db-border); display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <div style="font-weight: bold; color: white; font-size: 0.9rem;">${t.name}</div>
+              <div style="font-size: 0.75rem; color: var(--dc-text-muted);">ID: ${t.id} | Pool: ${poolCount}</div>
+            </div>
+            <div style="font-size: 0.7rem; font-weight: bold; color: ${statusColor}; text-transform: uppercase; border: 1px solid ${statusColor}; padding: 2px 6px; border-radius: 4px;">
+              ${t.status}
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button onclick="adminAdvanceTournament('${t.id}')" class="btn btn-outline" style="flex: 1; font-size: 0.7rem; padding: 4px; border-color: ${statusColor}; color: ${statusColor};">Advance Status</button>
+            <button onclick="adminDeleteTournament('${t.id}')" class="btn btn-outline" style="font-size: 0.7rem; padding: 4px 8px; border-color: rgba(244,63,94,0.3); color: #f43f5e;">Delete</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  // Render Calendar Events
+  if (calendarEvents.length === 0) {
+    eventsList.innerHTML = `<div style="color:var(--dc-text-muted); font-size:0.8rem; text-align:center;">No events scheduled.</div>`;
+  } else {
+    eventsList.innerHTML = calendarEvents.map(e => `
+      <div style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--db-border); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: bold; color: white; font-size: 0.8rem;">${e.name}</div>
+          <div style="font-size: 0.7rem; color: var(--dc-text-muted);">${e.date} | ${e.game.toUpperCase()}</div>
+        </div>
+        <button onclick="deleteCalendarEvent('${e.id}')" class="btn btn-outline" style="font-size: 0.7rem; padding: 4px 8px; border-color: rgba(244,63,94,0.3); color: #f43f5e;">Cancel</button>
+      </div>
+    `).join('');
+  }
+}
+
 
 function joinTournamentFromCalendar(game) {
   let t = appState.tournaments.find(tour => tour.game === game && tour.status !== 'complete');
