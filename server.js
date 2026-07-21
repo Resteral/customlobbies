@@ -18,37 +18,59 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-  const urlPath = req.url.split('?')[0];
-  let filePath = path.join(__dirname, urlPath === '/' ? 'index.html' : urlPath);
-  
-  const hashIndex = filePath.indexOf('#');
-  if (hashIndex !== -1) {
-    filePath = filePath.substring(0, hashIndex);
+  const rawPath = req.url.split('?')[0];
+  const urlPath = rawPath.toLowerCase();
+
+  // ── /clicker shortcut ─────────────────────────────────────────────
+  if (urlPath === '/clicker') {
+    res.writeHead(302, { Location: '/clicker.html' });
+    res.end();
+    return;
   }
 
-  const extname = path.extname(filePath).toLowerCase();
-  let contentType = MIME_TYPES[extname] || 'application/octet-stream';
-
-  fs.readFile(filePath, (error, content) => {
-    if (error) {
-      if (error.code === 'ENOENT') {
-        fs.readFile(path.join(__dirname, 'index.html'), (err, indexContent) => {
-          if (err) {
-            res.writeHead(404, { 'Content-Type': 'text/html' });
-            res.end('<h1>404 Not Found</h1>', 'utf-8');
-          } else {
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(indexContent, 'utf-8');
-          }
-        });
+  // ── Static file — has a file extension, serve normally ────────────
+  const extname = path.extname(urlPath);
+  if (extname) {
+    const filePath = path.join(__dirname, rawPath);
+    fs.readFile(filePath, (err, content) => {
+      if (err) {
+        res.writeHead(404); res.end('Not found');
       } else {
-        res.writeHead(500);
-        res.end(`Server Error: ${error.code} ..\n`);
+        const mime = MIME_TYPES[extname] || 'application/octet-stream';
+        res.writeHead(200, { 'Content-Type': mime });
+        res.end(content, 'utf-8');
       }
-    } else {
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf-8');
-    }
+    });
+    return;
+  }
+
+  // ── Dynamic profile route: /username ──────────────────────────────
+  // Any single-segment path (e.g. /resteral, /tofushark) is treated as
+  // a player profile URL. The server injects __PROFILE_PLAYER__ into the
+  // HTML; the client resolves whether that player actually exists.
+  const segments = urlPath.split('/').filter(Boolean);
+  if (segments.length === 1 && segments[0] !== 'index') {
+    const slug = segments[0]; // e.g. "resteral"
+    const htmlPath = path.join(__dirname, 'index.html');
+    fs.readFile(htmlPath, 'utf-8', (err, html) => {
+      if (err) { res.writeHead(500); res.end('Server Error'); return; }
+      const injected = html.replace('</head>', `
+  <script>
+    /* Profile route: /${slug} */
+    window.__PROFILE_SLUG__ = ${JSON.stringify(slug)};
+  </script>
+</head>`);
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(injected, 'utf-8');
+    });
+    return;
+  }
+
+  // ── Root / → index.html ───────────────────────────────────────────
+  fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
+    if (err) { res.writeHead(500); res.end('Server Error'); return; }
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(content, 'utf-8');
   });
 });
 

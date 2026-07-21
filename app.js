@@ -107,8 +107,21 @@ function initLandingParticles() {
 
 // Hide the login screen until the user enters from the landing page
 document.addEventListener('DOMContentLoaded', () => {
-  const loginScr = document.getElementById('login-screen');
-  if (loginScr) loginScr.style.display = 'none';
+  // If a profile route injected __PROFILE_PLAYER__, auto-sign in
+  if (window.__PROFILE_PLAYER__) {
+    const name = window.__PROFILE_PLAYER__;
+    appState.currentUser = name;
+    localStorage.setItem('custom_lobbies_signed_in', 'true');
+    localStorage.setItem('custom_lobbies_user', name);
+    // Skip landing + login — go straight to lobby
+    const ls = document.getElementById('landing-screen');
+    if (ls) ls.style.display = 'none';
+    const loginScr = document.getElementById('login-screen');
+    if (loginScr) loginScr.style.display = 'none';
+  } else {
+    const loginScr = document.getElementById('login-screen');
+    if (loginScr) loginScr.style.display = 'none';
+  }
   initLandingParticles();
 });
 
@@ -1776,8 +1789,11 @@ function renderProfilesTab() {
     const refCountEl = document.getElementById('sponsorship-ref-count');
     const refEloEl = document.getElementById('sponsorship-ref-elo');
 
-    if (refCodeEl) refCodeEl.innerText = `customlobbies.${me.username}`;
-    if (refLinkEl) refLinkEl.value = `${window.location.origin}/?ref=customlobbies.${me.username}`;
+    // Short slug: just their lowercase username — resolves via /username route
+    const slug = me.username.toLowerCase().replace(/\s+/g, '');
+    const domain = window.location.hostname === 'localhost' ? window.location.origin : 'https://customlobbies.com';
+    if (refCodeEl) refCodeEl.innerText = slug;
+    if (refLinkEl) refLinkEl.value = `${domain}/${slug}`;
     if (refCountEl) refCountEl.innerText = me.referralsCount || 0;
     if (refEloEl) refEloEl.innerText = `+${(me.referralsCount || 0) * 15} ELO`;
   }
@@ -3208,53 +3224,52 @@ function signInAsGuest() {
 
 function applyReferralCode(newUsername, code) {
   if (!code) return;
-  if (code.startsWith('customlobbies.')) {
-    const referrerName = code.replace('customlobbies.', '');
-    const referrer = players.find(p => p.username.toLowerCase() === referrerName.toLowerCase());
-    if (referrer) {
-      referrer.referralsCount = (referrer.referralsCount || 0) + 1;
-      referrer.coins = (referrer.coins || 500) + 150;
-      GAMES.forEach(g => {
-        if (referrer.games[g]) {
-          referrer.games[g].elo += 15;
-          if (referrer.games[g].eloHistory) {
-            referrer.games[g].eloHistory.push(referrer.games[g].elo);
-          }
-        }
-      });
-      savePlayersToStorage();
-      showToast(`Referral code applied! Partner ${referrer.username} received +15 ELO & +150 Coins!`, "success");
-      
-      setTimeout(() => {
-        const chatMsgContainer = document.getElementById('chat-messages');
-        if (chatMsgContainer) {
-          const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          const botMessageHtml = `
-            <div class="dc-msg font-slide-in">
-              <div class="dc-msg-avatar" style="background-color:#8b5cf6;">🤝</div>
-              <div class="dc-msg-content">
-                <div class="dc-msg-header">
-                  <span class="dc-msg-username" style="color:#a78bfa;">Sponsor Bot</span>
-                  <span class="dc-msg-botbadge" style="background:#7c3aed;">PARTNER</span>
-                  <span class="dc-msg-time">${timeStr}</span>
-                </div>
-                <div class="dc-msg-text">
-                  🎉 Streamer Referral! <strong>${newUsername}</strong> registered using sponsor code <code style="color:#fbbf24; font-weight:bold;">${code}</code>! 
-                  Partner <strong>${referrer.username}</strong> has been credited with +15 ELO points in all ladders!
-                </div>
+
+  // Accept both short slug ("resteral") and legacy long format ("customlobbies.Resteral.TV")
+  const slug = code.startsWith('customlobbies.')
+    ? code.replace('customlobbies.', '').toLowerCase()
+    : code.trim().toLowerCase();
+
+  const referrer = players.find(p => p.username.toLowerCase().replace(/\s+/g, '') === slug);
+
+  if (referrer) {
+    referrer.referralsCount = (referrer.referralsCount || 0) + 1;
+    referrer.coins = (referrer.coins || 500) + 150;
+    GAMES.forEach(g => {
+      if (referrer.games[g]) {
+        referrer.games[g].elo += 15;
+        if (referrer.games[g].eloHistory) referrer.games[g].eloHistory.push(referrer.games[g].elo);
+      }
+    });
+    savePlayersToStorage();
+    showToast(`✅ Referral applied! ${referrer.username} earned +15 ELO & +150 Coins!`, "success");
+
+    setTimeout(() => {
+      const chatMsgContainer = document.getElementById('chat-messages');
+      if (chatMsgContainer) {
+        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        chatMsgContainer.insertAdjacentHTML('beforeend', `
+          <div class="dc-msg font-slide-in">
+            <div class="dc-msg-avatar" style="background-color:#8b5cf6;">🤝</div>
+            <div class="dc-msg-content">
+              <div class="dc-msg-header">
+                <span class="dc-msg-username" style="color:#a78bfa;">Sponsor Bot</span>
+                <span class="dc-msg-botbadge" style="background:#7c3aed;">PARTNER</span>
+                <span class="dc-msg-time">${timeStr}</span>
+              </div>
+              <div class="dc-msg-text">
+                🎉 <strong>${newUsername}</strong> joined via <strong>${referrer.username}</strong>'s link!
+                Partner credited: <span style="color:#10b981;">+15 ELO</span> &amp; <span style="color:#fbbf24;">+150 🪙</span>
               </div>
             </div>
-          `;
-          chatMsgContainer.insertAdjacentHTML('beforeend', botMessageHtml);
-          chatMsgContainer.scrollTop = chatMsgContainer.scrollHeight;
-          playSound('message');
-        }
-      }, 1500);
-    } else {
-      showToast(`Referral partner "${referrerName}" not found.`, "warning");
-    }
+          </div>
+        `);
+        chatMsgContainer.scrollTop = chatMsgContainer.scrollHeight;
+        playSound('message');
+      }
+    }, 1500);
   } else {
-    showToast("Invalid referral format. Use customlobbies.(username)", "warning");
+    showToast(`Referral code "${code}" not found. Check the username.`, "warning");
   }
 }
 
