@@ -305,6 +305,47 @@ function initSupabase() {
     try {
       supabaseClient = supabase.createClient(url, key);
       console.log("Supabase Client initialized successfully.");
+      
+      // Listen for OAuth callbacks
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+           const meta = session.user.user_metadata || {};
+           const username = meta.custom_claims?.global_name || meta.name || session.user.email?.split('@')[0] || 'DiscordUser';
+           
+           appState.currentUser = username;
+           localStorage.setItem('custom_lobbies_signed_in', 'true');
+           localStorage.setItem('custom_lobbies_user', username);
+           
+           if (session.user.app_metadata?.provider === 'discord') {
+             localStorage.setItem('custom_lobbies_discord_linked', 'true');
+           }
+           
+           const loginScr = document.getElementById('login-screen');
+           if (loginScr) loginScr.style.display = 'none';
+           
+           playSound('match_found');
+           showToast(`Welcome back, ${username}!`, "success");
+           
+           // Ensure player exists in simulated DB
+           let pl = players.find(p => p.username === username);
+           if (!pl) {
+             pl = {
+               username,
+               avatar: '👤',
+               bio: 'Competitive player via Supabase OAuth.',
+               referralsCount: 0,
+               games: {
+                 arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
+                 cs: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
+                 zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] }
+               }
+             };
+             players.push(pl);
+           }
+           renderLeaderboard();
+        }
+      });
+      
     } catch (e) {
       console.warn("Could not load Supabase client details:", e);
     }
