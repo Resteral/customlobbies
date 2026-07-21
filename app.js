@@ -219,7 +219,9 @@ let appState = {
       title: '🎥 Scrimming live on Arkheron custom lobbies! Join in.',
       isLive: true
     }
-  ]
+  ],
+  discordConnected: false,
+  connectedDiscordUser: null
 };
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -2610,4 +2612,103 @@ function renderStreamsList() {
       </div>
     `;
   }).join('');
+}
+
+// ==========================================
+// DISCORD ACCOUNT CONNECT / SYNC LOGIC
+// ==========================================
+
+function openDiscordOAuthModal() {
+  const modal = document.getElementById('discord-oauth-modal');
+  if (!modal) return;
+  
+  modal.style.display = 'flex';
+  
+  const select = document.getElementById('discord-oauth-player-select');
+  if (select) {
+    select.innerHTML = players.map(p => `
+      <option value="${p.username}" ${appState.currentUser === p.username ? 'selected' : ''}>
+        ${p.avatar || '👤'} ${p.username} (Avg ELO: ${Math.round(((p.games.arkheron?.elo || 1000) + (p.games.hockey?.elo || 1000) + (p.games.zealot?.elo || 1000)) / 3)})
+      </option>
+    `).join('');
+  }
+  
+  const unlinkSec = document.getElementById('discord-unlink-section');
+  if (unlinkSec) {
+    unlinkSec.style.display = appState.discordConnected ? 'block' : 'none';
+  }
+}
+
+function closeDiscordOAuthModal() {
+  const modal = document.getElementById('discord-oauth-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function authorizeDiscordAccount() {
+  const select = document.getElementById('discord-oauth-player-select');
+  if (!select) return;
+  
+  const selectedUser = select.value;
+  const pl = players.find(p => p.username === selectedUser);
+  if (!pl) return;
+  
+  appState.currentUser = selectedUser;
+  appState.discordConnected = true;
+  appState.connectedDiscordUser = selectedUser;
+  
+  const connBtn = document.getElementById('connect-discord-btn');
+  const profBadge = document.getElementById('discord-profile-badge');
+  const avatarBadge = document.getElementById('connected-avatar-badge');
+  const nameBadge = document.getElementById('connected-username-badge');
+  
+  if (connBtn && profBadge && avatarBadge && nameBadge) {
+    connBtn.style.display = 'none';
+    profBadge.style.display = 'inline-flex';
+    avatarBadge.innerText = pl.avatar || '👤';
+    nameBadge.innerText = selectedUser;
+  }
+  
+  playSound('match_found');
+  showToast(`Successfully connected to Discord as ${selectedUser}!`, "success");
+  
+  renderLeaderboard();
+  
+  if (appState.currentTab === 'profiles') {
+    renderProfilesTab();
+  } else if (appState.currentTab === 'tournaments') {
+    renderTournamentsTab();
+  } else if (appState.currentTab === 'forums') {
+    renderForumsTab();
+  }
+  
+  closeDiscordOAuthModal();
+}
+
+function disconnectDiscordAccount() {
+  appState.currentUser = 'Resteral.TV';
+  appState.discordConnected = false;
+  appState.connectedDiscordUser = null;
+  
+  const connBtn = document.getElementById('connect-discord-btn');
+  const profBadge = document.getElementById('discord-profile-badge');
+  
+  if (connBtn && profBadge) {
+    connBtn.style.display = 'inline-flex';
+    profBadge.style.display = 'none';
+  }
+  
+  playSound('pick');
+  showToast("Discord account disconnected.", "info");
+  
+  renderLeaderboard();
+  
+  if (appState.currentTab === 'profiles') {
+    renderProfilesTab();
+  } else if (appState.currentTab === 'tournaments') {
+    renderTournamentsTab();
+  } else if (appState.currentTab === 'forums') {
+    renderForumsTab();
+  }
+  
+  closeDiscordOAuthModal();
 }
