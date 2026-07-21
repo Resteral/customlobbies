@@ -2613,6 +2613,20 @@ function scheduleMonthlyCup() {
   appState.tournaments.push(newTourn);
   appState.activeTournamentId = newTourn.id;
 
+  if (typeof calendarEvents !== 'undefined') {
+    calendarEvents.push({
+      id: 'EV-TOUR-' + newTourn.id,
+      name: `🏆 ${newTourn.name}`,
+      game: newTourn.game,
+      isTournament: true,
+      date: nextSaturday.toISOString().split('T')[0]
+    });
+    saveCalendarEvents();
+    if (appState.currentTab === 'calendar') {
+      renderCalendar();
+    }
+  }
+
   playSound('match_found');
   showToast("Monthly League Championship scheduled!", "success");
   renderTournamentsTab();
@@ -3301,44 +3315,7 @@ async function signInWithSupabaseEmail() {
       showToast(`Supabase Auth Error: ${e.message}`, "danger");
     }
   } else {
-    // Simulated auth (Demo mode)
-    const username = email.split('@')[0];
-    
-    let pl = players.find(p => p.username === username);
-    const isNewUser = !pl;
-    if (isNewUser) {
-      pl = {
-        username,
-        avatar: '👤',
-        bio: 'Competitive player authenticated via demo Supabase.',
-        referralsCount: 0,
-        games: {
-          arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-          cs: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-          zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] }
-        }
-      };
-      players.push(pl);
-    }
-    
-    appState.currentUser = username;
-    localStorage.setItem('custom_lobbies_signed_in', 'true');
-    localStorage.setItem('custom_lobbies_user', username);
-    
-    const loginScr = document.getElementById('login-screen');
-    if (loginScr) loginScr.style.display = 'none';
-    
-    playSound('match_found');
-    showToast(`[Demo Mode] Signed in successfully as ${username}!`, "success");
-    
-    if (isNewUser) {
-      const referralCode = document.getElementById('supabase-referral-input').value.trim();
-      if (referralCode) {
-        applyReferralCode(username, referralCode);
-      }
-    }
-    
-    renderLeaderboard();
+    showToast("Supabase is not configured! Real authentication is required.", "danger");
   }
 }
 
@@ -3375,12 +3352,7 @@ async function signUpWithSupabaseEmail() {
       showToast(`Supabase Sign Up Error: ${e.message}`, "danger");
     }
   } else {
-    const username = email.split('@')[0];
-    showToast(`[Demo Mode] Created profile for ${username}! Signing in...`, "success");
-    
-    setTimeout(() => {
-      signInWithSupabaseEmail();
-    }, 1000);
+    showToast("Supabase is not configured! Real authentication is required.", "danger");
   }
 }
 
