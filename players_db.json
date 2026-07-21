@@ -52,5 +52,59 @@
     },
     "warnings": [],
     "role": "Flex"
+  },
+  "hawwkss": {
+    "username": "hawwkss",
+    "bio": "Competitive Custom Lobbies player.",
+    "avatar": "👤",
+    "registeredAt": "7/21/2026",
+    "games": {
+      "arkheron": {
+        "elo": 1000,
+        "wins": 0,
+        "losses": 0,
+        "kd": "1.00",
+        "eloHistory": [
+          1000
+        ],
+        "streak": 0,
+        "peakStreak": 0,
+        "lossStreak": 0,
+        "peakLossStreak": 0,
+        "avgFloor": "1.0 Floor",
+        "savedBuilds": [],
+        "teammates": {}
+      },
+      "hockey": {
+        "elo": 1000,
+        "wins": 0,
+        "losses": 0,
+        "kd": "1.00",
+        "eloHistory": [
+          1000
+        ],
+        "streak": 0,
+        "peakStreak": 0,
+        "lossStreak": 0,
+        "peakLossStreak": 0,
+        "teammates": {}
+      },
+      "zealot": {
+        "elo": 1000,
+        "wins": 0,
+        "losses": 0,
+        "kd": "1.00",
+        "eloHistory": [
+          1000
+        ],
+        "streak": 0,
+        "peakStreak": 0,
+        "lossStreak": 0,
+        "peakLossStreak": 0,
+        "teammates": {}
+      }
+    },
+    "warnings": [],
+    "role": "Flex"
   }
 }

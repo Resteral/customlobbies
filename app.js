@@ -2989,3 +2989,22 @@ function applyReferralCode(newUsername, code) {
     showToast("Invalid referral format. Use customlobbies.(username)", "warning");
   }
 }
+
+function signInWithDiscordOAuth() {
+  if (supabaseClient) {
+    try {
+      showToast("Redirecting to Discord Auth...", "info");
+      supabaseClient.auth.signInWithOAuth({
+        provider: 'discord',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+    } catch (e) {
+      showToast(`Supabase OAuth Error: ${e.message}`, "danger");
+    }
+  } else {
+    // Fallback to local dev simulated consent popup modal
+    openDiscordOAuthModal();
+  }
+}
