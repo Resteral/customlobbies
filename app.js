@@ -1570,6 +1570,17 @@ function renderProfilesTab() {
     document.getElementById('prof-edit-color').value = me.color || '#7c3aed';
     document.getElementById('prof-edit-color-hex').value = me.color || '#7c3aed';
     document.getElementById('prof-edit-role').value = me.role || 'Flex';
+
+    // Update referrals widget values
+    const refCodeEl = document.getElementById('sponsorship-ref-code');
+    const refLinkEl = document.getElementById('sponsorship-ref-link');
+    const refCountEl = document.getElementById('sponsorship-ref-count');
+    const refEloEl = document.getElementById('sponsorship-ref-elo');
+
+    if (refCodeEl) refCodeEl.innerText = `customlobbies.${me.username}`;
+    if (refLinkEl) refLinkEl.value = `${window.location.origin}/?ref=customlobbies.${me.username}`;
+    if (refCountEl) refCountEl.innerText = me.referralsCount || 0;
+    if (refEloEl) refEloEl.innerText = `+${(me.referralsCount || 0) * 15} ELO`;
   }
 
   // Render profiles list of all players
@@ -2843,11 +2854,13 @@ async function signInWithSupabaseEmail() {
     const username = email.split('@')[0];
     
     let pl = players.find(p => p.username === username);
-    if (!pl) {
+    const isNewUser = !pl;
+    if (isNewUser) {
       pl = {
         username,
         avatar: '👤',
         bio: 'Competitive player authenticated via demo Supabase.',
+        referralsCount: 0,
         games: {
           arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
           hockey: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
@@ -2866,6 +2879,14 @@ async function signInWithSupabaseEmail() {
     
     playSound('match_found');
     showToast(`[Demo Mode] Signed in successfully as ${username}!`, "success");
+    
+    if (isNewUser) {
+      const referralCode = document.getElementById('supabase-referral-input').value.trim();
+      if (referralCode) {
+        applyReferralCode(username, referralCode);
+      }
+    }
+    
     renderLeaderboard();
   }
 }
@@ -2885,6 +2906,12 @@ async function signUpWithSupabaseEmail() {
       const { data, error } = await supabaseClient.auth.signUp({ email, password });
       
       if (error) throw error;
+      
+      const referralCode = document.getElementById('supabase-referral-input').value.trim();
+      const username = email.split('@')[0];
+      if (referralCode) {
+        applyReferralCode(username, referralCode);
+      }
       
       showToast("Sign up successful! Please check your email inbox to confirm.", "success");
     } catch (e) {
@@ -2911,4 +2938,54 @@ function signInAsGuest() {
   playSound('join');
   showToast("Signed in as Guest.", "info");
   renderLeaderboard();
+}
+
+function applyReferralCode(newUsername, code) {
+  if (!code) return;
+  if (code.startsWith('customlobbies.')) {
+    const referrerName = code.replace('customlobbies.', '');
+    const referrer = players.find(p => p.username.toLowerCase() === referrerName.toLowerCase());
+    if (referrer) {
+      referrer.referralsCount = (referrer.referralsCount || 0) + 1;
+      GAMES.forEach(g => {
+        if (referrer.games[g]) {
+          referrer.games[g].elo += 15;
+          if (referrer.games[g].eloHistory) {
+            referrer.games[g].eloHistory.push(referrer.games[g].elo);
+          }
+        }
+      });
+      showToast(`Referral code applied! Partner ${referrer.username} received +15 ELO!`, "success");
+      
+      setTimeout(() => {
+        const chatMsgContainer = document.getElementById('chat-messages');
+        if (chatMsgContainer) {
+          const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const botMessageHtml = `
+            <div class="dc-msg font-slide-in">
+              <div class="dc-msg-avatar" style="background-color:#8b5cf6;">🤝</div>
+              <div class="dc-msg-content">
+                <div class="dc-msg-header">
+                  <span class="dc-msg-username" style="color:#a78bfa;">Sponsor Bot</span>
+                  <span class="dc-msg-botbadge" style="background:#7c3aed;">PARTNER</span>
+                  <span class="dc-msg-time">${timeStr}</span>
+                </div>
+                <div class="dc-msg-text">
+                  🎉 Streamer Referral! <strong>${newUsername}</strong> registered using sponsor code <code style="color:#fbbf24; font-weight:bold;">${code}</code>! 
+                  Partner <strong>${referrer.username}</strong> has been credited with +15 ELO points in all ladders!
+                </div>
+              </div>
+            </div>
+          `;
+          chatMsgContainer.insertAdjacentHTML('beforeend', botMessageHtml);
+          chatMsgContainer.scrollTop = chatMsgContainer.scrollHeight;
+          playSound('message');
+        }
+      }, 1500);
+    } else {
+      showToast(`Referral partner "${referrerName}" not found.`, "warning");
+    }
+  } else {
+    showToast("Invalid referral format. Use customlobbies.(username)", "warning");
+  }
 }

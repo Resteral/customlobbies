@@ -34,6 +34,10 @@
           <label style="display: block; font-size: 0.65rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold; text-transform: uppercase;">Password</label>
           <input type="password" id="supabase-password-input" placeholder="••••••••" style="width: 100%; padding: 8px 12px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;">
         </div>
+        <div>
+          <label style="display: block; font-size: 0.65rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold; text-transform: uppercase;">Sponsorship Referral Code (Optional)</label>
+          <input type="text" id="supabase-referral-input" placeholder="customlobbies.username" style="width: 100%; padding: 8px 12px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;">
+        </div>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px;">
           <button class="btn btn-primary" onclick="signInWithSupabaseEmail()" style="font-size: 0.8rem; padding: 10px; font-weight: bold; background: var(--db-primary); border-color: var(--db-primary); margin:0;">🔑 Sign In</button>
@@ -442,47 +446,80 @@
     <!-- TAB 4: PLAYER PROFILES -->
     <section class="tab-pane" id="pane-profiles">
       <div style="max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 320px 1fr; gap: 20px;">
-        
-        <!-- Profile Editor Column -->
-        <div class="db-card" style="padding: 16px;">
-          <div class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">👤 Edit Your Profile</div>
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div>
-              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">AVATAR EMOJI</label>
-              <input type="text" id="prof-edit-avatar" value="🛡️" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. 🦊">
+        <!-- Profile Editor & Referral Column -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Profile Editor Card -->
+          <div class="db-card" style="padding: 16px;">
+            <div class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">👤 Edit Your Profile</div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">AVATAR EMOJI</label>
+                <input type="text" id="prof-edit-avatar" value="🛡️" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. 🦊">
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">LINKED IN-GAME NAME</label>
+                <input type="text" id="prof-edit-ingame" value="Resteral.TV" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. Resteral.TV">
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">STEAM HEX ID</label>
+                <input type="text" id="prof-edit-steamhex" value="11000011a2b3c4d" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. 11000011a2b3c4d">
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">PROFILE EMBED COLOR</label>
+                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                  <input type="color" id="prof-edit-color" value="#7c3aed" style="width: 40px; height: 36px; padding: 0; border: none; border-radius: 4px; background: none; cursor: pointer;" oninput="document.getElementById('prof-edit-color-hex').value = this.value">
+                  <input type="text" id="prof-edit-color-hex" value="#7c3aed" style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. #7c3aed" oninput="if(/^#[0-9A-F]{6}$/i.test(this.value)) document.getElementById('prof-edit-color').value = this.value">
+                </div>
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">PREFERRED ROLE</label>
+                <select id="prof-edit-role" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;">
+                  <option value="Flex">🔄 Flex Role</option>
+                  <option value="Forward">🏒 Forward (Hockey)</option>
+                  <option value="Defender">🛡️ Defender (Hockey)</option>
+                  <option value="Goalie">🧤 Goalie (Hockey / Zealot)</option>
+                  <option value="DPS">⚔️ DPS (Arkheron)</option>
+                  <option value="Tank">🛡️ Tank (Arkheron)</option>
+                  <option value="Support">💚 Support (Arkheron)</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">PROFILE BIO</label>
+                <textarea id="prof-edit-bio" rows="4" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white; resize: none;" placeholder="Tell the lobby about yourself...">Apex player looking for scrims.</textarea>
+              </div>
+              <button class="btn btn-primary" onclick="saveUserProfile()" style="width: 100%; margin-top: 4px;">💾 Save Changes</button>
             </div>
-            <div>
-              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">LINKED IN-GAME NAME</label>
-              <input type="text" id="prof-edit-ingame" value="Resteral.TV" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. Resteral.TV">
+          </div>
+
+          <!-- Sponsorship & Referral Card -->
+          <div class="db-card" style="padding: 16px; border-top: 3.5px solid #a78bfa;">
+            <div class="card-title" style="font-size: 1.1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+              <span>🤝 Sponsorships</span>
+              <span class="badge" style="background:#8b5cf6; font-size:0.65rem; padding: 2px 6px; margin: 0;">Active Partner</span>
             </div>
-            <div>
-              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">STEAM HEX ID</label>
-              <input type="text" id="prof-edit-steamhex" value="11000011a2b3c4d" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. 11000011a2b3c4d">
-            </div>
-            <div>
-              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">PROFILE EMBED COLOR</label>
-              <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
-                <input type="color" id="prof-edit-color" value="#7c3aed" style="width: 40px; height: 36px; padding: 0; border: none; border-radius: 4px; background: none; cursor: pointer;" oninput="document.getElementById('prof-edit-color-hex').value = this.value">
-                <input type="text" id="prof-edit-color-hex" value="#7c3aed" style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;" placeholder="e.g. #7c3aed" oninput="if(/^#[0-9A-F]{6}$/i.test(this.value)) document.getElementById('prof-edit-color').value = this.value">
+            <p style="font-size: 0.75rem; color: var(--dc-text-muted); line-height: 1.4; margin-bottom: 12px;">
+              Promote Custom Lobbies! Get new players to register using your custom referral code to earn ELO bonuses.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem;">
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--dc-text-muted); font-weight:bold; text-transform:uppercase;">Your Referral Code</span>
+                <code id="sponsorship-ref-code" style="display:block; background:var(--db-bg); padding:6px 10px; border-radius:4px; border:1px solid var(--db-border); color:#fbbf24; font-weight:bold; font-size:0.85rem; margin-top:2px;">customlobbies.Resteral.TV</code>
+              </div>
+              <div>
+                <span style="display:block; font-size:0.65rem; color:var(--dc-text-muted); font-weight:bold; text-transform:uppercase;">Personal Referral Link</span>
+                <input type="text" id="sponsorship-ref-link" value="http://localhost:3002/?ref=customlobbies.Resteral.TV" readonly style="width:100%; padding:6px; font-size:0.75rem; border-radius:4px; border:1px solid var(--db-border); background:var(--db-bg); color:white; margin-top:2px; cursor:text;">
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: center; margin-top: 4px; background: rgba(0,0,0,0.15); padding: 8px; border-radius: 6px;">
+                <div>
+                  <span style="display:block; font-size:0.6rem; color:var(--dc-text-muted);">Referrals</span>
+                  <strong id="sponsorship-ref-count" style="font-size:1.1rem; color:white;">0</strong>
+                </div>
+                <div>
+                  <span style="display:block; font-size:0.6rem; color:var(--dc-text-muted);">ELO Bonus</span>
+                  <strong id="sponsorship-ref-elo" style="font-size:1.1rem; color:#10b981;">+0 ELO</strong>
+                </div>
               </div>
             </div>
-            <div>
-              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">PREFERRED ROLE</label>
-              <select id="prof-edit-role" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;">
-                <option value="Flex">🔄 Flex Role</option>
-                <option value="Forward">🏒 Forward (Hockey)</option>
-                <option value="Defender">🛡️ Defender (Hockey)</option>
-                <option value="Goalie">🧤 Goalie (Hockey / Zealot)</option>
-                <option value="DPS">⚔️ DPS (Arkheron)</option>
-                <option value="Tank">🛡️ Tank (Arkheron)</option>
-                <option value="Support">💚 Support (Arkheron)</option>
-              </select>
-            </div>
-            <div>
-              <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">PROFILE BIO</label>
-              <textarea id="prof-edit-bio" rows="4" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white; resize: none;" placeholder="Tell the lobby about yourself...">Apex player looking for scrims.</textarea>
-            </div>
-            <button class="btn btn-primary" onclick="saveUserProfile()" style="width: 100%; margin-top: 4px;">💾 Save Changes</button>
           </div>
         </div>
 
