@@ -5057,5 +5057,91 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(initPublicProfileRoute, 50); // slight delay to ensure UI parses
 });
 
+// ==========================================
+// 🏒 SLAP SHOT HOCKEY CASINO GAME
+// ==========================================
 
+function playSlapShot() {
+  const me = players.find(p => p.username === appState.currentUser);
+  if (!me) return showToast("Log in to play Slap Shot Hockey!", "warning");
+  
+  const betInput = document.getElementById('hockey-bet-input');
+  const targetSelect = document.getElementById('hockey-target-select');
+  const visual = document.getElementById('hockey-visual');
+  const btn = document.getElementById('btn-slap-shot');
+  
+  if (!betInput || !targetSelect || !visual || !btn) return;
+  
+  const amount = parseInt(betInput.value, 10);
+  const target = targetSelect.value;
+  
+  me.coins = me.coins || 500;
+  if (isNaN(amount) || amount < 10) return showToast("Minimum bet is 10 Coins!", "warning");
+  if (amount > me.coins) return showToast("Insufficient balance for this bet!", "warning");
+  
+  // Deduct bet
+  me.coins -= amount;
+  updateCoinsUI();
+  
+  // Disable button during animation
+  btn.disabled = true;
+  btn.innerText = "Taking the Shot...";
+  
+  // Animate the shot
+  visual.style.transform = "scale(1.1) translateX(10px)";
+  visual.innerHTML = "🏒 💨";
+  playSound('click'); // placeholder sound
+  
+  setTimeout(() => {
+    // Determine win/loss
+    const rand = Math.random();
+    let winChance = 0;
+    let multiplier = 0;
+    let targetName = "";
+    
+    if (target === 'left') {
+      winChance = 0.35;
+      multiplier = 2.5;
+      targetName = "Left Top Shelf";
+    } else if (target === 'right') {
+      winChance = 0.35;
+      multiplier = 2.5;
+      targetName = "Right Top Shelf";
+    } else if (target === 'fivehole') {
+      winChance = 0.10;
+      multiplier = 8.0;
+      targetName = "Five Hole";
+    }
+    
+    const isWin = rand < winChance;
+    
+    if (isWin) {
+      const winnings = Math.floor(amount * multiplier);
+      me.coins += winnings;
+      visual.style.transform = "scale(1.2)";
+      visual.style.borderColor = "#10b981"; // green
+      visual.innerHTML = "🥅 🚨 GOAL!";
+      showToast(`🎯 SCORE! You hit the ${targetName} and won ${winnings} Coins!`, "success");
+      playSound('match_found');
+    } else {
+      visual.style.transform = "scale(0.9)";
+      visual.style.borderColor = "#ef4444"; // red
+      visual.innerHTML = "🧱 SAVED!";
+      showToast(`❌ Saved by the goalie. You lost ${amount} Coins.`, "warning");
+    }
+    
+    savePlayersToStorage();
+    updateCoinsUI();
+    
+    // Reset after delay
+    setTimeout(() => {
+      visual.style.transform = "scale(1)";
+      visual.style.borderColor = "var(--dc-brand)";
+      visual.innerHTML = "🥅 🏒";
+      btn.disabled = false;
+      btn.innerHTML = "🎯 Take the Shot!";
+    }, 2000);
+    
+  }, 800);
+}
 
