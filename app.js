@@ -550,46 +550,152 @@ function selectSimulatedChannel(game) {
 function renderLeaderboard() {
   const tbody = document.getElementById('leaderboard-table-body');
   if (!tbody) return;
-  tbody.innerHTML = '';
 
-  const sortedPlayers = [...players].sort((a, b) => {
-    const eloA = a.games[currentSelectedGame]?.elo || 1000;
-    const eloB = b.games[currentSelectedGame]?.elo || 1000;
-    return eloB - eloA;
-  });
+  const searchEl = document.getElementById('lb-search');
+  const searchTerm = searchEl ? searchEl.value.toLowerCase() : '';
+
+  const sortedPlayers = [...players]
+    .filter(p => p.username.toLowerCase().includes(searchTerm))
+    .sort((a, b) => {
+      const eloA = a.games[currentSelectedGame]?.elo || 1000;
+      const eloB = b.games[currentSelectedGame]?.elo || 1000;
+      return eloB - eloA;
+    });
 
   const titleSpan = document.querySelector('.tab-pane#pane-leaderboard .card-title span');
-  if (titleSpan) {
-    titleSpan.innerHTML = `🏆 Custom Lobbies Leaderboard: <strong>${currentSelectedGame.toUpperCase()}</strong>`;
+  if (titleSpan) titleSpan.innerHTML = `🏆 Stat Tracker — <strong>${currentSelectedGame.toUpperCase()}</strong>`;
+
+  function getRankInfo(elo) {
+    if (elo >= 2000) return { label: 'Immortal', emoji: '👑', color: '#f43f5e' };
+    if (elo >= 1800) return { label: 'Diamond',  emoji: '💠', color: '#06b6d4' };
+    if (elo >= 1600) return { label: 'Platinum', emoji: '💎', color: '#8b5cf6' };
+    if (elo >= 1450) return { label: 'Gold II',  emoji: '🥇', color: '#fbbf24' };
+    if (elo >= 1300) return { label: 'Gold I',   emoji: '🥇', color: '#f59e0b' };
+    if (elo >= 1200) return { label: 'Silver II', emoji: '🥈', color: '#94a3b8' };
+    if (elo >= 1100) return { label: 'Silver I',  emoji: '🥈', color: '#64748b' };
+    if (elo >= 900)  return { label: 'Bronze',    emoji: '🥉', color: '#a16207' };
+    return                  { label: 'Iron',      emoji: '⬛', color: '#374151' };
   }
 
-  sortedPlayers.forEach((p, idx) => {
-    const pg = p.games[currentSelectedGame] || { elo: 1000, wins: 0, losses: 0, kd: "1.00" };
-    const ratio = pg.losses > 0 ? (pg.wins / pg.losses).toFixed(2) : pg.wins.toFixed(2);
-    
-    let tier = 'Silver';
-    let tierClass = 'badge-danger';
-    if (pg.elo >= 1500) { tier = 'Challenger'; tierClass = 'badge-warning'; }
-    else if (pg.elo >= 1350) { tier = 'Elite'; tierClass = 'badge-primary'; }
-    else if (pg.elo >= 1200) { tier = 'Diamond'; tierClass = 'badge-success'; }
-    else if (pg.elo >= 1050) { tier = 'Gold'; tierClass = 'badge-secondary'; }
+  function miniSparkline(eloHistory) {
+    if (!eloHistory || eloHistory.length < 2) return '<span style="color:var(--dc-text-muted);font-size:0.68rem;">No data</span>';
+    const vals = eloHistory.slice(-10);
+    const min  = Math.min(...vals), max = Math.max(...vals);
+    const range = max - min || 1;
+    const w = 60, h = 22;
+    const pts = vals.map((v, i) => {
+      const x = (i / (vals.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    const trend = vals[vals.length - 1] >= vals[0];
+    return `<svg width="${w}" height="${h}" style="vertical-align:middle;">
+      <polyline points="${pts}" fill="none" stroke="${trend ? '#10b981' : '#f43f5e'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+  }
 
-    const rowHtml = `
-      <tr style="border-bottom:1px solid var(--db-border); height:52px;">
-        <td style="padding:8px; font-weight:800; font-family:var(--font-display); color:${idx === 0 ? 'var(--dc-yellow)' : '#d1d5db'}">${idx + 1}</td>
-        <td style="padding:8px; font-weight:600; display:flex; align-items:center; gap:8px; height:52px;">
-          <span>${p.avatar}</span>
-          <span>${p.username}</span>
+  tbody.innerHTML = sortedPlayers.map((p, idx) => {
+    const pg    = p.games[currentSelectedGame] || { elo: 1000, wins: 0, losses: 0, kd: '1.00', eloHistory: [1000] };
+    const rank  = getRankInfo(pg.elo);
+    const wr    = pg.wins + pg.losses > 0 ? ((pg.wins / (pg.wins + pg.losses)) * 100).toFixed(1) : '0.0';
+    const ratio = pg.losses > 0 ? (pg.wins / pg.losses).toFixed(2) : (pg.wins || 0).toFixed(2);
+    const peak  = pg.eloHistory ? Math.max(...pg.eloHistory) : pg.elo;
+    const streak = pg.streak || 0;
+    const streakLabel = streak > 0 ? `🔥 ${streak}W` : streak < 0 ? `❄️ ${Math.abs(streak)}L` : '—';
+    const isMe  = p.username === appState.currentUser;
+    const rowId = `lb-expand-${p.username.replace(/\W/g, '')}`;
+
+    // All 3 games mini stats for expanded view
+    const allGames = GAMES.map(g => {
+      const gg = p.games[g] || { elo: 1000, wins: 0, losses: 0, kd: '1.00', eloHistory: [1000] };
+      const gr = getRankInfo(gg.elo);
+      const gwr = gg.wins + gg.losses > 0 ? ((gg.wins / (gg.wins + gg.losses)) * 100).toFixed(1) : '0.0';
+      return `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <div style="width:70px;font-weight:700;font-size:0.72rem;color:white;text-transform:uppercase;">${g}</div>
+          <span style="font-size:1rem;">${gr.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-size:0.75rem;color:white;font-weight:700;">${gg.elo} <span style="color:${gr.color};font-size:0.65rem;">${gr.label}</span></div>
+            <div style="font-size:0.65rem;color:var(--dc-text-muted);">${gg.wins}W / ${gg.losses}L · ${gwr}% WR · K/D ${gg.kd}</div>
+          </div>
+          <div>${miniSparkline(gg.eloHistory)}</div>
+        </div>`;
+    }).join('');
+
+    return `
+      <tr id="lb-row-${rowId}"
+          onclick="toggleLbExpand('${rowId}')"
+          style="border-bottom:1px solid var(--db-border);cursor:pointer;transition:background 0.15s ease;${isMe ? 'background:rgba(139,92,246,0.07);' : ''}"
+          onmouseover="this.style.background='rgba(255,255,255,0.03)'"
+          onmouseout="this.style.background='${isMe ? 'rgba(139,92,246,0.07)' : 'transparent'}'">
+        <td style="padding:10px 8px;font-weight:900;font-family:var(--font-display);color:${idx===0?'#fbbf24':idx===1?'#94a3b8':idx===2?'#a16207':'var(--dc-text-muted)'};font-size:${idx<3?'1.1rem':'0.9rem'};">
+          ${idx===0?'🥇':idx===1?'🥈':idx===2?'🥉':`#${idx+1}`}
         </td>
-        <td style="padding:8px;"><span class="badge ${tierClass}">${tier}</span></td>
-        <td style="padding:8px; font-weight:700; color:white;">${pg.elo}</td>
-        <td style="padding:8px; text-align:center;">${pg.wins} W / ${pg.losses} L (K/D: ${pg.kd})</td>
-        <td style="padding:8px; text-align:right; font-weight:700; color:var(--dc-text-link);">${ratio}</td>
+        <td style="padding:10px 8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:1.4rem;">${p.avatar || '👤'}</span>
+            <div>
+              <div style="font-weight:700;color:${isMe?'#a78bfa':'white'};font-size:0.88rem;">${p.username}${isMe?' (You)':''}</div>
+              <div style="font-size:0.65rem;color:var(--dc-text-muted);">${streakLabel}</div>
+            </div>
+          </div>
+        </td>
+        <td style="padding:10px 8px;">
+          <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;background:${rank.color}22;border:1px solid ${rank.color}55;font-size:0.72rem;font-weight:700;color:${rank.color};">
+            ${rank.emoji} ${rank.label}
+          </span>
+        </td>
+        <td style="padding:10px 8px;font-family:var(--font-display);font-weight:900;font-size:1.05rem;color:white;">${pg.elo}</td>
+        <td style="padding:10px 8px;font-size:0.78rem;color:var(--dc-text-muted);">${pg.wins}W <span style="color:rgba(255,255,255,0.2);">/</span> ${pg.losses}L</td>
+        <td style="padding:10px 8px;text-align:center;">
+          <div style="font-size:0.8rem;font-weight:700;color:${parseFloat(wr)>=50?'#10b981':'#f43f5e'}">${wr}%</div>
+          <div style="font-size:0.6rem;color:var(--dc-text-muted);">win rate</div>
+        </td>
+        <td style="padding:10px 8px;text-align:right;">${miniSparkline(pg.eloHistory)}</td>
+        <td style="padding:10px 8px;text-align:center;color:var(--dc-text-muted);font-size:0.75rem;">▼</td>
       </tr>
-    `;
-    tbody.insertAdjacentHTML('beforeend', rowHtml);
-  });
+      <tr id="${rowId}" style="display:none;">
+        <td colspan="8" style="padding:0;">
+          <div style="padding:14px 20px;background:rgba(0,0,0,0.25);border-bottom:1px solid var(--db-border);">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+              <div style="text-align:center;padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--db-border);">
+                <div style="font-size:0.6rem;color:var(--dc-text-muted);text-transform:uppercase;margin-bottom:2px;">Peak ELO</div>
+                <div style="font-family:var(--font-display);font-weight:800;color:#fbbf24;">${peak}</div>
+              </div>
+              <div style="text-align:center;padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--db-border);">
+                <div style="font-size:0.6rem;color:var(--dc-text-muted);text-transform:uppercase;margin-bottom:2px;">K/D Ratio</div>
+                <div style="font-family:var(--font-display);font-weight:800;color:white;">${pg.kd}</div>
+              </div>
+              <div style="text-align:center;padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--db-border);">
+                <div style="font-size:0.6rem;color:var(--dc-text-muted);text-transform:uppercase;margin-bottom:2px;">W/L Ratio</div>
+                <div style="font-family:var(--font-display);font-weight:800;color:white;">${ratio}</div>
+              </div>
+              <div style="text-align:center;padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--db-border);">
+                <div style="font-size:0.6rem;color:var(--dc-text-muted);text-transform:uppercase;margin-bottom:2px;">Coins</div>
+                <div style="font-family:var(--font-display);font-weight:800;color:#fbbf24;">🪙 ${p.coins || 500}</div>
+              </div>
+            </div>
+            <div style="font-size:0.7rem;color:var(--dc-text-muted);margin-bottom:8px;text-transform:uppercase;font-weight:700;letter-spacing:.5px;">All Games</div>
+            ${allGames}
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  if (sortedPlayers.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--dc-text-muted);">No players found matching "${searchTerm}"</td></tr>`;
+  }
 }
+
+function toggleLbExpand(rowId) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  const isOpen = row.style.display !== 'none';
+  // Close all others
+  document.querySelectorAll('[id^="lb-expand-"]').forEach(r => r.style.display = 'none');
+  if (!isOpen) row.style.display = 'table-row';
+}
+
 
 // Chat Parser
 function simulateCommand(cmdText) {
