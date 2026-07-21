@@ -1487,4 +1487,6 @@ if (!token || token === 'YOUR_DISCORD_BOT_TOKEN') {
   console.error("❌ Error: DISCORD_BOT_TOKEN is not configured in your .env file!");
   process.exit(1);
 }
-client.login(token);
+client.login(token).catch(err => {
+  console.error("❌ Failed to log in to Discord:", err);
+});

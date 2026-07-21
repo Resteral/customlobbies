@@ -1,6 +1,6 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/hns-draft-bot/$1" }
+    { "source": "/(.*)", "destination": "/custom-lobbies/$1" }
   ]
 }

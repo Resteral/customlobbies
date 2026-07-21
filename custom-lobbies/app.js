@@ -1312,7 +1312,7 @@ const CODE_SOURCES = {
     "dotenv": "^16.4.5"
   },
   "scripts": {
-    "start": "node bot.js"
+    "start": "node server.js"
   },
   "author": "Antigravity Pair",
   "license": "MIT"

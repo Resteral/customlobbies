@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 3002; // Simulator runs on port 3002
+const PORT = process.env.PORT || 3002; // Dynamically bound port for platforms like Railway or local testing
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -54,3 +54,16 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);
 });
+
+// Start the Discord bot in the same process if a token is configured
+const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
+if (DISCORD_BOT_TOKEN && DISCORD_BOT_TOKEN !== 'YOUR_DISCORD_BOT_TOKEN') {
+  console.log('DISCORD_BOT_TOKEN detected in environment. Initializing Discord bot...');
+  try {
+    require('./bot.js');
+  } catch (error) {
+    console.error('Failed to load or start Discord bot:', error);
+  }
+} else {
+  console.log('No DISCORD_BOT_TOKEN found or it is using the placeholder. Operating in Web Simulator mode only.');
+}

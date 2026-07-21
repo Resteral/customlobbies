@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arkheron Stats, Profiles & Build Maker | Ascension Royale</title>
+  <meta name="description" content="Track your performance, design winning relic synergies, transform into Eternals, and check meta builds for Arkheron, the Ascension Royale PvP game by Bonfire Studios.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container header-inner">
+      <a href="#" class="logo" onclick="switchTab('dashboard'); return false;">
+        <span class="logo-icon">🔥</span>
+        <span>ARKHERON // STATS</span>
+      </a>
+      
+      <nav>
+        <button class="nav-link active" id="nav-dashboard" onclick="switchTab('dashboard')">
+          <span>📊</span> Dashboard
+        </button>
+        <button class="nav-link" id="nav-buildmaker" onclick="switchTab('buildmaker')">
+          <span>⚒️</span> Build Maker
+        </button>
+        <button class="nav-link" id="nav-eternals" onclick="switchTab('eternals')">
+          <span>👑</span> Eternals
+        </button>
+        <button class="nav-link" id="nav-profiles" onclick="switchTab('profiles')">
+          <span>👤</span> Profile
+        </button>
+      </nav>
+
+      <div class="user-widget" id="user-widget" onclick="switchTab('profiles')">
+        <div class="user-widget-avatar" id="user-widget-avatar">?</div>
+        <div class="user-widget-name" id="user-widget-name">Guest Player</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="container">
+
+    <!-- 1. DASHBOARD TAB -->
+    <section class="tab-content active" id="tab-dashboard">
+      <div class="title-section">
+        <h1>Ascension Royale <span>Live Stats</span></h1>
+        <p>Real-time analytics and character trends compiled from active combat inside the Tower of Arkheron.</p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid-stats">
+        <div class="glass-card stat-item">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <span class="stat-label">Active Climbers</span>
+            <span class="stat-value" id="live-players">1,482</span>
+          </div>
+        </div>
+        <div class="glass-card stat-item">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-info">
+            <span class="stat-label">24-Hour Peak</span>
+            <span class="stat-value" id="peak-players">3,248</span>
+          </div>
+        </div>
+        <div class="glass-card stat-item">
+          <div class="stat-icon">⚔️</div>
+          <div class="stat-info">
+            <span class="stat-label">Matches Completed</span>
+            <span class="stat-value" id="global-matches">41,208</span>
+          </div>
+        </div>
+        <div class="glass-card stat-item">
+          <div class="stat-icon">💎</div>
+          <div class="stat-info">
+            <span class="stat-label">Relic Combinations</span>
+            <span class="stat-value">1,296</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Visual Layout -->
+      <div class="dashboard-layout">
+        <!-- Most Played Eternals -->
+        <div class="glass-card dashboard-chart-card">
+          <div class="dashboard-chart-header">
+            <h2 class="dashboard-chart-title"><span>👑</span> Most Played Eternals</h2>
+            <span class="badge badge-primary">This Season</span>
+          </div>
+          <div class="usage-list" id="eternals-usage-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Meta Relic Sets -->
+        <div class="glass-card dashboard-chart-card">
+          <div class="dashboard-chart-header">
+            <h2 class="dashboard-chart-title"><span>💎</span> Relic Set Meta</h2>
+            <span class="badge badge-success">S-Tier</span>
+          </div>
+          <div class="usage-list" id="relic-set-meta-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. BUILD MAKER TAB -->
+    <section class="tab-content" id="tab-buildmaker">
+      <div class="title-section">
+        <h1>Ascension <span>Build Maker</span></h1>
+        <p>Equip relic combinations, discover powerful set bonuses, and preview your Eternal transformation stats.</p>
+      </div>
+
+      <div class="buildmaker-layout">
+        <!-- Left Panel: Relic Slots -->
+        <div class="buildmaker-slots">
+          <h2 class="synergy-header"><span>🎒</span> Equip Relics</h2>
+          
+          <!-- Crown Slot -->
+          <div class="relic-slot-card" id="slot-crown" onclick="openRelicSelector('crown')">
+            <div class="relic-slot-icon-container">👑</div>
+            <div class="relic-slot-details">
+              <span class="relic-slot-label">Crown Slot</span>
+              <span class="relic-slot-name" id="name-crown">Empty Slot</span>
+              <span class="relic-slot-set" id="set-crown">Click to select relic</span>
+            </div>
+            <div class="relic-slot-remove" onclick="removeRelic('crown', event)">✖</div>
+          </div>
+
+          <!-- Weapon 1 Slot -->
+          <div class="relic-slot-card" id="slot-weapon1" onclick="openRelicSelector('weapon1')">
+            <div class="relic-slot-icon-container">⚔️</div>
+            <div class="relic-slot-details">
+              <span class="relic-slot-label">Weapon 1</span>
+              <span class="relic-slot-name" id="name-weapon1">Empty Slot</span>
+              <span class="relic-slot-set" id="set-weapon1">Click to select relic</span>
+            </div>
+            <div class="relic-slot-remove" onclick="removeRelic('weapon1', event)">✖</div>
+          </div>
+
+          <!-- Weapon 2 Slot -->
+          <div class="relic-slot-card" id="slot-weapon2" onclick="openRelicSelector('weapon2')">
+            <div class="relic-slot-icon-container">🛡️</div>
+            <div class="relic-slot-details">
+              <span class="relic-slot-label">Weapon 2</span>
+              <span class="relic-slot-name" id="name-weapon2">Empty Slot</span>
+              <span class="relic-slot-set" id="set-weapon2">Click to select relic</span>
+            </div>
+            <div class="relic-slot-remove" onclick="removeRelic('weapon2', event)">✖</div>
+          </div>
+
+          <!-- Amulet Slot -->
+          <div class="relic-slot-card" id="slot-amulet" onclick="openRelicSelector('amulet')">
+            <div class="relic-slot-icon-container">📿</div>
+            <div class="relic-slot-details">
+              <span class="relic-slot-label">Amulet</span>
+              <span class="relic-slot-name" id="name-amulet">Empty Slot</span>
+              <span class="relic-slot-set" id="set-amulet">Click to select relic</span>
+            </div>
+            <div class="relic-slot-remove" onclick="removeRelic('amulet', event)">✖</div>
+          </div>
+        </div>
+
+        <!-- Center Panel: Synergies and Saving -->
+        <div class="buildmaker-center">
+          <!-- Build Profile -->
+          <div class="glass-card">
+            <h2 class="synergy-header" style="margin-bottom: 1.25rem;"><span>📝</span> Build Details</h2>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">Build Name</label>
+                <input type="text" class="form-input" id="build-name-input" placeholder="e.g., Infinite Fire Shield Warden">
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">Description / Guide Notes</label>
+                <textarea class="form-input" id="build-desc-input" rows="3" style="resize: none;" placeholder="Write any tips on how to play this build, item order, or gameplay strategies..."></textarea>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem;">
+                <button class="btn btn-primary" onclick="saveCurrentBuild()">💾 Save Build</button>
+                <button class="btn btn-secondary" onclick="shareCurrentBuild()">🔗 Copy Share Link</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Synergies -->
+          <div class="glass-card">
+            <h2 class="synergy-header"><span>⚡</span> Relic Set Synergies</h2>
+            <div id="synergy-rows-container">
+              <!-- Set Synergy status lists -->
+              <div class="synergy-row" id="synergy-2set">
+                <div class="synergy-indicator" id="ind-2set">2</div>
+                <div class="synergy-info">
+                  <span class="synergy-title" id="title-2set">2-Piece Resonance (Inactive)</span>
+                  <span class="synergy-desc" id="desc-2set">Equip at least 2 relics from the same set to trigger a resonant set passive.</span>
+                </div>
+              </div>
+              <div class="synergy-row" id="synergy-4set">
+                <div class="synergy-indicator" id="ind-4set">4</div>
+                <div class="synergy-info">
+                  <span class="synergy-title" id="title-4set">4-Piece Eternal Harmony (Inactive)</span>
+                  <span class="synergy-desc" id="desc-4set">Equip all 4 relics from a set to transform your Eternal and unlock a 5th ultimate ability.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Eternal Transformation Panel -->
+          <div class="eternal-transform-card" id="eternal-transform-panel" style="display: none;">
+            <div class="eternal-transform-inner">
+              <div class="eternal-avatar-spot" id="transformation-avatar">🧝</div>
+              <span class="eternal-transform-title" id="transformation-eternal-name">Unknown Eternal</span>
+              <p class="eternal-transform-desc" id="transformation-lore">You have fully harmonized with this relic set! Your Eternal avatar transformation is complete.</p>
+              
+              <div class="eternal-ability-box">
+                <div class="eternal-ability-header">
+                  <span>🌀</span> Ultimate Ability: <span id="transformation-ability-name">Cosmic Blast</span>
+                </div>
+                <div class="eternal-ability-desc" id="transformation-ability-desc">
+                  This ability triggers automatically and changes the battlefield parameters.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shattered Build Mode Panel -->
+          <div class="glass-card" id="shattered-build-panel" style="border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.02); display: block;">
+            <h3 style="color: var(--color-danger); font-family: var(--font-title); font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <span>🔮</span> Shattered Build Synergy
+            </h3>
+            <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5;">
+              You are currently mixing relic sets. You get individual relic stats and specific multi-set 2-piece bonuses, but you forfeit transforming into an Eternal with a 5th ability.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Panel: Stat Summary -->
+        <div class="glass-card buildmaker-right stats-radar-card">
+          <h2 class="synergy-header"><span>🔮</span> Combat Stats Preview</h2>
+          
+          <div class="stats-grid">
+            <!-- Damage -->
+            <div class="stat-bar-item">
+              <div class="stat-bar-info">
+                <span class="stat-bar-name">⚔️ Attack Power (AP)</span>
+                <span class="stat-bar-value" id="val-ap">100</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill" id="bar-ap" style="width: 25%"></div>
+              </div>
+            </div>
+
+            <!-- Health -->
+            <div class="stat-bar-item">
+              <div class="stat-bar-info">
+                <span class="stat-bar-name">❤️ Vitality (HP)</span>
+                <span class="stat-bar-value" id="val-hp">1000</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill" id="bar-hp" style="width: 35%"></div>
+              </div>
+            </div>
+
+            <!-- Armor -->
+            <div class="stat-bar-item">
+              <div class="stat-bar-info">
+                <span class="stat-bar-name">🛡️ Protection / Armor</span>
+                <span class="stat-bar-value" id="val-armor">50</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill" id="bar-armor" style="width: 20%"></div>
+              </div>
+            </div>
+
+            <!-- CDR -->
+            <div class="stat-bar-item">
+              <div class="stat-bar-info">
+                <span class="stat-bar-name">⏳ Cooldown Reduction (CDR)</span>
+                <span class="stat-bar-value" id="val-cdr">0%</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill" id="bar-cdr" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Crit Chance -->
+            <div class="stat-bar-item">
+              <div class="stat-bar-info">
+                <span class="stat-bar-name">⚡ Critical Strike Chance</span>
+                <span class="stat-bar-value" id="val-crit">5%</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill" id="bar-crit" style="width: 5%"></div>
+              </div>
+            </div>
+
+            <!-- Movement Speed -->
+            <div class="stat-bar-item">
+              <div class="stat-bar-info">
+                <span class="stat-bar-name">🏃 Movement Velocity</span>
+                <span class="stat-bar-value" id="val-speed">320</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill" id="bar-speed" style="width: 40%"></div>
+              </div>
+            </div>
+
+            <!-- Lifesteal -->
+            <div class="stat-bar-item">
+              <div class="stat-bar-info">
+                <span class="stat-bar-name">🩸 Relic Lifesteal</span>
+                <span class="stat-bar-value" id="val-lifesteal">0%</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill" id="bar-lifesteal" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 0.5rem;">
+            <h3 style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">Passive Stat Traits</h3>
+            <div id="stat-traits-container" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <span style="font-size: 0.8rem; color: var(--text-dark);">No active set passive modifiers yet. Equip relics of matching sets to activate special passive traits.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ETERNALS LORE TAB -->
+    <section class="tab-content" id="tab-eternals">
+      <div class="title-section">
+        <h1>Ascension Royale <span>Eternals</span></h1>
+        <p>Read profiles on the game's mysterious avatars that climbers transform into upon completing relic alignments.</p>
+      </div>
+
+      <div class="eternals-grid" id="eternals-cards-container">
+        <!-- Dynamically populated -->
+      </div>
+    </section>
+
+    <!-- 4. PROFILE TAB -->
+    <section class="tab-content" id="tab-profiles">
+      <div class="title-section">
+        <h1>Climber <span>Profile Portal</span></h1>
+        <p>Link your account, customize your profile titles, track match statistics, and view your stored relic setups.</p>
+      </div>
+
+      <div class="profiles-layout">
+        <!-- Sidebar controls -->
+        <div class="profiles-sidebar">
+          <!-- Search Climber -->
+          <div class="glass-card profile-search-card">
+            <h3 style="font-family: var(--font-title); font-size: 1.1rem;">🔍 Search Climber</h3>
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="text" class="form-input" id="search-climber-input" placeholder="Enter climber username...">
+              <button class="btn btn-primary" onclick="searchProfile()">Go</button>
+            </div>
+          </div>
+
+          <!-- Account link widget -->
+          <div class="glass-card profile-link-widget" id="profile-link-widget">
+            <h3 style="font-family: var(--font-title); font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;" id="link-widget-title">
+              <span>🔗</span> Link Steam Account
+            </h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;" id="link-widget-desc">
+              Claim this profile and link your account to customize badges, select titles, and save custom builds.
+            </p>
+            <button class="btn btn-primary" id="link-widget-btn" onclick="openLinkAccountModal()">Link Account</button>
+          </div>
+        </div>
+
+        <!-- Main Profile Dashboard Panel -->
+        <div class="glass-card profile-main-card" id="profile-main-card">
+          <!-- Profile header detail -->
+          <div class="profile-header-details">
+            <div class="profile-avatar-big" id="profile-avatar-big">👨</div>
+            <div class="profile-identity">
+              <h2 class="profile-username">
+                <span id="profile-username-val">Guest Climber</span>
+                <span class="badge badge-primary" id="profile-badge-val" style="margin-left: 0.5rem;">Tier III</span>
+              </h2>
+              <div class="profile-badges-row" id="profile-titles-val">
+                <span class="badge badge-secondary">Scavenger</span>
+              </div>
+              <p class="profile-bio" id="profile-bio-val">No description set yet.</p>
+            </div>
+            <div>
+              <button class="btn btn-secondary" id="edit-profile-btn" onclick="openLinkAccountModal()" style="display: none;">⚙️ Edit Profile</button>
+            </div>
+          </div>
+
+          <!-- Statistics breakdown -->
+          <div class="profile-stats-summary">
+            <div class="profile-stat-box">
+              <div class="profile-stat-box-value" id="profile-stat-matches">0</div>
+              <div class="profile-stat-box-label">Matches</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="profile-stat-box-value" id="profile-stat-winrate">0%</div>
+              <div class="profile-stat-box-label">Win Rate</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="profile-stat-box-value" id="profile-stat-kd">0.0</div>
+              <div class="profile-stat-box-label">K/D Ratio</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="profile-stat-box-value" id="profile-stat-floor">1st</div>
+              <div class="profile-stat-box-label">Avg Floor</div>
+            </div>
+          </div>
+
+          <!-- Saved Builds Section -->
+          <div>
+            <h3 class="match-history-title"><span>📂</span> Saved Builds (<span id="saved-builds-count">0</span>)</h3>
+            <div class="saved-builds-grid" id="profile-saved-builds-container">
+              <div style="grid-column: span 3; color: var(--text-dark); text-align: center; padding: 2rem 0; font-size: 0.9rem;">
+                No saved builds found. Go to the Build Maker tab to create and save one.
+              </div>
+            </div>
+          </div>
+
+          <!-- Match History list -->
+          <div class="match-history-section">
+            <h3 class="match-history-title"><span>⚔️</span> Recent Match Log</h3>
+            <div class="match-list" id="profile-matches-container">
+              <!-- Match cards go here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>Arkheron Stats & Build Maker - Crafted in pair-programming with Antigravity AI.</p>
+      <p style="margin-top: 0.5rem; font-size: 0.75rem;">
+        Game assets, concepts, and names are trademark of Bonfire Studios. This website is a simulator tool.
+      </p>
+    </div>
+  </footer>
+
+  <!-- MODALS -->
+  
+  <!-- Relics Selector Modal -->
+  <div class="modal-overlay" id="relic-selector-modal" onclick="closeModal('relic-selector-modal')">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title" id="relic-selector-title">Select Relic</h2>
+        <span class="modal-close" onclick="closeModal('relic-selector-modal')">✖</span>
+      </div>
+      
+      <!-- Filters inside body -->
+      <div class="modal-body">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary nav-link active" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" id="filter-all-relics" onclick="filterRelics('all')">All Sets</button>
+          <button class="btn btn-secondary nav-link" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" id="filter-Tempest" onclick="filterRelics('Tempest')">Tempest</button>
+          <button class="btn btn-secondary nav-link" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" id="filter-Bloodthorn" onclick="filterRelics('Bloodthorn')">Bloodthorn</button>
+          <button class="btn btn-secondary nav-link" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" id="filter-Voidbringer" onclick="filterRelics('Voidbringer')">Voidbringer</button>
+          <button class="btn btn-secondary nav-link" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" id="filter-Solar Flare" onclick="filterRelics('Solar Flare')">Solar Flare</button>
+          <button class="btn btn-secondary nav-link" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" id="filter-Frostward" onclick="filterRelics('Frostward')">Frostward</button>
+          <button class="btn btn-secondary nav-link" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" id="filter-Shadowstep" onclick="filterRelics('Shadowstep')">Shadowstep</button>
+        </div>
+        
+        <div class="relics-selector-grid" id="relics-selector-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Link/Edit Account Modal -->
+  <div class="modal-overlay" id="link-account-modal" onclick="closeModal('link-account-modal')">
+    <div class="modal-card" style="max-width: 480px;" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title" id="link-account-modal-title">Link Bonfire / Steam Account</h2>
+        <span class="modal-close" onclick="closeModal('link-account-modal')">✖</span>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">Steam Profile Name</label>
+          <input type="text" class="form-input" id="link-username-input" placeholder="Enter Steam/Bonfire name">
+        </div>
+        
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">Select Avatar Emoji</label>
+          <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; text-align: center;">
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('👨')">👨</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('👩')">👩</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('🦊')">🦊</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('🧙')">🧙</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('🥷')">🥷</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('🐲')">🐲</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('👾')">👾</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('🤖')">🤖</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('👻')">👻</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('💀')">💀</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('⚔️')">⚔️</button>
+            <button class="btn btn-secondary" onclick="selectAvatarIcon('👑')">👑</button>
+          </div>
+          <div style="margin-top: 0.5rem; text-align: center;">
+            Selected: <span id="link-selected-avatar-preview" style="font-size: 1.5rem;">👨</span>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">Select Showcase Title</label>
+          <select class="form-input" id="link-title-select">
+            <option value="Scavenger">Scavenger</option>
+            <option value="Tower Ascendant">Tower Ascendant</option>
+            <option value="Relic Hunter">Relic Hunter</option>
+            <option value="Apex Eternal">Apex Eternal</option>
+            <option value="Gladiator">Gladiator</option>
+            <option value="Lore Keeper">Lore Keeper</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">Profile Bio</label>
+          <textarea class="form-input" id="link-bio-input" rows="2" style="resize: none;" placeholder="Write a short gamer bio..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top: 0.5rem;" onclick="confirmAccountLink()">Save Profile Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Eternal Details Modal -->
+  <div class="modal-overlay" id="eternal-detail-modal" onclick="closeModal('eternal-detail-modal')">
+    <div class="modal-card" style="max-width: 520px;" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title" id="eternal-modal-title">Eternal Profile</h2>
+        <span class="modal-close" onclick="closeModal('eternal-detail-modal')">✖</span>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 1.25rem;">
+          <div class="eternal-avatar-spot" id="eternal-modal-avatar" style="width: 80px; height: 80px; font-size: 2.5rem;">🧝</div>
+          <div>
+            <h2 id="eternal-modal-name" style="font-family: var(--font-title); font-weight: 800; font-size: 1.5rem;">Eternal Name</h2>
+            <span class="badge badge-primary" id="eternal-modal-role">Fighter</span>
+            <span class="badge badge-success" id="eternal-modal-relicset">Set Name</span>
+          </div>
+        </div>
+        
+        <div>
+          <h3 style="font-family: var(--font-title); font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Background</h3>
+          <p id="eternal-modal-lore" style="font-size: 0.85rem; color: var(--text-main); line-height: 1.5;">Lore text goes here.</p>
+        </div>
+
+        <div>
+          <h3 style="font-family: var(--font-title); font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem;">Avatar Synergy Stats</h3>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--text-muted);">HEALTH</div>
+              <div id="eternal-modal-stat-health" style="font-weight: 700; color: var(--color-success);">S</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--text-muted);">SPEED</div>
+              <div id="eternal-modal-stat-speed" style="font-weight: 700; color: var(--color-secondary);">A</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--text-muted);">ATTACK</div>
+              <div id="eternal-modal-stat-damage" style="font-weight: 700; color: var(--color-danger);">A</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1rem;">
+          <div class="eternal-ability-box" style="margin-top: 0; background: rgba(139, 92, 246, 0.05); border-color: rgba(139, 92, 246, 0.3);">
+            <div class="eternal-ability-header" style="color: var(--color-primary);">
+              <span>🌀</span> Signature Ultimate: <span id="eternal-modal-ability-name">Cosmic Smash</span>
+            </div>
+            <div class="eternal-ability-desc" id="eternal-modal-ability-desc">
+              Description of ultimate ability.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Area -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Client JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>
