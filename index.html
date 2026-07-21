@@ -1453,6 +1453,20 @@
     </aside>
   </div>
 
+  <!-- Standalone Public Profile Screen -->
+  <div id="public-profile-screen" style="display:none; position:fixed; inset:0; z-index:9000; background:var(--db-bg); background-image:radial-gradient(circle at top, rgba(139,92,246,0.15) 0%, var(--db-bg) 60%); overflow-y:auto;">
+    <div style="max-width:900px; margin:0 auto; padding:60px 20px; position:relative;">
+      <!-- Nav Header -->
+      <a href="/" style="display:inline-flex; align-items:center; gap:8px; color:var(--dc-text-muted); text-decoration:none; font-weight:bold; margin-bottom:30px; transition:color 0.2s ease;">
+        ← Back to Custom Lobbies
+      </a>
+      
+      <div id="public-profile-content">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
     <div class="container">

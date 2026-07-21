@@ -4926,4 +4926,136 @@ function updateArkheronStrategyView() {
   `;
 }
 
+// ==========================================
+// 🔗 DYNAMIC PUBLIC PROFILE ROUTING
+// ==========================================
+
+function initPublicProfileRoute() {
+  if (typeof window.__PROFILE_SLUG__ !== 'undefined' && window.__PROFILE_SLUG__) {
+    const slug = window.__PROFILE_SLUG__;
+    
+    // Hide standard app layout
+    const ls = document.getElementById('landing-screen');
+    const login = document.getElementById('login-screen');
+    const header = document.querySelector('header');
+    const grid = document.querySelector('.global-portal-grid');
+    if (ls) ls.style.display = 'none';
+    if (login) login.style.display = 'none';
+    if (header) header.style.display = 'none';
+    if (grid) grid.style.display = 'none';
+
+    // Show profile screen
+    const pScreen = document.getElementById('public-profile-screen');
+    const pContent = document.getElementById('public-profile-content');
+    if (pScreen) pScreen.style.display = 'block';
+    if (!pContent) return;
+
+    // Find player
+    const p = players.find(x => x.username.toLowerCase() === slug.toLowerCase());
+
+    if (!p) {
+      pContent.innerHTML = `
+        <div style="text-align:center; padding:100px 20px;">
+          <div style="font-size:4rem; margin-bottom:10px;">👻</div>
+          <h1 style="font-family:var(--font-display); font-size:2.5rem; color:white; font-weight:900;">Profile Not Found</h1>
+          <p style="color:var(--dc-text-muted); font-size:1.1rem;">We couldn't find a registered player named <strong style="color:white;">${slug}</strong>.</p>
+          <button class="btn btn-primary" onclick="window.location.href='/'" style="margin-top:30px; font-size:1.1rem; padding:12px 32px; background:linear-gradient(135deg,#8b5cf6,#06b6d4); border:none;">Return to Lobbies</button>
+        </div>
+      `;
+      return;
+    }
+
+    // Player found! Build a high-fidelity profile
+    const avatarUrl = p.img || `https://api.dicebear.com/9.x/avataaars/svg?seed=${p.username}`;
+    
+    // Extract stats for each game
+    const games = Object.keys(p.stats || {});
+    let gamesHtml = '';
+    if (games.length === 0) {
+      gamesHtml = '<div style="color:var(--dc-text-muted); padding:20px 0;">No ranked matches played yet.</div>';
+    } else {
+      gamesHtml = games.map(g => {
+        const stats = p.stats[g];
+        const winPct = ((stats.wins / stats.matches) * 100).toFixed(1);
+        const kdr = (stats.kills / Math.max(1, stats.deaths)).toFixed(2);
+        return `
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:24px; transition:transform 0.3s ease, border-color 0.3s ease;" onmouseover="this.style.borderColor='var(--db-primary)'; this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.transform='translateY(0)'">
+            <div style="display:flex; align-items:center; gap:16px; margin-bottom:20px;">
+              <div style="width:48px; height:48px; background:var(--db-primary); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 8px 24px rgba(139,92,246,0.4);">
+                ${g === 'arkheron' ? '🔱' : g === 'cs' ? '🔫' : '🎯'}
+              </div>
+              <div>
+                <h3 style="margin:0; font-family:var(--font-display); font-size:1.4rem; color:white; text-transform:uppercase;">${g}</h3>
+                <div style="color:var(--db-primary); font-weight:bold; font-size:0.9rem;">${stats.rank || 'Unranked'}</div>
+              </div>
+              <div style="margin-left:auto; text-align:right;">
+                <div style="font-family:var(--font-display); font-size:1.8rem; font-weight:900; color:white;">${stats.elo}</div>
+                <div style="font-size:0.75rem; color:var(--dc-text-muted); text-transform:uppercase; letter-spacing:1px;">MMR</div>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; background:rgba(0,0,0,0.3); padding:16px; border-radius:12px;">
+              <div>
+                <div style="font-size:0.7rem; color:var(--dc-text-muted); margin-bottom:4px;">Win Rate</div>
+                <div style="font-size:1.1rem; color:#10b981; font-weight:bold;">${winPct}%</div>
+              </div>
+              <div>
+                <div style="font-size:0.7rem; color:var(--dc-text-muted); margin-bottom:4px;">Matches</div>
+                <div style="font-size:1.1rem; color:white; font-weight:bold;">${stats.matches}</div>
+              </div>
+              <div>
+                <div style="font-size:0.7rem; color:var(--dc-text-muted); margin-bottom:4px;">K/D Ratio</div>
+                <div style="font-size:1.1rem; color:#fbbf24; font-weight:bold;">${kdr}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    pContent.innerHTML = `
+      <!-- Banner -->
+      <div style="height:250px; border-radius:24px; background:linear-gradient(45deg, rgba(139,92,246,0.3), rgba(6,182,212,0.3)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=2070') center/cover; position:relative; box-shadow:0 20px 40px rgba(0,0,0,0.4);">
+        <!-- Avatar overlapping banner -->
+        <div style="position:absolute; bottom:-60px; left:40px; width:140px; height:140px; border-radius:50%; border:4px solid var(--db-bg); background:var(--db-bg); box-shadow:0 10px 30px rgba(0,0,0,0.5); overflow:hidden;">
+          <img src="${avatarUrl}" style="width:100%; height:100%; object-fit:cover;" alt="${p.username} avatar" onerror="this.src='https://api.dicebear.com/9.x/avataaars/svg?seed=${p.username}'">
+        </div>
+      </div>
+
+      <!-- Header Info -->
+      <div style="margin-top:80px; padding:0 40px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px;">
+        <div>
+          <h1 style="font-family:var(--font-display); font-size:3rem; font-weight:900; color:white; margin:0; line-height:1;">${p.username}</h1>
+          <div style="display:flex; align-items:center; gap:12px; margin-top:10px;">
+            <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); font-size:0.8rem; padding:4px 10px;">
+              ${p.roles ? p.roles.join(', ') : 'Player'}
+            </span>
+            <span style="color:var(--dc-text-muted); font-size:0.9rem;">Joined 2026</span>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="window.location.href='/'" style="font-size:1rem; padding:12px 24px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); box-shadow:none;">
+            Play vs ${p.username}
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div style="margin-top:50px; padding:0 40px;">
+        <h2 style="font-family:var(--font-display); font-size:1.8rem; color:white; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+          <span>📈</span> Competitive Stats
+        </h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:24px;">
+          ${gamesHtml}
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Call on load
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initPublicProfileRoute, 50); // slight delay to ensure UI parses
+});
+
+
 
