@@ -1,8 +1,132 @@
 // ==========================================
-// CUSTOM LOBBIES MATCHMAKER SIMULATOR
+// CUSTOM LOBBIES MATCHMAKER PORTAL
 // ==========================================
 
 const GAMES = ['arkheron', 'hockey', 'zealot'];
+
+// Web Audio API Sound Synthesizer for Lobby Notifications
+let audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+function playSound(type) {
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    
+    const now = audioCtx.currentTime;
+    
+    switch(type) {
+      case 'join': {
+        // Player joins queue: short gentle blip
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+        
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        
+        osc.start(now);
+        osc.stop(now + 0.15);
+        break;
+      }
+      case 'match_found': {
+        // Match found / Draft starts: sonar chime (double pulse)
+        const playPing = (time, freq) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, time);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.4, time + 0.3);
+          
+          gain.gain.setValueAtTime(0.1, time);
+          gain.gain.exponentialRampToValueAtTime(0.001, time + 0.4);
+          
+          osc.start(time);
+          osc.stop(time + 0.4);
+        };
+        playPing(now, 523.25); // C5
+        playPing(now + 0.18, 659.25); // E5
+        break;
+      }
+      case 'your_turn': {
+        // Your turn to pick: clean double alert chime
+        const playTone = (time, freq, duration) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, time);
+          
+          gain.gain.setValueAtTime(0.08, time);
+          gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+          
+          osc.start(time);
+          osc.stop(time + duration);
+        };
+        playTone(now, 587.33, 0.22); // D5
+        playTone(now + 0.14, 880, 0.45); // A5
+        break;
+      }
+      case 'pick': {
+        // Draft pick locked in: mechanical tick/thud
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.exponentialRampToValueAtTime(70, now + 0.08);
+        
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        
+        osc.start(now);
+        osc.stop(now + 0.08);
+        break;
+      }
+      case 'message': {
+        // Discord message sound: gentle pop
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+        
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        
+        osc.start(now);
+        osc.stop(now + 0.08);
+        break;
+      }
+    }
+  } catch (e) {
+    console.warn("AudioContext failed to play:", e);
+  }
+}
 
 // Playable Eternals Database (for Arkheron)
 const ETERNALS = [
@@ -26,56 +150,20 @@ const SETS_METADATA = {
   'Solar Flare': '+25 Armor, +100 Max HP.'
 };
 
-// Initial mock database of competitive players (Multi-game)
+// Static pool of mock players for testing and matchmaking simulation
+const MOCK_PLAYERS_POOL = [
+  { username: 'TofuShark', avatar: '🦊', games: { arkheron: { elo: 1050, wins: 5, losses: 3, kd: "1.25", eloHistory: [1000, 1020, 1050] }, hockey: { elo: 1000, wins: 2, losses: 2, kd: "1.00", eloHistory: [1000] }, zealot: { elo: 980, wins: 1, losses: 3, kd: "0.50", eloHistory: [1000, 980] } } },
+  { username: 'TowerGod', avatar: '👑', games: { arkheron: { elo: 1200, wins: 12, losses: 4, kd: "2.10", eloHistory: [1000, 1050, 1120, 1200] }, hockey: { elo: 1100, wins: 6, losses: 2, kd: "1.80", eloHistory: [1000, 1100] }, zealot: { elo: 1150, wins: 8, losses: 3, kd: "1.90", eloHistory: [1000, 1150] } } },
+  { username: 'Rynshi', avatar: '🥷', games: { arkheron: { elo: 950, wins: 2, losses: 6, kd: "0.60", eloHistory: [1000, 950] }, hockey: { elo: 1020, wins: 3, losses: 2, kd: "1.10", eloHistory: [1000, 1020] }, zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] } } },
+  { username: 'Dahla', avatar: '🧛', games: { arkheron: { elo: 1120, wins: 9, losses: 5, kd: "1.45", eloHistory: [1000, 1060, 1120] }, hockey: { elo: 980, wins: 1, losses: 4, kd: "0.40", eloHistory: [1000, 980] }, zealot: { elo: 1080, wins: 5, losses: 2, kd: "1.35", eloHistory: [1000, 1080] } } },
+  { username: 'Grimwold', avatar: '❄️', games: { arkheron: { elo: 1010, wins: 4, losses: 4, kd: "1.05", eloHistory: [1000, 1010] }, hockey: { elo: 1040, wins: 5, losses: 3, kd: "1.20", eloHistory: [1000, 1040] }, zealot: { elo: 1030, wins: 4, losses: 3, kd: "1.15", eloHistory: [1000, 1030] } } }
+];
+
+// Clean starting database of competitive players (Current user only)
 let players = [
   {
     username: 'Resteral.TV',
     avatar: '🛡️',
-    games: {
-      arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      hockey: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] }
-    }
-  },
-  {
-    username: 'TofuShark',
-    avatar: '🦊',
-    games: {
-      arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      hockey: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] }
-    }
-  },
-  {
-    username: 'TowerGod',
-    avatar: '👑',
-    games: {
-      arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      hockey: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] }
-    }
-  },
-  {
-    username: 'Rynshi',
-    avatar: '🥷',
-    games: {
-      arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      hockey: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] }
-    }
-  },
-  {
-    username: 'Dahla',
-    avatar: '🧛',
-    games: {
-      arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      hockey: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
-      zealot: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] }
-    }
-  },
-  {
-    username: 'Grimwold',
-    avatar: '❄️',
     games: {
       arkheron: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
       hockey: { elo: 1000, wins: 0, losses: 0, kd: "1.00", eloHistory: [1000] },
@@ -91,7 +179,7 @@ let currentSelectedGame = 'arkheron'; // default selected game for UI display
 let appState = {
   currentTab: 'simulator',
   currentUser: 'Resteral.TV',
-  activeChannel: 'arkheron', // active channel state inside simulator: 'arkheron', 'zealot', 'hockey'
+  activeChannel: 'arkheron', // active channel state inside portal: 'arkheron', 'zealot', 'hockey'
   queues: {
     arkheron: [],
     hockey: [],
@@ -118,56 +206,10 @@ let appState = {
     timer: null,
     game: 'arkheron'
   },
-  tournaments: [
-    {
-      id: 'TOURN-JUNE',
-      name: '🏆 June Arkheron Cup 🏆',
-      game: 'arkheron',
-      type: 'snake',
-      status: 'complete',
-      captains: ['Resteral.TV', 'Bacon'],
-      teams: { 'Resteral.TV': ['Resteral.TV', 'Slayer', 'Ghost'], 'Bacon': ['Bacon', 'Leodin', 'Dahla'] },
-      matches: [{ round: 'Finals', teamA: 'Team Resteral.TV', teamB: 'Team Bacon', scoreA: 5, scoreB: 2 }]
-    },
-    {
-      id: 'TOURN-JULY',
-      name: '🏒 Summer Hockey Open 🏒',
-      game: 'hockey',
-      type: 'auction',
-      status: 'complete',
-      captains: ['Slayer', 'Ghost'],
-      teams: { 'Slayer': ['Slayer', 'Resteral.TV', 'Karriv', 'Edani'], 'Ghost': ['Ghost', 'Bacon', 'Leodin', 'Dahla'] },
-      matches: [{ round: 'Finals', teamA: 'Team Slayer', teamB: 'Team Ghost', scoreA: 4, scoreB: 5 }]
-    }
-  ],
+  tournaments: [],
   activeTournamentId: null,
   forumFilter: 'all',
-  forumPosts: [
-    {
-      id: 'POST-SEED1',
-      author: 'Resteral.TV',
-      title: '📈 How to raise ELO in Zealot Hockey quickly',
-      content: 'Make sure you always communicate defender swaps. 4v4 Hockey requires clean passing channels and rotating to cover open spaces when your teammate commits to a shot. Streaks are crucial!',
-      category: 'hockey',
-      createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
-    },
-    {
-      id: 'POST-SEED2',
-      author: 'Slayer',
-      title: '🧜 Arkheron Team Compositions',
-      content: 'Leodin is strong for fast rotations, but make sure your team has a Voidcollapse setup wizard (like Edani) for magic damage. Relic setups really matter here.',
-      category: 'arkheron',
-      createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
-    },
-    {
-      id: 'POST-SEED3',
-      author: 'Ghost',
-      title: '🛡️ Zealot Mod Scrim tonight!',
-      content: 'Creating a lobby around 7 PM EST. Join custom room LOB-SCRIM. We need 6 players for a solid serpentine draft. All skill levels welcome!',
-      category: 'zealot',
-      createdAt: new Date(Date.now() - 3600000 * 48).toISOString()
-    }
-  ]
+  forumPosts: []
 };
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -376,9 +418,11 @@ function parseChatCommand(command, argument, senderUser) {
       }
       
       lobby.players.push(senderUser);
+      playSound('join'); // Play join blip
       const playerElo = players.find(p => p.username === senderUser)?.games[game]?.elo || 1000;
       
       if (lobby.players.length === lobby.targetSize) {
+        playSound('match_found'); // Play sonar chime
         const lobbyPlayers = lobby.players.map(p => players.find(pl => pl.username === p));
         let description = `Lobby **${code}** for **${game.toUpperCase()}** is full! balanced by MMR:\n\n`;
         
@@ -414,6 +458,7 @@ function parseChatCommand(command, argument, senderUser) {
       }
 
       appState.queues[game].push(senderUser);
+      playSound('join'); // Play join blip
       const playerElo = players.find(p => p.username === senderUser)?.games[game]?.elo || 1000;
       const limit = game === 'hockey' ? 8 : 6;
       writeMessage('TheBot', true, `✅ **${senderUser}** (MMR: **${playerElo}**) joined the **${game.toUpperCase()}** queue! (${appState.queues[game].length}/${limit})`);
@@ -505,7 +550,17 @@ function parseChatCommand(command, argument, senderUser) {
 
     if (!appState.queues[game].includes(appState.currentUser)) {
       appState.queues[game].push(appState.currentUser);
+      playSound('join');
     }
+
+    // Since players list might be empty, ensure we check the MOCK_PLAYERS_POOL
+    // and copy them into players if needed to fill the queue
+    const othersPool = MOCK_PLAYERS_POOL.filter(p => p.username !== appState.currentUser);
+    othersPool.forEach(mp => {
+      if (!players.find(p => p.username === mp.username)) {
+        players.push(JSON.parse(JSON.stringify(mp)));
+      }
+    });
 
     const others = players.filter(p => p.username !== appState.currentUser);
     const shuffled = [...others].sort(() => 0.5 - Math.random());
@@ -515,6 +570,7 @@ function parseChatCommand(command, argument, senderUser) {
       const candidate = shuffled.pop().username;
       if (!appState.queues[game].includes(candidate)) {
         appState.queues[game].push(candidate);
+        playSound('join');
       }
     }
 
@@ -881,6 +937,7 @@ function parseChatCommand(command, argument, senderUser) {
 function triggerDraftStart(game) {
   appState.draft.active = true;
   appState.draft.game = game;
+  playSound('match_found'); // Play sonar chime for match found
 
   const requiredPlayers = game === 'hockey' ? 8 : 6;
   const lobbyNames = appState.queues[game].slice(0, requiredPlayers);
@@ -922,6 +979,10 @@ function triggerDraftStart(game) {
   updateQueueUI();
   updateDraftArenaUI();
 
+  if (capB.username === appState.currentUser) {
+    setTimeout(() => playSound('your_turn'), 800); // Alert user that it is their turn to select
+  }
+
   checkBotPickSchedule();
 }
 
@@ -952,12 +1013,21 @@ function executeDraftPick(playerUsername) {
   const activeTeam = currentTurn === 'A' ? activeDraft.teams.teamA : activeDraft.teams.teamB;
   activeTeam.players.push(playerUsername);
   
+  playSound('pick'); // Play draft pick thud
   writeMessage('TheBot', true, `✨ Captain **${capName}** drafted **${playerUsername}** for **${currentTurn === 'A' ? 'Team Alpha' : 'Team Beta'}**!`);
   activeDraft.pickIdx++;
 
   if (activeDraft.pickIdx < activeDraft.pickSequence.length) {
     activeDraft.turn = activeDraft.pickSequence[activeDraft.pickIdx];
     updateDraftArenaUI();
+    
+    // Check if the next turn is the current user's turn
+    const nextTurn = activeDraft.pickSequence[activeDraft.pickIdx];
+    const nextCap = nextTurn === 'A' ? activeDraft.captains[0].username : activeDraft.captains[1].username;
+    if (nextCap === appState.currentUser) {
+      setTimeout(() => playSound('your_turn'), 400); // Alert user that it is their turn to select
+    }
+
     checkBotPickSchedule();
   } else {
     concludeDrafting();
@@ -1115,8 +1185,12 @@ function updateQueueUI() {
   const ratioText = document.getElementById('queue-ratio-text');
   const progressBar = document.getElementById('queue-progress-bar');
   const count = appState.queues[game].length;
-  countBadge.textContent = `${count}/6 Players`;
-  const pct = Math.min(100, (count / 6) * 100);
+  const limit = game === 'hockey' ? 8 : 6;
+  
+  const indicatorHtml = count > 0 ? `<span class="queue-scanning-indicator" style="margin-right: 6px;"></span>` : '';
+  countBadge.innerHTML = `${indicatorHtml}${count}/${limit} Players`;
+  
+  const pct = Math.min(100, (count / limit) * 100);
   ratioText.textContent = `${Math.round(pct)}%`;
   progressBar.style.width = `${pct}%`;
 }
@@ -1252,6 +1326,9 @@ function writeMessage(sender, isBot, text, embedObj) {
 
   container.insertAdjacentHTML('beforeend', msgHtml);
   container.scrollTop = container.scrollHeight;
+  if (sender !== appState.currentUser) {
+    playSound('message');
+  }
 }
 
 function viewCodeFile(fileKey) {
@@ -1526,17 +1603,29 @@ function selectTournament(id) {
   renderTournamentsTab();
 }
 
+function getPlayerSalary(username, game) {
+  const pl = players.find(p => p.username === username);
+  const elo = pl?.games[game]?.elo || 1000;
+  // 1000 ELO -> 30 credits, 1200 ELO -> 50 credits, 800 ELO -> 10 credits
+  return Math.round(10 + Math.max(0, (elo - 800) / 10));
+}
+
 function initCustomTournament() {
   const game = document.getElementById('tourney-select-game').value;
   const type = document.getElementById('tourney-select-type').value;
+  const numTeams = parseInt(document.getElementById('tourney-select-teams').value, 10) || 2;
+  const useSalaries = document.getElementById('tourney-use-salaries').checked;
 
   const newTourn = {
     id: 'TOURN-' + Math.random().toString(36).substr(2, 5).toUpperCase(),
     name: 'Community Open Cup',
     game,
     type,
+    numTeams,
+    useSalaries,
     status: 'signup',
     pool: [],
+    checkedIn: [],
     captains: [],
     budgets: {},
     teams: {},
@@ -1560,17 +1649,62 @@ function registerTourneyUser(username) {
     return;
   }
   t.pool.push(username);
+  // Auto check-in if not monthly, or if user is registering themselves
+  if (!t.isMonthly || username === appState.currentUser) {
+    t.checkedIn = t.checkedIn || [];
+    t.checkedIn.push(username);
+  }
   showToast(`${username} registered for the cup!`, "success");
+  renderTournamentsTab();
+}
+
+function checkInTourneyUser(username) {
+  const t = getActiveTournament();
+  if (!t || t.status !== 'signup') return;
+  if (!t.pool.includes(username)) {
+    showToast("Must be registered in the tournament first!", "warning");
+    return;
+  }
+  t.checkedIn = t.checkedIn || [];
+  if (t.checkedIn.includes(username)) {
+    showToast("Already checked in!", "warning");
+    return;
+  }
+  t.checkedIn.push(username);
+  playSound('join'); // Play feedback chime
+  showToast(`${username} checked in successfully!`, "success");
   renderTournamentsTab();
 }
 
 function addMockSignups() {
   const t = getActiveTournament();
   if (!t) return;
+
+  // Make sure mock players exist in the main database
+  MOCK_PLAYERS_POOL.forEach(mp => {
+    if (!players.find(p => p.username === mp.username)) {
+      players.push(JSON.parse(JSON.stringify(mp))); // clone it
+    }
+  });
+
+  const numTeams = t.numTeams || 2;
+  const playersPerTeam = t.game === 'hockey' ? 4 : 3;
+  const requiredPlayers = numTeams * playersPerTeam;
+
   players.forEach(p => {
-    const requiredPlayers = t.game === 'hockey' ? 8 : 6;
     if (t.pool.length < requiredPlayers && !t.pool.includes(p.username)) {
       t.pool.push(p.username);
+      
+      // If monthly cup, auto check-in some mock players (80% chance) to simulate check-in requirements
+      if (t.isMonthly) {
+        t.checkedIn = t.checkedIn || [];
+        if (Math.random() > 0.20) {
+          t.checkedIn.push(p.username);
+        }
+      } else {
+        t.checkedIn = t.checkedIn || [];
+        t.checkedIn.push(p.username);
+      }
     }
   });
   showToast("Mock players added to signup pool!", "info");
@@ -1580,9 +1714,22 @@ function addMockSignups() {
 function startTourneyDraft() {
   const t = getActiveTournament();
   if (!t) return;
-  const requiredPlayers = t.game === 'hockey' ? 8 : 6;
+
+  if (t.isMonthly) {
+    t.checkedIn = t.checkedIn || [];
+    const removedCount = t.pool.length - t.pool.filter(pName => t.checkedIn.includes(pName)).length;
+    t.pool = t.pool.filter(pName => t.checkedIn.includes(pName));
+    if (removedCount > 0) {
+      showToast(`Removed ${removedCount} unchecked players from the draft pool!`, "warning");
+    }
+  }
+
+  const numTeams = t.numTeams || 2;
+  const playersPerTeam = t.game === 'hockey' ? 4 : 3;
+  const requiredPlayers = numTeams * playersPerTeam;
+
   if (t.pool.length < requiredPlayers) {
-    showToast(`Need at least ${requiredPlayers} players to start draft!`, "warning");
+    showToast(`Need at least ${requiredPlayers} checked-in players to start draft!`, "warning");
     return;
   }
 
@@ -1592,25 +1739,46 @@ function startTourneyDraft() {
     return { name: pName, elo: pl?.games[game]?.elo || 1000 };
   }).sort((a, b) => b.elo - a.elo);
 
-  const capA = sorted[0].name;
-  const capB = sorted[1].name;
+  const captains = sorted.slice(0, numTeams).map(p => p.name);
+  t.captains = captains;
 
-  t.captains = [capA, capB];
-  t.teams = { [capA]: [capA], [capB]: [capB] };
-  t.pool = sorted.slice(2).map(p => p.name);
+  t.teams = {};
+  t.budgets = {};
+  captains.forEach(capName => {
+    t.teams[capName] = [capName];
+    t.budgets[capName] = 100;
+  });
+
+  t.pool = sorted.slice(numTeams).map(p => p.name);
   t.status = 'draft';
 
   if (t.type === 'snake') {
-    t.turn = capB;
-    t.pickSequence = game === 'hockey' ? [capB, capA, capA, capB, capB, capA] : [capB, capA, capA, capB];
+    const seq = [];
+    const rounds = playersPerTeam - 1;
+    for (let r = 0; r < rounds; r++) {
+      if (r % 2 === 0) {
+        for (let i = numTeams - 1; i >= 0; i--) {
+          seq.push(captains[i]);
+        }
+      } else {
+        for (let i = 0; i < numTeams; i++) {
+          seq.push(captains[i]);
+        }
+      }
+    }
+    t.pickSequence = seq;
     t.pickIdx = 0;
+    t.turn = seq[0];
   } else {
-    t.budgets = { [capA]: 100, [capB]: 100 };
-    t.nominationTurn = capA;
+    t.nominationTurn = captains[0];
+    t.currentBidding = { player: null, highestBidder: null, highestBid: 0 };
   }
 
-  showToast("Tournament draft has begun!", "success");
+  playSound('match_found'); // Play sonar start chime
+  showToast(`Tournament draft with ${numTeams} teams has begun!`, "success");
   renderTournamentsTab();
+
+  checkBotTourneyPick();
 }
 
 function pickTourneySnakePlayer(player) {
@@ -1621,11 +1789,54 @@ function pickTourneySnakePlayer(player) {
   t.teams[currentCap].push(player);
   t.pool = t.pool.filter(p => p !== player);
 
+  playSound('pick');
+
   t.pickIdx++;
   if (t.pickIdx < t.pickSequence.length) {
     t.turn = t.pickSequence[t.pickIdx];
+    checkBotTourneyPick();
   } else {
     resolveTourneyMatches();
+  }
+  renderTournamentsTab();
+}
+
+function buyTourneySalaryPlayer(player) {
+  const t = getActiveTournament();
+  if (!t || t.status !== 'draft' || t.type !== 'auction' || !t.useSalaries) return;
+
+  const buyer = t.nominationTurn;
+  const salary = getPlayerSalary(player, t.game);
+
+  if (t.budgets[buyer] < salary) {
+    showToast(`Insufficient budget! Cost: ${salary}, Budget: ${t.budgets[buyer]}`, "warning");
+    return;
+  }
+
+  t.teams[buyer].push(player);
+  t.budgets[buyer] -= salary;
+  t.pool = t.pool.filter(p => p !== player);
+
+  playSound('pick');
+  showToast(`Purchased ${player} for ${salary} credits!`, "success");
+
+  const targetSize = t.game === 'hockey' ? 4 : 3;
+  const allTeamsFilled = t.captains.every(cap => t.teams[cap].length === targetSize);
+
+  if (allTeamsFilled) {
+    resolveTourneyMatches();
+  } else {
+    const currentIdx = t.captains.indexOf(t.nominationTurn);
+    let nextCap = null;
+    for (let i = 1; i <= t.captains.length; i++) {
+      const candidate = t.captains[(currentIdx + i) % t.captains.length];
+      if (t.teams[candidate].length < targetSize) {
+        nextCap = candidate;
+        break;
+      }
+    }
+    t.nominationTurn = nextCap || t.captains[0];
+    checkBotTourneyPick();
   }
   renderTournamentsTab();
 }
@@ -1642,6 +1853,8 @@ function nominateTourneyPlayer(player) {
   };
   showToast(`${player} nominated onto the block!`, "info");
   renderTournamentsTab();
+  
+  checkBotTourneyPick();
 }
 
 function bidTourneyPlayer(cap, amount) {
@@ -1661,6 +1874,8 @@ function bidTourneyPlayer(cap, amount) {
   t.currentBidding.highestBidder = cap;
   showToast(`${cap} bid ${amount} credits!`, "success");
   renderTournamentsTab();
+
+  checkBotTourneyPick();
 }
 
 function sellTourneyPlayer() {
@@ -1675,19 +1890,94 @@ function sellTourneyPlayer() {
   t.budgets[winner] -= cost;
   t.pool = t.pool.filter(p => p !== player);
 
+  playSound('pick');
   showToast(`SOLD! ${player} goes to Team ${winner} for ${cost} pts!`, "success");
   t.currentBidding = { player: null, highestBidder: null, highestBid: 0 };
 
-  const capA = t.captains[0];
-  const capB = t.captains[1];
   const targetSize = t.game === 'hockey' ? 4 : 3;
+  const allTeamsFilled = t.captains.every(cap => t.teams[cap].length === targetSize);
 
-  if (t.teams[capA].length === targetSize && t.teams[capB].length === targetSize) {
+  if (allTeamsFilled) {
     resolveTourneyMatches();
   } else {
-    t.nominationTurn = t.nominationTurn === capA ? capB : capA;
+    const currentIdx = t.captains.indexOf(t.nominationTurn);
+    let nextCap = null;
+    for (let i = 1; i <= t.captains.length; i++) {
+      const candidate = t.captains[(currentIdx + i) % t.captains.length];
+      if (t.teams[candidate].length < targetSize) {
+        nextCap = candidate;
+        break;
+      }
+    }
+    t.nominationTurn = nextCap || t.captains[0];
+    checkBotTourneyPick();
   }
   renderTournamentsTab();
+}
+
+function checkBotTourneyPick() {
+  const t = getActiveTournament();
+  if (!t || t.status !== 'draft') return;
+  
+  let activeCapName = '';
+  if (t.type === 'snake') {
+    activeCapName = t.turn;
+  } else {
+    activeCapName = t.nominationTurn;
+  }
+  
+  if (activeCapName && activeCapName !== appState.currentUser) {
+    setTimeout(() => {
+      const t = getActiveTournament();
+      if (!t || t.status !== 'draft') return;
+      
+      if (t.type === 'snake') {
+        const pool = t.pool;
+        if (pool.length > 0) {
+          const randomPlayer = pool[Math.floor(Math.random() * pool.length)];
+          pickTourneySnakePlayer(randomPlayer);
+        }
+      } else if (t.type === 'auction') {
+        if (t.useSalaries) {
+          const buyer = t.nominationTurn;
+          const affordable = t.pool.filter(p => getPlayerSalary(p, t.game) <= t.budgets[buyer]);
+          if (affordable.length > 0) {
+            affordable.sort((a, b) => getPlayerSalary(b, t.game) - getPlayerSalary(a, t.game));
+            buyTourneySalaryPlayer(affordable[0]);
+          } else {
+            const sortedPool = [...t.pool].sort((a, b) => getPlayerSalary(a, t.game) - getPlayerSalary(b, t.game));
+            if (sortedPool.length > 0) {
+              buyTourneySalaryPlayer(sortedPool[0]);
+            }
+          }
+        } else {
+          if (!t.currentBidding.player) {
+            const randomPlayer = t.pool[Math.floor(Math.random() * t.pool.length)];
+            if (randomPlayer) nominateTourneyPlayer(randomPlayer);
+          } else {
+            const block = t.currentBidding;
+            const targetSize = t.game === 'hockey' ? 4 : 3;
+            const potentialBidders = t.captains.filter(c => 
+              c !== block.highestBidder && 
+              c !== appState.currentUser && 
+              t.teams[c].length < targetSize &&
+              t.budgets[c] > block.highestBid
+            );
+            
+            if (potentialBidders.length > 0 && Math.random() > 0.40) {
+              const bidder = potentialBidders[Math.floor(Math.random() * potentialBidders.length)];
+              const nextBid = block.highestBid + Math.floor(Math.random() * 6) + 1;
+              if (nextBid <= t.budgets[bidder]) {
+                bidTourneyPlayer(bidder, nextBid);
+                return;
+              }
+            }
+            setTimeout(sellTourneyPlayer, 800);
+          }
+        }
+      }
+    }, 1500);
+  }
 }
 
 function resolveTourneyMatches() {
@@ -1697,54 +1987,109 @@ function resolveTourneyMatches() {
   showToast("Running simulated brackets...", "info");
 
   setTimeout(() => {
-    const capA = t.captains[0];
-    const capB = t.captains[1];
-    const scoreA = Math.floor(Math.random() * 3) + 3;
-    const scoreB = scoreA === 5 ? Math.floor(Math.random() * 4) + 1 : 5;
+    const matches = [];
+    let currentTeams = [...t.captains];
     
-    t.matches = [
-      { round: 'Finals', teamA: `Team ${capA}`, teamB: `Team ${capB}`, scoreA, scoreB }
-    ];
-
-    const winnerCap = scoreA > scoreB ? capA : capB;
-    const winnerTeam = t.teams[winnerCap];
-    const loserCap = winnerCap === capA ? capB : capA;
-    const loserTeam = t.teams[loserCap];
-
-    winnerTeam.forEach(name => {
+    while (currentTeams.length > 1) {
+      const nextRoundTeams = [];
+      const numMatches = Math.floor(currentTeams.length / 2);
+      let roundLabel = currentTeams.length <= 2 ? 'Finals' : (currentTeams.length <= 4 ? 'Semifinals' : (currentTeams.length <= 8 ? 'Quarterfinals' : 'Round of 16'));
+      
+      for (let i = 0; i < numMatches; i++) {
+        const teamA = currentTeams[i * 2];
+        const teamB = currentTeams[i * 2 + 1];
+        const scoreA = Math.floor(Math.random() * 3) + 3; // 3 to 5
+        const scoreB = scoreA === 5 ? Math.floor(Math.random() * 4) + 1 : 5; // 5 vs random
+        
+        matches.push({
+          round: roundLabel,
+          teamA: `Team ${teamA}`,
+          teamB: `Team ${teamB}`,
+          scoreA,
+          scoreB
+        });
+        
+        const winner = scoreA > scoreB ? teamA : teamB;
+        const loser = scoreA > scoreB ? teamB : teamA;
+        
+        t.teams[winner].forEach(name => {
+          const pl = players.find(p => p.username === name);
+          if (pl?.games[t.game]) {
+            pl.games[t.game].elo += 25; // Win increment
+            pl.games[t.game].wins++;
+          }
+        });
+        
+        t.teams[loser].forEach(name => {
+          const pl = players.find(p => p.username === name);
+          if (pl?.games[t.game]) {
+            pl.games[t.game].elo = Math.max(800, pl.games[t.game].elo - 15);
+            pl.games[t.game].losses++;
+          }
+        });
+        
+        nextRoundTeams.push(winner);
+      }
+      
+      if (currentTeams.length % 2 !== 0) {
+        const byeTeam = currentTeams[currentTeams.length - 1];
+        nextRoundTeams.push(byeTeam);
+        matches.push({
+          round: roundLabel,
+          teamA: `Team ${byeTeam}`,
+          teamB: 'BYE',
+          scoreA: 1,
+          scoreB: 0
+        });
+      }
+      
+      currentTeams = nextRoundTeams;
+    }
+    
+    const champion = currentTeams[0];
+    t.teams[champion].forEach(name => {
       const pl = players.find(p => p.username === name);
       if (pl?.games[t.game]) {
-        pl.games[t.game].elo += 50;
-        pl.games[t.game].wins++;
+        pl.games[t.game].elo += 25; // Extra champ reward
       }
     });
 
-    loserTeam.forEach(name => {
-      const pl = players.find(p => p.username === name);
-      if (pl?.games[t.game]) {
-        pl.games[t.game].elo = Math.max(800, pl.games[t.game].elo - 20);
-        pl.games[t.game].losses++;
-      }
-    });
-
+    t.matches = matches;
     t.status = 'complete';
-    showToast(`Finals Complete! Team ${winnerCap} wins the Cup!`, "success");
+    showToast(`Tournament Complete! Team ${champion} wins the Cup!`, "success");
     renderLeaderboard();
     renderTournamentsTab();
   }, 2500);
 }
 
-function simulateMonthlyLeague() {
+function scheduleMonthlyCup() {
   const game = document.getElementById('tourney-select-game').value;
   const type = document.getElementById('tourney-select-type').value;
+  const numTeams = parseInt(document.getElementById('tourney-select-teams').value, 10) || 8;
+  const useSalaries = document.getElementById('tourney-use-salaries').checked;
+
+  // Set the tournament time to next Saturday at 8:00 PM EST
+  const today = new Date();
+  const nextSaturday = new Date(today);
+  nextSaturday.setDate(today.getDate() + (6 - today.getDay() + 7) % 7);
+  nextSaturday.setHours(20, 0, 0, 0); // 8:00 PM
+  
+  const dateOptions = { weekday: 'long', hour: '2-digit', minute: '2-digit' };
+  const startTimeStr = nextSaturday.toLocaleDateString('en-US', dateOptions) + ' at 8:00 PM EST';
 
   const newTourn = {
-    id: 'TOURN-' + Math.random().toString(36).substr(2, 5).toUpperCase(),
+    id: 'TOURN-MONTHLY',
     name: '🏆 Monthly League Championship 🏆',
     game,
     type,
+    numTeams,
+    useSalaries,
     status: 'signup',
-    pool: [],
+    isMonthly: true,
+    startTime: startTimeStr,
+    checkInStartTime: '7:50 PM EST',
+    pool: [appState.currentUser], // User starts in the pool
+    checkedIn: [appState.currentUser], // User starts checked in
     captains: [],
     budgets: {},
     teams: {},
@@ -1753,77 +2098,15 @@ function simulateMonthlyLeague() {
     matches: []
   };
 
+  // Remove existing monthly tournament if any, so only one is active at a time
+  appState.tournaments = appState.tournaments.filter(t => t.id !== 'TOURN-MONTHLY');
+
   appState.tournaments.push(newTourn);
   appState.activeTournamentId = newTourn.id;
 
-  players.forEach(p => {
-    newTourn.pool.push(p.username);
-  });
-
-  const sorted = [...newTourn.pool].map(pName => {
-    const pl = players.find(p => p.username === pName);
-    return { name: pName, elo: pl?.games[game]?.elo || 1000 };
-  }).sort((a, b) => b.elo - a.elo);
-
-  const capA = sorted[0].name;
-  const capB = sorted[1].name;
-
-  newTourn.captains = [capA, capB];
-  newTourn.teams = { [capA]: [capA], [capB]: [capB] };
-  newTourn.pool = sorted.slice(2).map(p => p.name);
-  newTourn.status = 'draft';
-
-  if (type === 'snake') {
-    newTourn.turn = capB;
-    newTourn.pickSequence = game === 'hockey' ? [capB, capA, capA, capB, capB, capA] : [capB, capA, capA, capB];
-    newTourn.pickIdx = 0;
-
-    showToast("Monthly League Snake Draft Started!", "success");
-    renderTournamentsTab();
-
-    let pickTimer = setInterval(() => {
-      const t = getActiveTournament();
-      if (!t || t.id !== newTourn.id || t.status !== 'draft') {
-        clearInterval(pickTimer);
-        return;
-      }
-      const randomPlayer = t.pool[Math.floor(Math.random() * t.pool.length)];
-      if (randomPlayer) {
-        pickTourneySnakePlayer(randomPlayer);
-      }
-      if (t.status !== 'draft') {
-        clearInterval(pickTimer);
-      }
-    }, 1000);
-  } else {
-    newTourn.budgets = { [capA]: 100, [capB]: 100 };
-    newTourn.nominationTurn = capA;
-
-    showToast("Monthly League Auction Draft Started!", "success");
-    renderTournamentsTab();
-
-    let auctionTimer = setInterval(() => {
-      const t = getActiveTournament();
-      if (!t || t.id !== newTourn.id || t.status !== 'draft') {
-        clearInterval(auctionTimer);
-        return;
-      }
-      if (!t.currentBidding.player) {
-        const randomPlayer = t.pool[Math.floor(Math.random() * t.pool.length)];
-        if (randomPlayer) nominateTourneyPlayer(randomPlayer);
-      } else {
-        const block = t.currentBidding;
-        const bidCap = t.captains.find(c => c !== block.highestBidder);
-        if (bidCap && t.budgets[bidCap] > block.highestBid) {
-          const nextBid = block.highestBid + Math.floor(Math.random() * 15) + 1;
-          if (nextBid <= t.budgets[bidCap]) {
-            bidTourneyPlayer(bidCap, nextBid);
-          }
-        }
-        setTimeout(sellTourneyPlayer, 800);
-      }
-    }, 2000);
-  }
+  playSound('match_found');
+  showToast("Monthly League Championship scheduled!", "success");
+  renderTournamentsTab();
 }
 
 function renderTournamentsTab() {
@@ -1835,19 +2118,23 @@ function renderTournamentsTab() {
   const signupActions = document.getElementById('tourney-signup-actions');
 
   if (listContainer) {
-    listContainer.innerHTML = appState.tournaments.map(tourn => {
-      const isActive = (t && t.id === tourn.id) ? 'border: 1.5px solid var(--dc-text-link); background: rgba(124,58,237,0.1);' : 'border: 1px solid var(--db-border);';
-      const statusColor = tourn.status === 'signup' ? '#10b981' : (tourn.status === 'draft' ? '#8b5cf6' : '#94a3b8');
-      return `
-        <div onclick="selectTournament('${tourn.id}')" style="padding: 8px 12px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; ${isActive}">
-          <div style="font-size: 0.85rem; font-weight: bold; color: white; display: flex; justify-content: space-between;">
-            <span>${tourn.name}</span>
-            <span style="font-size: 0.7rem; color: ${statusColor};">${tourn.status.toUpperCase()}</span>
+    if (appState.tournaments.length === 0) {
+      listContainer.innerHTML = `<div style="color:var(--dc-text-muted); font-size:0.75rem; text-align:center; padding: 16px 0;">No active tournaments. Create one on the left!</div>`;
+    } else {
+      listContainer.innerHTML = appState.tournaments.map(tourn => {
+        const isActive = (t && t.id === tourn.id) ? 'border: 1.5px solid var(--dc-text-link); background: rgba(124,58,237,0.1);' : 'border: 1px solid var(--db-border);';
+        const statusColor = tourn.status === 'signup' ? '#10b981' : (tourn.status === 'draft' ? '#8b5cf6' : '#94a3b8');
+        return `
+          <div onclick="selectTournament('${tourn.id}')" style="padding: 8px 12px; border-radius: 4px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; ${isActive}">
+            <div style="font-size: 0.85rem; font-weight: bold; color: white; display: flex; justify-content: space-between;">
+              <span>${tourn.name}</span>
+              <span style="font-size: 0.7rem; color: ${statusColor};">${tourn.status.toUpperCase()}</span>
+            </div>
+            <div style="font-size: 0.7rem; color: var(--dc-text-muted);">Game: ${tourn.game.toUpperCase()} • Type: ${tourn.type.toUpperCase()}</div>
           </div>
-          <div style="font-size: 0.7rem; color: var(--dc-text-muted);">Game: ${tourn.game.toUpperCase()} • Type: ${tourn.type.toUpperCase()}</div>
-        </div>
-      `;
-    }).join('');
+        `;
+      }).join('');
+    }
   }
 
   if (!t) {
@@ -1859,7 +2146,7 @@ function renderTournamentsTab() {
     content.innerHTML = `
       <div style="text-align: center; color: var(--dc-text-muted); padding: 60px 0;">
         <span style="font-size: 3rem; display: block; margin-bottom: 12px;">🏆</span>
-        Select a game and start a new tournament signup pool above, or trigger the automated Monthly League simulation.
+        Select a tournament from the hub, or configure a custom brackets cup / schedule a Monthly Cup on the left.
       </div>
     `;
     return;
@@ -1871,21 +2158,58 @@ function renderTournamentsTab() {
 
   if (t.status === 'signup') {
     displayStatus.style.background = '#10b981';
+    
+    const isUserRegistered = t.pool.includes(appState.currentUser);
+    const isUserCheckedIn = t.checkedIn && t.checkedIn.includes(appState.currentUser);
+    
+    let checkInBtn = '';
+    if (t.isMonthly && isUserRegistered && !isUserCheckedIn) {
+      checkInBtn = `<button class="btn btn-secondary" onclick="checkInTourneyUser('${appState.currentUser}')" style="background:#23a55a; border-color:#23a55a; color:white;">✅ Check In</button>`;
+    }
+
     signupActions.innerHTML = `
-      <button class="btn btn-secondary" onclick="registerTourneyUser('${appState.currentUser}')">Join Pool</button>
+      <button class="btn btn-secondary" onclick="registerTourneyUser('${appState.currentUser}')" ${isUserRegistered ? 'disabled' : ''}>Join Pool</button>
+      ${checkInBtn}
       <button class="btn btn-secondary" onclick="addMockSignups()">Add Mock Players</button>
       <button class="btn btn-primary" onclick="startTourneyDraft()">Start Draft</button>
     `;
 
-    const listHtml = t.pool.map((p, idx) => `
-      <div style="padding: 10px; border-radius: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--db-border); display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: bold; color: white;">${idx+1}. ${p}</span>
-        <span style="font-size: 0.8rem; color: var(--dc-text-muted);">MMR: ${players.find(pl => pl.username === p)?.games[t.game]?.elo || 1000}</span>
-      </div>
-    `).join('') || '<div style="color:var(--dc-text-muted); font-size:0.9rem; text-align:center;">No players registered. Click Join Pool or Add Mock Players!</div>';
+    const listHtml = t.pool.map((p, idx) => {
+      const isChecked = t.checkedIn && t.checkedIn.includes(p);
+      const statusBadge = t.isMonthly 
+        ? isChecked 
+          ? `<span style="font-size:0.65rem; color:#10b981; font-weight:bold; background:rgba(16,185,129,0.1); padding:2px 6px; border-radius:4px; display:inline-block; width:fit-content;">🟢 Checked In</span>`
+          : `<span style="font-size:0.65rem; color:#ef4444; font-weight:bold; background:rgba(239,68,68,0.1); padding:2px 6px; border-radius:4px; display:inline-block; width:fit-content;">🔴 Pending</span>`
+        : '';
+
+      return `
+        <div style="padding: 10px; border-radius: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--db-border); display: flex; justify-content: space-between; align-items: center;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-weight: bold; color: white;">${idx+1}. ${p}</span>
+            ${statusBadge}
+          </div>
+          <span style="font-size: 0.8rem; color: var(--dc-text-muted);">MMR: ${players.find(pl => pl.username === p)?.games[t.game]?.elo || 1000}</span>
+        </div>
+      `;
+    }).join('') || '<div style="color:var(--dc-text-muted); font-size:0.9rem; text-align:center;">No players registered. Click Join Pool or Add Mock Players!</div>';
+
+    let monthlyNoticeHtml = '';
+    if (t.isMonthly) {
+      monthlyNoticeHtml = `
+        <div class="db-card" style="padding: 14px; background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.12); border-left: 4px solid #ef4444; margin-bottom: 20px; display:flex; flex-direction:column; gap:6px;">
+          <div style="font-weight:bold; color:white; font-size:0.9rem; display:flex; align-items:center; gap:6px;">
+            <span>📅 Scheduled Start:</span> <span style="color:#f43f5e;">${t.startTime}</span>
+          </div>
+          <p style="font-size:0.75rem; color:var(--dc-text-muted); line-height:1.45;">
+            <strong>⚠️ CHECK-IN REQUIREMENT:</strong> All players must check in at least <strong>10 minutes before the draft starts</strong> (by <strong>7:50 PM EST</strong>). Players who have not checked in will be removed from the selection pool once drafting commences.
+          </p>
+        </div>
+      `;
+    }
 
     content.innerHTML = `
       <div>
+        ${monthlyNoticeHtml}
         <div style="font-weight: bold; color: white; margin-bottom: 8px; font-size: 1rem;">👥 Registered Entrants (${t.pool.length})</div>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 12px;">
           ${listHtml}
@@ -1896,9 +2220,6 @@ function renderTournamentsTab() {
   else if (t.status === 'draft') {
     displayStatus.style.background = '#8b5cf6';
     signupActions.innerHTML = '';
-
-    const capA = t.captains[0];
-    const capB = t.captains[1];
 
     if (t.type === 'snake') {
       const activeCap = t.turn;
@@ -1916,29 +2237,34 @@ function renderTournamentsTab() {
         `;
       }).join('');
 
+      const teamsHtml = t.captains.map((cap, cIdx) => {
+        const teamColor = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#ef4444', '#14b8a6', '#f43f5e', '#6366f1', '#06b6d4', '#84cc16', '#eab308', '#a855f7', '#d946ef', '#0ea5e9'][cIdx % 15];
+        return `
+          <div class="db-card" style="padding: 10px; background: rgba(0,0,0,0.15); border-top: 3px solid ${teamColor};">
+            <div style="font-weight: bold; color: ${teamColor}; font-size: 0.85rem; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Team ${cap}</div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              ${t.teams[cap].map(p => `<div style="font-size:0.75rem; font-weight:bold; color:white;">• ${p}</div>`).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
       content.innerHTML = `
         <div style="text-align: center; font-weight: bold; color: #a78bfa; margin-bottom: 12px; font-size: 1.05rem;">
           🎯 Turn: Captain **${activeCap}** is picking!
         </div>
-        <div style="display: grid; grid-template-columns: 240px 240px 1fr; gap: 20px;">
-          <!-- Team Alpha -->
-          <div class="db-card" style="padding: 12px; background: rgba(0,0,0,0.15);">
-            <div style="font-weight: bold; color: #10b981; font-size: 0.9rem; margin-bottom: 8px;">🟢 Team ${capA}</div>
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-              ${t.teams[capA].map(p => `<div style="font-size:0.8rem; font-weight:bold; color:white;">• ${p}</div>`).join('')}
-            </div>
-          </div>
-          <!-- Team Beta -->
-          <div class="db-card" style="padding: 12px; background: rgba(0,0,0,0.15);">
-            <div style="font-weight: bold; color: #3b82f6; font-size: 0.9rem; margin-bottom: 8px;">🔵 Team ${capB}</div>
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-              ${t.teams[capB].map(p => `<div style="font-size:0.8rem; font-weight:bold; color:white;">• ${p}</div>`).join('')}
+        <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start;">
+          <!-- Teams Grid -->
+          <div>
+            <div style="font-weight: bold; color: white; margin-bottom: 8px; font-size: 0.9rem;">Rosters</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;">
+              ${teamsHtml}
             </div>
           </div>
           <!-- Selection Pool -->
           <div>
-            <div style="font-weight: bold; color: white; margin-bottom: 8px; font-size: 0.9rem;">👥 Players Selection Pool</div>
-            <div style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto;">
+            <div style="font-weight: bold; color: white; margin-bottom: 8px; font-size: 0.9rem;">👥 Players Selection Pool (${t.pool.length})</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto;">
               ${listHtml}
             </div>
           </div>
@@ -1947,81 +2273,122 @@ function renderTournamentsTab() {
     } 
     else if (t.type === 'auction') {
       const activeBid = t.currentBidding;
-      const onBlockHtml = activeBid.player ? `
-        <div class="db-card" style="padding: 16px; background: rgba(245,158,11,0.05); border: 1.5px solid #f59e0b; text-align: center;">
-          <div style="font-size: 0.75rem; color: #f59e0b; font-weight: bold; margin-bottom: 4px;">ON THE BIDDING BLOCK</div>
-          <div style="font-size: 1.5rem; font-weight: bold; color: white; margin-bottom: 4px;">${activeBid.player}</div>
-          <div style="font-size: 0.8rem; color: var(--dc-text-muted); margin-bottom: 12px;">MMR: ${players.find(pl => pl.username === activeBid.player)?.games[t.game]?.elo || 1000}</div>
-          
-          <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 12px;">
-            <div>
-              <span style="display: block; font-size: 0.7rem; color: var(--dc-text-muted);">CURRENT BID</span>
-              <strong style="font-size: 1.2rem; color: #fbbf24;">${activeBid.highestBid} Credits</strong>
+      let mainWorkspaceHtml = '';
+      let poolHtml = '';
+      
+      if (t.useSalaries) {
+        poolHtml = t.pool.map(pName => {
+          const pl = players.find(p => p.username === pName);
+          const elo = pl?.games[t.game]?.elo || 1000;
+          const salary = getPlayerSalary(pName, t.game);
+          return `
+            <div style="padding: 8px 12px; border-radius: 4px; background: var(--dc-bg-chat); border: 1px solid var(--db-border); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: bold; color: white; font-size: 0.85rem;">${pName}</div>
+                <div style="font-size: 0.75rem; color: var(--dc-text-muted);">MMR: ${elo} • Salary: <strong style="color:#fbbf24;">${salary}</strong> pts</div>
+              </div>
+              <button class="btn btn-primary" onclick="buyTourneySalaryPlayer('${pName}')" ${appState.currentUser === t.nominationTurn ? '' : 'disabled'} style="font-size: 0.75rem; padding: 4px 8px;">Buy [${salary} pts]</button>
             </div>
-            <div>
-              <span style="display: block; font-size: 0.7rem; color: var(--dc-text-muted);">HIGHEST BIDDER</span>
-              <strong style="font-size: 1.2rem; color: white;">${activeBid.highestBidder}</strong>
+          `;
+        }).join('');
+
+        mainWorkspaceHtml = `
+          <div class="db-card" style="padding: 16px; background: rgba(16,185,129,0.04); border: 1.5px solid #10b981; text-align: center; margin-bottom: 12px;">
+            <div style="font-size: 0.75rem; color: #10b981; font-weight: bold; margin-bottom: 4px;">SALARY CAP DRAFT ACTIVE</div>
+            <div style="font-size: 1.25rem; font-weight: bold; color: white; margin-bottom: 4px;">
+              Captain <span style="color:#a78bfa;">${t.nominationTurn}</span>'s Turn to Buy
+            </div>
+            <div style="font-size: 0.75rem; color: var(--dc-text-muted);">Select any player from the pool below to purchase them at their MMR salary price.</div>
+          </div>
+          <div>
+            <div style="font-weight: bold; color: white; margin-bottom: 6px; font-size: 0.9rem;">👥 Players Selection Pool (${t.pool.length})</div>
+            <div style="display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto;">
+              ${poolHtml}
             </div>
           </div>
+        `;
+      } else {
+        const onBlockHtml = activeBid.player ? `
+          <div class="db-card" style="padding: 16px; background: rgba(245,158,11,0.05); border: 1.5px solid #f59e0b; text-align: center;">
+            <div style="font-size: 0.75rem; color: #f59e0b; font-weight: bold; margin-bottom: 4px;">ON THE BIDDING BLOCK</div>
+            <div style="font-size: 1.5rem; font-weight: bold; color: white; margin-bottom: 4px;">${activeBid.player}</div>
+            <div style="font-size: 0.8rem; color: var(--dc-text-muted); margin-bottom: 12px;">MMR: ${players.find(pl => pl.username === activeBid.player)?.games[t.game]?.elo || 1000}</div>
+            
+            <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 12px;">
+              <div>
+                <span style="display: block; font-size: 0.7rem; color: var(--dc-text-muted);">CURRENT BID</span>
+                <strong style="font-size: 1.2rem; color: #fbbf24;">${activeBid.highestBid} Credits</strong>
+              </div>
+              <div>
+                <span style="display: block; font-size: 0.7rem; color: var(--dc-text-muted);">HIGHEST BIDDER</span>
+                <strong style="font-size: 1.2rem; color: white;">${activeBid.highestBidder}</strong>
+              </div>
+            </div>
 
-          <div style="display: flex; justify-content: center; gap: 8px;">
-            <input type="number" id="tourney-bid-input" value="${activeBid.highestBid + 5}" style="width: 80px; padding: 6px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white; text-align: center;">
-            <button class="btn btn-primary" onclick="bidTourneyPlayer('${appState.currentUser}', parseInt(document.getElementById('tourney-bid-input').value))" ${t.captains.includes(appState.currentUser) ? '' : 'disabled'}>Place Bid</button>
-            <button class="btn btn-secondary" onclick="sellTourneyPlayer()">Hammer Sold</button>
+            <div style="display: flex; justify-content: center; gap: 8px;">
+              <input type="number" id="tourney-bid-input" value="${activeBid.highestBid + 5}" style="width: 80px; padding: 6px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white; text-align: center;">
+              <button class="btn btn-primary" onclick="bidTourneyPlayer('${appState.currentUser}', parseInt(document.getElementById('tourney-bid-input').value))" ${t.captains.includes(appState.currentUser) ? '' : 'disabled'}>Place Bid</button>
+              <button class="btn btn-secondary" onclick="sellTourneyPlayer()">Hammer Sold</button>
+            </div>
           </div>
-        </div>
-      ` : `
-        <div style="border: 1px dashed var(--db-border); border-radius: 6px; padding: 30px; text-align: center; color: var(--dc-text-muted);">
-          Waiting for Captain <strong>${t.nominationTurn}</strong> to nominate a player.
-        </div>
-      `;
+        ` : `
+          <div style="border: 1px dashed var(--db-border); border-radius: 6px; padding: 30px; text-align: center; color: var(--dc-text-muted);">
+            Waiting for Captain <strong>${t.nominationTurn}</strong> to nominate a player.
+          </div>
+        `;
 
-      const poolHtml = t.pool.map(pName => {
-        const pl = players.find(p => p.username === pName);
-        const elo = pl?.games[t.game]?.elo || 1000;
+        poolHtml = t.pool.map(pName => {
+          const pl = players.find(p => p.username === pName);
+          const elo = pl?.games[t.game]?.elo || 1000;
+          return `
+            <div style="padding: 8px 12px; border-radius: 4px; background: var(--dc-bg-chat); border: 1px solid var(--db-border); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: bold; color: white; font-size: 0.85rem;">${pName}</div>
+                <div style="font-size: 0.75rem; color: var(--dc-text-muted);">MMR: ${elo}</div>
+              </div>
+              <button class="btn btn-secondary" onclick="nominateTourneyPlayer('${pName}')" ${appState.currentUser === t.nominationTurn && !activeBid.player ? '' : 'disabled'} style="font-size: 0.75rem; padding: 4px 8px;">Nominate</button>
+            </div>
+          `;
+        }).join('');
+
+        mainWorkspaceHtml = `
+          ${onBlockHtml}
+          <div>
+            <div style="font-weight: bold; color: white; margin-bottom: 6px; font-size: 0.9rem;">👥 Players Selection Pool (${t.pool.length})</div>
+            <div style="display: flex; flex-direction: column; gap: 6px; max-height: 250px; overflow-y: auto;">
+              ${poolHtml}
+            </div>
+          </div>
+        `;
+      }
+
+      const teamsHtml = t.captains.map((cap, cIdx) => {
+        const teamColor = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#ef4444', '#14b8a6', '#f43f5e', '#6366f1', '#06b6d4', '#84cc16', '#eab308', '#a855f7', '#d946ef', '#0ea5e9'][cIdx % 15];
         return `
-          <div style="padding: 8px 12px; border-radius: 4px; background: var(--dc-bg-chat); border: 1px solid var(--db-border); display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="font-weight: bold; color: white; font-size: 0.85rem;">${pName}</div>
-              <div style="font-size: 0.75rem; color: var(--dc-text-muted);">MMR: ${elo}</div>
+          <div class="db-card" style="padding: 10px; background: rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 8px; border-top: 3px solid ${teamColor};">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--db-border); padding-bottom: 4px;">
+              <span style="font-weight: bold; color: ${teamColor}; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">Team ${cap}</span>
+              <strong style="color: white; font-size: 0.8rem;">${t.budgets[cap]}</strong>
             </div>
-            <button class="btn btn-secondary" onclick="nominateTourneyPlayer('${pName}')" ${appState.currentUser === t.nominationTurn && !activeBid.player ? '' : 'disabled'} style="font-size: 0.75rem; padding: 4px 8px;">Nominate</button>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              ${t.teams[cap].map(p => `<div style="font-size:0.75rem; font-weight:bold; color:white;">• ${p}</div>`).join('')}
+            </div>
           </div>
         `;
       }).join('');
 
       content.innerHTML = `
-        <div style="display: grid; grid-template-columns: 240px 1fr 240px; gap: 20px;">
-          <!-- Team Alpha -->
-          <div class="db-card" style="padding: 12px; background: rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 10px;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--db-border); padding-bottom: 6px;">
-              <span style="font-weight: bold; color: #10b981; font-size: 0.85rem;">🟢 Team ${capA}</span>
-              <strong style="color: white; font-size: 0.85rem;">${t.budgets[capA]} pts</strong>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-              ${t.teams[capA].map(p => `<div style="font-size:0.8rem; font-weight:bold; color:white;">• ${p}</div>`).join('')}
-            </div>
+        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start;">
+          <!-- Bidding or Purchasing block -->
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            ${mainWorkspaceHtml}
           </div>
 
-          <!-- Bidding block -->
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            ${onBlockHtml}
-            <div>
-              <div style="font-weight: bold; color: white; margin-bottom: 6px; font-size: 0.9rem;">👥 Players Selection Pool</div>
-              <div style="display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto;">
-                ${poolHtml}
-              </div>
-            </div>
-          </div>
-
-          <!-- Team Beta -->
-          <div class="db-card" style="padding: 12px; background: rgba(0,0,0,0.15); display: flex; flex-direction: column; gap: 10px;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--db-border); padding-bottom: 6px;">
-              <span style="font-weight: bold; color: #3b82f6; font-size: 0.85rem;">🔵 Team ${capB}</span>
-              <strong style="color: white; font-size: 0.85rem;">${t.budgets[capB]} pts</strong>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 6px;">
-              ${t.teams[capB].map(p => `<div style="font-size:0.8rem; font-weight:bold; color:white;">• ${p}</div>`).join('')}
+          <!-- Rosters & Budgets -->
+          <div>
+            <div style="font-weight: bold; color: white; margin-bottom: 8px; font-size: 0.9rem;">Budgets & Rosters</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+              ${teamsHtml}
             </div>
           </div>
         </div>

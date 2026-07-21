@@ -172,7 +172,7 @@
           <div class="db-card">
             <div class="card-title">
               <span>👥 Match Queue Status</span>
-              <span id="queue-count-badge" class="badge" style="background-color:var(--dc-brand); font-size:0.75rem; padding: 0.25rem 0.5rem;">0/6 Players</span>
+              <span id="queue-count-badge" class="badge" style="background-color:var(--dc-brand); font-size:0.75rem; padding: 0.25rem 0.5rem; display: inline-flex; align-items: center; gap: 6px;">0/6 Players</span>
             </div>
             
             <div class="lobby-controls">
@@ -238,7 +238,7 @@
           <!-- Match Simulator Card -->
           <div class="db-card" id="match-simulator-card" style="display: none;">
             <div class="card-title">
-              <span>🏟️ Simulated Match Feed</span>
+              <span>🏟️ Live Scrim Match Feed</span>
               <span id="match-map-badge" class="badge" style="background-color:var(--db-secondary); font-size:0.75rem; padding: 0.25rem 0.5rem;">Ascension Arena</span>
             </div>
 
@@ -390,6 +390,27 @@
                   <option value="auction">Auction (Points Bidding)</option>
                 </select>
               </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 4px; font-weight: bold;">NUMBER OF TEAMS</label>
+                <select id="tourney-select-teams" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--db-border); background: var(--db-bg); color: white;">
+                  <option value="2">2 Teams</option>
+                  <option value="3">3 Teams</option>
+                  <option value="4">4 Teams</option>
+                  <option value="5">5 Teams</option>
+                  <option value="6">6 Teams</option>
+                  <option value="7">7 Teams</option>
+                  <option value="8">8 Teams</option>
+                  <option value="9">9 Teams</option>
+                  <option value="10">10 Teams</option>
+                  <option value="12">12 Teams</option>
+                  <option value="14">14 Teams</option>
+                  <option value="15">15 Teams</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                <input type="checkbox" id="tourney-use-salaries" style="cursor: pointer; width: 16px; height: 16px;">
+                <label for="tourney-use-salaries" style="font-size: 0.75rem; color: white; cursor: pointer; user-select: none;">💵 Use MMR-based Salaries (Auction)</label>
+              </div>
               <button class="btn btn-primary" onclick="initCustomTournament()" style="width: 100%; margin-top: 4px;">🚀 Start Tournament signup</button>
             </div>
           </div>
@@ -400,7 +421,7 @@
             <p style="font-size: 0.75rem; color: var(--dc-text-muted); margin-bottom: 12px;">
               Automatically gathers the top MMR players to act as team Captains, drafts pools, and simulates the competitive monthly brackets.
             </p>
-            <button class="btn btn-secondary" onclick="simulateMonthlyLeague()" style="width: 100%;">⚡ Run Monthly Cup</button>
+            <button class="btn btn-secondary" onclick="scheduleMonthlyCup()" style="width: 100%;">📅 Schedule Monthly Cup</button>
           </div>
 
           <!-- Tournaments List Card -->
@@ -525,9 +546,9 @@
   <!-- Footer -->
   <footer>
     <div class="container">
-      <p>Custom Lobbies Discord Draft Bot Simulator - Pair Programmed with Antigravity AI.</p>
+      <p>Custom Lobbies Discord Draft Bot Portal - Pair Programmed with Antigravity AI.</p>
       <p style="font-size:0.7rem; color:var(--dc-text-muted); margin-top:0.4rem;">
-        Recreates standard features of Arkheron serpentine drafting systems. Free to deploy using the export tab.
+        Recreates standard features of Arkheron serpentine drafting systems. Ready to deploy.
       </p>
     </div>
   </footer>
