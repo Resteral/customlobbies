@@ -530,11 +530,17 @@ class CustomLobbiesApp {
           </div>
         </div>
 
-        <div style="display: flex; gap: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem;">
-          <button class="btn btn-primary btn-sm" style="flex: 1; font-size: 0.75rem;" onclick="window.app.recruitPoolPlayer(${p.id})">
-            ➕ Recruit Player
+        <div style="display: flex; gap: 0.3rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-sm" style="flex: 1; font-size: 0.72rem; padding: 0.25rem 0.4rem;" onclick="window.app.recruitPoolPlayer(${p.id})">
+            ➕ Recruit
           </button>
-          <button class="btn btn-secondary btn-sm" style="font-size: 0.75rem;" onclick="window.app.openPlayerPassportModal('${p.name}')">
+          <button class="btn btn-success btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.4rem; background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: var(--accent-green);" onclick="window.app.awardPlayerHonor('${p.name}', 'friendly')" title="Award Commendation">
+            ⭐
+          </button>
+          <button class="btn btn-danger btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.4rem;" onclick="window.app.flagPlayerMisconduct('${p.name}', 'toxic')" title="Flag Misconduct">
+            🚩
+          </button>
+          <button class="btn btn-secondary btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.4rem;" onclick="window.app.openPlayerPassportModal('${p.name}')">
             🪪 Passport
           </button>
         </div>
@@ -2367,9 +2373,17 @@ class CustomLobbiesApp {
             <div style="font-size: 0.75rem; color: var(--text-muted);">${p.gStats.mvp} MVPs</div>
           </td>
           <td style="padding: 0.8rem; text-align: right;">
-            <button class="btn btn-purple btn-sm" onclick="window.app.openPlayerPassportModal('${p.name}')">
-              🪪 View Passport
-            </button>
+            <div style="display: flex; gap: 0.3rem; justify-content: flex-end; flex-wrap: wrap;">
+              <button class="btn btn-success btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.5rem; background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: var(--accent-green);" onclick="window.app.awardPlayerHonor('${p.name}', 'friendly')" title="Award Commendation & +25 Honor XP">
+                ⭐ Commend
+              </button>
+              <button class="btn btn-danger btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;" onclick="window.app.flagPlayerMisconduct('${p.name}', 'toxic')" title="Flag Misconduct / Toxicity to Guardian AC">
+                🚩 Flag
+              </button>
+              <button class="btn btn-purple btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;" onclick="window.app.openPlayerPassportModal('${p.name}')" title="View Full Gamer Passport & Stats">
+                🪪 Passport
+              </button>
+            </div>
           </td>
         </tr>
       `;
