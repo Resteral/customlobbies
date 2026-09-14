@@ -374,6 +374,50 @@ class CustomLobbiesApp {
     }
   }
 
+  startQueueFromWidget(game = 'Counter-Strike 2', region = 'NA East', role = 'Any Role') {
+    if (this.activeQueue) {
+      alert('⚠️ ALREADY IN MATCHMAKING QUEUE!\n\nYour queue search is currently active.');
+      return;
+    }
+
+    this.activeQueue = true;
+    this.queueSeconds = 0;
+    this.queuedGame = game;
+    this.queuedRegion = region;
+
+    const queueCard = document.getElementById('queueStatusCard');
+    const queueTimer = document.getElementById('queueTimer');
+
+    if (queueCard) queueCard.style.display = 'block';
+
+    // Award +25 CL-Points queue bonus
+    this.clPoints += 25;
+    this.updatePointsWidget();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('ggwp');
+    }
+
+    clearInterval(this.queueTimerInterval);
+    this.queueTimerInterval = setInterval(() => {
+      this.queueSeconds++;
+      const mins = String(Math.floor(this.queueSeconds / 60)).padStart(2, '0');
+      const secs = String(this.queueSeconds % 60).padStart(2, '0');
+      const foundPlayers = Math.min(10, 6 + Math.floor(this.queueSeconds / 1.5));
+
+      if (queueTimer) {
+        queueTimer.textContent = `🎯 Searching for ${game} [${region}] • Role: ${role} | Time: ${mins}:${secs} | Est: ~00:15 | Pool: ${foundPlayers}/10 Players`;
+      }
+
+      if (this.queueSeconds >= 6 && this.activeQueue) {
+        this.leaveQueue(true);
+        this.triggerMatchFoundModal(`${game} • 5v5 Premier Match [${region}]`);
+      }
+    }, 1000);
+
+    alert(`🚀 WIDGET QUEUE LAUNCHED!\n\nYou entered the matchmaking queue for ${game} (${region}) directly from the Quick Widget!\nEarned +25 🪙 CL-Points queue bonus!`);
+  }
+
   leaveQueue(silent = false) {
     this.activeQueue = false;
     clearInterval(this.queueTimerInterval);
