@@ -313,6 +313,8 @@ class WardogsEngine {
       let player = pool[i - 3];
       if (!player) {
         const selectedRole = rolesList[(i - 3) % rolesList.length];
+        const randomKd = (2.4 - (i - 3) * 0.01 + Math.random() * 0.2).toFixed(2);
+        const randomCash = Math.floor(6500 - (i - 3) * 50 + Math.random() * 200);
         player = {
           id: 1000 + i,
           name: `Operative_DOG_${i + 1}`,
@@ -320,7 +322,8 @@ class WardogsEngine {
           game: gameName,
           role: selectedRole,
           elo: Math.floor(2550 - (i - 3) * 6 + Math.random() * 35),
-          kd: (2.2 - (i - 3) * 0.01).toFixed(2),
+          kd: randomKd,
+          bountyEarned: `$${randomCash.toLocaleString()}`,
           status: 'Selected for Ranked',
           badge: i % 5 === 0 ? '🏆 Elite Veteran' : '🛡️ Standard Operative'
         };
@@ -329,6 +332,16 @@ class WardogsEngine {
       }
       remainingDraft.push(player);
     }
+
+    // Attach Rank Info to all players
+    [...factionAlpha, ...factionBravo, ...factionCharlie, ...remainingDraft].forEach(p => {
+      const rank = this.computePlayerRankTier(p);
+      p.rankInfo = rank;
+      p.kd = rank.kd;
+      p.bountyEarned = p.bountyEarned || rank.cashFormatted;
+      p.rankTitle = rank.rankTitle;
+      p.rankBadge = rank.rankBadge;
+    });
 
     // Sort remaining draft operatives descending by ELO
     remainingDraft.sort((a, b) => b.elo - a.elo);
@@ -352,6 +365,14 @@ class WardogsEngine {
     const avgBravo = Math.round(factionBravo.reduce((acc, p) => acc + p.elo, 0) / factionBravo.length);
     const avgCharlie = Math.round(factionCharlie.reduce((acc, p) => acc + p.elo, 0) / factionCharlie.length);
 
+    const kdAlpha = (factionAlpha.reduce((acc, p) => acc + parseFloat(p.kd), 0) / factionAlpha.length).toFixed(2);
+    const kdBravo = (factionBravo.reduce((acc, p) => acc + parseFloat(p.kd), 0) / factionBravo.length).toFixed(2);
+    const kdCharlie = (factionCharlie.reduce((acc, p) => acc + parseFloat(p.kd), 0) / factionCharlie.length).toFixed(2);
+
+    const cashAlpha = factionAlpha.reduce((acc, p) => acc + (p.rankInfo ? p.rankInfo.cashVal : 1000), 0);
+    const cashBravo = factionBravo.reduce((acc, p) => acc + (p.rankInfo ? p.rankInfo.cashVal : 1000), 0);
+    const cashCharlie = factionCharlie.reduce((acc, p) => acc + (p.rankInfo ? p.rankInfo.cashVal : 1000), 0);
+
     const maxAvg = Math.max(avgAlpha, avgBravo, avgCharlie);
     const minAvg = Math.min(avgAlpha, avgBravo, avgCharlie);
     const overallAvg = Math.round((avgAlpha + avgBravo + avgCharlie) / 3);
@@ -371,6 +392,12 @@ class WardogsEngine {
       avgEloAlpha: avgAlpha,
       avgEloBravo: avgBravo,
       avgEloCharlie: avgCharlie,
+      kdAlpha,
+      kdBravo,
+      kdCharlie,
+      cashAlpha: `$${cashAlpha.toLocaleString()}`,
+      cashBravo: `$${cashBravo.toLocaleString()}`,
+      cashCharlie: `$${cashCharlie.toLocaleString()}`,
       balanceRating: `${balancePct}% Equalized`,
       map: 'Sector 33 - Quantum Citadel (Tri-Zone Fortress)',
       serverNode: `US-EAST-WARNODE-${Math.floor(Math.random() * 90 + 10)} (128-Tick Tickrate)`,
@@ -381,6 +408,41 @@ class WardogsEngine {
     this.rankedSelectionHistory.unshift(matchRoom);
     this.saveState();
     return matchRoom;
+  }
+
+  // Compute Player Rank & Balance Rating from ELO, K/D Ratio, and Cash Economy Balance
+  computePlayerRankTier(player) {
+    const elo = player.elo || 1800;
+    const kd = parseFloat(player.kd) || 1.85;
+    const cashVal = parseInt((player.bountyEarned || '$1200').replace(/[^0-9]/g, '')) || 1200;
+
+    const compositeScore = (elo * 0.5) + (kd * 450) + (cashVal / 8);
+
+    let rankTitle = '🥉 Vanguard Recruit';
+    let rankBadge = '🥉';
+
+    if (compositeScore >= 2400) {
+      rankTitle = '👑 Apex Commander';
+      rankBadge = '👑';
+    } else if (compositeScore >= 2100) {
+      rankTitle = '💎 Diamond Veteran';
+      rankBadge = '💎';
+    } else if (compositeScore >= 1800) {
+      rankTitle = '🥇 Gold Operative';
+      rankBadge = '🥇';
+    } else if (compositeScore >= 1500) {
+      rankTitle = '🥈 Silver Combatant';
+      rankBadge = '🥈';
+    }
+
+    return {
+      compositeScore: Math.round(compositeScore),
+      rankTitle,
+      rankBadge,
+      kd: kd.toFixed(2),
+      cashVal,
+      cashFormatted: `$${cashVal.toLocaleString()}`
+    };
   }
 
   // Live Scraped Telemetry Engine for WARDOGS (SteamDB & Twitch Tracker Sync)

@@ -1538,32 +1538,50 @@ class CustomLobbiesApp {
 
     const matchRoom = window.wardogsEngine.generateRankedSelectionMatch(selectedGame);
 
-    document.getElementById('wardogsDraftMatchId').textContent = `Match ID: ${matchRoom.id} • Game: ${matchRoom.game} (${matchRoom.capacity} Operatives) — Commanders Assigned by Highest Roster Size`;
-    document.getElementById('wardogsAlphaElo').textContent = `Commander: ${matchRoom.commanderAlpha?.captain || 'Ghost_Dog_99'} (${matchRoom.commanderAlpha?.membersCount || 33} Members) • Avg: ${matchRoom.avgEloAlpha} ELO`;
-    document.getElementById('wardogsBravoElo').textContent = `Commander: ${matchRoom.commanderBravo?.captain || 'Sargeant_Iron'} (${matchRoom.commanderBravo?.membersCount || 33} Members) • Avg: ${matchRoom.avgEloBravo} ELO`;
+    document.getElementById('wardogsDraftMatchId').textContent = `Match ID: ${matchRoom.id} • Game: ${matchRoom.game} (${matchRoom.capacity} Operatives) — Tri-Faction Auto-Balanced by MMR, K/D & Economy`;
+    document.getElementById('wardogsAlphaElo').textContent = `Commander: ${matchRoom.commanderAlpha?.captain || 'Ghost_Dog_99'} • Avg: ${matchRoom.avgEloAlpha} ELO • K/D: ${matchRoom.kdAlpha} • Pool: ${matchRoom.cashAlpha}`;
+    document.getElementById('wardogsBravoElo').textContent = `Commander: ${matchRoom.commanderBravo?.captain || 'Sargeant_Iron'} • Avg: ${matchRoom.avgEloBravo} ELO • K/D: ${matchRoom.kdBravo} • Pool: ${matchRoom.cashBravo}`;
     const charlieEloEl = document.getElementById('wardogsCharlieElo');
-    if (charlieEloEl) charlieEloEl.textContent = `Commander: ${matchRoom.commanderCharlie?.captain || 'Shadow_K9'} (${matchRoom.commanderCharlie?.membersCount || 28} Members) • Avg: ${matchRoom.avgEloCharlie} ELO`;
+    if (charlieEloEl) charlieEloEl.textContent = `Commander: ${matchRoom.commanderCharlie?.captain || 'Shadow_K9'} • Avg: ${matchRoom.avgEloCharlie} ELO • K/D: ${matchRoom.kdCharlie} • Pool: ${matchRoom.cashCharlie}`;
 
     document.getElementById('wardogsAlphaRosterList').innerHTML = matchRoom.factionAlpha.map((p, idx) => `
-      <div style="display: flex; justify-content: space-between; background: ${idx === 0 ? 'rgba(0,242,254,0.18)' : 'rgba(0,242,254,0.08)'}; padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.82rem; border: ${idx === 0 ? '1px solid var(--accent-cyan)' : 'none'};">
-        <span style="font-weight: 700;">${idx === 0 ? '👑 COMMANDER ' : ''}${p.name} <span style="font-size: 0.72rem; color: var(--accent-cyan);">(${p.callsign})</span></span>
-        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; background: ${idx === 0 ? 'rgba(0,242,254,0.18)' : 'rgba(0,242,254,0.08)'}; padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.8rem; border: ${idx === 0 ? '1px solid var(--accent-cyan)' : 'none'};">
+        <div>
+          <span style="font-weight: 700;">${p.rankBadge || '🛡️'} ${p.name} <span style="font-size: 0.7rem; color: var(--accent-cyan);">(${p.callsign})</span></span>
+          <div style="font-size: 0.68rem; color: var(--text-muted);">${p.rankTitle || 'Operative'}</div>
+        </div>
+        <div style="text-align: right;">
+          <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
+          <div style="font-size: 0.68rem; color: var(--accent-green); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
+        </div>
       </div>
     `).join('');
 
     document.getElementById('wardogsBravoRosterList').innerHTML = matchRoom.factionBravo.map((p, idx) => `
-      <div style="display: flex; justify-content: space-between; background: ${idx === 0 ? 'rgba(255,111,0,0.18)' : 'rgba(255,111,0,0.08)'}; padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.82rem; border: ${idx === 0 ? '1px solid #ffab00' : 'none'};">
-        <span style="font-weight: 700;">${idx === 0 ? '👑 COMMANDER ' : ''}${p.name} <span style="font-size: 0.72rem; color: #ffab00;">(${p.callsign})</span></span>
-        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; background: ${idx === 0 ? 'rgba(255,111,0,0.18)' : 'rgba(255,111,0,0.08)'}; padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.8rem; border: ${idx === 0 ? '1px solid #ffab00' : 'none'};">
+        <div>
+          <span style="font-weight: 700;">${p.rankBadge || '🛡️'} ${p.name} <span style="font-size: 0.7rem; color: #ffab00;">(${p.callsign})</span></span>
+          <div style="font-size: 0.68rem; color: var(--text-muted);">${p.rankTitle || 'Operative'}</div>
+        </div>
+        <div style="text-align: right;">
+          <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
+          <div style="font-size: 0.68rem; color: var(--accent-green); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
+        </div>
       </div>
     `).join('');
 
     const charlieListEl = document.getElementById('wardogsCharlieRosterList');
     if (charlieListEl) {
       charlieListEl.innerHTML = matchRoom.factionCharlie.map((p, idx) => `
-        <div style="display: flex; justify-content: space-between; background: ${idx === 0 ? 'rgba(255,215,0,0.18)' : 'rgba(255,215,0,0.08)'}; padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.82rem; border: ${idx === 0 ? '1px solid #ffd700' : 'none'};">
-          <span style="font-weight: 700;">${idx === 0 ? '👑 COMMANDER ' : ''}${p.name} <span style="font-size: 0.72rem; color: #ffd700;">(${p.callsign})</span></span>
-          <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: ${idx === 0 ? 'rgba(255,215,0,0.18)' : 'rgba(255,215,0,0.08)'}; padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.8rem; border: ${idx === 0 ? '1px solid #ffd700' : 'none'};">
+          <div>
+            <span style="font-weight: 700;">${p.rankBadge || '🛡️'} ${p.name} <span style="font-size: 0.7rem; color: #ffd700;">(${p.callsign})</span></span>
+            <div style="font-size: 0.68rem; color: var(--text-muted);">${p.rankTitle || 'Operative'}</div>
+          </div>
+          <div style="text-align: right;">
+            <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
+            <div style="font-size: 0.68rem; color: var(--accent-green); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
+          </div>
         </div>
       `).join('');
     }
