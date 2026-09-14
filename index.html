@@ -2395,8 +2395,8 @@
         <div class="input-group">
           <label class="input-label">Squad Size</label>
           <select class="input-field" id="modalWardogsTeamSize">
-            <option value="5" selected>5 Operatives (5v5 Scrims)</option>
-            <option value="3">3 Operatives (3v3 Arena)</option>
+            <option value="33" selected>33 Operatives (33 v 33 v 33 Mercenary Battalion)</option>
+            <option value="5">5 Operatives (5v5 Tactical Fireteam)</option>
           </select>
         </div>
       </div>
@@ -2410,45 +2410,52 @@
 
   <!-- WARDOGS RANKED SELECTION DRAFT ROOM MODAL -->
   <div class="modal-overlay" id="wardogsRankedDraftModal">
-    <div class="modal-card" style="max-width: 780px; width: 92%; border-color: #ff6f00;">
+    <div class="modal-card" style="max-width: 980px; width: 95%; border-color: #ff6f00;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
         <div>
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span style="font-size: 1.6rem;">⚡</span>
-            <h3 style="font-size: 1.4rem; font-weight: 900; color: #ffab00; margin: 0;">WARDOGS Ranked Selection Draft & Deployment</h3>
+            <h3 style="font-size: 1.4rem; font-weight: 900; color: #ffab00; margin: 0;">WARDOGS Ranked Selection Draft & Deployment (33 v 33 v 33 Tri-Faction)</h3>
           </div>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.2rem 0 0 0;" id="wardogsDraftMatchId">Match ID: WD-RANKED-4921 • Automated Combatant Selection</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.2rem 0 0 0;" id="wardogsDraftMatchId">Match ID: WD-TRIWAR-4921 • Automated 99-Combatant Tri-Faction Selection</p>
         </div>
         <button class="btn btn-secondary btn-sm" onclick="window.app.closeWardogsDraftModal()">✕ Close</button>
       </div>
 
       <!-- Fireteam Rosters Grid -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
-        <!-- Fireteam Alpha -->
-        <div style="background: rgba(0, 229, 255, 0.08); padding: 1rem; border-radius: 8px; border: 1px solid var(--accent-cyan);">
-          <div style="font-size: 0.8rem; color: var(--accent-cyan); text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔵 WARDOG Fireteam Alpha</div>
-          <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.8rem;" id="wardogsAlphaElo">Avg Rating: 2520 ELO</div>
-          <div id="wardogsAlphaRosterList"></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+        <!-- Faction Alpha -->
+        <div style="background: rgba(0, 229, 255, 0.08); padding: 0.8rem; border-radius: 8px; border: 1px solid var(--accent-cyan);">
+          <div style="font-size: 0.8rem; color: var(--accent-cyan); text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔵 Faction Alpha (33)</div>
+          <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.6rem;" id="wardogsAlphaElo">Avg Rating: 2520 ELO</div>
+          <div id="wardogsAlphaRosterList" style="max-height: 280px; overflow-y: auto;"></div>
         </div>
 
-        <!-- Fireteam Bravo -->
-        <div style="background: rgba(255, 111, 0, 0.08); padding: 1rem; border-radius: 8px; border: 1px solid #ff6f00;">
-          <div style="font-size: 0.8rem; color: #ffab00; text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔴 WARDOG Fireteam Bravo</div>
-          <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.8rem;" id="wardogsBravoElo">Avg Rating: 2515 ELO</div>
-          <div id="wardogsBravoRosterList"></div>
+        <!-- Faction Bravo -->
+        <div style="background: rgba(255, 111, 0, 0.08); padding: 0.8rem; border-radius: 8px; border: 1px solid #ff6f00;">
+          <div style="font-size: 0.8rem; color: #ffab00; text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔴 Faction Bravo (33)</div>
+          <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.6rem;" id="wardogsBravoElo">Avg Rating: 2515 ELO</div>
+          <div id="wardogsBravoRosterList" style="max-height: 280px; overflow-y: auto;"></div>
+        </div>
+
+        <!-- Faction Charlie -->
+        <div style="background: rgba(255, 215, 0, 0.08); padding: 0.8rem; border-radius: 8px; border: 1px solid #ffd700;">
+          <div style="font-size: 0.8rem; color: #ffd700; text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🟡 Faction Charlie (33)</div>
+          <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.6rem;" id="wardogsCharlieElo">Avg Rating: 2510 ELO</div>
+          <div id="wardogsCharlieRosterList" style="max-height: 280px; overflow-y: auto;"></div>
         </div>
       </div>
 
       <!-- Deployment Banner -->
       <div style="background: rgba(0, 230, 118, 0.15); border: 1px solid var(--accent-green); border-radius: 8px; padding: 0.8rem; text-align: center; margin-bottom: 1.25rem;">
         <span style="font-weight: 900; color: var(--accent-green); font-size: 0.92rem;" id="wardogsDeploymentBanner">
-          🚀 COMBATANTS SELECTED! 128-Tick Dedicated Server Reserved on Arena Map (de_mirage)
+          🚀 COMBATANTS SELECTED! 128-Tick Dedicated Server Reserved on Sector 33 - Quantum Citadel
         </span>
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <button class="btn btn-secondary" onclick="window.app.runWardogsRankedDraft()">🔄 Re-Select Players</button>
-        <button class="btn btn-primary" onclick="alert('🚀 DEPLOYED TO RANKED MATCH!\n\nConnecting all 10 selected WARDOG combatants to Dedicated 128-tick Server Node...')">🚀 Deploy to Ranked Match</button>
+        <button class="btn btn-primary" onclick="alert('🚀 DEPLOYED TO 33v33v33 TRI-FACTION MATCH!\n\nConnecting all 99 selected WARDOG combatants to Dedicated 128-tick Server Node...')">🚀 Deploy to Ranked Match</button>
       </div>
     </div>
   </div>

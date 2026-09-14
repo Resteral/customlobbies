@@ -1,7 +1,7 @@
-/* CustomLobbies.com - WARDOGS Tactical Mercenary League & Ranked Selection Engine */
+/* CustomLobbies.com - WARDOGS 33v33v33 (99-Player) Tri-Faction Tactical Engine */
 class WardogsEngine {
   constructor() {
-    this.divisionName = 'WARDOGS Tactical Mercenary League';
+    this.divisionName = 'WARDOGS 33 v 33 v 33 Tri-Faction Mercenary League';
     this.seasonCode = 'OPERATION: AMBER STRIKE (Season 4)';
     this.totalBounty = '$50,000 USD Bounties';
 
@@ -16,12 +16,12 @@ class WardogsEngine {
       { id: 107, name: 'Arkheron_Vanguard', callsign: 'Titan-7', game: 'Arkheron', role: '🛡️ Heavy / Tank', elo: 2310, kd: '2.05', status: 'Available', contracts: 24, acVerified: true }
     ];
 
-    // Registered Squad Units / Mercenary Teams
+    // Registered Squad Units / Mercenary Battalions (33-Man Companies)
     this.registeredSquads = [
-      { id: 201, name: 'WARDOG Alpha Strike', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', game: 'Counter-Strike 2', record: '18W - 2L', membersCount: 5, status: 'SELECTED FOR RANKED', bountyEarned: '$12,500' },
-      { id: 202, name: 'Iron Claw Mercenaries', tag: '[CLAW]', captain: 'Sargeant_Iron', game: 'Empulse', record: '15W - 3L', membersCount: 5, status: 'ACTIVE CONTRACT', bountyEarned: '$8,200' },
-      { id: 203, name: 'Phantom Unit K9', tag: '[K9-PHANTOM]', captain: 'Shadow_K9', game: 'REMATCH', record: '14W - 1L', membersCount: 5, status: 'ACTIVE CONTRACT', bountyEarned: '$9,400' },
-      { id: 204, name: 'Slapshot Cyber Hounds', tag: '[HOUNDS]', captain: 'Puck_Hunter', game: 'Slapshot: Rebound', record: '12W - 0L', membersCount: 3, status: 'SELECTED FOR RANKED', bountyEarned: '$7,800' }
+      { id: 201, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', game: 'Counter-Strike 2', record: '18W - 2L', membersCount: 33, status: 'SELECTED FOR RANKED', bountyEarned: '$12,500' },
+      { id: 202, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', game: 'Empulse', record: '15W - 3L', membersCount: 33, status: 'ACTIVE CONTRACT', bountyEarned: '$8,200' },
+      { id: 203, name: 'Phantom Brigade Charlie', tag: '[K9-PHANTOM]', captain: 'Shadow_K9', game: 'REMATCH', record: '14W - 1L', membersCount: 33, status: 'ACTIVE CONTRACT', bountyEarned: '$9,400' },
+      { id: 204, name: 'Slapshot Cyber Hounds', tag: '[HOUNDS]', captain: 'Puck_Hunter', game: 'Slapshot: Rebound', record: '12W - 0L', membersCount: 33, status: 'SELECTED FOR RANKED', bountyEarned: '$7,800' }
     ];
 
     // Active Ranked Selection Match Rooms
@@ -48,15 +48,15 @@ class WardogsEngine {
   }
 
   // Register Squad Unit
-  registerSquadUnit(squadName, tag, captainHandle, game, squadSize = 5) {
+  registerSquadUnit(squadName, tag, captainHandle, game, squadSize = 33) {
     const newSquad = {
       id: Date.now(),
-      name: squadName || 'Tactical Squad',
+      name: squadName || 'Tactical Company',
       tag: tag.startsWith('[') ? tag.toUpperCase() : `[${tag.toUpperCase()}]`,
       captain: captainHandle || 'Ghost_Dog_99',
       game: game || 'Counter-Strike 2',
       record: '0W - 0L',
-      membersCount: parseInt(squadSize) || 5,
+      membersCount: parseInt(squadSize) || 33,
       status: 'ACTIVE CONTRACT',
       bountyEarned: '$0'
     };
@@ -65,42 +65,56 @@ class WardogsEngine {
     return newSquad;
   }
 
-  // Perform Ranked Selection Draft for a Game Title
+  // Perform Ranked Selection Draft for 33 v 33 v 33 (99 Players)
   generateRankedSelectionMatch(gameName = 'Counter-Strike 2') {
-    // Filter available solo combatants and squad captains for target game
     const eligibleSolos = this.soloMercenaries.filter(m => m.game === gameName || m.game === 'Counter-Strike 2');
-    const eligibleSquads = this.registeredSquads.filter(s => s.game === gameName || s.game === 'Counter-Strike 2');
-
-    // Sort by ELO
     const pool = [...eligibleSolos].sort((a, b) => b.elo - a.elo);
-    const capacity = (gameName === 'Slapshot: Rebound' || gameName === 'Rocket League') ? 6 : 10;
 
-    // Pick top combatants
-    const selected = pool.slice(0, capacity);
+    const capacity = 99; // 33 v 33 v 33 Tri-Faction
 
-    // Split into Fireteam Alpha and Fireteam Bravo
-    const alpha = [];
-    const bravo = [];
+    const factionAlpha = [];
+    const factionBravo = [];
+    const factionCharlie = [];
 
-    selected.forEach((player, idx) => {
-      if (idx % 2 === 0) {
-        alpha.push(player);
+    for (let i = 0; i < capacity; i++) {
+      let player = pool[i];
+      if (!player) {
+        player = {
+          id: 1000 + i,
+          name: `Operative_DOG_${i + 1}`,
+          callsign: `DOG-${Math.floor(Math.random() * 899 + 100)}`,
+          game: gameName,
+          role: i % 4 === 0 ? '🎯 Marksman' : i % 3 === 0 ? '⚡ Breacher' : i % 2 === 0 ? '🧠 Recon' : '🛡️ Heavy',
+          elo: Math.floor(2550 - i * 6 + Math.random() * 40),
+          kd: (2.2 - i * 0.01).toFixed(2),
+          status: 'Selected for Ranked'
+        };
       } else {
-        bravo.push(player);
+        player.status = 'Selected for Ranked';
       }
-      player.status = 'Selected for Ranked';
-    });
+
+      if (i % 3 === 0) {
+        factionAlpha.push(player);
+      } else if (i % 3 === 1) {
+        factionBravo.push(player);
+      } else {
+        factionCharlie.push(player);
+      }
+    }
 
     const matchRoom = {
-      id: `WD-RANKED-${Date.now().toString().slice(-4)}`,
+      id: `WD-TRIWAR-${Date.now().toString().slice(-4)}`,
       game: gameName,
-      capacity: capacity,
-      fireteamAlpha: alpha,
-      fireteamBravo: bravo,
-      avgEloAlpha: Math.round(alpha.reduce((acc, p) => acc + p.elo, 0) / (alpha.length || 1)),
-      avgEloBravo: Math.round(bravo.reduce((acc, p) => acc + p.elo, 0) / (bravo.length || 1)),
-      map: gameName === 'Slapshot: Rebound' ? 'Puck Arena Stadium' : 'de_mirage',
-      status: 'DEPLOYED TO DEDICATED SERVER (128-TICK)',
+      format: '33 v 33 v 33 Tri-Faction War (99 Operatives)',
+      capacity: 99,
+      factionAlpha: factionAlpha,
+      factionBravo: factionBravo,
+      factionCharlie: factionCharlie,
+      avgEloAlpha: Math.round(factionAlpha.reduce((acc, p) => acc + p.elo, 0) / factionAlpha.length),
+      avgEloBravo: Math.round(factionBravo.reduce((acc, p) => acc + p.elo, 0) / factionBravo.length),
+      avgEloCharlie: Math.round(factionCharlie.reduce((acc, p) => acc + p.elo, 0) / factionCharlie.length),
+      map: 'Sector 33 - Quantum Citadel (Tri-Zone Fortress)',
+      status: 'DEPLOYED TO DEDICATED 99-PLAYER SERVER NODE (128-TICK)',
       timestamp: new Date().toLocaleTimeString()
     };
 

@@ -1130,20 +1130,32 @@ class CustomLobbiesApp {
     document.getElementById('wardogsDraftMatchId').textContent = `Match ID: ${matchRoom.id} • Game: ${matchRoom.game} (${matchRoom.capacity} Operatives)`;
     document.getElementById('wardogsAlphaElo').textContent = `Avg Rating: ${matchRoom.avgEloAlpha} ELO`;
     document.getElementById('wardogsBravoElo').textContent = `Avg Rating: ${matchRoom.avgEloBravo} ELO`;
+    const charlieEloEl = document.getElementById('wardogsCharlieElo');
+    if (charlieEloEl) charlieEloEl.textContent = `Avg Rating: ${matchRoom.avgEloCharlie} ELO`;
 
-    document.getElementById('wardogsAlphaRosterList').innerHTML = matchRoom.fireteamAlpha.map(p => `
-      <div style="display: flex; justify-content: space-between; background: rgba(0,242,254,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem;">
-        <span style="font-weight: 700;">${p.name} <span style="font-size: 0.75rem; color: var(--accent-cyan);">(${p.callsign})</span></span>
+    document.getElementById('wardogsAlphaRosterList').innerHTML = matchRoom.factionAlpha.map(p => `
+      <div style="display: flex; justify-content: space-between; background: rgba(0,242,254,0.08); padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.82rem;">
+        <span style="font-weight: 700;">${p.name} <span style="font-size: 0.72rem; color: var(--accent-cyan);">(${p.callsign})</span></span>
         <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span>
       </div>
     `).join('');
 
-    document.getElementById('wardogsBravoRosterList').innerHTML = matchRoom.fireteamBravo.map(p => `
-      <div style="display: flex; justify-content: space-between; background: rgba(255,111,0,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem;">
-        <span style="font-weight: 700;">${p.name} <span style="font-size: 0.75rem; color: #ffab00;">(${p.callsign})</span></span>
+    document.getElementById('wardogsBravoRosterList').innerHTML = matchRoom.factionBravo.map(p => `
+      <div style="display: flex; justify-content: space-between; background: rgba(255,111,0,0.08); padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.82rem;">
+        <span style="font-weight: 700;">${p.name} <span style="font-size: 0.72rem; color: #ffab00;">(${p.callsign})</span></span>
         <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span>
       </div>
     `).join('');
+
+    const charlieListEl = document.getElementById('wardogsCharlieRosterList');
+    if (charlieListEl) {
+      charlieListEl.innerHTML = matchRoom.factionCharlie.map(p => `
+        <div style="display: flex; justify-content: space-between; background: rgba(255,215,0,0.08); padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.82rem;">
+          <span style="font-weight: 700;">${p.name} <span style="font-size: 0.72rem; color: #ffd700;">(${p.callsign})</span></span>
+          <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span>
+        </div>
+      `).join('');
+    }
 
     document.getElementById('wardogsDeploymentBanner').textContent = `🚀 COMBATANTS SELECTED! 128-Tick Dedicated Server Reserved on Arena Map (${matchRoom.map})`;
 
