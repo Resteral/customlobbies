@@ -57,6 +57,9 @@
       <button class="nav-btn" data-tab="integrations-view">
         <span>🔌</span> Integrations
       </button>
+      <button class="nav-btn" data-tab="leagues-view">
+        <span>🏆</span> Esports Leagues
+      </button>
       <button class="nav-btn" data-tab="leaderboard-view">
         <span>👑</span> ELO Leaderboard
       </button>
@@ -1068,6 +1071,100 @@
       </div>
     </section>
 
+    <!-- 5.5 COMPETITIVE ESPORTS LEAGUES VIEW -->
+    <section id="leagues-view" class="view-section">
+      <div class="lobby-header-banner" style="background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(0, 229, 255, 0.1)); border: 1px solid var(--accent-purple); margin-bottom: 1.5rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span style="font-size: 2.2rem;">🏆</span>
+            <div>
+              <h1 style="font-size: 1.8rem; font-weight: 900; color: #fff; margin: 0;">Official Competitive Esports Leagues & Seasons</h1>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">Season 4: Cyberpunk Showdown • Round Robin & Swiss League Format across 28 Games</p>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <div style="text-align: right;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800;">Total Season Prize Pool</div>
+            <div style="font-size: 1.4rem; font-weight: 900; color: var(--accent-gold);">$35,000 USD</div>
+          </div>
+          <button class="btn btn-primary" onclick="window.app.openJoinLeagueModal()">
+            <span>🛡️</span> Register Team for League (+100 CL-Points)
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls Bar: Game Title Selector + Division Tabs -->
+      <div class="card" style="margin-bottom: 1.5rem; padding: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <label style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Select Game League:</label>
+            <select class="input-field" id="leagueGameSelect" style="margin-bottom: 0; min-width: 220px;" onchange="window.app.renderLeaguesView()">
+              <option value="Counter-Strike 2" selected>Counter-Strike 2 ($5,000)</option>
+              <option value="Valorant">Valorant ($4,000)</option>
+              <option value="Empulse">Empulse ($3,500)</option>
+              <option value="REMATCH">REMATCH ($3,000)</option>
+              <option value="Arkheron">Arkheron ($2,500)</option>
+              <option value="Marvel Rivals">Marvel Rivals ($2,000)</option>
+              <option value="Deadlock">Deadlock ($2,000)</option>
+              <option value="The Finals">The Finals ($3,000)</option>
+              <option value="Apex Legends">Apex Legends ($2,500)</option>
+              <option value="Rocket League">Rocket League ($2,000)</option>
+              <option value="Rainbow Six Siege">Rainbow Six Siege ($3,000)</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 0.5rem;" id="leagueDivisionTabs">
+            <button class="btn btn-purple btn-sm league-tab-btn active" data-div="premier" onclick="window.app.switchLeagueDivision('premier')">🏆 Premier Division</button>
+            <button class="btn btn-secondary btn-sm league-tab-btn" data-div="diamond" onclick="window.app.switchLeagueDivision('diamond')">🥇 Diamond Division</button>
+            <button class="btn btn-secondary btn-sm league-tab-btn" data-div="challenger" onclick="window.app.switchLeagueDivision('challenger')">🥉 Open Challenger</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- League Grid: Standings Table + Fixtures Schedule -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+        <!-- Standings Table -->
+        <div class="card">
+          <h3 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 1rem; color: var(--accent-cyan); display: flex; align-items: center; justify-content: space-between;">
+            <span>📊 Official League Division Standings</span>
+            <span style="font-size: 0.8rem; color: var(--accent-gold);" id="leagueDivisionBadge">Premier Master Division</span>
+          </h3>
+
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase;">
+                  <th style="padding: 0.75rem;">Rank</th>
+                  <th style="padding: 0.75rem;">Team / Tag</th>
+                  <th style="padding: 0.75rem;">W - L</th>
+                  <th style="padding: 0.75rem;">Points</th>
+                  <th style="padding: 0.75rem;">Round Delta</th>
+                  <th style="padding: 0.75rem;">Win %</th>
+                  <th style="padding: 0.75rem;">ELO</th>
+                  <th style="padding: 0.75rem; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="leagueStandingsBody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Weekly Fixtures Schedule -->
+        <div>
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 900; margin-bottom: 1rem; color: var(--accent-purple); display: flex; align-items: center; gap: 0.4rem;">
+              <span>🗓️</span> Weekly Fixtures Schedule
+            </h3>
+            <div id="leagueFixturesContainer" style="display: flex; flex-direction: column; gap: 0.8rem;">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 6. ELO LEADERBOARD & STATS VIEW -->
     <section id="leaderboard-view" class="view-section">
       <!-- Player Account Trophy Showcase -->
@@ -1952,6 +2049,61 @@
     </div>
   </div>
 
+  <!-- Register Team for League Modal -->
+  <div class="modal-overlay" id="joinLeagueModal">
+    <div class="modal-card" style="max-width: 550px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--accent-gold);">🛡️ Register Team for Competitive League</h3>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeJoinLeagueModal()">✕ Close</button>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Select Game Title</label>
+        <select class="input-field" id="modalLeagueGameSelect">
+          <option value="Counter-Strike 2">Counter-Strike 2 ($5,000)</option>
+          <option value="Valorant">Valorant ($4,000)</option>
+          <option value="Empulse">Empulse ($3,500)</option>
+          <option value="REMATCH">REMATCH ($3,000)</option>
+          <option value="Arkheron">Arkheron ($2,500)</option>
+          <option value="Marvel Rivals">Marvel Rivals ($2,000)</option>
+          <option value="Deadlock">Deadlock ($2,000)</option>
+          <option value="The Finals">The Finals ($3,000)</option>
+          <option value="Apex Legends">Apex Legends ($2,500)</option>
+          <option value="Rocket League">Rocket League ($2,000)</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Target Division Tier</label>
+        <select class="input-field" id="modalLeagueDivisionSelect">
+          <option value="premier">🏆 Premier Master Division (ELO 2000+)</option>
+          <option value="diamond">🥇 Diamond Competitive Division (ELO 1800+)</option>
+          <option value="challenger" selected>🥉 Challenger Open Division (Free Entry)</option>
+        </select>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Team / Squad Name</label>
+          <input type="text" class="input-field" id="modalLeagueTeamName" value="Valkyrie Esports">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Team Tag</label>
+          <input type="text" class="input-field" id="modalLeagueTeamTag" value="VCS">
+        </div>
+      </div>
+
+      <div style="background: rgba(0, 230, 118, 0.1); border: 1px solid var(--accent-green); border-radius: 8px; padding: 0.8rem; font-size: 0.85rem; color: var(--accent-green); margin-bottom: 1.25rem;">
+        🎁 Registration Reward: Earn +100 🪙 CL-Points into your wallet instantly upon submitting team registration!
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
+        <button class="btn btn-secondary" onclick="window.app.closeJoinLeagueModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.app.submitLeagueRegistration()">Confirm & Register Team 🛡️</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase & Google Cloud SDK Imports -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -1966,6 +2118,7 @@
   <script src="js/widget-builder.js"></script>
   <script src="js/integrations.js"></script>
   <script src="js/tournaments-store.js"></script>
+  <script src="js/leagues-engine.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

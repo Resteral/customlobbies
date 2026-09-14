@@ -65,7 +65,7 @@
     /* Tabs Navigation */
     .tab-bar {
       display: flex;
-      gap: 0.3rem;
+      gap: 0.25rem;
       background: rgba(255, 255, 255, 0.04);
       padding: 0.25rem;
       border-radius: 8px;
@@ -78,9 +78,9 @@
       background: transparent;
       border: none;
       color: var(--text-muted);
-      padding: 0.45rem 0.2rem;
+      padding: 0.4rem 0.1rem;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 800;
       cursor: pointer;
       text-align: center;
@@ -254,6 +254,7 @@
   <!-- Navigation Tabs -->
   <div class="tab-bar">
     <button class="tab-btn active" data-tab="tab-queue">⚡ Queue</button>
+    <button class="tab-btn" data-tab="tab-leagues">🏆 Leagues</button>
     <button class="tab-btn" data-tab="tab-veto">🗺️ Veto</button>
     <button class="tab-btn" data-tab="tab-pool">👥 Roster</button>
     <button class="tab-btn" data-tab="tab-live">📺 Streams</button>
@@ -311,7 +312,39 @@
     </button>
   </div>
 
-  <!-- TAB 2: INTERACTIVE MAP VETO -->
+  <!-- TAB 2: ESPORTS LEAGUES -->
+  <div class="tab-content" id="tab-leagues">
+    <div class="card-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.85rem; font-weight: 900; color: var(--accent-gold);">🏆 Season 4 Esports Leagues</span>
+        <span style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 800;">$35,000 Pool</span>
+      </div>
+      
+      <div class="player-row">
+        <div>
+          <div style="font-weight: 800; color: #fff;">🥇 Valkyrie Esports</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">CS2 Premier • 14W - 1L (42 Pts)</div>
+        </div>
+        <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">#1 Rank</span>
+      </div>
+      <div class="player-row">
+        <div>
+          <div style="font-weight: 800; color: #fff;">🥈 Cyber Titans</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">CS2 Premier • 12W - 3L (36 Pts)</div>
+        </div>
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800;">#2 Rank</span>
+      </div>
+      <div class="player-row">
+        <div>
+          <div style="font-weight: 800; color: #fff;">🥇 Empulse Overlords</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">Empulse Pro • 13W - 0L (39 Pts)</div>
+        </div>
+        <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">#1 Rank</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: INTERACTIVE MAP VETO -->
   <div class="tab-content" id="tab-veto">
     <div class="card-box">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -333,7 +366,7 @@
     </div>
   </div>
 
-  <!-- TAB 3: FREE AGENT PLAYER POOL -->
+  <!-- TAB 4: FREE AGENT PLAYER POOL -->
   <div class="tab-content" id="tab-pool">
     <div class="card-box">
       <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-purple); margin-bottom: 0.5rem;">🔥 Solo-Queue Free Agents</div>
@@ -361,7 +394,7 @@
     </div>
   </div>
 
-  <!-- TAB 4: STREAMERS & HYPE -->
+  <!-- TAB 5: STREAMERS & HYPE -->
   <div class="tab-content" id="tab-live">
     <div class="card-box">
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">

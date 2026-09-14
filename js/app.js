@@ -231,6 +231,7 @@ class CustomLobbiesApp {
     this.renderPoolFeed();
     this.renderLobbies();
     this.renderLeaderboard();
+    this.renderLeaguesView();
     this.setupQueueButtons();
     this.setupModalHandlers();
     this.setupAutoDraftHandlers();
@@ -792,6 +793,121 @@ class CustomLobbiesApp {
   closeChromeExtensionModal() {
     const modal = document.getElementById('chromeExtensionModal');
     if (modal) modal.classList.remove('active');
+  }
+
+  // Esports Leagues & Divisions Implementation
+  renderLeaguesView() {
+    const gameSelect = document.getElementById('leagueGameSelect');
+    const selectedGame = gameSelect ? gameSelect.value : 'Counter-Strike 2';
+
+    if (!this.activeLeagueDivision) this.activeLeagueDivision = 'premier';
+
+    const leagueData = window.leaguesEngine ? window.leaguesEngine.getLeagueForGame(selectedGame) : null;
+    if (!leagueData) return;
+
+    const divData = leagueData.divisions.find(d => d.id === this.activeLeagueDivision) || leagueData.divisions[0];
+
+    const badge = document.getElementById('leagueDivisionBadge');
+    if (badge) badge.textContent = divData.name;
+
+    // Render Standings
+    const tbody = document.getElementById('leagueStandingsBody');
+    if (tbody) {
+      tbody.innerHTML = divData.teams.map(t => `
+        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+          <td style="padding: 0.75rem; font-weight: 900; color: ${t.rank === 1 ? 'var(--accent-gold)' : t.rank === 2 ? '#c0c0c0' : t.rank === 3 ? '#cd7f32' : 'inherit'};">
+            ${t.rank === 1 ? '🥇 #1' : t.rank === 2 ? '🥈 #2' : t.rank === 3 ? '🥉 #3' : '#' + t.rank}
+          </td>
+          <td style="padding: 0.75rem;">
+            <strong style="color: #fff;">${t.name}</strong>
+            <span style="font-size: 0.75rem; color: var(--accent-cyan); margin-left: 0.3rem;">${t.tag}</span>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">Captain: ${t.captain}</div>
+          </td>
+          <td style="padding: 0.75rem; font-weight: 800; color: var(--accent-green);">${t.wins} - ${t.losses}</td>
+          <td style="padding: 0.75rem; font-weight: 900; color: var(--accent-gold);">${t.points} Pts</td>
+          <td style="padding: 0.75rem; color: var(--accent-cyan); font-weight: 700;">${t.roundDelta}</td>
+          <td style="padding: 0.75rem; font-weight: 700;">${t.winRate}</td>
+          <td style="padding: 0.75rem; font-weight: 800; color: var(--accent-purple);">${t.elo} ELO</td>
+          <td style="padding: 0.75rem; text-align: right;">
+            <button class="btn btn-secondary btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="alert('⚔️ LEAGUE MATCH CHALLENGE!\\n\\nOfficial Challenge sent to ${t.name} (${t.captain})!')">⚔️ Match</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Render Fixtures
+    const fixturesContainer = document.getElementById('leagueFixturesContainer');
+    if (fixturesContainer) {
+      fixturesContainer.innerHTML = (leagueData.fixtures || []).map(f => `
+        <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--accent-cyan); margin-bottom: 0.4rem; font-weight: 800;">
+            <span>${f.week}</span>
+            <span style="color: ${f.status.includes('LIVE') ? 'var(--accent-green)' : 'var(--accent-gold)'};">${f.status}</span>
+          </div>
+          <div style="font-weight: 900; font-size: 0.92rem; margin-bottom: 0.3rem;">
+            ${f.teamA} <span style="color: var(--accent-purple);">VS</span> ${f.teamB}
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted);">
+            <span>⏱️ ${f.date}</span>
+            <button class="btn btn-purple btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.7rem;" onclick="window.app.openMapVetoModal('${selectedGame}')">🗺️ Map Veto</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  switchLeagueDivision(divId) {
+    this.activeLeagueDivision = divId;
+
+    const btns = document.querySelectorAll('.league-tab-btn');
+    btns.forEach(b => {
+      if (b.getAttribute('data-div') === divId) {
+        b.classList.remove('btn-secondary');
+        b.classList.add('btn-purple', 'active');
+      } else {
+        b.classList.remove('btn-purple', 'active');
+        b.classList.add('btn-secondary');
+      }
+    });
+
+    this.renderLeaguesView();
+  }
+
+  openJoinLeagueModal() {
+    const modal = document.getElementById('joinLeagueModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeJoinLeagueModal() {
+    const modal = document.getElementById('joinLeagueModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  submitLeagueRegistration() {
+    const game = document.getElementById('modalLeagueGameSelect').value;
+    const division = document.getElementById('modalLeagueDivisionSelect').value;
+    const teamName = document.getElementById('modalLeagueTeamName').value.trim() || 'Custom Squad';
+    const teamTag = document.getElementById('modalLeagueTeamTag').value.trim() || 'TAG';
+
+    if (window.leaguesEngine) {
+      window.leaguesEngine.registerTeamForLeague(game, division, teamName, teamTag);
+    }
+
+    this.clPoints += 100;
+    const clDisplay = document.getElementById('userCLPointsValue');
+    if (clDisplay) clDisplay.textContent = `${this.clPoints.toLocaleString()} Points`;
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    this.closeJoinLeagueModal();
+
+    const gameSelect = document.getElementById('leagueGameSelect');
+    if (gameSelect) gameSelect.value = game;
+    this.switchLeagueDivision(division);
+
+    alert(`🎉 LEAGUE TEAM REGISTERED!\n\nTeam "${teamName} [${teamTag.toUpperCase()}]" registered into the ${game} Official League!\n\nEarned +100 🪙 CL-Points into your wallet!`);
   }
 
   flipCaptainCoin() {
