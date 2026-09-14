@@ -1094,6 +1094,36 @@
       </div>
     </section>
 
+    <!-- 7. FLOATING QUICK SOUNDBOARD & MATCHMAKER WIDGET -->
+    <div id="floatingQuickWidget" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: linear-gradient(135deg, rgba(16, 20, 30, 0.95), rgba(26, 32, 48, 0.95)); border: 1px solid var(--accent-cyan); border-radius: 16px; padding: 1rem 1.2rem; box-shadow: 0 8px 32px rgba(0, 242, 254, 0.25); backdrop-filter: blur(10px); max-width: 320px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.2rem;">🎮</span>
+          <span style="font-size: 0.9rem; font-weight: 900; color: var(--accent-cyan);">Quick Matchmaker Widget</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="padding: 0.1rem 0.4rem; font-size: 0.7rem;" onclick="document.getElementById('floatingQuickWidget').style.display='none'">✕</button>
+      </div>
+
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+        Instant match sign-up & Stream Soundboard controls.
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 0.8rem;">
+        <button class="btn btn-primary btn-sm" style="flex: 1; font-size: 0.78rem;" id="btnJoinQueue">
+          <span>⚡</span> Quick Queue
+        </button>
+        <button class="btn btn-purple btn-sm" style="flex: 1; font-size: 0.78rem;" onclick="window.app.triggerMatchFoundModal()">
+          <span>🔥</span> Test Pop
+        </button>
+      </div>
+
+      <!-- Quick Soundboard Buttons -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;">
+        <button class="btn btn-secondary btn-sm" style="padding: 0.3rem 0.2rem; font-size: 0.7rem;" data-sound="airhorn">🎺 Airhorn</button>
+        <button class="btn btn-secondary btn-sm" style="padding: 0.3rem 0.2rem; font-size: 0.7rem;" data-sound="hitmarker">🎯 Hitmark</button>
+        <button class="btn btn-secondary btn-sm" style="padding: 0.3rem 0.2rem; font-size: 0.7rem;" data-sound="ggwp">🎮 GG WP</button>
+      </div>
+    </div>
   </main>
 
   <!-- Sign-Up Matchmaking Queue Selection Modal -->
