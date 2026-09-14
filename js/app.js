@@ -758,30 +758,43 @@ class CustomLobbiesApp {
 
   setupCaptainModeToggle() {
     const btnHighestMMR = document.getElementById('btnModeHighestMMR');
+    const btnCaptainCommends = document.getElementById('btnModeCaptainCommends');
     const btnSelectedCap = document.getElementById('btnModeSelectedCap');
+
+    const updateActiveButton = (activeBtn) => {
+      [btnHighestMMR, btnCaptainCommends, btnSelectedCap].forEach(b => {
+        if (b) {
+          b.classList.remove('btn-primary');
+          b.classList.add('btn-secondary');
+        }
+      });
+      if (activeBtn) {
+        activeBtn.classList.add('btn-primary');
+        activeBtn.classList.remove('btn-secondary');
+      }
+    };
 
     if (btnHighestMMR) {
       btnHighestMMR.addEventListener('click', () => {
         this.captainSelectionMode = 'highest_mmr';
-        btnHighestMMR.classList.add('btn-primary');
-        btnHighestMMR.classList.remove('btn-secondary');
-        if (btnSelectedCap) {
-          btnSelectedCap.classList.remove('btn-primary');
-          btnSelectedCap.classList.add('btn-secondary');
-        }
+        updateActiveButton(btnHighestMMR);
         this.renderPoolFeed();
+      });
+    }
+
+    if (btnCaptainCommends) {
+      btnCaptainCommends.addEventListener('click', () => {
+        this.captainSelectionMode = 'captain_commends';
+        updateActiveButton(btnCaptainCommends);
+        this.renderPoolFeed();
+        alert('🧠 CAPTAIN MODE UPDATED!\n\nTeam Captains are now designated based on the highest accumulated Captain / Leadership Commendations!');
       });
     }
 
     if (btnSelectedCap) {
       btnSelectedCap.addEventListener('click', () => {
         this.captainSelectionMode = 'selected';
-        btnSelectedCap.classList.add('btn-primary');
-        btnSelectedCap.classList.remove('btn-secondary');
-        if (btnHighestMMR) {
-          btnHighestMMR.classList.remove('btn-primary');
-          btnHighestMMR.classList.add('btn-secondary');
-        }
+        updateActiveButton(btnSelectedCap);
         this.renderPoolFeed();
       });
     }
@@ -1589,6 +1602,15 @@ class CustomLobbiesApp {
       const sorted = [...this.poolFeed].sort((a, b) => b.elo - a.elo);
       captain1 = sorted[0];
       captain2 = sorted[1];
+    } else if (this.captainSelectionMode === 'captain_commends') {
+      const sorted = [...this.poolFeed].sort((a, b) => {
+        const cA = a.commendations ? a.commendations.leadership || 0 : 0;
+        const cB = b.commendations ? b.commendations.leadership || 0 : 0;
+        if (cB !== cA) return cB - cA;
+        return b.elo - a.elo;
+      });
+      captain1 = sorted[0];
+      captain2 = sorted[1];
     } else {
       const sorted = [...this.poolFeed].sort((a, b) => (b.votes || 0) - (a.votes || 0));
       captain1 = sorted[0];
@@ -1598,6 +1620,12 @@ class CustomLobbiesApp {
     const displayList = [...this.poolFeed];
     displayList.sort((a, b) => {
       if (this.captainSelectionMode === 'highest_mmr') return b.elo - a.elo;
+      if (this.captainSelectionMode === 'captain_commends') {
+        const cA = a.commendations ? a.commendations.leadership || 0 : 0;
+        const cB = b.commendations ? b.commendations.leadership || 0 : 0;
+        if (cB !== cA) return cB - cA;
+        return b.elo - a.elo;
+      }
       return (b.votes || 0) - (a.votes || 0);
     });
 
@@ -2130,26 +2158,33 @@ class CustomLobbiesApp {
 
   runDraftSimulation() {
     const maxCap = window.eloEngine.getGameCapacity(this.currentDraftGame);
-    const result = window.eloEngine.performCustomSnakeDraft(this.leaderboardData, this.passedFirstPick);
+    const mode = this.captainSelectionMode || 'highest_mmr';
+    const result = window.eloEngine.performCustomSnakeDraft(this.leaderboardData, this.passedFirstPick, mode);
 
-    document.getElementById('captainAName').textContent = `👑 Captain #1 (Highest MMR): ${result.captain1.name} (${result.captain1.elo} MMR)`;
-    document.getElementById('captainBName').textContent = `👑 Captain #2 (2nd Highest MMR): ${result.captain2.name} (${result.captain2.elo} MMR)`;
+    const cap1Commends = result.captain1.commendations ? result.captain1.commendations.leadership || 0 : 0;
+    const cap2Commends = result.captain2.commendations ? result.captain2.commendations.leadership || 0 : 0;
+
+    const label1 = mode === 'captain_commends' ? `🧠 Captain Commends: +${cap1Commends}` : `${result.captain1.elo} MMR`;
+    const label2 = mode === 'captain_commends' ? `🧠 Captain Commends: +${cap2Commends}` : `${result.captain2.elo} MMR`;
+
+    document.getElementById('captainAName').textContent = `👑 Captain #1 (${result.criteriaLabel}): ${result.captain1.name} (${label1})`;
+    document.getElementById('captainBName').textContent = `👑 Captain #2 (${result.criteriaLabel}): ${result.captain2.name} (${label2})`;
 
     document.getElementById('teamAList').innerHTML = result.team1.map((p, idx) => `
       <div style="display: flex; justify-content: space-between; background: rgba(0,242,254,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem; border: 1px solid rgba(0,242,254,0.2);">
         <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
-        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
+        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR (🧠 +${p.commendations ? p.commendations.leadership || 0 : 0})</span>
       </div>
     `).join('');
 
     document.getElementById('teamBList').innerHTML = result.team2.map((p, idx) => `
       <div style="display: flex; justify-content: space-between; background: rgba(157,78,221,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem; border: 1px solid rgba(157,78,221,0.2);">
         <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
-        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
+        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR (🧠 +${p.commendations ? p.commendations.leadership || 0 : 0})</span>
       </div>
     `).join('');
 
-    document.getElementById('draftMMRSummary').textContent = `🐍 Snake Draft Order (1-2-2-1) | Capacity: ${maxCap} Players | First Pick: ${result.firstPickOwner} | Team 1 Avg: ${result.avgMMR1} MMR | Team 2 Avg: ${result.avgMMR2} MMR | Delta: ${result.mmrDelta} MMR`;
+    document.getElementById('draftMMRSummary').textContent = `🐍 Snake Order (1-2-2-1) | Criteria: ${result.criteriaLabel} | Capacity: ${maxCap} | First Pick: ${result.firstPickOwner} | Team 1 Avg: ${result.avgMMR1} MMR | Team 2 Avg: ${result.avgMMR2} MMR`;
   }
 
   setupAutoDraftHandlers() {

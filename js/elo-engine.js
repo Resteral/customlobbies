@@ -280,11 +280,25 @@ class EloEngine {
     };
   }
 
-  // Modified Captain Snake Draft
-  performCustomSnakeDraft(playersPool, passFirstPick = false) {
-    const sorted = [...playersPool].sort((a, b) => b.elo - a.elo);
-    const cap1 = sorted[0] || { name: 'Captain #1 (Highest MMR)', elo: 2540 };
-    const cap2 = sorted[1] || { name: 'Captain #2 (2nd Highest MMR)', elo: 2150 };
+  // Modified Captain Snake Draft (Supports Highest MMR, Captain Commendations, or Community Votes)
+  performCustomSnakeDraft(playersPool, passFirstPick = false, selectionMode = 'highest_mmr') {
+    let sorted = [...playersPool];
+
+    if (selectionMode === 'captain_commends') {
+      sorted.sort((a, b) => {
+        const commendsA = (a.commendations ? a.commendations.leadership || 0 : 0);
+        const commendsB = (b.commendations ? b.commendations.leadership || 0 : 0);
+        if (commendsB !== commendsA) return commendsB - commendsA;
+        return (b.elo || 1800) - (a.elo || 1800);
+      });
+    } else if (selectionMode === 'selected') {
+      sorted.sort((a, b) => (b.votes || 0) - (a.votes || 0));
+    } else {
+      sorted.sort((a, b) => (b.elo || 1800) - (a.elo || 1800));
+    }
+
+    const cap1 = sorted[0] || { name: 'Captain #1', elo: 2540 };
+    const cap2 = sorted[1] || { name: 'Captain #2', elo: 2150 };
 
     const unpicked = sorted.slice(2);
     const team1 = [cap1];
@@ -310,18 +324,26 @@ class EloEngine {
       }
     }
 
-    const sum1 = team1.reduce((acc, p) => acc + p.elo, 0);
-    const sum2 = team2.reduce((acc, p) => acc + p.elo, 0);
+    const sum1 = team1.reduce((acc, p) => acc + (p.elo || 1800), 0);
+    const sum2 = team2.reduce((acc, p) => acc + (p.elo || 1800), 0);
+
+    const cap1Commends = cap1.commendations ? cap1.commendations.leadership || 0 : 0;
+    const cap2Commends = cap2.commendations ? cap2.commendations.leadership || 0 : 0;
+
+    const criteriaLabel = selectionMode === 'captain_commends' 
+      ? `Highest Captain Commends (+${cap1Commends} vs +${cap2Commends})`
+      : selectionMode === 'selected' ? 'Community Votes' : 'Highest ELO / MMR';
 
     return {
       captain1: cap1,
       captain2: cap2,
       team1,
       team2,
-      avgMMR1: Math.round(sum1 / team1.length),
-      avgMMR2: Math.round(sum2 / team2.length),
-      mmrDelta: Math.abs(Math.round(sum1 / team1.length) - Math.round(sum2 / team2.length)),
-      firstPickOwner: passFirstPick ? 'Captain #1 (Passed by Cap #2)' : 'Captain #2 (2nd Highest MMR)'
+      avgMMR1: Math.round(sum1 / (team1.length || 1)),
+      avgMMR2: Math.round(sum2 / (team2.length || 1)),
+      mmrDelta: Math.abs(Math.round(sum1 / (team1.length || 1)) - Math.round(sum2 / (team2.length || 1))),
+      firstPickOwner: passFirstPick ? 'Captain #1 (Passed by Cap #2)' : 'Captain #2',
+      criteriaLabel: criteriaLabel
     };
   }
 
