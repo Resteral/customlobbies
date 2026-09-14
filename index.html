@@ -365,6 +365,20 @@
               <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.2rem;">💎 Diamond Veteran (1840 MMR)</p>
             </div>
 
+            <!-- Profile Reputation & Commendations Badge -->
+            <div style="background: rgba(0, 230, 118, 0.08); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; border: 1px solid rgba(0, 230, 118, 0.25);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-size: 0.78rem; font-weight: 800; color: var(--accent-green); text-transform: uppercase;">⭐ Karma & Commendations</span>
+                <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-weight: 900; font-size: 0.75rem;">👍 100% Positive</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: 0.78rem;">
+                <div>🧠 Leadership: <strong style="color: var(--accent-green);">+19</strong></div>
+                <div>🎯 Friendly: <strong style="color: var(--accent-green);">+28</strong></div>
+                <div>⚡ Clutch: <strong style="color: var(--accent-green);">+34</strong></div>
+                <div>🎓 Helpful: <strong style="color: var(--accent-green);">+15</strong></div>
+              </div>
+            </div>
+
             <!-- Multi-Game Rank Breakdown -->
             <div style="background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; border: 1px solid var(--border-color);">
               <div style="font-size: 0.78rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 0.6rem; display: flex; justify-content: space-between;">
@@ -1334,6 +1348,25 @@
           <button class="btn btn-secondary btn-sm" style="border-color: var(--accent-green); color: var(--accent-green);" onclick="window.app.triggerCommendPlayer('clutch')">⚡ +1 Clutch</button>
           <button class="btn btn-secondary btn-sm" style="border-color: var(--accent-green); color: var(--accent-green);" onclick="window.app.triggerCommendPlayer('teacher')">🎓 +1 Helpful</button>
           <button class="btn btn-secondary btn-sm" style="border-color: var(--accent-red); color: var(--accent-red); margin-left: auto;" onclick="window.app.triggerBadRemarkPlayer()">⚠️ Report Misconduct</button>
+        </div>
+      </div>
+
+      <!-- Written Profile Remarks & Teammate Reviews Wall -->
+      <div style="background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>💬 Player Profile Written Remarks & Endorsements</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Verified Teammates</span>
+        </h4>
+
+        <!-- Recent Written Remarks Feed -->
+        <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.8rem; max-height: 180px; overflow-y: auto;" id="passportRemarksFeed">
+          <!-- Injected via app.js -->
+        </div>
+
+        <!-- Add Written Remark Input Form -->
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.8rem;">
+          <input type="text" class="input-field" id="passportNewRemarkInput" placeholder="Write a comment or remark on this gamer's profile page..." style="font-size: 0.85rem;">
+          <button class="btn btn-primary btn-sm" onclick="window.app.postWrittenProfileRemark()">✍️ Post Remark</button>
         </div>
       </div>
 

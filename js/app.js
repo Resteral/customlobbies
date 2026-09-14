@@ -1136,7 +1136,64 @@ class CustomLobbiesApp {
       `;
     }
 
+    // Written remarks & endorsements wall feed
+    const remarksFeed = document.getElementById('passportRemarksFeed');
+    if (remarksFeed) {
+      const comments = p.writtenRemarks || [
+        { id: 1, author: 'Valkyrie_CS', text: 'Insane clutch player! Always stays calm in 1v3 situations and calls great site retakes.', type: 'positive', date: '2 hours ago' },
+        { id: 2, author: 'ApexGod99', text: 'Awesome IGL shotcaller, great communication on Discord voice channel!', type: 'positive', date: '1 day ago' }
+      ];
+
+      remarksFeed.innerHTML = comments.map(c => `
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem 0.7rem; border-radius: 6px; font-size: 0.82rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
+            <strong style="color: var(--accent-cyan);">${c.author}</strong>
+            <span style="font-size: 0.75rem; color: var(--text-dim);">${c.date}</span>
+          </div>
+          <p style="margin: 0; color: var(--text-main); font-size: 0.8rem;">${c.text}</p>
+        </div>
+      `).join('');
+    }
+
     modal.classList.add('active');
+  }
+
+  postWrittenProfileRemark() {
+    const input = document.getElementById('passportNewRemarkInput');
+    if (!input || !input.value.trim()) return;
+
+    const text = input.value.trim();
+    const targetName = this.activePassportPlayer || 'RadiantReaper';
+    const p = this.leaderboardData.find(user => user.name === targetName);
+
+    if (p) {
+      if (!p.writtenRemarks) {
+        p.writtenRemarks = [
+          { id: 1, author: 'Valkyrie_CS', text: 'Insane clutch player! Always stays calm in 1v3 situations and calls great site retakes.', type: 'positive', date: '2 hours ago' },
+          { id: 2, author: 'ApexGod99', text: 'Awesome IGL shotcaller, great communication on Discord voice channel!', type: 'positive', date: '1 day ago' }
+        ];
+      }
+
+      p.writtenRemarks.unshift({
+        id: Date.now(),
+        author: 'You (Host)',
+        text: text,
+        type: 'positive',
+        date: 'Just now'
+      });
+
+      if (!p.commendations) p.commendations = { leadership: 10, friendly: 10, clutch: 10, teacher: 5 };
+      p.commendations.friendly = (p.commendations.friendly || 0) + 1;
+
+      input.value = '';
+
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('fanfare');
+      }
+
+      this.openPlayerPassportModal(targetName);
+      alert(`💬 REMARK POSTED!\n\nYour remark was published live to ${p.name}'s profile wall!`);
+    }
   }
 
   triggerCommendPlayer(type) {
