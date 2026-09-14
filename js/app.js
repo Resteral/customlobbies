@@ -1,4 +1,4 @@
-/* CustomLobbies.com - Main Hub Controller, FACEIT-Style Competitive Match Room & Guardian AC */
+/* CustomLobbies.com - Main Hub Controller, Gamer Quests Engine & FACEIT Competitive Match Room */
 class CustomLobbiesApp {
   constructor() {
     this.activeQueue = false;
@@ -121,6 +121,22 @@ class CustomLobbiesApp {
     this.renderFavoriteStarTags();
     this.renderActiveGamesBar();
     this.renderLobbies();
+  }
+
+  // Claim Daily Quest Reward Handler
+  claimQuestReward(questBtnId, pointsReward) {
+    const btn = document.getElementById(questBtnId);
+    if (!btn || btn.disabled) return;
+
+    this.clPoints += pointsReward;
+    this.updatePointsWidget();
+
+    btn.textContent = '✅ Claimed';
+    btn.disabled = true;
+    btn.classList.remove('btn-success');
+    btn.classList.add('btn-secondary');
+
+    alert(`🎁 QUEST COMPLETED!\n\nYou claimed +${pointsReward} 🪙 CL-Points! Added to your wallet balance.`);
   }
 
   // Buy & Equip Profile Customization Upgrade
