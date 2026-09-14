@@ -178,6 +178,14 @@ body {
   left: 0;
 }
 
+.nav-dropdown-wrapper:hover,
+.nav-dropdown-wrapper:focus-within,
+.dropdown-wrapper:hover,
+.dropdown-wrapper:focus-within {
+  z-index: 9999;
+  position: relative;
+}
+
 .nav-dropdown-wrapper:hover .nav-dropdown-menu,
 .nav-dropdown-wrapper:focus-within .nav-dropdown-menu,
 .dropdown-wrapper:hover .dropdown-menu,
