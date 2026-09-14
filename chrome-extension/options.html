@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CustomLobbies Chrome Extension Settings</title>
+  <style>
+    body {
+      max-width: 550px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0d1117;
+      color: #f0f4f8;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    h2 {
+      font-size: 1.5rem;
+      color: #00e5ff;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+    label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #8b949e;
+      display: block;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+    input, select {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 0.6rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+    .btn {
+      background: linear-gradient(135deg, #00e5ff, #0091ea);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>⚙️ CustomLobbies Extension Settings</h2>
+
+  <div class="input-group">
+    <label>Default Preferred Game</label>
+    <select id="optDefaultGame">
+      <option value="Counter-Strike 2">Counter-Strike 2</option>
+      <option value="Valorant">Valorant</option>
+      <option value="Empulse">Empulse</option>
+      <option value="REMATCH">REMATCH</option>
+      <option value="Arkheron">Arkheron</option>
+    </select>
+  </div>
+
+  <div class="input-group">
+    <label>Audio SFX Notification Volume</label>
+    <input type="range" id="optVolume" min="0" max="100" value="80">
+  </div>
+
+  <div class="input-group">
+    <label>Custom Server Node API Endpoint</label>
+    <input type="text" id="optServerUrl" value="https://customlobbies.com/api/v1">
+  </div>
+
+  <button class="btn" id="btnSaveOptions">Save Settings 💾</button>
+
+  <script src="options.js"></script>
+</body>
+</html>

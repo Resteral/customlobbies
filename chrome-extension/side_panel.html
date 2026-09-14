@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CustomLobbies Side Panel</title>
+  <style>
+    :root {
+      --bg-dark: #090c10;
+      --bg-card: rgba(22, 27, 34, 0.95);
+      --accent-cyan: #00e5ff;
+      --accent-purple: #9d4edd;
+      --accent-green: #00e676;
+      --accent-gold: #ffd700;
+      --accent-red: #ff5252;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --text-main: #f0f4f8;
+      --text-muted: #8b949e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      padding: 1rem;
+      user-select: none;
+      min-height: 100vh;
+    }
+
+    .sp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .sp-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .card-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .input-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .input-field {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-main);
+      padding: 0.55rem;
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+      outline: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.7rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), #0091ea);
+      color: #000;
+    }
+
+    .btn-danger {
+      background: var(--accent-red);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .status-banner {
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="sp-header">
+    <div class="sp-title">
+      <span>🎮</span> CustomLobbies Side Panel
+    </div>
+    <span style="font-size: 0.75rem; background: rgba(0, 229, 255, 0.15); color: var(--accent-cyan); padding: 0.25rem 0.5rem; border-radius: 8px; font-weight: 800;">1840 ELO</span>
+  </div>
+
+  <div class="card-box">
+    <label class="input-label">Select Game Title</label>
+    <select class="input-field" id="spGameSelect">
+      <option value="Counter-Strike 2" selected>Counter-Strike 2</option>
+      <option value="Valorant">Valorant</option>
+      <option value="Empulse">Empulse</option>
+      <option value="REMATCH">REMATCH</option>
+      <option value="Arkheron">Arkheron</option>
+      <option value="Marvel Rivals">Marvel Rivals</option>
+      <option value="Deadlock">Deadlock</option>
+    </select>
+
+    <label class="input-label">Match Mode</label>
+    <select class="input-field" id="spModeSelect">
+      <option value="5v5 Premier Scrim">5v5 Premier Scrim</option>
+      <option value="2v2 Wingman">2v2 Wingman</option>
+      <option value="1v1 Aim Arena">1v1 Aim Arena</option>
+    </select>
+
+    <div class="status-banner">
+      <span id="spStatusText">Status: Idle</span>
+      <span id="spTimer" style="font-weight: 900; color: var(--accent-gold);">⏱️ 00:00</span>
+    </div>
+
+    <button class="btn btn-primary" id="spBtnQueue">
+      <span>⚡</span> JOIN MATCHMAKING QUEUE (-join)
+    </button>
+  </div>
+
+  <div class="card-box">
+    <div style="font-size: 0.85rem; font-weight: 900; color: var(--accent-gold); margin-bottom: 0.6rem;">📅 Upcoming Esports Events</div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+      <strong style="color: #fff;">$1,000 CS2 Premier Major</strong> • Tomorrow 18:00
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); padding: 0.4rem 0;">
+      <strong style="color: #fff;">Empulse 3v3 Arena Clash</strong> • Sept 18 20:00
+    </div>
+  </div>
+
+  <script src="side_panel.js"></script>
+</body>
+</html>
