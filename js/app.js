@@ -2967,15 +2967,20 @@ class CustomLobbiesApp {
   }
 
   autoBalanceLineup() {
-    const roles = ['IGL / Shotcaller', 'Entry Fragger', 'AWPer / Sniper', 'Support / Anchor', 'Lurker / Rifler'];
+    // Sort starting roster by highest ELO first (Highest MMR = Team Captain)
+    this.teamLineup.sort((a, b) => (b.elo || 1800) - (a.elo || 1800));
+
+    const roles = ['IGL / Shotcaller (Captain 👑)', 'Entry Fragger', 'AWPer / Sniper', 'Support / Anchor', 'Lurker / Rifler'];
     this.teamLineup.forEach((p, idx) => {
       p.role = roles[idx % roles.length];
+      p.slot = idx + 1;
     });
+
     this.renderTeamLineupSlots();
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('click');
     }
-    alert('🔄 Lineup roles auto-balanced based on tactical squad positions!');
+    alert(`👑 CAPTAIN ASSIGNED BY HIGHEST MMR!\n\n${this.teamLineup[0].name} (${this.teamLineup[0].elo} MMR) designated as Team Captain & IGL.`);
   }
 
   saveTeamLineup() {

@@ -240,32 +240,28 @@ class EloEngine {
     }
   }
 
-  // Auto-Balance Team Matchmaker
+  // Auto-Balance Team Matchmaker (Highest MMR = Team Captains)
   autoBalanceTeams(playersPool) {
-    const sorted = [...playersPool].sort((a, b) => b.elo - a.elo);
-    const team1 = [];
-    const team2 = [];
+    const sorted = [...playersPool].sort((a, b) => (b.elo || b.mmr || 1800) - (a.elo || a.mmr || 1800));
+    
+    // Assign 1st highest MMR as Team 1 Captain, 2nd highest MMR as Team 2 Captain
+    const cap1 = sorted[0] ? { ...sorted[0], isCaptain: true, captainLabel: '👑 Team 1 Captain (Highest MMR)' } : null;
+    const cap2 = sorted[1] ? { ...sorted[1], isCaptain: true, captainLabel: '👑 Team 2 Captain (2nd Highest MMR)' } : null;
 
-    let sum1 = 0;
-    let sum2 =- 0;
+    const team1 = cap1 ? [cap1] : [];
+    const team2 = cap2 ? [cap2] : [];
 
-    sorted.forEach((p, idx) => {
-      if (idx % 2 === 0) {
-        if (sum1 <= sum2) {
-          team1.push(p);
-          sum1 += p.elo;
-        } else {
-          team2.push(p);
-          sum2 += p.elo;
-        }
+    let sum1 = cap1 ? (cap1.elo || 1800) : 0;
+    let sum2 = cap2 ? (cap2.elo || 1800) : 0;
+
+    const remaining = sorted.slice(2);
+    remaining.forEach((p) => {
+      if (sum1 <= sum2) {
+        team1.push({ ...p, isCaptain: false });
+        sum1 += (p.elo || 1800);
       } else {
-        if (sum2 <= sum1) {
-          team2.push(p);
-          sum2 += p.elo;
-        } else {
-          team1.push(p);
-          sum1 += p.elo;
-        }
+        team2.push({ ...p, isCaptain: false });
+        sum2 += (p.elo || 1800);
       }
     });
 
@@ -276,6 +272,8 @@ class EloEngine {
     return {
       team1,
       team2,
+      captain1: cap1,
+      captain2: cap2,
       avgMMR1: avg1,
       avgMMR2: avg2,
       mmrDiff
