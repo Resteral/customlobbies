@@ -1733,14 +1733,37 @@ class CustomLobbiesApp {
     const container = document.getElementById('favoriteGamesTagsContainer');
     if (!container) return;
 
-    container.innerHTML = this.allGames.map(game => {
-      const isFav = this.favoriteGames.has(game);
+    const favList = this.allGames.filter(game => this.favoriteGames.has(game));
+
+    let html = favList.map(game => {
+      const isSelected = this.activeFilter === game;
       return `
-        <button class="btn btn-sm ${isFav ? 'btn-purple' : 'btn-secondary'}" onclick="window.app.toggleFavorite('${game}')">
-          <span>${isFav ? '⭐' : '☆'}</span> ${game}
+        <button class="btn btn-sm ${isSelected ? 'btn-primary' : 'btn-purple'}" onclick="window.app.setGameFilter('${game}')" title="Filter lobbies by ${game}">
+          <span>⭐</span> ${game}
         </button>
       `;
     }).join('');
+
+    // Add Manage Favorites Dropdown Menu
+    html += `
+      <div class="dropdown-wrapper dropdown-left">
+        <button class="btn btn-secondary btn-sm" style="gap: 0.3rem;">
+          <span>⚙️</span> Manage Favorites (${this.favoriteGames.size}) <span style="font-size: 0.7rem;">▼</span>
+        </button>
+        <div class="dropdown-menu" style="max-height: 280px; overflow-y: auto;">
+          ${this.allGames.map(game => {
+            const isFav = this.favoriteGames.has(game);
+            return `
+              <button class="dropdown-item" onclick="window.app.toggleFavorite('${game}')">
+                <span>${isFav ? '⭐' : '☆'}</span> ${game} ${isFav ? '<span style="margin-left: auto; color: var(--accent-gold); font-size: 0.72rem; font-weight: 800;">FAVORITED</span>' : ''}
+              </button>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
   }
 
   renderActiveGamesBar() {
