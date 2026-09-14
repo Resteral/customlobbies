@@ -1,17 +1,22 @@
-/* CustomLobbies.com - ELO Engine, Modified Captain Snake Draft, Game Capacity Pools & XP System */
+/* CustomLobbies.com - ELO Engine, FACEIT-Style Level 1-10 Rank System, CPL Pro League & Guardian AC */
 
 class EloEngine {
   constructor() {
     this.defaultKFactor = 32;
+
+    // FACEIT-Style Level 1 - 10 Rank Tiers + CPL Challenger Tier
     this.rankTiers = [
-      { name: 'Bronze', min: 0, max: 1199, badge: '🥉', color: '#cd7f32' },
-      { name: 'Silver', min: 1200, max: 1399, badge: '🥈', color: '#c0c0c0' },
-      { name: 'Gold', min: 1400, max: 1599, badge: '🥇', color: '#ffd700' },
-      { name: 'Platinum', min: 1600, max: 1799, badge: '💎', color: '#00e5ff' },
-      { name: 'Diamond', min: 1800, max: 1999, badge: '🔷', color: '#00f2fe' },
-      { name: 'Master', min: 2000, max: 2199, badge: '🔮', color: '#9d4edd' },
-      { name: 'Grandmaster', min: 2200, max: 2399, badge: '👑', color: '#ff007f' },
-      { name: 'Radiant', min: 2400, max: 9999, badge: '🔥', color: '#ffea00' }
+      { level: 1, name: 'FACEIT Level 1', min: 0, max: 800, badge: '🔴 Level 1', color: '#ff5252' },
+      { level: 2, name: 'FACEIT Level 2', min: 801, max: 950, badge: '🟠 Level 2', color: '#ff793f' },
+      { level: 3, name: 'FACEIT Level 3', min: 951, max: 1100, badge: '🟡 Level 3', color: '#ffb142' },
+      { level: 4, name: 'FACEIT Level 4', min: 1101, max: 1250, badge: '🟢 Level 4', color: '#33d9b2' },
+      { level: 5, name: 'FACEIT Level 5', min: 1251, max: 1400, badge: '🟢 Level 5', color: '#2ed573' },
+      { level: 6, name: 'FACEIT Level 6', min: 1401, max: 1550, badge: '🔵 Level 6', color: '#70a1ff' },
+      { level: 7, name: 'FACEIT Level 7', min: 1551, max: 1700, badge: '🔵 Level 7', color: '#1e90ff' },
+      { level: 8, name: 'FACEIT Level 8', min: 1701, max: 1850, badge: '🟣 Level 8', color: '#706fd3' },
+      { level: 9, name: 'FACEIT Level 9', min: 1851, max: 2000, badge: '🟣 Level 9', color: '#474787' },
+      { level: 10, name: 'FACEIT Level 10 (Master)', min: 2001, max: 2400, badge: '👑 Level 10', color: '#ff5252' },
+      { level: 11, name: 'CPL Pro League (FPL Challenger)', min: 2401, max: 9999, badge: '🔥 CPL PRO', color: '#ffd700' }
     ];
 
     // Max player capacity per game mode
@@ -69,7 +74,7 @@ class EloEngine {
     return changeA;
   }
 
-  // Get Rank Tier Info
+  // Get Rank Tier Info (FACEIT Level 1-10)
   getRankTier(mmr) {
     const tier = this.rankTiers.find(t => mmr >= t.min && mmr <= t.max);
     return tier || this.rankTiers[0];
@@ -82,11 +87,10 @@ class EloEngine {
     const currentLevelXP = xp % xpPerLevel;
     const pct = Math.round((currentLevelXP / xpPerLevel) * 100);
 
-    let title = 'Rookie Challenger';
-    if (level > 40) title = 'Apex Warlord';
-    else if (level > 30) title = 'Grandmaster Striker';
-    else if (level > 20) title = 'Diamond Veteran';
-    else if (level > 10) title = 'Gold Competitor';
+    let title = 'Level 8 Challenger';
+    if (level > 40) title = 'CPL Pro Legend';
+    else if (level > 30) title = 'FACEIT Level 10 Master';
+    else if (level > 20) title = 'FACEIT Level 8 Veteran';
 
     return {
       level,
@@ -140,23 +144,17 @@ class EloEngine {
     };
   }
 
-  /* MODIFIED CAPTAIN SNAKE DRAFT RULE:
-     - Top MMR = Captain #1
-     - 2nd Highest MMR = Captain #2
-     - Turn 1: Captain #2 gets First Pick (or CAN PASS to Captain #1)
-     - Turn 2: Captain #1 gets next TWO picks
-     - Turn 3: Alternates back to Captain #2 for next picks
-  */
+  // Modified Captain Snake Draft
   performCustomSnakeDraft(playersPool, passFirstPick = false) {
     const sorted = [...playersPool].sort((a, b) => b.elo - a.elo);
     const cap1 = sorted[0] || { name: 'Captain #1 (Highest MMR)', elo: 2540 };
     const cap2 = sorted[1] || { name: 'Captain #2 (2nd Highest MMR)', elo: 2150 };
 
     const unpicked = sorted.slice(2);
-    const team1 = [cap1]; // Highest MMR Team
-    const team2 = [cap2]; // 2nd Highest MMR Team
+    const team1 = [cap1];
+    const team2 = [cap2];
 
-    let turnOwner = passFirstPick ? 1 : 2; // 2nd Highest MMR starts unless passed!
+    let turnOwner = passFirstPick ? 1 : 2;
     let picksRemainingForTurn = (turnOwner === 2 && !passFirstPick) ? 1 : 2;
 
     while (unpicked.length > 0) {
@@ -171,7 +169,6 @@ class EloEngine {
       picksRemainingForTurn--;
 
       if (picksRemainingForTurn <= 0) {
-        // Switch turn owner and assign double picks (2)
         turnOwner = turnOwner === 1 ? 2 : 1;
         picksRemainingForTurn = 2;
       }
@@ -192,7 +189,6 @@ class EloEngine {
     };
   }
 
-  // Standard Snake Draft fallback
   performSnakeAutoDraft(playersPool) {
     return this.performCustomSnakeDraft(playersPool, false);
   }

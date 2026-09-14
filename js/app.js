@@ -1,4 +1,4 @@
-/* CustomLobbies.com - Main Hub Controller, Game Capacity Draft Pools, Modified Snake Draft & Map Veto Engine */
+/* CustomLobbies.com - Main Hub Controller, FACEIT-Style Competitive Match Room & Guardian AC */
 class CustomLobbiesApp {
   constructor() {
     this.activeQueue = false;
@@ -10,17 +10,16 @@ class CustomLobbiesApp {
     this.bannedMaps = new Set();
     this.selectedMatchMap = null;
     this.passedFirstPick = false;
+    this.acStatus = 'ACTIVE_RING0';
 
     // Live Matchmaking Pool Feed
     this.poolFeed = [
-      { id: 1, name: 'RadiantReaper', elo: 2540, time: 'Just Now', isCaptain: true, votes: 5 },
-      { id: 2, name: 'ApexGod99', elo: 2150, time: '1m ago', isCaptain: true, votes: 4 },
-      { id: 3, name: 'ShadowNinja', elo: 1920, time: '2m ago', isCaptain: false, votes: 2 },
-      { id: 4, name: 'You (Host)', elo: 1840, time: '2m ago', isCaptain: false, votes: 3 },
-      { id: 5, name: 'Valkyrie_CS', elo: 1790, time: '3m ago', isCaptain: false, votes: 1 },
-      { id: 6, name: 'ViperQueen', elo: 1720, time: '3m ago', isCaptain: false, votes: 0 },
-      { id: 7, name: 'NightHawk99', elo: 1680, time: '4m ago', isCaptain: false, votes: 0 },
-      { id: 8, name: 'Pulse_CS', elo: 1590, time: '4m ago', isCaptain: false, votes: 0 }
+      { id: 1, name: 'RadiantReaper', elo: 2540, time: 'Just Now', isCaptain: true, votes: 5, level: 11, acVerified: true },
+      { id: 2, name: 'ApexGod99', elo: 2150, time: '1m ago', isCaptain: true, votes: 4, level: 10, acVerified: true },
+      { id: 3, name: 'ShadowNinja', elo: 1920, time: '2m ago', isCaptain: false, votes: 2, level: 9, acVerified: true },
+      { id: 4, name: 'You (Host)', elo: 1840, time: '2m ago', isCaptain: false, votes: 3, level: 8, acVerified: true },
+      { id: 5, name: 'Valkyrie_CS', elo: 1790, time: '3m ago', isCaptain: false, votes: 1, level: 8, acVerified: true },
+      { id: 6, name: 'ViperQueen', elo: 1720, time: '3m ago', isCaptain: false, votes: 0, level: 7, acVerified: true }
     ];
 
     // Expanded Game Roster
@@ -49,22 +48,20 @@ class CustomLobbiesApp {
       'Apex Legends'
     ];
 
-    this.favoriteGames = new Set(['Counter-Strike 2', 'CS2 Bhop (Auto & Scroll)', 'CS2 Retake (Bomb Defusal)', 'CS2 1v1 Arena (Aim Map)', 'CS2 Gun Game (Arms Race)', 'CS2 HNS (Hide & Seek)', 'Valorant', 'FiveM GTA RP']);
+    this.favoriteGames = new Set(['Counter-Strike 2', 'CS2 Bhop (Auto & Scroll)', 'CS2 Retake (Bomb Defusal)', 'Valorant', 'Dota 2', 'FiveM GTA RP']);
     this.loadFavorites();
 
     this.sponsoredServers = [
       { id: 314, name: 'CS2 128-Tick Auto-Bhop Speedrun Server', game: 'CS2 Bhop (Auto & Scroll)', host: 'Bhop_God', players: 18, max: 24, connectURL: 'steam://connect/192.168.1.100:27015', sponsoredBadge: '🐰 BHOP SPONSOR' },
       { id: 315, name: 'CS2 Danger Zone Solos & Duos Arena', game: 'CS2 Danger Zone (BR)', host: 'DZ_Survivor', players: 16, max: 18, connectURL: 'steam://connect/192.168.1.105:27015', sponsoredBadge: '🪂 DZ SPONSOR' },
       { id: 311, name: 'CS2 128-Tick Retake Server #1', game: 'CS2 Retake (Bomb Defusal)', host: 'Retake_Leader', players: 7, max: 9, connectURL: 'steam://connect/192.168.1.85:27015', sponsoredBadge: '💣 RETAKE SPONSOR' },
-      { id: 309, name: 'CS2 Gun Game Arms Race Shoots Server', game: 'CS2 Gun Game (Arms Race)', host: 'GunGame_Master', players: 12, max: 16, connectURL: 'steam://connect/192.168.1.75:27015', sponsoredBadge: '🔫 GUN GAME SPONSOR' },
-      { id: 301, name: 'CustomLobbies FiveM High Stakes RP', game: 'FiveM GTA RP', host: 'GTA_Legend', players: 64, max: 64, connectURL: 'fivem://connect/cfx.re/join/cl_gta_rp', sponsoredBadge: '💎 DIAMOND SPONSOR' }
+      { id: 309, name: 'CS2 Gun Game Arms Race Shoots Server', game: 'CS2 Gun Game (Arms Race)', host: 'GunGame_Master', players: 12, max: 16, connectURL: 'steam://connect/192.168.1.75:27015', sponsoredBadge: '🔫 GUN GAME SPONSOR' }
     ];
 
     this.lobbies = [
-      { id: 9, title: 'CS2 Auto-Bhop bhop_badges Speedrun Ladder', game: 'CS2 Bhop (Auto & Scroll)', host: 'Bhop_God', players: 14, max: 24, region: 'NA East', draftType: 'Bhop Speedrun' },
+      { id: 9, title: 'CS2 FACEIT Level 8-10 Premier Scrims', game: 'Counter-Strike 2', host: 'ApexGod99', players: 9, max: 10, region: 'NA East', draftType: 'FACEIT Pro League' },
       { id: 8, title: 'CS2 3v4 Retake Mirage A/B Site Scrims', game: 'CS2 Retake (Bomb Defusal)', host: 'Retake_Leader', players: 7, max: 9, region: 'NA East', draftType: 'Retakers vs Defenders' },
-      { id: 7, title: 'CS2 Gun Game Arms Race Fast Weapon Swap', game: 'CS2 Gun Game (Arms Race)', host: 'GunGame_Master', players: 12, max: 16, region: 'NA East', draftType: 'Free-For-All Race' },
-      { id: 1, title: 'CS2 5v5 Mirage Auto-Draft Scrims', game: 'Counter-Strike 2', host: 'ApexGod99', players: 8, max: 10, region: 'NA East', draftType: 'Highest MMR Captains' }
+      { id: 6, title: 'CS2 Surf Utopia v3 Tier 2 Speedrun Scrims', game: 'CS2 Surf (Tier 1-6)', host: 'SurfGod', players: 16, max: 32, region: 'NA East', draftType: 'Surf Timer Race' }
     ];
 
     this.leaderboardData = [
@@ -122,15 +119,16 @@ class CustomLobbiesApp {
     this.renderLobbies();
   }
 
-  getActiveLobbyCounts() {
-    const counts = {};
-    this.lobbies.forEach(l => {
-      counts[l.game] = (counts[l.game] || 0) + 1;
-    });
-    return counts;
+  // FACEIT-Style Match Room & Ready Check
+  launchFaceitMatchRoom(lobbyTitle, gameTitle) {
+    const serverIP = '192.168.1.50:27015';
+    const serverPass = 'cl_scrim_2026';
+    const connectCmd = `connect ${serverIP}; password ${serverPass}`;
+
+    alert(`🏆 FACEIT-STYLE COMPETITIVE MATCH ROOM DISPATCHED!\n\nMatch: "${lobbyTitle}" (${gameTitle})\n\n🛡️ Anti-Cheat Status: Guardian AC Verified (Active Ring 0 Driver)\n🎮 Server IP: ${serverIP}\n🔑 Password: ${serverPass}\n\n1-Click Launch Command:\n${connectCmd}`);
   }
 
-  // Social Media Wall Post Composer Handler
+  // Social Media Post Handler
   postToGamersWall() {
     const input = document.getElementById('socialComposerInput');
     if (!input) return;
@@ -156,7 +154,7 @@ class CustomLobbiesApp {
             <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Posted Just Now • Social Media Update</p>
           </div>
         </div>
-        <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">🔥 LIVE POST</span>
+        <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">🛡️ Guardian AC Verified</span>
       </div>
 
       <p style="font-size: 0.95rem; margin-bottom: 1rem;">${text}</p>
@@ -173,7 +171,6 @@ class CustomLobbiesApp {
     alert('🚀 POST PUBLISHED!\n\nYour post was published live to The Gamers Wall Social Media feed!');
   }
 
-  // Dedicated Button: Join Game Draft Pool
   setupGameDraftPoolButton() {
     const btnDraftPool = document.getElementById('btnJoinGameDraftPool');
     if (!btnDraftPool) return;
@@ -187,7 +184,6 @@ class CustomLobbiesApp {
       if (statusCard) statusCard.style.display = 'block';
       btnDraftPool.disabled = true;
 
-      // Push user into pool
       this.poolFeed.unshift({
         id: Date.now(),
         name: 'You (Queued for Draft)',
@@ -207,14 +203,14 @@ class CustomLobbiesApp {
         const mins = String(Math.floor(this.queueSeconds / 60)).padStart(2, '0');
         const secs = String(this.queueSeconds % 60).padStart(2, '0');
         
-        document.getElementById('queueTimer').textContent = `Queueing for ${selectedGame} Draft Pool: ${mins}:${secs} | Pool Players: ${maxCap - 1}/${maxCap}`;
+        document.getElementById('queueTimer').textContent = `Queueing for ${selectedGame} FACEIT Draft Pool: ${mins}:${secs} | Pool Players: ${maxCap - 1}/${maxCap}`;
 
         if (this.queueSeconds >= 6) {
           clearInterval(this.queueTimerInterval);
           if (statusCard) statusCard.style.display = 'none';
           btnDraftPool.disabled = false;
 
-          alert(`🎉 DRAFT POOL FULL (${maxCap}/${maxCap} Players)!\n\nLaunching Captain Snake Draft for ${selectedGame}...`);
+          alert(`🎉 FACEIT DRAFT POOL FULL (${maxCap}/${maxCap} Players)!\n\nLaunching Captain Snake Draft for ${selectedGame}...`);
           this.triggerAutoDraftModal(selectedGame);
         }
       }, 1000);
@@ -336,15 +332,18 @@ class CustomLobbiesApp {
 
     container.innerHTML = displayList.map((p, idx) => {
       const isCaptain = (p.name === captain1?.name || p.name === captain2?.name);
+      const tier = window.eloEngine.getRankTier(p.elo);
+
       return `
         <div style="display: flex; align-items: center; justify-content: space-between; background: ${isCaptain ? 'rgba(0, 242, 254, 0.12)' : 'rgba(255, 255, 255, 0.04)'}; border: 1px solid ${isCaptain ? 'var(--accent-cyan)' : 'var(--border-color)'}; border-radius: 8px; padding: 0.6rem 0.8rem; margin-bottom: 0.5rem;">
           <div style="display: flex; align-items: center; gap: 0.6rem;">
             <div class="speaking-indicator" style="background: ${isCaptain ? 'var(--accent-gold)' : 'var(--accent-green)'};"></div>
             <span style="font-weight: 700; font-size: 0.9rem;">${p.name}</span>
+            <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">🛡️ AC Verified</span>
             ${isCaptain ? `<span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.2); color: var(--accent-gold);">👑 CAPTAIN ${idx + 1}</span>` : ''}
           </div>
           <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <span style="font-size: 0.85rem; color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
+            <span style="font-size: 0.82rem; color: ${tier.color}; font-weight: 800;">${tier.badge} (${p.elo} MMR)</span>
             ${this.captainSelectionMode === 'selected' ? `
               <button class="btn btn-purple btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;" onclick="window.app.voteSelectCaptain('${p.name}')">
                 🗳️ Vote (${p.votes || 0})
@@ -560,7 +559,7 @@ class CustomLobbiesApp {
               <span class="lobby-game-tag" style="${isFav ? 'background: rgba(255, 215, 0, 0.15); color: var(--accent-gold);' : ''}">
                 ${isFav ? '⭐ ' : ''}${l.game}
               </span>
-              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">🔥 Hosting Now</span>
+              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">🛡️ Guardian AC Verified</span>
             </div>
             <button style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: ${isFav ? 'var(--accent-gold)' : 'var(--text-dim)'};" onclick="window.app.toggleFavorite('${l.game}')" title="Pin / Favorite Game">
               ${isFav ? '⭐' : '☆'}
@@ -568,7 +567,7 @@ class CustomLobbiesApp {
           </div>
 
           <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0.5rem 0;">${l.title}</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Host: <strong style="color: var(--accent-cyan);">${l.host}</strong></p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Host: <strong style="color: var(--accent-cyan);">${l.host}</strong> | Type: <strong style="color: var(--accent-gold);">${l.draftType}</strong></p>
 
           <div class="lobby-players-bar">
             <div class="lobby-players-fill" style="width: ${fillPct}%;"></div>
@@ -579,7 +578,7 @@ class CustomLobbiesApp {
             <div style="display: flex; gap: 0.4rem;">
               <button class="btn btn-secondary btn-sm" onclick="window.app.connectLobbyVoice('${l.title}')" title="Connect WebRTC Voice Room">🎙️ Voice</button>
               <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('${l.game}')">👑 Captain Draft</button>
-              <button class="btn btn-primary btn-sm" onclick="window.app.joinLobby(${l.id})">Join Lobby</button>
+              <button class="btn btn-primary btn-sm" onclick="window.app.launchFaceitMatchRoom('${l.title}', '${l.game}')">🏆 Match Room</button>
             </div>
           </div>
         </div>
@@ -615,7 +614,7 @@ class CustomLobbiesApp {
     this.passedFirstPick = false;
 
     const modal = document.getElementById('autoDraftModal');
-    document.getElementById('draftGameTitle').textContent = `${gameTitle} Captain Snake Draft Control Board`;
+    document.getElementById('draftGameTitle').textContent = `${gameTitle} FACEIT Captain Snake Draft Board`;
     modal.classList.add('active');
     this.runDraftSimulation();
     this.renderMapVetoGrid();
@@ -663,7 +662,7 @@ class CustomLobbiesApp {
     if (btnConfirmDraft) {
       btnConfirmDraft.addEventListener('click', () => {
         modal.classList.remove('active');
-        alert(`🎮 CAPTAIN DRAFT & MAP VETO LOCKED!\n\nMap: ${this.selectedMatchMap || 'Mirage'}\nTeams for ${this.currentDraftGame} dispatched to voice channels!`);
+        this.launchFaceitMatchRoom(this.currentDraftGame, this.currentDraftGame);
       });
     }
   }
@@ -736,12 +735,13 @@ class CustomLobbiesApp {
           <td>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span style="font-weight: 700;">${p.name}</span>
+              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-size: 0.72rem;">🛡️ AC Active</span>
             </div>
           </td>
-          <td><span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span></td>
+          <td><span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span></td>
           <td>
             <span style="display: flex; align-items: center; gap: 0.3rem; color: ${tier.color}; font-weight: 700;">
-              ${tier.badge} ${tier.name}
+              ${tier.badge}
             </span>
           </td>
           <td>${p.wins}W / ${p.losses}L</td>
@@ -775,13 +775,13 @@ class CustomLobbiesApp {
           players: 1,
           max,
           region: 'NA East',
-          draftType: 'Highest MMR Captains'
+          draftType: 'FACEIT Competitive'
         });
 
         this.renderActiveGamesBar();
         this.renderLobbies();
         modal.classList.remove('active');
-        alert(`🔥 Active Custom Lobby created for ${game}! This game has been prioritized on the Lobby Feed.`);
+        alert(`🔥 Active FACEIT-Style Custom Lobby created for ${game}! Protected by Guardian Anti-Cheat Engine.`);
       });
     }
   }
