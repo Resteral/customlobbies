@@ -151,6 +151,25 @@ class StreamStudioEngine {
     }
   }
 
+  upvoteFarmedClip(clipId) {
+    const clip = this.farmedClips.find(c => c.id === clipId);
+    if (!clip) return;
+
+    clip.upvotes = (clip.upvotes || 40) + 1;
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    if (window.app) {
+      window.app.clPoints += 10;
+      window.app.updatePointsWidget();
+    }
+
+    this.renderFarmedClipsFeed();
+    alert(`🔥 FARMED CLIP HYPED!\n\nYou gave +1 Hype Upvote to "${clip.title}"! Earned +10 🪙 CL-Points bonus!`);
+  }
+
   exportClip916Vertical(clipId) {
     const clip = this.farmedClips.find(c => c.id === clipId);
     if (!clip) return;
@@ -188,6 +207,9 @@ class StreamStudioEngine {
               📱 TikTok 9:16
             </button>
           </div>
+          <button class="btn btn-secondary btn-sm" style="width: 100%; font-size: 0.75rem; border-color: var(--accent-gold); color: var(--accent-gold);" onclick="window.streamStudioEngine.upvoteFarmedClip(${c.id})">
+            🔥 Hype Upvote (${c.upvotes || 42})
+          </button>
           <button class="btn ${c.claimed ? 'btn-secondary' : 'btn-primary'} btn-sm" style="width: 100%; font-size: 0.75rem;" onclick="window.streamStudioEngine.claimFarmClipPoints(${c.id})" ${c.claimed ? 'disabled' : ''}>
             ${c.claimed ? '✅ +25 Points Claimed' : '🪙 Claim +25 CL-Points'}
           </button>

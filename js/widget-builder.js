@@ -3,14 +3,30 @@ class WidgetBuilderEngine {
   constructor() {
     this.audioCtx = null;
     this.recordedClips = [
-      { id: 1, title: 'CS2 1v4 Clutch Mirage Ace', duration: '0:24', author: 'ApexGod99', date: 'Just Now', thumb: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&auto=format&fit=crop&q=80' },
-      { id: 2, title: 'Valorant Radiant Headshot Spray', duration: '0:18', author: 'Valkyrie_CS', date: '2h ago', thumb: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&auto=format&fit=crop&q=80' }
+      { id: 1, title: 'CS2 1v4 Clutch Mirage Ace', duration: '0:24', author: 'ApexGod99', date: 'Just Now', upvotes: 38, thumb: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&auto=format&fit=crop&q=80' },
+      { id: 2, title: 'Valorant Radiant Headshot Spray', duration: '0:18', author: 'Valkyrie_CS', date: '2h ago', upvotes: 24, thumb: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&auto=format&fit=crop&q=80' }
     ];
   }
 
   init() {
     this.setupEventListeners();
     this.renderClipsFeed();
+  }
+
+  upvoteClip(clipId) {
+    const clip = this.recordedClips.find(c => c.id === clipId);
+    if (!clip) return;
+
+    clip.upvotes = (clip.upvotes || 0) + 1;
+    this.playSoundEffect('fanfare');
+
+    if (window.app) {
+      window.app.clPoints += 10;
+      window.app.updatePointsWidget();
+    }
+
+    this.renderClipsFeed();
+    alert(`🔥 CLIP HYPED!\n\nYou gave +1 Hype Upvote to "${clip.title}"! Earned +10 🪙 CL-Points bonus!`);
   }
 
   setupEventListeners() {
@@ -158,14 +174,20 @@ class WidgetBuilderEngine {
     if (!grid) return;
 
     grid.innerHTML = this.recordedClips.map(c => `
-      <div class="card" style="padding: 0.8rem; overflow: hidden; position: relative;">
-        <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 0.6rem;">
-          <img src="${c.thumb}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;" alt="Clip">
-          <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">${c.duration}</div>
-          <button class="btn btn-primary btn-sm" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 50%; width: 44px; height: 44px; padding: 0;" onclick="alert('▶️ Playing clip: ${c.title}')">▶</button>
+      <div class="card" style="padding: 0.8rem; overflow: hidden; position: relative; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 0.6rem;">
+            <img src="${c.thumb}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;" alt="Clip">
+            <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">${c.duration}</div>
+            <button class="btn btn-primary btn-sm" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 50%; width: 44px; height: 44px; padding: 0;" onclick="alert('▶️ Playing clip: ${c.title}')">▶</button>
+          </div>
+          <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.2rem;">${c.title}</h4>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.8rem;">Clipped by <strong style="color: var(--accent-cyan);">${c.author}</strong> • ${c.date}</p>
         </div>
-        <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.2rem;">${c.title}</h4>
-        <p style="font-size: 0.78rem; color: var(--text-muted);">Clipped by <strong style="color: var(--accent-cyan);">${c.author}</strong> • ${c.date}</p>
+
+        <button class="btn btn-purple btn-sm" style="width: 100%;" onclick="window.widgetBuilderEngine.upvoteClip(${c.id})">
+          🔥 Upvote Clip (${c.upvotes || 0})
+        </button>
       </div>
     `).join('');
   }
