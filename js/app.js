@@ -270,6 +270,7 @@ class CustomLobbiesApp {
     this.renderFavoriteStarTags();
     this.renderActiveGamesBar();
     this.renderSponsoredServers();
+    this.renderMyCreatedTeams();
     this.renderPoolFeed();
     this.renderLobbies();
     this.renderLeaderboard();
@@ -1435,12 +1436,151 @@ class CustomLobbiesApp {
     }
 
     this.closeWardogsTeamModal();
+  }
 
-    const gameSelect = document.getElementById('wardogsGameSelect');
-    if (gameSelect) gameSelect.value = game;
-    this.switchWardogsMode('squads');
+  openCreateTeamModal() {
+    const modal = document.getElementById('createUniversalTeamModal');
+    if (modal) modal.classList.add('active');
+  }
 
-    alert(`🎉 SQUAD UNIT REGISTERED!\n\nSquad "${squadName} [${tag.toUpperCase()}]" registered into WARDOGS Mercenary League!\n\nEarned +100 🪙 CL-Points!`);
+  closeCreateTeamModal() {
+    const modal = document.getElementById('createUniversalTeamModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  loadMyCreatedTeams() {
+    try {
+      const saved = localStorage.getItem('cl_user_custom_teams_v1');
+      if (saved) {
+        this.myCreatedTeams = JSON.parse(saved);
+      } else {
+        this.myCreatedTeams = [
+          {
+            id: 'TEAM-101',
+            name: 'Vanguard Cyber Squad',
+            tag: '[VANGUARD]',
+            captain: 'Sean',
+            game: 'Counter-Strike 2',
+            size: 5,
+            members: ['Sean (Captain)', 'Ghost_Dog_99', 'Sargeant_Iron', 'Valkyrie_Merc', 'Shadow_K9'],
+            record: '12W - 2L',
+            elo: 2380,
+            kd: '2.35',
+            bountyEarned: '$4,500',
+            createdDate: 'Live Active'
+          }
+        ];
+      }
+    } catch (e) {
+      this.myCreatedTeams = [];
+    }
+  }
+
+  renderMyCreatedTeams() {
+    const grid = document.getElementById('myCreatedTeamsGrid');
+    if (!grid) return;
+
+    if (!this.myCreatedTeams) this.loadMyCreatedTeams();
+
+    if (!this.myCreatedTeams || this.myCreatedTeams.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 8px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border-color);">
+          🛡️ No custom teams created yet. Click "Create New Team" to build your 5v5 fireteam or WARDOG battalion!
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = this.myCreatedTeams.map(t => `
+      <div class="card" style="border-color: var(--accent-purple); position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+          <div>
+            <span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe; font-weight: 900; border: 1px solid var(--accent-purple);">🛡️ ${t.tag}</span>
+            <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); margin-left: 0.3rem;">🎮 ${t.game}</span>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">${t.record || '0W - 0L'}</span>
+        </div>
+
+        <h3 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 0.2rem; color: #fff;">${t.name}</h3>
+        <div style="font-size: 0.82rem; color: var(--accent-cyan); font-weight: 800; margin-bottom: 0.6rem;">👑 Captain: ${t.captain} • Roster: ${t.members ? t.members.length : t.size} Members</div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; background: rgba(0,0,0,0.4); padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; margin-bottom: 0.8rem; text-align: center;">
+          <div><div style="color: var(--text-muted);">Team MMR</div><strong style="color: var(--accent-gold);">${t.elo || 2200} ELO</strong></div>
+          <div><div style="color: var(--text-muted);">Team K/D</div><strong style="color: var(--accent-green);">${t.kd || '2.10'}</strong></div>
+          <div><div style="color: var(--text-muted);">Earnings</div><strong style="color: #ffab00;">${t.bountyEarned || '$1k'}</strong></div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem; max-height: 50px; overflow-y: auto;">
+          Roster: ${t.members ? t.members.join(', ') : 'Active Roster'}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+          <button class="btn btn-purple btn-sm" style="flex: 1; padding: 0.3rem 0.6rem; font-size: 0.78rem;" onclick="alert('⚔️ SCRIM CHALLENGE DISPATCHED!\\n\\nOfficial 5v5 Scrim challenge sent for team \"${t.name}\"!')">
+            ⚔️ Scrim Challenge
+          </button>
+          <button class="btn btn-danger btn-sm" style="padding: 0.3rem 0.5rem; font-size: 0.75rem;" onclick="window.app.disbandTeam('${t.id}')">
+            ❌ Disband
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  submitCreateTeam() {
+    const name = document.getElementById('modalTeamName').value.trim() || 'Vanguard Esports';
+    const tag = document.getElementById('modalTeamTag').value.trim() || 'VANGUARD';
+    const captain = document.getElementById('modalTeamCaptain').value.trim() || (this.user ? this.user.displayName : 'Sean');
+    const game = document.getElementById('modalTeamGame').value;
+    const size = parseInt(document.getElementById('modalTeamSize').value) || 5;
+    const membersRaw = document.getElementById('modalTeamMembers').value.trim();
+
+    const members = membersRaw ? membersRaw.split(',').map(m => m.trim()).filter(Boolean) : [captain, 'Operative_Alpha', 'Operative_Bravo', 'Operative_Charlie', 'Operative_Delta'];
+
+    const newTeam = {
+      id: `TEAM-${Date.now().toString().slice(-4)}`,
+      name,
+      tag: tag.startsWith('[') ? tag.toUpperCase() : `[${tag.toUpperCase()}]`,
+      captain,
+      game,
+      size,
+      members,
+      record: '0W - 0L',
+      elo: Math.floor(2100 + Math.random() * 300),
+      kd: '2.25',
+      bountyEarned: '$2,500',
+      createdDate: new Date().toLocaleDateString()
+    };
+
+    if (!this.myCreatedTeams) this.myCreatedTeams = [];
+    this.myCreatedTeams.unshift(newTeam);
+    localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
+
+    if (window.wardogsEngine) {
+      window.wardogsEngine.registerSquadUnit(name, tag, captain, game, size);
+    }
+    if (window.leaguesEngine) {
+      window.leaguesEngine.registerLeagueTeam(name, tag, captain, game, 'Premier Division');
+    }
+
+    this.clPoints += 150;
+    this.updatePointsWidget();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    this.closeCreateTeamModal();
+    this.renderMyCreatedTeams();
+
+    alert(`🎉 TEAM CREATED SUCCESSFULLY!\n\nTeam "${name} ${newTeam.tag}" created for ${game}!\nAdded to your Team Management Cabinet (+150 🪙 CL-Points)!`);
+  }
+
+  disbandTeam(teamId) {
+    if (!confirm('⚠️ DISBAND TEAM?\n\nAre you sure you want to disband this team roster?')) return;
+    if (!this.myCreatedTeams) return;
+    this.myCreatedTeams = this.myCreatedTeams.filter(t => t.id !== teamId);
+    localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
+    this.renderMyCreatedTeams();
   }
 
   start99PlayerQueue() {

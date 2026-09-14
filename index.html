@@ -248,6 +248,25 @@
         </div>
       </div>
 
+      <!-- My Created Teams & Squads Cabinet -->
+      <div class="card" style="margin-bottom: 1.5rem; border-color: var(--accent-purple); box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);" id="myCreatedTeamsCabinet">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 900; color: var(--accent-purple); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+              <span>🛡️</span> My Created Teams, Squads & Clan Rosters
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">Create and manage your competitive 5v5 fireteams, 2v2 wingman rosters, or 33-man WARDOG battalions!</p>
+          </div>
+          <button class="btn btn-purple btn-sm" onclick="window.app.openCreateTeamModal()">
+            <span>➕</span> Create New Team (+150 Pts)
+          </button>
+        </div>
+
+        <div id="myCreatedTeamsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+          <!-- Injected dynamically via app.js -->
+        </div>
+      </div>
+
       <!-- Universal Free-Agent Player Pool for Tournaments & Lobbies -->
       <div class="card" style="margin-bottom: 1.5rem; border-color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
@@ -2562,6 +2581,77 @@
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
         <button class="btn btn-secondary" onclick="window.app.closeWardogsTeamModal()">Cancel</button>
         <button class="btn btn-primary" onclick="window.app.submitWardogsTeam()">Register Squad Unit 🛡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNIVERSAL TEAM CREATION MODAL -->
+  <div class="modal-overlay" id="createUniversalTeamModal">
+    <div class="modal-card" style="max-width: 580px; border-color: var(--accent-purple);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.8rem;">🛡️</span>
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--accent-purple); margin: 0;">Create Custom Team & Clan Roster</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Register your competitive fireteam or battalion into tournaments, leagues, and scrims</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeCreateTeamModal()">✕ Close</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Team Name</label>
+          <input type="text" class="input-field" id="modalTeamName" value="Vanguard Cyber Squad">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Clan Tag</label>
+          <input type="text" class="input-field" id="modalTeamTag" value="VANGUARD">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Team Captain Handle</label>
+        <input type="text" class="input-field" id="modalTeamCaptain" value="Sean">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Game Title</label>
+          <select class="input-field" id="modalTeamGame">
+            <option value="Counter-Strike 2" selected>Counter-Strike 2</option>
+            <option value="Valorant">Valorant</option>
+            <option value="WARDOGS">WARDOGS (33v33v33)</option>
+            <option value="Empulse">Empulse</option>
+            <option value="REMATCH">REMATCH</option>
+            <option value="Marvel Rivals">Marvel Rivals</option>
+            <option value="Slapshot: Rebound">Slapshot: Rebound</option>
+            <option value="Rocket League">Rocket League</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Roster Capacity / Format</label>
+          <select class="input-field" id="modalTeamSize">
+            <option value="5" selected>5 Players (5v5 Competitive)</option>
+            <option value="2">2 Players (2v2 Wingman / Duel)</option>
+            <option value="6">6 Players (6v6 Arena / Finals)</option>
+            <option value="33">33 Operatives (33-Man WARDOG Battalion)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Teammates / Roster Handles (Comma-separated)</label>
+        <input type="text" class="input-field" id="modalTeamMembers" value="Ghost_Dog_99, Sargeant_Iron, Valkyrie_Merc, Shadow_K9">
+      </div>
+
+      <div style="background: rgba(168, 85, 247, 0.12); border: 1px solid var(--accent-purple); border-radius: 8px; padding: 0.8rem; font-size: 0.85rem; color: #d8b4fe; margin-bottom: 1.25rem;">
+        🎁 Team Bonus: Earn +150 🪙 CL-Points & unlock official Team Scrims & Tournament Eligibility!
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
+        <button class="btn btn-secondary" onclick="window.app.closeCreateTeamModal()">Cancel</button>
+        <button class="btn btn-purple" onclick="window.app.submitCreateTeam()">Create Team 🛡️</button>
       </div>
     </div>
   </div>
