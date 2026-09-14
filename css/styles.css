@@ -902,3 +902,72 @@ body.obs-transparent-mode {
   overflow-y: auto;
   margin-top: 1rem;
 }
+
+/* Custom Cyberpunk Neon Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #07090d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+}
+
+/* Animated Card Glow Effects */
+.card {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 242, 254, 0.4);
+  box-shadow: 0 12px 40px 0 rgba(0, 242, 254, 0.15);
+}
+
+/* Glowing Primary Action Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  color: #000;
+  font-weight: 800;
+  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 242, 254, 0.6);
+  filter: brightness(1.1);
+}
+
+.btn-purple {
+  background: linear-gradient(135deg, var(--accent-purple), #7b2cbf);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+}
+
+.btn-purple:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(157, 78, 221, 0.6);
+  filter: brightness(1.1);
+}
+
+/* Pulse Glow Keyframes */
+@keyframes neonPulse {
+  0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(0, 242, 254, 0.7); }
+  100% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+}
+
+.brand-icon {
+  animation: neonPulse 3s infinite ease-in-out;
+}
