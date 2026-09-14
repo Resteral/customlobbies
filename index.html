@@ -80,8 +80,8 @@
       <button class="btn btn-secondary btn-sm" id="btnInstallPWAApp" onclick="alert('📥 INSTALL STANDALONE APP!\n\nClick your browser URL bar Install button to save CustomLobbies directly to your desktop or phone home screen!')">
         <span>📥</span> Install App
       </button>
-      <button class="btn btn-secondary btn-sm" id="btnGoogleSignIn" style="gap: 0.4rem;">
-        <span>🔴</span> Sign in with Google
+      <button class="btn btn-primary btn-sm" id="btnOpenAuthModal" onclick="window.app.openAuthModal()" style="gap: 0.4rem; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
+        <span>🔑</span> <span id="authBtnLabel">Sign In / Register</span>
       </button>
 
       <!-- Player Level & XP Badge -->
@@ -1568,6 +1568,111 @@
       </div>
     </div>
   </main>
+
+  <!-- Authentication Portal Modal -->
+  <div class="modal-overlay" id="authPortalModal">
+    <div class="auth-modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <img src="assets/logo.jpg" alt="CustomLobbies Shield" style="width: 42px; height: 42px; border-radius: 10px; border: 1.5px solid var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: #fff; margin: 0; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">CustomLobbies Account Portal</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Access 128-tick lobbies, ELO rankings, & Ring 0 Guardian Anti-Cheat</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeAuthModal()">✕</button>
+      </div>
+
+      <!-- Auth Navigation Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="authTabSignIn" onclick="window.app.switchAuthTab('signin')">🔑 Quick Sign In</button>
+        <button class="auth-tab-btn" id="authTabRegister" onclick="window.app.switchAuthTab('register')">📝 Register</button>
+        <button class="auth-tab-btn" id="authTabOAuth" onclick="window.app.switchAuthTab('oauth')">🎮 Gaming OAuth</button>
+      </div>
+
+      <!-- Tab 1: Sign In View -->
+      <div id="authViewSignIn">
+        <form onsubmit="event.preventDefault(); window.app.handleEmailSignIn();">
+          <div class="auth-input-group">
+            <label>Username or Email Address</label>
+            <input type="text" id="signInUsername" class="auth-input" placeholder="e.g. Sean_ProGamer or user@customlobbies.com" required>
+          </div>
+          <div class="auth-input-group">
+            <label>Account Password</label>
+            <input type="password" id="signInPassword" class="auth-input" placeholder="••••••••••••" required>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; font-size: 0.82rem;">
+            <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-muted); cursor: pointer;">
+              <input type="checkbox" id="signInRemember" checked> Keep me logged in
+            </label>
+            <a href="#" style="color: var(--accent-cyan); text-decoration: none;" onclick="alert('🔑 PASSWORD RESET RECOVERY:\n\nA password reset link has been dispatched to your registered email address!')">Forgot Password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem; font-size: 1rem; font-weight: 800; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);">
+            🔑 Sign In to CustomLobbies
+          </button>
+        </form>
+      </div>
+
+      <!-- Tab 2: Register View -->
+      <div id="authViewRegister" style="display: none;">
+        <form onsubmit="event.preventDefault(); window.app.handleUserRegistration();">
+          <div class="auth-input-group">
+            <label>Desired Gamer Tag / Username</label>
+            <input type="text" id="regUsername" class="auth-input" placeholder="e.g. ApexLegend_99" required>
+          </div>
+          <div class="auth-input-group">
+            <label>Email Address</label>
+            <input type="email" id="regEmail" class="auth-input" placeholder="gamer@domain.com" required>
+          </div>
+          <div class="auth-input-group">
+            <label>Create Password</label>
+            <input type="password" id="regPassword" class="auth-input" placeholder="Minimum 6 characters" required>
+          </div>
+          <div class="auth-input-group">
+            <label>Primary Game Title</label>
+            <select id="regPrimaryGame" class="auth-input">
+              <option value="Counter-Strike 2">Counter-Strike 2 (5v5 Premier)</option>
+              <option value="Valorant">Valorant (Radiant Circuit)</option>
+              <option value="WARDOGS Tactical Arena">WARDOGS Tactical Arena ($50k Circuit)</option>
+              <option value="Rocket League">Rocket League (3v3 High Octane)</option>
+              <option value="Slapshot: Rebound">Slapshot: Rebound (3v3 Arena)</option>
+            </select>
+          </div>
+          <div style="margin-bottom: 1.2rem; font-size: 0.8rem; color: var(--text-muted);">
+            <label style="display: flex; align-items: flex-start; gap: 0.4rem; cursor: pointer;">
+              <input type="checkbox" id="regAntiCheatAgree" checked required style="margin-top: 0.2rem;">
+              <span>I agree to Guardian Ring 0 Anti-Cheat Telemetry and CustomLobbies Esports Terms of Service.</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-success" style="width: 100%; padding: 0.8rem; font-size: 1rem; font-weight: 800; box-shadow: 0 0 20px rgba(0, 230, 118, 0.4);">
+            ✨ Create Verified Account
+          </button>
+        </form>
+      </div>
+
+      <!-- Tab 3: OAuth Gaming Connect -->
+      <div id="authViewOAuth" style="display: none;">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">Sign in instantly using your existing gaming network account:</p>
+        <div class="oauth-grid">
+          <button class="oauth-btn oauth-btn-google" onclick="window.app.handleOAuthSignIn('google')">
+            <span>🔴</span> Sign In with Google Cloud Auth
+          </button>
+          <button class="oauth-btn oauth-btn-steam" onclick="window.app.handleOAuthSignIn('steam')">
+            <span>🎮</span> Connect Steam Community ID
+          </button>
+          <button class="oauth-btn oauth-btn-discord" onclick="window.app.handleOAuthSignIn('discord')">
+            <span>💬</span> Sign In with Discord OAuth2
+          </button>
+          <button class="oauth-btn oauth-btn-twitch" onclick="window.app.handleOAuthSignIn('twitch')">
+            <span>📺</span> Connect Twitch Streamer Profile
+          </button>
+          <button class="oauth-btn oauth-btn-riot" onclick="window.app.handleOAuthSignIn('riot')">
+            <span>🛡️</span> Sign In with Riot Games ID
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Sign-Up Matchmaking Queue Selection Modal -->
   <div class="modal-overlay" id="signUpQueueModal">

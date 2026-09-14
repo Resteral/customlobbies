@@ -265,6 +265,7 @@ class CustomLobbiesApp {
   }
 
   init() {
+    this.initAuthSession();
     this.setupTabNavigation();
     this.renderFavoriteStarTags();
     this.renderActiveGamesBar();
@@ -1803,6 +1804,183 @@ class CustomLobbiesApp {
       filterFavs.addEventListener('click', () => {
         this.setGameFilter('favorites');
       });
+    }
+  }
+
+  initAuthSession() {
+    try {
+      const savedUser = localStorage.getItem('cl_auth_user');
+      if (savedUser) {
+        this.user = JSON.parse(savedUser);
+        this.updateUserAuthUI();
+      }
+    } catch (err) {
+      console.warn('Auth session load fallback:', err);
+    }
+  }
+
+  openAuthModal() {
+    const modal = document.getElementById('authPortalModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeAuthModal() {
+    const modal = document.getElementById('authPortalModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  switchAuthTab(tabName) {
+    const btnSignIn = document.getElementById('authTabSignIn');
+    const btnReg = document.getElementById('authTabRegister');
+    const btnOAuth = document.getElementById('authTabOAuth');
+
+    const viewSignIn = document.getElementById('authViewSignIn');
+    const viewReg = document.getElementById('authViewRegister');
+    const viewOAuth = document.getElementById('authViewOAuth');
+
+    [btnSignIn, btnReg, btnOAuth].forEach(btn => btn && btn.classList.remove('active'));
+    [viewSignIn, viewReg, viewOAuth].forEach(view => view && (view.style.display = 'none'));
+
+    if (tabName === 'signin') {
+      if (btnSignIn) btnSignIn.classList.add('active');
+      if (viewSignIn) viewSignIn.style.display = 'block';
+    } else if (tabName === 'register') {
+      if (btnReg) btnReg.classList.add('active');
+      if (viewReg) viewReg.style.display = 'block';
+    } else if (tabName === 'oauth') {
+      if (btnOAuth) btnOAuth.classList.add('active');
+      if (viewOAuth) viewOAuth.style.display = 'block';
+    }
+  }
+
+  handleEmailSignIn() {
+    const usernameInput = document.getElementById('signInUsername');
+    const username = usernameInput ? usernameInput.value.trim() : 'Gamer';
+    if (!username) return;
+
+    if (this.user) {
+      // Toggle Sign Out if already logged in
+      this.signOutUser();
+      return;
+    }
+
+    this.user = {
+      username: username,
+      displayName: username,
+      email: `${username.toLowerCase()}@customlobbies.com`,
+      elo: 1840,
+      level: 8,
+      title: '💎 Diamond Veteran',
+      avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
+      acVerified: true,
+      provider: 'email'
+    };
+
+    localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+    this.updateUserAuthUI();
+    this.closeAuthModal();
+
+    if (window.firebaseGoogleEngine && typeof window.firebaseGoogleEngine.speakTextAlert === 'function') {
+      window.firebaseGoogleEngine.speakTextAlert(`Welcome back ${this.user.displayName}`);
+    }
+
+    alert(`🎉 SIGN IN SUCCESSFUL!\n\nWelcome back, ${this.user.displayName}!\nGuardian Kernel Anti-Cheat Active. 128-tick server node access unlocked.`);
+  }
+
+  handleUserRegistration() {
+    const usernameInput = document.getElementById('regUsername');
+    const emailInput = document.getElementById('regEmail');
+    const primaryGameSelect = document.getElementById('regPrimaryGame');
+
+    const username = usernameInput ? usernameInput.value.trim() : 'Recruit';
+    const email = emailInput ? emailInput.value.trim() : 'recruit@customlobbies.com';
+    const primaryGame = primaryGameSelect ? primaryGameSelect.value : 'Counter-Strike 2';
+
+    if (!username || !email) return;
+
+    this.user = {
+      username: username,
+      displayName: username,
+      email: email,
+      primaryGame: primaryGame,
+      elo: 1200,
+      level: 1,
+      title: '🌟 Verified Recruit',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+      acVerified: true,
+      provider: 'registration'
+    };
+
+    localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+    this.updateUserAuthUI();
+    this.closeAuthModal();
+
+    alert(`✨ ACCOUNT CREATED SUCCESSFULLY!\n\nWelcome to CustomLobbies, ${this.user.displayName}!\nRanked Placement Matches unlocked for ${primaryGame}.`);
+  }
+
+  handleOAuthSignIn(provider) {
+    const providerNames = {
+      google: 'Google Cloud Auth',
+      steam: 'Steam Community OAuth',
+      discord: 'Discord OAuth2',
+      twitch: 'Twitch Streamer Profile',
+      riot: 'Riot Games ID'
+    };
+
+    const provName = providerNames[provider] || provider;
+
+    this.user = {
+      username: `Sean_${provider.toUpperCase()}`,
+      displayName: `Sean (${provider.charAt(0).toUpperCase() + provider.slice(1)} Verified)`,
+      email: `sean.${provider}@customlobbies.com`,
+      elo: 1840,
+      level: 17,
+      title: '👑 Grandmaster Captain',
+      avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
+      acVerified: true,
+      provider: provider
+    };
+
+    localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+    this.updateUserAuthUI();
+    this.closeAuthModal();
+
+    alert(`🎮 LINKED WITH ${provName.toUpperCase()}!\n\nSigned in as ${this.user.displayName}.\nYour competitive stats and badge rankings are active!`);
+  }
+
+  signOutUser() {
+    this.user = null;
+    localStorage.removeItem('cl_auth_user');
+    this.updateUserAuthUI();
+    alert('Logged out from CustomLobbies Account.');
+  }
+
+  updateUserAuthUI() {
+    const authBtnLabel = document.getElementById('authBtnLabel');
+    const userPassportTitle = document.getElementById('userPassportTitle');
+    const userMMRValue = document.getElementById('userMMRValue');
+    const btnOpenAuthModal = document.getElementById('btnOpenAuthModal');
+
+    if (this.user) {
+      if (authBtnLabel) {
+        authBtnLabel.textContent = `👤 ${this.user.displayName} (Sign Out)`;
+      }
+      if (btnOpenAuthModal) {
+        btnOpenAuthModal.onclick = () => this.signOutUser();
+      }
+      if (userPassportTitle) {
+        userPassportTitle.textContent = this.user.title || '💎 Diamond Veteran';
+      }
+      if (userMMRValue) {
+        userMMRValue.textContent = `Level ${this.user.level || 8} (${this.user.elo || 1840} ELO)`;
+      }
+    } else {
+      if (authBtnLabel) {
+        authBtnLabel.textContent = 'Sign In / Register';
+      }
+      if (btnOpenAuthModal) {
+        btnOpenAuthModal.onclick = () => this.openAuthModal();
+      }
     }
   }
 
