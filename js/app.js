@@ -2071,7 +2071,7 @@ class CustomLobbiesApp {
               <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('192.168.1.85:27015')" title="Copy Console Connect Command">📋 Copy IP</button>
               <button class="btn btn-secondary btn-sm" onclick="window.app.connectLobbyVoice('${l.title}')" title="Connect WebRTC Voice Room">🎙️ Voice</button>
               <button class="btn btn-secondary btn-sm" style="border-color: var(--accent-gold); color: var(--accent-gold);" onclick="window.app.openPostGameHonorModal('${l.title}')" title="After Game Honor & Misconduct Flags">🏁 Post-Game Honor</button>
-              <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('${l.game}')">👑 Captain Draft</button>
+              <button class="btn btn-purple btn-sm" onclick="window.app.triggerLobbySnakeDraft('${l.title}', '${l.game}')" title="Launch FACEIT 1-2-2-1 Snake Draft Board for this lobby">🐍 Snake Draft</button>
               <button class="btn btn-primary btn-sm" onclick="window.app.launchFaceitMatchRoom('${l.title}', '${l.game}')">🏆 Direct Join</button>
             </div>
           </div>
@@ -2101,17 +2101,25 @@ class CustomLobbiesApp {
     }
   }
 
-  triggerAutoDraftModal(gameTitle) {
+  triggerLobbySnakeDraft(lobbyTitle, gameTitle) {
+    this.currentDraftLobby = lobbyTitle;
     this.currentDraftGame = gameTitle;
     this.bannedMaps.clear();
     this.selectedMatchMap = null;
     this.passedFirstPick = false;
 
     const modal = document.getElementById('autoDraftModal');
-    document.getElementById('draftGameTitle').textContent = `${gameTitle} FACEIT Captain Snake Draft Board`;
-    modal.classList.add('active');
+    const titleEl = document.getElementById('draftGameTitle');
+    if (titleEl) {
+      titleEl.textContent = `🐍 ${lobbyTitle || gameTitle} — FACEIT Snake Draft Board`;
+    }
+    if (modal) modal.classList.add('active');
     this.runDraftSimulation();
     this.renderMapVetoGrid();
+  }
+
+  triggerAutoDraftModal(gameTitle) {
+    this.triggerLobbySnakeDraft(`${gameTitle} Competitive Scrim`, gameTitle);
   }
 
   passTurnToCaptain1() {
@@ -2127,21 +2135,21 @@ class CustomLobbiesApp {
     document.getElementById('captainAName').textContent = `👑 Captain #1 (Highest MMR): ${result.captain1.name} (${result.captain1.elo} MMR)`;
     document.getElementById('captainBName').textContent = `👑 Captain #2 (2nd Highest MMR): ${result.captain2.name} (${result.captain2.elo} MMR)`;
 
-    document.getElementById('teamAList').innerHTML = result.team1.map(p => `
-      <div style="display: flex; justify-content: space-between; background: rgba(0,242,254,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem;">
-        <span style="font-weight: 700;">${p.name}</span>
-        <span style="color: var(--accent-gold);">${p.elo} MMR</span>
+    document.getElementById('teamAList').innerHTML = result.team1.map((p, idx) => `
+      <div style="display: flex; justify-content: space-between; background: rgba(0,242,254,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem; border: 1px solid rgba(0,242,254,0.2);">
+        <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
+        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
       </div>
     `).join('');
 
-    document.getElementById('teamBList').innerHTML = result.team2.map(p => `
-      <div style="display: flex; justify-content: space-between; background: rgba(157,78,221,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem;">
-        <span style="font-weight: 700;">${p.name}</span>
-        <span style="color: var(--accent-gold);">${p.elo} MMR</span>
+    document.getElementById('teamBList').innerHTML = result.team2.map((p, idx) => `
+      <div style="display: flex; justify-content: space-between; background: rgba(157,78,221,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem; border: 1px solid rgba(157,78,221,0.2);">
+        <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
+        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
       </div>
     `).join('');
 
-    document.getElementById('draftMMRSummary').textContent = `Capacity: ${maxCap} Players | First Pick: ${result.firstPickOwner} | Team 1 Avg: ${result.avgMMR1} MMR | Team 2 Avg: ${result.avgMMR2} MMR | Delta: ${result.mmrDelta} MMR`;
+    document.getElementById('draftMMRSummary').textContent = `🐍 Snake Draft Order (1-2-2-1) | Capacity: ${maxCap} Players | First Pick: ${result.firstPickOwner} | Team 1 Avg: ${result.avgMMR1} MMR | Team 2 Avg: ${result.avgMMR2} MMR | Delta: ${result.mmrDelta} MMR`;
   }
 
   setupAutoDraftHandlers() {
