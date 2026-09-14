@@ -60,6 +60,9 @@
       <button class="nav-btn" data-tab="leagues-view">
         <span>🏆</span> Esports Leagues
       </button>
+      <button class="nav-btn" data-tab="wardogs-view">
+        <span>🐕</span> WARDOGS Tactical
+      </button>
       <button class="nav-btn" data-tab="leaderboard-view">
         <span>👑</span> ELO Leaderboard
       </button>
@@ -1166,6 +1169,63 @@
       </div>
     </section>
 
+    <!-- 5.8 WARDOGS TACTICAL ARENA & MERCENARY LEAGUE VIEW -->
+    <section id="wardogs-view" class="view-section">
+      <div class="lobby-header-banner" style="background: linear-gradient(135deg, rgba(255, 111, 0, 0.25), rgba(26, 28, 35, 0.9)); border: 1px solid #ff6f00; margin-bottom: 1.5rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <span style="font-size: 2.6rem;">🐕</span>
+            <div>
+              <h1 style="font-size: 1.9rem; font-weight: 900; color: #ffab00; margin: 0; text-transform: uppercase; letter-spacing: 1px;">WARDOGS Tactical Arena & Mercenary League</h1>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">OPERATION: AMBER STRIKE (Season 4) • Contract Bounties & Ranked Selection Draft Room</p>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+          <div style="text-align: right; margin-right: 0.5rem;">
+            <div style="font-size: 0.75rem; color: #ffab00; text-transform: uppercase; font-weight: 800;">Total Mercenary Bounty Pool</div>
+            <div style="font-size: 1.4rem; font-weight: 900; color: #ffab00;">$50,000 USD</div>
+          </div>
+          <button class="btn btn-purple" onclick="window.app.openWardogsSoloModal()">
+            <span>🐕</span> Solo Mercenary Registration
+          </button>
+          <button class="btn btn-secondary" onclick="window.app.openWardogsTeamModal()">
+            <span>🛡️</span> Register Squad Unit
+          </button>
+          <button class="btn btn-primary" onclick="window.app.runWardogsRankedDraft()">
+            <span>⚡</span> Ranked Match Selection Draft
+          </button>
+        </div>
+      </div>
+
+      <!-- Control Bar: Game Filter + Wardogs View Mode Switcher -->
+      <div class="card" style="margin-bottom: 1.5rem; padding: 1rem; border-color: rgba(255, 111, 0, 0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <label style="font-size: 0.85rem; font-weight: 800; color: #ffab00; text-transform: uppercase;">Tactical Game Title:</label>
+            <select class="input-field" id="wardogsGameSelect" style="margin-bottom: 0; min-width: 220px;" onchange="window.app.renderWardogsView()">
+              <option value="Counter-Strike 2" selected>Counter-Strike 2 ($15,000 Bounty)</option>
+              <option value="Valorant">Valorant ($10,000 Bounty)</option>
+              <option value="Empulse">Empulse ($8,000 Bounty)</option>
+              <option value="REMATCH">REMATCH ($7,000 Bounty)</option>
+              <option value="Slapshot: Rebound">Slapshot: Rebound ($5,000 Bounty)</option>
+              <option value="Deadlock">Deadlock ($5,000 Bounty)</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 0.5rem;" id="wardogsCategoryTabs">
+            <button class="btn btn-purple btn-sm wardogs-tab-btn active" data-mode="solos" onclick="window.app.switchWardogsMode('solos')">🐕 Solo Mercenary Pool</button>
+            <button class="btn btn-secondary btn-sm wardogs-tab-btn" data-mode="squads" onclick="window.app.switchWardogsMode('squads')">🛡️ Registered Squad Units</button>
+            <button class="btn btn-secondary btn-sm wardogs-tab-btn" data-mode="ranked" onclick="window.app.switchWardogsMode('ranked')">⚡ Ranked Selection Draft Room</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Container Grid -->
+      <div id="wardogsMainContent">
+        <!-- Injected dynamically via JS -->
+      </div>
+    </section>
+
     <!-- 6. ELO LEADERBOARD & STATS VIEW -->
     <section id="leaderboard-view" class="view-section">
       <!-- Player Account Trophy Showcase -->
@@ -2107,6 +2167,155 @@
     </div>
   </div>
 
+  <!-- WARDOGS SOLO MERCENARY REGISTRATION MODAL -->
+  <div class="modal-overlay" id="wardogsJoinSoloModal">
+    <div class="modal-card" style="max-width: 550px; border-color: #ff6f00;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: #ffab00;">🐕 Solo Mercenary Contract Sign-Up</h3>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeWardogsSoloModal()">✕ Close</button>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Operative Gamer Handle</label>
+        <input type="text" class="input-field" id="modalWardogsHandle" value="Ghost_Dog_99">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Tactical Callsign</label>
+          <input type="text" class="input-field" id="modalWardogsCallsign" value="VIPER-1">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Tactical Game Title</label>
+          <select class="input-field" id="modalWardogsGame">
+            <option value="Counter-Strike 2">Counter-Strike 2</option>
+            <option value="Valorant">Valorant</option>
+            <option value="Empulse">Empulse</option>
+            <option value="REMATCH">REMATCH</option>
+            <option value="Slapshot: Rebound">Slapshot: Rebound</option>
+            <option value="Deadlock">Deadlock</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Primary Combat Role</label>
+        <select class="input-field" id="modalWardogsRole">
+          <option value="🎯 Marksman / Sniper">🎯 Marksman / Sniper</option>
+          <option value="⚡ Breacher / Assault" selected>⚡ Breacher / Assault</option>
+          <option value="🧠 Recon / Scout">🧠 Recon / Scout</option>
+          <option value="🛡️ Heavy / Tank">🛡️ Heavy / Tank</option>
+          <option value="📻 Comms Specialist">📻 Comms Specialist</option>
+        </select>
+      </div>
+
+      <div style="background: rgba(255, 111, 0, 0.12); border: 1px solid #ff6f00; border-radius: 8px; padding: 0.8rem; font-size: 0.85rem; color: #ffab00; margin-bottom: 1.25rem;">
+        🎁 Operative Bounty: Earn +100 🪙 CL-Points & enter the WARDOGS Ranked Selection Draft Pool immediately!
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
+        <button class="btn btn-secondary" onclick="window.app.closeWardogsSoloModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.app.submitWardogsSolo()">Enlist Mercenary 🐕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WARDOGS SQUAD UNIT REGISTRATION MODAL -->
+  <div class="modal-overlay" id="wardogsJoinTeamModal">
+    <div class="modal-card" style="max-width: 550px; border-color: #ff6f00;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: #ffab00;">🛡️ Squad Unit Mercenary Contract Registration</h3>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeWardogsTeamModal()">✕ Close</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Squad Name</label>
+          <input type="text" class="input-field" id="modalWardogsTeamName" value="WARDOG Alpha Strike">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Squad Tag</label>
+          <input type="text" class="input-field" id="modalWardogsTeamTag" value="WD-ALPHA">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Squad Captain Handle</label>
+        <input type="text" class="input-field" id="modalWardogsCaptain" value="Ghost_Dog_99">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Tactical Game Title</label>
+          <select class="input-field" id="modalWardogsTeamGame">
+            <option value="Counter-Strike 2">Counter-Strike 2</option>
+            <option value="Valorant">Valorant</option>
+            <option value="Empulse">Empulse</option>
+            <option value="REMATCH">REMATCH</option>
+            <option value="Slapshot: Rebound">Slapshot: Rebound</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Squad Size</label>
+          <select class="input-field" id="modalWardogsTeamSize">
+            <option value="5" selected>5 Operatives (5v5 Scrims)</option>
+            <option value="3">3 Operatives (3v3 Arena)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
+        <button class="btn btn-secondary" onclick="window.app.closeWardogsTeamModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.app.submitWardogsTeam()">Register Squad Unit 🛡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WARDOGS RANKED SELECTION DRAFT ROOM MODAL -->
+  <div class="modal-overlay" id="wardogsRankedDraftModal">
+    <div class="modal-card" style="max-width: 780px; width: 92%; border-color: #ff6f00;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.6rem;">⚡</span>
+            <h3 style="font-size: 1.4rem; font-weight: 900; color: #ffab00; margin: 0;">WARDOGS Ranked Selection Draft & Deployment</h3>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.2rem 0 0 0;" id="wardogsDraftMatchId">Match ID: WD-RANKED-4921 • Automated Combatant Selection</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeWardogsDraftModal()">✕ Close</button>
+      </div>
+
+      <!-- Fireteam Rosters Grid -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+        <!-- Fireteam Alpha -->
+        <div style="background: rgba(0, 229, 255, 0.08); padding: 1rem; border-radius: 8px; border: 1px solid var(--accent-cyan);">
+          <div style="font-size: 0.8rem; color: var(--accent-cyan); text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔵 WARDOG Fireteam Alpha</div>
+          <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.8rem;" id="wardogsAlphaElo">Avg Rating: 2520 ELO</div>
+          <div id="wardogsAlphaRosterList"></div>
+        </div>
+
+        <!-- Fireteam Bravo -->
+        <div style="background: rgba(255, 111, 0, 0.08); padding: 1rem; border-radius: 8px; border: 1px solid #ff6f00;">
+          <div style="font-size: 0.8rem; color: #ffab00; text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔴 WARDOG Fireteam Bravo</div>
+          <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.8rem;" id="wardogsBravoElo">Avg Rating: 2515 ELO</div>
+          <div id="wardogsBravoRosterList"></div>
+        </div>
+      </div>
+
+      <!-- Deployment Banner -->
+      <div style="background: rgba(0, 230, 118, 0.15); border: 1px solid var(--accent-green); border-radius: 8px; padding: 0.8rem; text-align: center; margin-bottom: 1.25rem;">
+        <span style="font-weight: 900; color: var(--accent-green); font-size: 0.92rem;" id="wardogsDeploymentBanner">
+          🚀 COMBATANTS SELECTED! 128-Tick Dedicated Server Reserved on Arena Map (de_mirage)
+        </span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn btn-secondary" onclick="window.app.runWardogsRankedDraft()">🔄 Re-Select Players</button>
+        <button class="btn btn-primary" onclick="alert('🚀 DEPLOYED TO RANKED MATCH!\n\nConnecting all 10 selected WARDOG combatants to Dedicated 128-tick Server Node...')">🚀 Deploy to Ranked Match</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase & Google Cloud SDK Imports -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -2122,6 +2331,7 @@
   <script src="js/integrations.js"></script>
   <script src="js/tournaments-store.js"></script>
   <script src="js/leagues-engine.js"></script>
+  <script src="js/wardogs-engine.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

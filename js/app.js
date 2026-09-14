@@ -234,6 +234,7 @@ class CustomLobbiesApp {
     this.renderLobbies();
     this.renderLeaderboard();
     this.renderLeaguesView();
+    this.renderWardogsView();
     this.setupQueueButtons();
     this.setupModalHandlers();
     this.setupAutoDraftHandlers();
@@ -910,6 +911,254 @@ class CustomLobbiesApp {
     this.switchLeagueDivision(division);
 
     alert(`🎉 LEAGUE TEAM REGISTERED!\n\nTeam "${teamName} [${teamTag.toUpperCase()}]" registered into the ${game} Official League!\n\nEarned +100 🪙 CL-Points into your wallet!`);
+  }
+
+  // WARDOGS Tactical Arena & Mercenary League Implementation
+  renderWardogsView() {
+    const gameSelect = document.getElementById('wardogsGameSelect');
+    const selectedGame = gameSelect ? gameSelect.value : 'Counter-Strike 2';
+    const container = document.getElementById('wardogsMainContent');
+    if (!container) return;
+
+    if (!this.activeWardogsMode) this.activeWardogsMode = 'solos';
+
+    if (!window.wardogsEngine) return;
+
+    if (this.activeWardogsMode === 'solos') {
+      const solos = window.wardogsEngine.soloMercenaries.filter(m => m.game === selectedGame || m.game === 'Counter-Strike 2');
+
+      container.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+          ${solos.map(m => `
+            <div class="card" style="border-color: rgba(255, 111, 0, 0.4); position: relative;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+                <div>
+                  <span class="lobby-game-tag" style="background: rgba(255, 111, 0, 0.2); color: #ffab00; border: 1px solid #ff6f00;">🐕 ${m.callsign}</span>
+                  <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); margin-left: 0.3rem;">🛡️ AC Verified</span>
+                </div>
+                <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 800;">${m.game}</span>
+              </div>
+
+              <h3 style="font-size: 1.15rem; font-weight: 900; margin-bottom: 0.3rem; color: #fff;">${m.name}</h3>
+              <div style="font-size: 0.82rem; color: var(--accent-gold); font-weight: 800; margin-bottom: 0.8rem;">Role: ${m.role}</div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; background: rgba(0,0,0,0.4); padding: 0.6rem; border-radius: 6px; font-size: 0.78rem; margin-bottom: 1rem; text-align: center;">
+                <div><div style="color: var(--text-muted);">Rating</div><strong style="color: var(--accent-purple);">${m.elo} MMR</strong></div>
+                <div><div style="color: var(--text-muted);">K/D Ratio</div><strong style="color: var(--accent-green);">${m.kd}</strong></div>
+                <div><div style="color: var(--text-muted);">Contracts</div><strong style="color: #ffab00;">${m.contracts}</strong></div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="lobby-game-tag" style="background: ${m.status.includes('Selected') ? 'rgba(0, 229, 255, 0.2)' : 'rgba(0, 230, 118, 0.2)'}; color: ${m.status.includes('Selected') ? 'var(--accent-cyan)' : 'var(--accent-green)'}; font-size: 0.72rem;">
+                  ${m.status}
+                </span>
+                <button class="btn btn-purple btn-sm" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.78rem;" onclick="alert('➕ RECRUIT SENT!\\n\\nRecruitment contract dispatched to ${m.name} (${m.callsign})!')">
+                  ➕ Recruit Mercenary
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } else if (this.activeWardogsMode === 'squads') {
+      const squads = window.wardogsEngine.registeredSquads.filter(s => s.game === selectedGame || s.game === 'Counter-Strike 2');
+
+      container.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
+          ${squads.map(s => `
+            <div class="card" style="border-color: rgba(255, 111, 0, 0.5);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+                <div>
+                  <span class="lobby-game-tag" style="background: rgba(255, 111, 0, 0.25); color: #ffab00; font-weight: 900;">${s.tag}</span>
+                  <span class="lobby-game-tag" style="background: rgba(0, 229, 255, 0.15); color: var(--accent-cyan); margin-left: 0.3rem;">${s.membersCount} Operatives</span>
+                </div>
+                <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 900;">${s.bountyEarned} Bounty</span>
+              </div>
+
+              <h3 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 0.3rem; color: #fff;">${s.name}</h3>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">Captain: <strong style="color: var(--accent-cyan);">${s.captain}</strong> | Game: <strong style="color: #fff;">${s.game}</strong></div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.82rem; margin-bottom: 1rem;">
+                <span>Battle Record: <strong style="color: var(--accent-green);">${s.record}</strong></span>
+                <span style="color: #ffab00; font-weight: 800;">${s.status}</span>
+              </div>
+
+              <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="alert('⚔️ SQUAD CHALLENGE DISPATCHED!\\n\\nTactical Scrim Challenge sent to ${s.name} [${s.tag}]!')">
+                ⚔️ Challenge Squad Unit
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } else if (this.activeWardogsMode === 'ranked') {
+      const history = window.wardogsEngine.rankedSelectionHistory;
+
+      container.innerHTML = `
+        <div class="card" style="border-color: rgba(255, 111, 0, 0.4);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.15rem; font-weight: 900; color: #ffab00;">⚡ WARDOGS Ranked Selection Match History</h3>
+            <button class="btn btn-primary btn-sm" onclick="window.app.runWardogsRankedDraft()" style="width: auto;">🎯 Run New Ranked Selection</button>
+          </div>
+
+          ${history.length === 0 ? `
+            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎯</div>
+              <p>No Ranked Selections generated yet. Click "Run New Ranked Selection" to match combatants!</p>
+            </div>
+          ` : `
+            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+              ${history.map(m => `
+                <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem;">
+                  <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.4rem;">
+                    <span style="color: #ffab00; font-weight: 900;">${m.id} • ${m.game} (${m.capacity} Players)</span>
+                    <span style="color: var(--accent-green); font-weight: 800;">${m.status}</span>
+                  </div>
+                  <div style="font-size: 0.85rem; margin-bottom: 0.4rem; color: #fff;">
+                    🔵 Alpha (${m.avgEloAlpha} ELO) <strong style="color: var(--accent-purple);">VS</strong> 🔴 Bravo (${m.avgEloBravo} ELO) | Arena: <strong style="color: var(--accent-gold);">${m.map}</strong>
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Timestamp: ${m.timestamp}</div>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+    }
+  }
+
+  switchWardogsMode(mode) {
+    this.activeWardogsMode = mode;
+
+    const btns = document.querySelectorAll('.wardogs-tab-btn');
+    btns.forEach(b => {
+      if (b.getAttribute('data-mode') === mode) {
+        b.classList.remove('btn-secondary');
+        b.classList.add('btn-purple', 'active');
+      } else {
+        b.classList.remove('btn-purple', 'active');
+        b.classList.add('btn-secondary');
+      }
+    });
+
+    this.renderWardogsView();
+  }
+
+  openWardogsSoloModal() {
+    const modal = document.getElementById('wardogsJoinSoloModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeWardogsSoloModal() {
+    const modal = document.getElementById('wardogsJoinSoloModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  submitWardogsSolo() {
+    const handle = document.getElementById('modalWardogsHandle').value.trim() || 'Ghost_Dog_99';
+    const callsign = document.getElementById('modalWardogsCallsign').value.trim() || 'VIPER-1';
+    const game = document.getElementById('modalWardogsGame').value;
+    const role = document.getElementById('modalWardogsRole').value;
+
+    if (window.wardogsEngine) {
+      window.wardogsEngine.registerSoloMercenary(handle, callsign, game, role, 2150);
+    }
+
+    this.clPoints += 100;
+    const clDisplay = document.getElementById('userCLPointsValue');
+    if (clDisplay) clDisplay.textContent = `${this.clPoints.toLocaleString()} Points`;
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    this.closeWardogsSoloModal();
+
+    const gameSelect = document.getElementById('wardogsGameSelect');
+    if (gameSelect) gameSelect.value = game;
+    this.switchWardogsMode('solos');
+
+    alert(`🎉 MERCENARY ENLISTED!\n\nOperative ${handle} (${callsign}) registered into WARDOGS Mercenary Pool!\n\nEarned +100 🪙 CL-Points!`);
+  }
+
+  openWardogsTeamModal() {
+    const modal = document.getElementById('wardogsJoinTeamModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeWardogsTeamModal() {
+    const modal = document.getElementById('wardogsJoinTeamModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  submitWardogsTeam() {
+    const squadName = document.getElementById('modalWardogsTeamName').value.trim() || 'WARDOG Alpha';
+    const tag = document.getElementById('modalWardogsTeamTag').value.trim() || 'WD-ALPHA';
+    const captain = document.getElementById('modalWardogsCaptain').value.trim() || 'Ghost_Dog_99';
+    const game = document.getElementById('modalWardogsTeamGame').value;
+    const size = document.getElementById('modalWardogsTeamSize').value;
+
+    if (window.wardogsEngine) {
+      window.wardogsEngine.registerSquadUnit(squadName, tag, captain, game, size);
+    }
+
+    this.clPoints += 100;
+    const clDisplay = document.getElementById('userCLPointsValue');
+    if (clDisplay) clDisplay.textContent = `${this.clPoints.toLocaleString()} Points`;
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    this.closeWardogsTeamModal();
+
+    const gameSelect = document.getElementById('wardogsGameSelect');
+    if (gameSelect) gameSelect.value = game;
+    this.switchWardogsMode('squads');
+
+    alert(`🎉 SQUAD UNIT REGISTERED!\n\nSquad "${squadName} [${tag.toUpperCase()}]" registered into WARDOGS Mercenary League!\n\nEarned +100 🪙 CL-Points!`);
+  }
+
+  runWardogsRankedDraft() {
+    const gameSelect = document.getElementById('wardogsGameSelect');
+    const selectedGame = gameSelect ? gameSelect.value : 'Counter-Strike 2';
+
+    if (!window.wardogsEngine) return;
+
+    const matchRoom = window.wardogsEngine.generateRankedSelectionMatch(selectedGame);
+
+    document.getElementById('wardogsDraftMatchId').textContent = `Match ID: ${matchRoom.id} • Game: ${matchRoom.game} (${matchRoom.capacity} Operatives)`;
+    document.getElementById('wardogsAlphaElo').textContent = `Avg Rating: ${matchRoom.avgEloAlpha} ELO`;
+    document.getElementById('wardogsBravoElo').textContent = `Avg Rating: ${matchRoom.avgEloBravo} ELO`;
+
+    document.getElementById('wardogsAlphaRosterList').innerHTML = matchRoom.fireteamAlpha.map(p => `
+      <div style="display: flex; justify-content: space-between; background: rgba(0,242,254,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem;">
+        <span style="font-weight: 700;">${p.name} <span style="font-size: 0.75rem; color: var(--accent-cyan);">(${p.callsign})</span></span>
+        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span>
+      </div>
+    `).join('');
+
+    document.getElementById('wardogsBravoRosterList').innerHTML = matchRoom.fireteamBravo.map(p => `
+      <div style="display: flex; justify-content: space-between; background: rgba(255,111,0,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem;">
+        <span style="font-weight: 700;">${p.name} <span style="font-size: 0.75rem; color: #ffab00;">(${p.callsign})</span></span>
+        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span>
+      </div>
+    `).join('');
+
+    document.getElementById('wardogsDeploymentBanner').textContent = `🚀 COMBATANTS SELECTED! 128-Tick Dedicated Server Reserved on Arena Map (${matchRoom.map})`;
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('match_found');
+    }
+
+    const modal = document.getElementById('wardogsRankedDraftModal');
+    if (modal) modal.classList.add('active');
+
+    this.renderWardogsView();
+  }
+
+  closeWardogsDraftModal() {
+    const modal = document.getElementById('wardogsRankedDraftModal');
+    if (modal) modal.classList.remove('active');
   }
 
   flipCaptainCoin() {
