@@ -26,7 +26,7 @@
 
   <!-- Top Navigation Bar -->
   <header class="navbar">
-    <div class="brand" onclick="window.app.switchView('lobbies-view')">
+    <div class="brand" onclick="document.querySelector('[data-tab=lobbies-view]').click()">
       <img src="assets/logo.jpg" alt="CustomLobbies Logo" class="brand-logo-img">
       <span>CustomLobbies.com</span>
     </div>
@@ -38,69 +38,69 @@
       <button class="nav-btn" data-tab="gamers-hub-view">
         <span>🌐</span> Gamers Hub & LFG
       </button>
-      <button class="nav-btn" data-tab="servers-view">
-        <span>🖥️</span> Sponsored Servers (FiveM)
-      </button>
-      <button class="nav-btn" data-tab="community-view">
-        <span>💬</span> Chat & Voice Hub
-      </button>
       <button class="nav-btn" data-tab="tournaments-view">
         <span>🏆</span> Tournaments
-      </button>
-      <button class="nav-btn" data-tab="store-view">
-        <span>🛍️</span> Banner Store
-      </button>
-      <button class="nav-btn" data-tab="studio-view">
-        <span>🎥</span> Stream Studio
-      </button>
-      <button class="nav-btn" data-tab="widgets-view">
-        <span>🎨</span> Widgets & Alerts
-      </button>
-      <button class="nav-btn" data-tab="integrations-view">
-        <span>🔌</span> Integrations
-      </button>
-      <button class="nav-btn" data-tab="matchmaking-view">
-        <span>🎯</span> Matchmaking
-      </button>
-      <button class="nav-btn" data-tab="leagues-view">
-        <span>🏆</span> Esports Leagues
       </button>
       <button class="nav-btn" data-tab="wardogs-view">
         <span>🐕</span> WARDOGS Tactical
       </button>
       <button class="nav-btn" data-tab="leaderboard-view">
-        <span>👑</span> ELO Leaderboard
+        <span>👑</span> Leaderboards
       </button>
+      
+      <!-- Sleek Dropdown for Secondary Nav Items -->
+      <div class="nav-dropdown-wrapper">
+        <button class="nav-btn nav-dropdown-btn" id="navMoreDropdownBtn" style="gap: 0.3rem;">
+          <span>✨</span> More <span style="font-size: 0.7rem;">▼</span>
+        </button>
+        <div class="nav-dropdown-menu" id="navMoreDropdownMenu">
+          <button class="nav-btn dropdown-item" data-tab="servers-view">
+            <span>🖥️</span> Sponsored Servers (FiveM)
+          </button>
+          <button class="nav-btn dropdown-item" data-tab="community-view">
+            <span>💬</span> Chat & Voice Hub
+          </button>
+          <button class="nav-btn dropdown-item" data-tab="store-view">
+            <span>🛍️</span> Banner Store
+          </button>
+          <button class="nav-btn dropdown-item" data-tab="studio-view">
+            <span>🎥</span> Stream Studio
+          </button>
+          <button class="nav-btn dropdown-item" data-tab="widgets-view">
+            <span>🎨</span> Widgets & Alerts
+          </button>
+          <button class="nav-btn dropdown-item" data-tab="integrations-view">
+            <span>🔌</span> Integrations
+          </button>
+          <button class="nav-btn dropdown-item" data-tab="matchmaking-view">
+            <span>🎯</span> Matchmaking Hub
+          </button>
+          <button class="nav-btn dropdown-item" data-tab="leagues-view">
+            <span>🏆</span> Esports Leagues
+          </button>
+        </div>
+      </div>
     </nav>
 
     <div class="user-profile-widget">
       <button class="btn btn-purple btn-sm" id="btnLaunchDesktopProgram" onclick="alert('💻 LAUNCHING NATIVE DESKTOP PROGRAM!\n\nLaunching CustomLobbies.exe Studio Program with GPU screen capturer & system tray overlay...')">
-        <span>💻</span> Desktop Program
-      </button>
-      <button class="btn btn-secondary btn-sm" id="btnInstallPWAApp" onclick="alert('📥 INSTALL STANDALONE APP!\n\nClick your browser URL bar Install button to save CustomLobbies directly to your desktop or phone home screen!')">
-        <span>📥</span> Install App
+        <span>💻</span> Desktop App
       </button>
       <button class="btn btn-primary btn-sm" id="btnOpenAuthModal" onclick="window.app.openAuthModal()" style="gap: 0.4rem; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
-        <span>🔑</span> <span id="authBtnLabel">Sign In / Register</span>
+        <span>🔑</span> <span id="authBtnLabel">Sign In</span>
       </button>
 
       <!-- Player Level & XP Badge -->
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
         <div style="display: flex; gap: 0.4rem; align-items: center;">
           <div class="mmr-badge" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); border-color: var(--accent-gold); padding: 0.35rem 0.7rem; font-size: 0.82rem; font-weight: 900;" title="Earn +50 Points per match played & +100 Points per win!">
-            <span>🪙</span> <span id="userCLPointsValue">2,450 Points</span>
+            <span>🪙</span> <span id="userCLPointsValue">2,450 Pts</span>
           </div>
           <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 0.2rem 0.5rem; font-size: 0.75rem; font-weight: 800;" title="Guardian Kernel Anti-Cheat Engine Active">
-            🛡️ Guardian AC Verified
+            🛡️ AC Active
           </span>
           <div class="mmr-badge" id="userMMRBadge" style="padding: 0.35rem 0.8rem; font-size: 0.82rem; cursor: pointer;" onclick="window.app.openPlayerPassportModal(window.app.user ? window.app.user.displayName : 'Sean')" title="Click to view full Gamer Passport & ELO stats!">
-            <span>👑</span> <span id="userPassportTitle">💎 Diamond Veteran</span> • <span id="userMMRValue">Level 8 (1840 ELO)</span>
-          </div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: var(--accent-gold); font-weight: 700;">
-          <span>⭐ Lv. 17 (170/200 XP)</span>
-          <div style="width: 60px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
-            <div style="width: 85%; height: 100%; background: var(--accent-gold);"></div>
+            <span>👑</span> <span id="userPassportTitle">💎 Diamond</span> • <span id="userMMRValue">1840 ELO</span>
           </div>
         </div>
       </div>
@@ -110,18 +110,18 @@
   </header>
 
   <!-- Live Esports Telemetry Ticker Bar -->
-  <div style="background: linear-gradient(90deg, #07090d, #12161f, #07090d); border-bottom: 1px solid var(--border-glow); padding: 0.4rem 1.5rem; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; overflow-x: auto; white-space: nowrap; font-family: monospace;">
+  <div style="background: linear-gradient(90deg, #07090d, #12161f, #07090d); border-bottom: 1px solid var(--border-glow); padding: 0.45rem 1.5rem; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; overflow-x: auto; white-space: nowrap; font-family: monospace;">
     <div style="display: flex; gap: 1.5rem; align-items: center;">
       <span style="color: var(--accent-green); font-weight: 800; display: flex; align-items: center; gap: 0.3rem;">
         <span class="live-dot" style="width: 8px; height: 8px; background: var(--accent-green);"></span> LIVE MATCHMAKING ACTIVE
       </span>
       <span style="color: var(--text-muted);">🔴 <strong style="color: var(--accent-cyan);">1,482</strong> Active Scrims</span>
-      <span style="color: var(--text-muted);">🛡️ <strong style="color: var(--accent-green);">Guardian Kernel AC: 100% Secure</strong></span>
-      <span style="color: var(--text-muted);">🪙 <strong style="color: var(--accent-gold);">$45,000 Total Prize Pool</strong></span>
-      <span style="color: var(--text-muted);">⚡ <strong style="color: var(--accent-purple);">0.2s WebRTC Stream Latency</strong></span>
-      <span style="color: var(--text-muted);">🎮 <strong style="color: var(--accent-cyan);">28 Game Titles Supported</strong></span>
+      <span style="color: var(--text-muted);">🛡️ <strong style="color: var(--accent-green);">Guardian AC: 100% Secure</strong></span>
+      <span style="color: var(--text-muted);">🪙 <strong style="color: var(--accent-gold);">$45,000 Prize Pool</strong></span>
+      <span style="color: var(--text-muted);">⚡ <strong style="color: var(--accent-purple);">0.2s WebRTC Latency</strong></span>
+      <span style="color: var(--text-muted);">🎮 <strong style="color: var(--accent-cyan);">28 Supported Games</strong></span>
     </div>
-    <div style="color: var(--text-dim); font-size: 0.72rem;">CustomLobbies.com v2.5 Premier</div>
+    <div style="color: var(--text-dim); font-size: 0.72rem;">CustomLobbies.com v2.5</div>
   </div>
 
   <!-- Main Content Container -->
@@ -129,48 +129,44 @@
 
     <!-- 1. LOBBIES & MATCHMAKING QUEUE VIEW -->
     <section id="lobbies-view" class="view-section active">
-      <div class="lobby-header-banner" style="background: linear-gradient(135deg, rgba(14, 18, 28, 0.9), rgba(6, 8, 14, 0.95)), url('assets/logo.jpg') center/cover no-repeat; border: 1px solid var(--border-color); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15);">
-        <div style="display: flex; align-items: center; gap: 1.2rem;">
-          <img src="assets/logo.jpg" alt="CustomLobbies Shield" style="width: 72px; height: 72px; border-radius: 16px; border: 2px solid var(--accent-cyan); box-shadow: 0 0 25px rgba(0,242,254,0.5), 0 0 40px rgba(168,85,247,0.4); flex-shrink: 0;">
+      <!-- Clean Hero Banner -->
+      <div class="lobby-header-banner" style="background: linear-gradient(135deg, rgba(14, 18, 28, 0.92), rgba(6, 8, 14, 0.96)), url('assets/logo.jpg') center/cover no-repeat; border: 1px solid var(--border-color); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15); display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; padding: 2rem; margin-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 1.25rem; max-width: 650px;">
+          <img src="assets/logo.jpg" alt="CustomLobbies Shield" style="width: 76px; height: 76px; border-radius: 18px; border: 2px solid var(--accent-cyan); box-shadow: 0 0 25px rgba(0,242,254,0.5), 0 0 40px rgba(168,85,247,0.4); flex-shrink: 0;">
           <div>
-            <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 0.3rem; background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 60%, var(--accent-purple) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Competitive Matchmaking & Custom Lobbies</h1>
-            <p style="color: var(--text-muted); font-size: 0.98rem;">Join queues, auto-balance 5v5 / 2v2 teams with ELO MMR rating, or host your own streamable lobby.</p>
-            <div style="display: flex; gap: 0.5rem; margin-top: 0.8rem;">
-              <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Counter-Strike 2')">⚡ Auto-Draft CS2</button>
-              <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Valorant')">⚡ Auto-Draft Valorant</button>
-              <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Rocket League')">⚡ Auto-Draft Rocket League</button>
-              <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Slapshot: Rebound')">⚡ Auto-Draft Slapshot</button>
-            </div>
+            <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 0.35rem; background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 60%, var(--accent-purple) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Competitive Matchmaking & Custom Lobbies</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.4;">Join 5v5 / 2v2 queues with ELO MMR auto-balancing, or host your own streamable lobby.</p>
           </div>
         </div>
-          <button class="btn btn-purple" onclick="window.app.openPostGameHonorModal()">
-            ⭐ Award Honor & Flags
-          </button>
-          <button class="btn btn-purple" onclick="window.app.openAntiCheatModal()">
-            🛡️ Guardian Anti-Cheat (Ring 0)
-          </button>
-          <button class="btn btn-purple" onclick="window.app.openTeamLineupModal()">
-            📋 Team Lineup Manager
-          </button>
-          <button class="btn btn-success" id="btnToggleAutoJoin" onclick="window.app.toggleAutoJoinSystem()">
-            ⚡ Auto-Join: OFF
-          </button>
-          <button class="btn btn-purple" onclick="window.app.openChromeExtensionModal()">
-            🧩 Chrome Extension Widget
-          </button>
-          <button class="btn btn-purple" onclick="window.app.openMapVetoModal('Counter-Strike 2')">
-            🗺️ Map Veto Room
-          </button>
-          <button class="btn btn-primary" id="btnJoinQueue">
+
+        <!-- Prominent Primary Call-To-Actions -->
+        <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="btnJoinQueue" style="padding: 0.85rem 1.6rem; font-size: 1.05rem; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);">
             <span>⚡</span> Quick Queue (-join)
           </button>
-          <button class="btn btn-secondary" id="btnCreateLobby">
+          <button class="btn btn-secondary" id="btnCreateLobby" style="padding: 0.85rem 1.6rem; font-size: 1.05rem;">
             <span>➕</span> Host Custom Lobby
           </button>
         </div>
       </div>
 
-      <!-- Queue Status Bar (Hidden until joining queue) -->
+      <!-- Quick Tools & Features Sub-Bar -->
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; background: rgba(14, 18, 28, 0.6); backdrop-filter: blur(10px); padding: 0.6rem 1rem; border-radius: 12px; border: 1px solid var(--border-color); align-items: center; justify-content: space-between;">
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+          <span style="font-size: 0.78rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; margin-right: 0.4rem;">⚡ Quick Tools:</span>
+          <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Counter-Strike 2')">⚡ Auto-Draft</button>
+          <button class="btn btn-purple btn-sm" onclick="window.app.openPostGameHonorModal()">⭐ Honor & Flags</button>
+          <button class="btn btn-purple btn-sm" onclick="window.app.openAntiCheatModal()">🛡️ Guardian AC</button>
+          <button class="btn btn-purple btn-sm" onclick="window.app.openTeamLineupModal()">📋 Lineups</button>
+          <button class="btn btn-purple btn-sm" onclick="window.app.openMapVetoModal('Counter-Strike 2')">🗺️ Map Veto</button>
+          <button class="btn btn-purple btn-sm" onclick="window.app.openChromeExtensionModal()">🧩 Chrome Extension</button>
+        </div>
+        <button class="btn btn-success btn-sm" id="btnToggleAutoJoin" onclick="window.app.toggleAutoJoinSystem()">
+          ⚡ Auto-Join: OFF
+        </button>
+      </div>
+
+      <!-- Queue Status Card (Hidden until joining queue) -->
       <div id="queueStatusCard" class="card" style="display: none; margin-bottom: 1.5rem; border-color: var(--accent-cyan);">
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 1rem;">
@@ -202,24 +198,22 @@
         </div>
       </div>
 
-      <!-- Favorite Games Priority Bar -->
+      <!-- Favorite Games Priority Bar (Decluttered & Streamlined) -->
       <div class="card" style="margin-bottom: 1.5rem; padding: 1rem; border-color: var(--accent-gold);">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-          <div style="display: flex; align-items: center; gap: 0.8rem;">
-            <span style="font-size: 1rem; font-weight: 800; color: var(--accent-gold); display: flex; align-items: center; gap: 0.4rem;">
+          <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+            <span style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); display: flex; align-items: center; gap: 0.4rem;">
               <span>⭐</span> Favorited Games:
             </span>
-            <div id="favoriteGamesTagsContainer" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <div id="favoriteGamesTagsContainer" style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
               <!-- Injected via app.js -->
             </div>
           </div>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
             <button class="btn btn-secondary btn-sm" id="filterAllGames">🎮 All Games</button>
             <button class="btn btn-purple btn-sm" id="filterFavsOnly">⭐ Favorites Only</button>
-            <button class="btn btn-primary" id="btnJoinQueue">🎮 Quick Match Queue</button>
-            <button class="btn btn-purple" id="btnJoinGameDraftPool" style="box-shadow: 0 0 15px rgba(157,78,221,0.4);">⚡ Join Game Draft Pool</button>
-            <button class="btn btn-secondary" id="btnRandomPicker">🎲 Pick Random Game</button>
-            <button class="btn btn-success" id="btnCreateLobby">➕ Create Custom Lobby</button>
+            <button class="btn btn-purple btn-sm" id="btnJoinGameDraftPool" style="box-shadow: 0 0 12px rgba(157,78,221,0.3);">⚡ Join Draft Pool</button>
+            <button class="btn btn-secondary btn-sm" id="btnRandomPicker">🎲 Pick Random</button>
           </div>
         </div>
       </div>
