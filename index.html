@@ -143,7 +143,9 @@
             </div>
           </div>
         </div>
-        <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-purple" onclick="window.app.openPostGameHonorModal()">
+            ⭐ Award Honor & Flags
+          </button>
           <button class="btn btn-purple" onclick="window.app.openAntiCheatModal()">
             🛡️ Guardian Anti-Cheat (Ring 0)
           </button>
@@ -2096,8 +2098,9 @@
           <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 2px solid var(--accent-gold);" id="passportAvatar">👑</div>
           <div>
             <h3 style="font-size: 1.4rem; font-weight: 900; margin: 0;" id="passportName">RadiantReaper</h3>
-            <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.3rem;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.3rem; flex-wrap: wrap;">
               <span class="mmr-badge" id="passportPrimaryRank">🔴 Radiant #14 (2540 MMR)</span>
+              <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 900;" id="passportHonorBadge">👑 Honor Level 5: Legend</span>
               <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);" id="passportACStatus">🛡️ Guardian AC Verified</span>
             </div>
           </div>
@@ -2201,6 +2204,34 @@
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
         <button class="btn btn-purple" onclick="alert('💬 MESSAGE SENT!\n\nDirect message opened on CustomLobbies Chat & Voice Hub!')">💬 Direct Message</button>
         <button class="btn btn-primary" onclick="alert('⚔️ CHALLENGE DISPATCHED!\n\n1v1 Duel challenge invite sent!')">⚔️ Challenge 1v1</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-Game Honor & Misconduct Flag Modal -->
+  <div class="modal-overlay" id="postGameHonorModal">
+    <div class="modal-card" style="max-width: 720px; border-color: var(--accent-gold); box-shadow: 0 0 35px rgba(255, 215, 0, 0.25);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <div style="font-size: 2.2rem; animation: bounce 1s infinite alternate;">🏆</div>
+          <div>
+            <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-gold); margin: 0;">MATCH COMPLETE: Award Honor & Flag Players</h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">Commend honorable teammates or report bad misconduct directly to Guardian AC</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('postGameHonorModal').classList.remove('active')">✕ Close</button>
+      </div>
+
+      <!-- Match Roster Honor & Flag Grid -->
+      <div id="postGameHonorRosterContainer" style="display: flex; flex-direction: column; gap: 0.8rem; max-height: 420px; overflow-y: auto; padding-right: 0.4rem; margin-bottom: 1.2rem;">
+        <!-- Injected via app.js -->
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Honor XP awards +50 Points to teammates & unlocks Honor Level Badges</span>
+        <button class="btn btn-primary" onclick="document.getElementById('postGameHonorModal').classList.remove('active'); alert('🌟 POST-MATCH HONOR SUBMITTED!\n\nAll commendations and reports have been saved to player profiles and logged to Guardian AC.')">
+          💾 Save & Finish Assessment
+        </button>
       </div>
     </div>
   </div>

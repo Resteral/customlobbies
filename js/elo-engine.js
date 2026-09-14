@@ -225,6 +225,21 @@ class EloEngine {
     };
   }
 
+  // Honor & Reputation Level Tiers
+  getHonorTier(honorPoints = 0) {
+    if (honorPoints >= 300) {
+      return { level: 5, name: 'Legend of Honor 👑', badge: '👑 Honor Level 5', color: '#ffd700', icon: '👑' };
+    } else if (honorPoints >= 150) {
+      return { level: 4, name: 'Exemplary Leader', badge: '🌟 Honor Level 4', color: '#a855f7', icon: '🌟' };
+    } else if (honorPoints >= 75) {
+      return { level: 3, name: 'Honorable Competitor', badge: '💙 Honor Level 3', color: '#00f2fe', icon: '💙' };
+    } else if (honorPoints >= 25) {
+      return { level: 2, name: 'Respectable Teammate', badge: '🟢 Honor Level 2', color: '#00e676', icon: '🟢' };
+    } else {
+      return { level: 1, name: 'Novice Recruit', badge: '⚪ Honor Level 1', color: '#8a99ad', icon: '⚪' };
+    }
+  }
+
   // Auto-Balance Team Matchmaker
   autoBalanceTeams(playersPool) {
     const sorted = [...playersPool].sort((a, b) => b.elo - a.elo);

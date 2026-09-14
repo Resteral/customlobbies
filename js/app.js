@@ -2387,6 +2387,14 @@ class CustomLobbiesApp {
     document.getElementById('passportName').textContent = p.name;
     document.getElementById('passportPrimaryRank').textContent = `${p.region} Region • ${p.targetElo || 1840} Rating`;
 
+    const passportHonorBadge = document.getElementById('passportHonorBadge');
+    if (passportHonorBadge) {
+      const hTier = window.eloEngine.getHonorTier(p.honorPoints || 120);
+      passportHonorBadge.textContent = `${hTier.badge}: ${hTier.name}`;
+      passportHonorBadge.style.color = hTier.color;
+      passportHonorBadge.style.borderColor = hTier.color;
+    }
+
     // Per-game ranks grid
     const gamesContainer = document.getElementById('passportGamesGrid');
     if (gamesContainer && p.games) {
@@ -2648,6 +2656,113 @@ class CustomLobbiesApp {
 
       alert(`🛑 REPORT SUBMITTED!\n\nBad remark logged for ${p.name} (${label}). Sent to Guardian Anti-Cheat Moderators for review.`);
     }
+  }
+
+  // --- POST-GAME HONOR & PLAYER FLAGGING SYSTEM ---
+  openPostGameHonorModal(lobbyTitle = 'CS2 Premier 5v5 Scrim') {
+    const modal = document.getElementById('postGameHonorModal');
+    if (!modal) return;
+
+    const rosterContainer = document.getElementById('postGameHonorRosterContainer');
+    if (rosterContainer) {
+      const players = this.leaderboardData.slice(0, 8);
+      rosterContainer.innerHTML = players.map(p => {
+        const hTier = window.eloEngine.getHonorTier(p.honorPoints || 120);
+        const flagStatus = p.standing || '🟢 Clean Standing';
+        return `
+          <div style="background: rgba(0, 0, 0, 0.4); padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.8rem;">
+              <div style="font-size: 1.4rem;">${p.avatar || '🎮'}</div>
+              <div>
+                <div style="font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <span>${p.name}</span>
+                  <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: ${hTier.color}; font-size: 0.7rem; padding: 0.1rem 0.4rem; border: 1px solid ${hTier.color};">${hTier.badge}</span>
+                  <span class="lobby-game-tag" style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted); font-size: 0.7rem; padding: 0.1rem 0.4rem;">${flagStatus}</span>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">${p.region} • ${p.targetElo || 1840} ELO • Honor XP: ${p.honorPoints || 120}</div>
+              </div>
+            </div>
+
+            <!-- Action Buttons: Honor Commendations vs Flags -->
+            <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-secondary btn-sm" style="font-size: 0.72rem; padding: 0.35rem 0.6rem; background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: var(--accent-green);" onclick="window.app.awardPlayerHonor('${p.name}', 'leadership')" title="Commend Leadership & Shotcalling">
+                🧠 Shotcaller (+Honor)
+              </button>
+              <button class="btn btn-secondary btn-sm" style="font-size: 0.72rem; padding: 0.35rem 0.6rem; background: rgba(0, 242, 254, 0.15); border-color: rgba(0, 242, 254, 0.4); color: var(--accent-cyan);" onclick="window.app.awardPlayerHonor('${p.name}', 'friendly')" title="Commend Sportsmanship">
+                🤝 Friendly (+Honor)
+              </button>
+              <button class="btn btn-secondary btn-sm" style="font-size: 0.72rem; padding: 0.35rem 0.6rem; background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: var(--accent-purple);" onclick="window.app.awardPlayerHonor('${p.name}', 'clutch')" title="Commend Clutch Aim Skill">
+                💥 Clutch (+Honor)
+              </button>
+              <button class="btn btn-danger btn-sm" style="font-size: 0.72rem; padding: 0.35rem 0.6rem;" onclick="window.app.flagPlayerMisconduct('${p.name}', 'toxic')" title="Flag Misconduct / Toxicity / Cheating">
+                🚩 Flag Misconduct
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    modal.classList.add('active');
+  }
+
+  awardPlayerHonor(playerName, honorType) {
+    const p = this.leaderboardData.find(user => user.name === playerName);
+    if (!p) return;
+
+    if (!p.honorPoints) p.honorPoints = 40;
+    p.honorPoints += 25;
+
+    if (!p.commendations) p.commendations = { leadership: 10, friendly: 10, clutch: 10, teacher: 5 };
+    p.commendations[honorType] = (p.commendations[honorType] || 0) + 1;
+
+    const hTier = window.eloEngine.getHonorTier(p.honorPoints);
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    if (window.firebaseGoogleEngine && typeof window.firebaseGoogleEngine.speakTextAlert === 'function') {
+      window.firebaseGoogleEngine.speakTextAlert(`Honor awarded to ${p.name}`);
+    }
+
+    this.saveState();
+    this.renderLeaderboard();
+    this.openPostGameHonorModal();
+
+    alert(`🌟 HONOR AWARDED TO ${p.name.toUpperCase()}!\n\n+25 Honor XP granted!\nPlayer Honor Standing: ${hTier.badge}\nSaved to Profile Database!`);
+  }
+
+  flagPlayerMisconduct(playerName, flagCategory) {
+    const p = this.leaderboardData.find(user => user.name === playerName);
+    if (!p) return;
+
+    const reason = prompt(`🚩 FLAG MISCONDUCT FOR ${p.name}:\n\nSelect reason category:\n1 - ☣️ Toxic Chat / Voice\n2 - 🏃 AFK / Abandon Match\n3 - 💥 Griefing / Team Damage\n4 - 🛡️ Suspected Cheating (Ring 0 Telemetry Flag)\n\nEnter choice (1-4):`, '1');
+    if (!reason) return;
+
+    if (!p.badRemarks) p.badRemarks = { toxic: 0, afk: 0, griefing: 0, suspected: 0 };
+    if (!p.flagCount) p.flagCount = 0;
+
+    let catKey = 'toxic';
+    let label = 'Toxic Behavior';
+
+    if (reason === '2') { catKey = 'afk'; label = 'AFK / Abandon'; }
+    else if (reason === '3') { catKey = 'griefing'; label = 'Griefing'; }
+    else if (reason === '4') { catKey = 'suspected'; label = 'Suspected AC Violation'; }
+
+    p.badRemarks[catKey] = (p.badRemarks[catKey] || 0) + 1;
+    p.flagCount += 1;
+    p.standing = p.flagCount > 3 ? '🔴 Under AC Audit' : '🟡 Caution Flagged';
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('hitmarker');
+    }
+
+    this.saveState();
+    this.renderLeaderboard();
+    this.openPostGameHonorModal();
+
+    alert(`🚩 PLAYER FLAGGED!\n\nMisconduct flag logged for ${p.name} (${label}).\nAccount Standing: ${p.standing}.\nDispatched to Guardian Anti-Cheat Moderators.`);
   }
 
   // --- GUARDIAN KERNEL ANTI-CHEAT ENGINE ---
