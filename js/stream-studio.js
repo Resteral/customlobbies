@@ -49,6 +49,30 @@ class StreamStudioEngine {
         claimed: false,
         thumb: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&auto=format&fit=crop&q=80',
         videoURL: '#'
+      },
+      {
+        id: 504,
+        title: '⚡ Empulse Facility 5K Electro-Pulse Wipe',
+        game: 'Empulse',
+        trigger: '⚡ 5K Electro-Pulse Wipe',
+        duration: '0:19',
+        date: '2h ago',
+        clPointsEarned: 25,
+        claimed: false,
+        thumb: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&auto=format&fit=crop&q=80',
+        videoURL: '#'
+      },
+      {
+        id: 505,
+        title: '🎯 Neon Skyline Apex Striker Railgun Headshot Ace',
+        game: 'Empulse',
+        trigger: '🎯 1v3 Overcharge Clutch',
+        duration: '0:16',
+        date: '3h ago',
+        clPointsEarned: 25,
+        claimed: false,
+        thumb: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop&q=80',
+        videoURL: '#'
       }
     ];
   }

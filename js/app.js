@@ -62,6 +62,7 @@ class CustomLobbiesApp {
     this.loadFavorites();
 
     this.sponsoredServers = [
+      { id: 318, name: 'Empulse 5v5 Cyber Arena Server Node #1', game: 'Empulse', host: 'Empulse_Overlord', players: 9, max: 10, connectURL: 'steam://connect/192.168.1.120:27015', sponsoredBadge: '⚡ EMPULSE SPONSOR' },
       { id: 316, name: 'REMATCH 5v5 Competitive Arena Node #1', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, connectURL: 'steam://connect/192.168.1.110:27015', sponsoredBadge: '🔥 REMATCH SPONSOR' },
       { id: 317, name: 'Arkheron 12-Player Cyber Scrim Spire', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, connectURL: 'steam://connect/192.168.1.115:27015', sponsoredBadge: '⚔️ ARKHERON SPONSOR' },
       { id: 314, name: 'CS2 128-Tick Auto-Bhop Speedrun Server', game: 'CS2 Bhop (Auto & Scroll)', host: 'Bhop_God', players: 18, max: 24, connectURL: 'steam://connect/192.168.1.100:27015', sponsoredBadge: '🐰 BHOP SPONSOR' },
@@ -70,6 +71,7 @@ class CustomLobbiesApp {
     ];
 
     this.lobbies = [
+      { id: 13, title: 'Empulse 5v5 Apex Striker Cyber Arena Scrims', game: 'Empulse', host: 'Empulse_Overlord', players: 9, max: 10, region: 'NA East', draftType: 'Captain Snake Draft' },
       { id: 12, title: 'REMATCH 5v5 High ELO Champion Scrims', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, region: 'NA East', draftType: 'Captain Draft' },
       { id: 11, title: 'Arkheron Cyber Spire Battle Scrims', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, region: 'NA East', draftType: 'Battle Draft' },
       { id: 9, title: 'CS2 FACEIT Level 8-10 Premier Scrims', game: 'Counter-Strike 2', host: 'ApexGod99', players: 9, max: 10, region: 'NA East', draftType: 'FACEIT Pro League' },
@@ -97,6 +99,7 @@ class CustomLobbiesApp {
           'Counter-Strike 2': { elo: 2540, wins: 142, losses: 28, winRate: 83.5, kd: '2.14', mvp: 48 },
           'REMATCH': { elo: 2480, wins: 115, losses: 20, winRate: 85.1, kd: '2.30', mvp: 40 },
           'Arkheron': { elo: 2200, wins: 95, losses: 18, winRate: 84.0, kd: '2.45', mvp: 35 },
+          'Empulse': { elo: 2450, wins: 105, losses: 15, winRate: 87.5, kd: '2.55', mvp: 38 },
           'Valorant': { elo: 2350, wins: 110, losses: 22, winRate: 83.3, kd: '1.98', mvp: 35 },
           'Marvel Rivals': { elo: 2400, wins: 88, losses: 15, winRate: 85.4, kd: '3.10', mvp: 30 },
           'Apex Legends': { elo: 2650, wins: 95, losses: 18, winRate: 84.0, kd: '3.45', mvp: 42 },
@@ -121,6 +124,7 @@ class CustomLobbiesApp {
           'Counter-Strike 2': { elo: 2150, wins: 98, losses: 31, winRate: 76.0, kd: '1.75', mvp: 32 },
           'REMATCH': { elo: 1950, wins: 70, losses: 28, winRate: 71.4, kd: '1.85', mvp: 25 },
           'Arkheron': { elo: 1750, wins: 62, losses: 25, winRate: 71.2, kd: '1.90', mvp: 22 },
+          'Empulse': { elo: 2150, wins: 85, losses: 20, winRate: 81.0, kd: '2.10', mvp: 28 },
           'Valorant': { elo: 2100, wins: 82, losses: 24, winRate: 77.3, kd: '1.68', mvp: 24 },
           'Apex Legends': { elo: 2580, wins: 112, losses: 20, winRate: 84.8, kd: '3.20', mvp: 50 },
           'Rocket League': { elo: 1850, wins: 64, losses: 30, winRate: 68.1, kd: 'N/A', mvp: 18 },

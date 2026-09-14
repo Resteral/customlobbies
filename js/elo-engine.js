@@ -35,6 +35,11 @@ class EloEngine {
       'REMATCH': 10,
       'Arkheron': 12,
       'Empulse': 10,
+      'Empulse 5v5 Cyber Arena': 10,
+      'Empulse Overcharge Control': 12,
+      'Empulse 10v10 Domination': 20,
+      'Empulse 1v1 Railgun Duel': 2,
+      'Empulse Electro Speedrun': 16,
       'Marvel Rivals': 12,
       'Deadlock': 12,
       'The Finals': 6,
@@ -66,10 +71,12 @@ class EloEngine {
         { min: 1801, max: 9999, name: 'Arkheron Overlord', badge: '👑 Arkheron Overlord', color: '#ff1744' }
       ],
       'Empulse': [
-        { min: 0, max: 500, name: 'Empulse Cadet', badge: '⚪ Cadet', color: '#a0a0a0' },
-        { min: 501, max: 1200, name: 'Specialist Operative', badge: '🩵 Specialist', color: '#00e5ff' },
-        { min: 1201, max: 1900, name: 'Empulse Commando', badge: '🟢 Commando', color: '#00e676' },
-        { min: 1901, max: 9999, name: 'Empulse Legend', badge: '⚡ Empulse Legend', color: '#ff1744' }
+        { min: 0, max: 400, name: 'Empulse Cadet', badge: '⚪ Cadet', color: '#a0a0a0' },
+        { min: 401, max: 800, name: 'Specialist Operative', badge: '🩵 Specialist', color: '#00e5ff' },
+        { min: 801, max: 1300, name: 'Empulse Commando', badge: '🟢 Commando', color: '#00e676' },
+        { min: 1301, max: 1800, name: 'Apex Striker', badge: '🟣 Apex Striker', color: '#b388ff' },
+        { min: 1801, max: 2300, name: 'Empulse Overlord', badge: '🔮 Overlord', color: '#aa00ff' },
+        { min: 2301, max: 9999, name: 'Empulse Legend', badge: '⚡ Empulse Legend', color: '#ff1744' }
       ],
       'Marvel Rivals': [
         { min: 0, max: 400, name: 'Bronze Rank', badge: '🤎 Bronze', color: '#cd7f32' },
@@ -149,7 +156,7 @@ class EloEngine {
       'Valorant': ['Ascent', 'Bind', 'Haven', 'Split', 'Lotus', 'Sunset'],
       'REMATCH': ['Nexus Arena', 'Cyber City', 'Sub-Zero Station', 'Viper Base'],
       'Arkheron': ['Arkheron Spire', 'Quantum Ruins', 'Oblivion Core'],
-      'Empulse': ['Empulse Facility', 'Neon Skyline', 'Pulse Station'],
+      'Empulse': ['Empulse Facility', 'Neon Skyline', 'Pulse Station', 'Cyber Core', 'Overcharge Dome', 'Vector Sector', 'Hyperion Matrix'],
       'Marvel Rivals': ['Tokyo 2099', 'Yggsgard', 'Wakanda Imperial'],
       'Deadlock': ['Cursed City Canyons', 'Midtown Lanes'],
       'The Finals': ['Monaco', 'Seoul', 'Las Vegas', 'Skyway Stadium'],
