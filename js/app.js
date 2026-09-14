@@ -235,6 +235,7 @@ class CustomLobbiesApp {
     this.renderLeaderboard();
     this.renderLeaguesView();
     this.renderWardogsView();
+    this.renderMatchmakingHub();
     this.setupQueueButtons();
     this.setupModalHandlers();
     this.setupAutoDraftHandlers();
@@ -1159,6 +1160,57 @@ class CustomLobbiesApp {
   closeWardogsDraftModal() {
     const modal = document.getElementById('wardogsRankedDraftModal');
     if (modal) modal.classList.remove('active');
+  }
+
+  // Dedicated Ranked Matchmaking Hub Implementation
+  renderMatchmakingHub() {
+    const historyContainer = document.getElementById('mmMatchHistoryGrid');
+    if (!historyContainer || !window.matchmakingHubEngine) return;
+
+    const history = window.matchmakingHubEngine.matchHistory;
+
+    historyContainer.innerHTML = history.map(m => `
+      <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <span style="font-size: 1.4rem;">${m.result.includes('VICTORY') ? '🏆' : '💔'}</span>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #fff;">${m.game} • ${m.mode} <span style="font-size: 0.8rem; color: var(--text-muted);">(${m.map})</span></div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">MVP: <strong style="color: var(--accent-cyan);">${m.mvp}</strong> | ${m.date}</div>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-weight: 900; font-size: 0.95rem; color: ${m.result.includes('VICTORY') ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.result}</div>
+          <div style="font-weight: 800; font-size: 0.82rem; color: ${m.eloChange.includes('+') ? 'var(--accent-gold)' : 'var(--accent-red)'};">${m.eloChange}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  startMatchmakingQueue() {
+    const game = document.getElementById('mmGameSelect').value;
+    const mode = document.getElementById('mmModeSelect').value;
+    const region = document.getElementById('mmRegionSelect').value;
+
+    if (window.matchmakingHubEngine) {
+      window.matchmakingHubEngine.startMatchmakingQueue(game, mode, region);
+    }
+  }
+
+  cancelMatchmakingQueue() {
+    if (window.matchmakingHubEngine) {
+      window.matchmakingHubEngine.stopMatchmakingQueue(true);
+    }
+  }
+
+  onMatchmakingGameChange(gameName) {
+    const modeSelect = document.getElementById('mmModeSelect');
+    if (!modeSelect) return;
+
+    if (gameName === 'Slapshot: Rebound' || gameName === 'Rocket League') {
+      modeSelect.value = '3v3 Arcade Hockey';
+    } else {
+      modeSelect.value = '5v5 Premier Scrim';
+    }
   }
 
   flipCaptainCoin() {

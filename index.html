@@ -57,6 +57,9 @@
       <button class="nav-btn" data-tab="integrations-view">
         <span>🔌</span> Integrations
       </button>
+      <button class="nav-btn" data-tab="matchmaking-view">
+        <span>🎯</span> Matchmaking
+      </button>
       <button class="nav-btn" data-tab="leagues-view">
         <span>🏆</span> Esports Leagues
       </button>
@@ -1070,6 +1073,140 @@
           <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 0.4rem;">CustomLobbies Native Stream Node Active</h4>
           <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">Broadcasting via RTMP / WebRTC Ingest Node • 1080p 60FPS Low Latency (0.2s)</p>
           <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-weight: 900;">🟢 LIVE • 247 Viewers</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5.2 COMPETITIVE RANKED MATCHMAKING HUB VIEW -->
+    <section id="matchmaking-view" class="view-section">
+      <div class="lobby-header-banner" style="background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(157, 78, 221, 0.2)); border: 1px solid var(--accent-cyan); margin-bottom: 1.5rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <span style="font-size: 2.6rem;">🎯</span>
+            <div>
+              <h1 style="font-size: 1.9rem; font-weight: 900; color: #fff; margin: 0;">Ranked Competitive Matchmaking Hub</h1>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">FACEIT-Style ELO Rating MM • 128-Tick Dedicated Servers • Guardian Anti-Cheat Protected</p>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.8rem; align-items: center;">
+          <span class="mmr-badge" style="font-size: 0.9rem; padding: 0.5rem 1rem;">👑 Level 8 (1840 ELO)</span>
+          <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 0.4rem 0.8rem; font-size: 0.85rem; font-weight: 900;">
+            🛡️ Guardian AC Verified
+          </span>
+        </div>
+      </div>
+
+      <!-- Searching Radar Animation Banner (Appears when in queue) -->
+      <div style="display: none; background: rgba(0, 229, 255, 0.12); border: 2px solid var(--accent-cyan); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; align-items: center; justify-content: space-between;" id="matchmakingRadarBanner">
+        <div style="display: flex; align-items: center; gap: 1.25rem;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--accent-cyan); border-top-color: transparent; animation: spin 1s linear infinite;"></div>
+          <div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: var(--accent-cyan);" id="mmSearchStatusText">⚡ SEARCHING FOR COMPETITIVE SCRIM...</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;" id="mmPlayerCountDisplay">1 / 10 Players Found • Balancing ELO MMR Delta...</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <span style="font-size: 1.3rem; font-weight: 900; color: var(--accent-gold);" id="mmSearchTimerDisplay">⏱️ 00:00</span>
+          <button class="btn btn-danger" style="width: auto; padding: 0.6rem 1.2rem;" onclick="window.app.cancelMatchmakingQueue()">
+            ❌ Cancel Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Matchmaking Options & Queue Controls Grid -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        <!-- Left: Game & Mode Selection Board -->
+        <div class="card">
+          <h3 style="font-size: 1.2rem; font-weight: 900; color: var(--accent-gold); margin-bottom: 1rem;">🎮 Choose Game & Match Mode</h3>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+            <div>
+              <label class="input-label">Select Game Title</label>
+              <select class="input-field" id="mmGameSelect" onchange="window.app.onMatchmakingGameChange(this.value)">
+                <option value="Counter-Strike 2" selected>Counter-Strike 2</option>
+                <option value="Valorant">Valorant</option>
+                <option value="Empulse">Empulse</option>
+                <option value="REMATCH">REMATCH</option>
+                <option value="Slapshot: Rebound">Slapshot: Rebound</option>
+                <option value="Arkheron">Arkheron</option>
+                <option value="Marvel Rivals">Marvel Rivals</option>
+                <option value="Deadlock">Deadlock</option>
+                <option value="The Finals">The Finals</option>
+                <option value="Apex Legends">Apex Legends</option>
+                <option value="Rocket League">Rocket League</option>
+              </select>
+            </div>
+            <div>
+              <label class="input-label">Match Mode</label>
+              <select class="input-field" id="mmModeSelect">
+                <option value="5v5 Premier Scrim" selected>5v5 Premier Scrim (BO1 Map Veto)</option>
+                <option value="2v2 Wingman">2v2 Wingman Tactical</option>
+                <option value="1v1 Aim Duel">1v1 Aim Arena Ladder</option>
+                <option value="3v3 Arcade Hockey">3v3 Arcade Hockey / Brawler</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <label class="input-label">Server Region</label>
+              <select class="input-field" id="mmRegionSelect">
+                <option value="US East (12ms)" selected>US East (12ms Ping)</option>
+                <option value="US West (42ms)">US West (42ms Ping)</option>
+                <option value="EU Central (78ms)">EU Central (78ms Ping)</option>
+                <option value="Asia Pacific (110ms)">Asia Pacific (110ms Ping)</option>
+              </select>
+            </div>
+            <div>
+              <label class="input-label">Max Acceptable Ping</label>
+              <select class="input-field">
+                <option value="50">Max 50ms Ping</option>
+                <option value="80" selected>Max 80ms Ping</option>
+                <option value="120">Max 120ms Ping</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Large Neon Queue Action Buttons -->
+          <button class="btn btn-primary btn-block" style="font-size: 1.1rem; padding: 1rem;" id="btnStartMatchmakingAction" onclick="window.app.startMatchmakingQueue()">
+            <span>⚡</span> FIND RANKED MATCH (QUEUE NOW)
+          </button>
+          <button class="btn btn-danger btn-block" style="font-size: 1.1rem; padding: 1rem; display: none;" id="btnCancelMatchmakingAction" onclick="window.app.cancelMatchmakingQueue()">
+            <span>❌</span> CANCEL MATCHMAKING QUEUE
+          </button>
+        </div>
+
+        <!-- Right: Party Queue & MMR Status Card -->
+        <div>
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 900; color: var(--accent-purple); margin-bottom: 0.8rem;">👥 Party Queue Roster</h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Invite party members to queue together into Ranked Scrims!</p>
+
+            <div style="background: rgba(0,0,0,0.4); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; margin-bottom: 0.4rem;">
+                <span>You (Host)</span>
+                <span style="color: var(--accent-gold);">1840 ELO</span>
+              </div>
+              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-size: 0.72rem;">✔ Ready</span>
+            </div>
+
+            <button class="btn btn-secondary btn-block" onclick="alert('➕ PARTY INVITE SENT!\n\nDirect party invite link copied to clipboard & sent to CustomLobbies Chat!')">
+              ➕ Invite Party Member
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Ranked Match History Scorecards -->
+      <div class="card">
+        <h3 style="font-size: 1.2rem; font-weight: 900; color: var(--accent-cyan); margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>📜 Recent Ranked Match Scorecards</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">FACEIT Verified Logs</span>
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 0.8rem;" id="mmMatchHistoryGrid">
+          <!-- Injected via JS -->
         </div>
       </div>
     </section>
@@ -2332,6 +2469,7 @@
   <script src="js/tournaments-store.js"></script>
   <script src="js/leagues-engine.js"></script>
   <script src="js/wardogs-engine.js"></script>
+  <script src="js/matchmaking-hub.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
