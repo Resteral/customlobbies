@@ -1383,7 +1383,7 @@
           <button class="btn btn-secondary" onclick="window.app.openWardogsTeamModal()">
             <span>🛡️</span> Register Squad Unit
           </button>
-          <button class="btn btn-primary" onclick="window.app.runWardogsRankedDraft()">
+          <button class="btn btn-primary" onclick="window.app.start99PlayerQueue()">
             <span>⚡</span> Ranked Match Selection Draft
           </button>
         </div>
@@ -2562,6 +2562,57 @@
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
         <button class="btn btn-secondary" onclick="window.app.closeWardogsTeamModal()">Cancel</button>
         <button class="btn btn-primary" onclick="window.app.submitWardogsTeam()">Register Squad Unit 🛡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WARDOGS 99-PLAYER SERVER LOBBY POOL QUEUE MODAL -->
+  <div class="modal-overlay" id="wardogsPoolQueueModal">
+    <div class="modal-card" style="max-width: 680px; width: 95%; border-color: #ff6f00; background: linear-gradient(135deg, rgba(20, 24, 36, 0.98), rgba(10, 12, 18, 0.99));">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 2rem;">🐕</span>
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: #ffab00; margin: 0;">99-Player Server Lobby Queue Pool</h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Queueing operatives & squad units into 128-tick server node...</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeWardogsPoolQueueModal()">✕ Leave Queue</button>
+      </div>
+
+      <!-- Live Server Pool Fill Bar -->
+      <div style="background: rgba(0, 0, 0, 0.5); padding: 1.25rem; border-radius: 10px; border: 1px solid rgba(255, 111, 0, 0.4); margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+          <span style="font-weight: 800; font-size: 0.9rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.4rem;">
+            <span class="live-dot" style="width: 10px; height: 10px; background: #00e676;"></span>
+            <span>Dedicated Server Node: US-EAST-WARNODE-42</span>
+          </span>
+          <span style="font-weight: 900; font-size: 1rem; color: #ffab00;" id="queue99CounterText">0 / 99 Operatives Queued (0%)</span>
+        </div>
+
+        <div style="width: 100%; height: 14px; background: rgba(255,255,255,0.1); border-radius: 7px; overflow: hidden; margin-bottom: 0.8rem; border: 1px solid var(--border-color);">
+          <div id="queue99ProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff6f00, #ffab00, #00e5ff); transition: width 0.3s ease;"></div>
+        </div>
+
+        <div style="font-size: 0.82rem; color: var(--text-muted); text-align: center;" id="queue99StatusText">
+          ⏳ Queueing solo mercenaries & squad units into server pool... When server reaches 99/99, selection draft triggers automatically!
+        </div>
+      </div>
+
+      <!-- Real-Time Queue Pool Live Feed -->
+      <div style="margin-bottom: 1.25rem;">
+        <div style="font-size: 0.82rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+          <span>Live Operative Queue Feed</span>
+          <span style="color: var(--accent-gold);">128-Tick Sync</span>
+        </div>
+        <div id="queue99RosterList" style="max-height: 200px; overflow-y: auto; background: rgba(0, 0, 0, 0.4); padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <!-- Dynamic queue entries injected here -->
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeWardogsPoolQueueModal()">❌ Cancel Queue</button>
+        <button class="btn btn-purple btn-sm" onclick="window.app.fillQueueImmediately()">⚡ Instant Fill (99/99 Test)</button>
       </div>
     </div>
   </div>

@@ -1129,7 +1129,7 @@ class CustomLobbiesApp {
                 <span class="lobby-game-tag" style="background: rgba(255, 111, 0, 0.3); color: #ffab00; font-weight: 900;">33 v 33 v 33 TRI-FACTION WAR ZONE</span>
                 <h3 style="font-size: 1.35rem; font-weight: 900; color: #fff; margin: 0.3rem 0 0 0;">Sector 33 Tactical Operations Command</h3>
               </div>
-              <button class="btn btn-purple" style="width: auto;" onclick="window.app.runWardogsRankedDraft()">⚡ LAUNCH 99-PLAYER TRI-FACTION DRAFT</button>
+              <button class="btn btn-purple" style="width: auto;" onclick="window.app.start99PlayerQueue()">⚡ LAUNCH 99-PLAYER TRI-FACTION DRAFT</button>
             </div>
 
             <!-- Sector Grid -->
@@ -1441,6 +1441,93 @@ class CustomLobbiesApp {
     this.switchWardogsMode('squads');
 
     alert(`🎉 SQUAD UNIT REGISTERED!\n\nSquad "${squadName} [${tag.toUpperCase()}]" registered into WARDOGS Mercenary League!\n\nEarned +100 🪙 CL-Points!`);
+  }
+
+  start99PlayerQueue() {
+    const modal = document.getElementById('wardogsPoolQueueModal');
+    if (!modal) {
+      this.runWardogsRankedDraft();
+      return;
+    }
+
+    modal.style.display = 'flex';
+    let queuedCount = Math.floor(Math.random() * 25) + 20; // Initial lobby pool count
+    const progressBar = document.getElementById('queue99ProgressBar');
+    const counterText = document.getElementById('queue99CounterText');
+    const statusText = document.getElementById('queue99StatusText');
+    const rosterList = document.getElementById('queue99RosterList');
+
+    if (rosterList) rosterList.innerHTML = '';
+    if (this.queue99Interval) clearInterval(this.queue99Interval);
+
+    const callsigns = ['VIPER-1', 'HAMMER-6', 'VALKYRIE-3', 'SPECTRE-4', 'ALPHA-DOG', 'SHADOW-9', 'IRON-CLAW', 'TITAN-1', 'GHOST-7', 'K9-VANGUARD'];
+
+    const updatePoolUI = () => {
+      const pct = Math.round((queuedCount / 99) * 100);
+      if (progressBar) progressBar.style.width = `${pct}%`;
+      if (counterText) counterText.textContent = `${queuedCount} / 99 Operatives Queued (${pct}%)`;
+
+      if (rosterList) {
+        const randomCall = callsigns[Math.floor(Math.random() * callsigns.length)];
+        const newItem = document.createElement('div');
+        newItem.style.cssText = 'padding: 0.3rem 0.6rem; background: rgba(0, 242, 254, 0.08); border-radius: 4px; font-size: 0.78rem; display: flex; justify-content: space-between; margin-bottom: 0.25rem; border: 1px solid rgba(0, 242, 254, 0.2);';
+        newItem.innerHTML = `<span>🟢 Operative_${randomCall}_${queuedCount} queued into Server Node</span><span style="color: var(--accent-cyan); font-weight: 700;">Slot #${queuedCount}</span>`;
+        rosterList.insertBefore(newItem, rosterList.firstChild);
+      }
+    };
+
+    updatePoolUI();
+
+    this.queue99Interval = setInterval(() => {
+      queuedCount += Math.floor(Math.random() * 7) + 3;
+      if (queuedCount >= 99) {
+        queuedCount = 99;
+        updatePoolUI();
+        clearInterval(this.queue99Interval);
+
+        if (statusText) {
+          statusText.innerHTML = '🎉 <strong style="color: var(--accent-green); font-size: 0.95rem;">SERVER FULL! 99/99 COMBATANTS QUEUED!</strong> Executing Tri-Faction Selection Draft...';
+        }
+
+        if (window.widgetBuilderEngine) {
+          window.widgetBuilderEngine.playSoundEffect('match_found');
+        }
+
+        setTimeout(() => {
+          modal.style.display = 'none';
+          this.runWardogsRankedDraft();
+        }, 1100);
+      } else {
+        updatePoolUI();
+      }
+    }, 280);
+  }
+
+  fillQueueImmediately() {
+    if (this.queue99Interval) clearInterval(this.queue99Interval);
+    const modal = document.getElementById('wardogsPoolQueueModal');
+    const progressBar = document.getElementById('queue99ProgressBar');
+    const counterText = document.getElementById('queue99CounterText');
+    const statusText = document.getElementById('queue99StatusText');
+
+    if (progressBar) progressBar.style.width = '100%';
+    if (counterText) counterText.textContent = '99 / 99 Operatives Queued (100%)';
+    if (statusText) statusText.innerHTML = '🎉 <strong style="color: var(--accent-green);">SERVER FULL! 99/99 COMBATANTS QUEUED!</strong> Launching 33v33v33 Selection Draft...';
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('match_found');
+    }
+
+    setTimeout(() => {
+      if (modal) modal.style.display = 'none';
+      this.runWardogsRankedDraft();
+    }, 600);
+  }
+
+  closeWardogsPoolQueueModal() {
+    if (this.queue99Interval) clearInterval(this.queue99Interval);
+    const modal = document.getElementById('wardogsPoolQueueModal');
+    if (modal) modal.style.display = 'none';
   }
 
   runWardogsRankedDraft() {
