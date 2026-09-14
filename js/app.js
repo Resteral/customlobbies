@@ -223,6 +223,37 @@ class CustomLobbiesApp {
         }
       }
     ];
+
+    this.loadState();
+  }
+
+  loadState() {
+    try {
+      const savedPoints = localStorage.getItem('cl_points_v2');
+      if (savedPoints) this.clPoints = parseInt(savedPoints);
+      const savedLobbies = localStorage.getItem('cl_lobbies_v2');
+      if (savedLobbies) this.lobbies = JSON.parse(savedLobbies);
+      const savedPool = localStorage.getItem('cl_pool_v2');
+      if (savedPool) this.poolFeed = JSON.parse(savedPool);
+      const savedTitle = localStorage.getItem('cl_title_v2');
+      if (savedTitle) this.equippedTitle = savedTitle;
+      const savedLeaderboard = localStorage.getItem('cl_leaderboard_v2');
+      if (savedLeaderboard) this.leaderboardData = JSON.parse(savedLeaderboard);
+    } catch (e) {
+      console.warn('Error loading app state:', e);
+    }
+  }
+
+  saveState() {
+    try {
+      localStorage.setItem('cl_points_v2', this.clPoints.toString());
+      localStorage.setItem('cl_lobbies_v2', JSON.stringify(this.lobbies));
+      localStorage.setItem('cl_pool_v2', JSON.stringify(this.poolFeed));
+      localStorage.setItem('cl_title_v2', this.equippedTitle);
+      localStorage.setItem('cl_leaderboard_v2', JSON.stringify(this.leaderboardData));
+    } catch (e) {
+      console.warn('Error saving app state:', e);
+    }
   }
 
   init() {
@@ -446,6 +477,7 @@ class CustomLobbiesApp {
     if (el) el.textContent = `${this.clPoints.toLocaleString()} Points`;
     const passportTitle = document.getElementById('userPassportTitle');
     if (passportTitle) passportTitle.textContent = this.equippedTitle;
+    this.saveState();
   }
 
   renderPoolFeed() {
@@ -2291,6 +2323,7 @@ class CustomLobbiesApp {
           draftType: 'FACEIT Competitive'
         });
 
+        this.saveState();
         this.renderActiveGamesBar();
         this.renderLobbies();
         modal.classList.remove('active');

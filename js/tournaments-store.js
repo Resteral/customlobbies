@@ -53,6 +53,31 @@ class TournamentsStoreEngine {
         }
       }
     ];
+
+    this.loadState();
+  }
+
+  loadState() {
+    try {
+      const savedT = localStorage.getItem('cl_tournaments_v2');
+      if (savedT) this.tournaments = JSON.parse(savedT);
+      const savedB = localStorage.getItem('cl_wallet_balance_v2');
+      if (savedB) this.walletBalance = parseFloat(savedB);
+      const savedTr = localStorage.getItem('cl_account_trophies_v2');
+      if (savedTr) this.accountTrophies = JSON.parse(savedTr);
+    } catch (e) {
+      console.warn('Error loading tournament state:', e);
+    }
+  }
+
+  saveState() {
+    try {
+      localStorage.setItem('cl_tournaments_v2', JSON.stringify(this.tournaments));
+      localStorage.setItem('cl_wallet_balance_v2', this.walletBalance.toString());
+      localStorage.setItem('cl_account_trophies_v2', JSON.stringify(this.accountTrophies));
+    } catch (e) {
+      console.warn('Error saving tournament state:', e);
+    }
   }
 
   init() {
@@ -135,6 +160,7 @@ class TournamentsStoreEngine {
       window.widgetBuilderEngine.playSoundEffect('fanfare');
     }
 
+    this.saveState();
     this.renderTournaments();
     alert(`🏅 ADVANCED TEAM!\n\n"${winningTeamName}" has won their match and advanced to the next bracket round!`);
   }
@@ -218,6 +244,7 @@ class TournamentsStoreEngine {
           }
         });
 
+        this.saveState();
         this.renderTournaments();
         alert(`✅ PAYMENT SUCCESSFUL!\n\nTransaction ID: tx_${Math.random().toString(36).substring(2, 10)}\nTotal Paid: $${this.pendingTournamentData.total.toFixed(2)} USD\n\nYour tournament "${this.pendingTournamentData.title}" is now LIVE on CustomLobbies with Highest ELO Bracket Seeding!`);
         this.pendingTournamentData = null;
@@ -271,6 +298,8 @@ class TournamentsStoreEngine {
       game: 'CustomLobbies Cup',
       tier: 'Highest ELO Tournament Winner'
     };
+    this.accountTrophies.unshift(newTrophy);
+    this.saveState();
 
     this.accountTrophies.unshift(newTrophy);
     this.renderTrophyCabinet();

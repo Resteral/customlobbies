@@ -1,4 +1,4 @@
-/* CustomLobbies.com - WARDOGS 33v33v33 (99-Player) Tri-Faction Tactical Engine */
+/* CustomLobbies.com - WARDOGS 33v33v33 (99-Player) Tri-Faction Tactical Engine with Local Storage Persistence */
 class WardogsEngine {
   constructor() {
     this.divisionName = 'WARDOGS 33 v 33 v 33 Tri-Faction Mercenary League';
@@ -28,39 +28,63 @@ class WardogsEngine {
       '📻 Comms Specialist': { primary: 'AUG / SG 553 Rifle', secondary: 'Five-SeveN', gadget: 'Tactical Respawn Beacon', perk: 'Field Medic Revive (+50 HP)' }
     };
 
-    // Solo Mercenary Recruitment Pool
+    // Default Solo Mercenaries
     this.soloMercenaries = [
       { id: 101, name: 'Ghost_Dog_99', callsign: 'VIPER-1', game: 'Counter-Strike 2', role: '🎯 Marksman / Sniper', elo: 2580, kd: '2.35', status: 'Selected for Ranked', contracts: 42, acVerified: true, badge: '🏆 Season 3 Champion', bountyEarned: '$6,400' },
       { id: 102, name: 'Sargeant_Iron', callsign: 'HAMMER-6', game: 'Empulse', role: '⚡ Breacher / Assault', elo: 2450, kd: '2.10', status: 'Available', contracts: 38, acVerified: true, badge: '⚡ Demolitions Expert', bountyEarned: '$4,800' },
       { id: 103, name: 'Valkyrie_Merc', callsign: 'VALKYRIE-3', game: 'Valorant', role: '🧠 Recon / Scout', elo: 2390, kd: '1.95', status: 'Available', contracts: 29, acVerified: true, badge: '🎯 Intel Specialist', bountyEarned: '$3,200' },
-      { id: 104, name: 'Shadow_K9', callsign: 'SPECTRE-4', game: 'REMATCH', role: '📻 Comms Specialist', elo: 2480, kd: '2.20', status: 'Selected for Ranked', contracts: 35, acVerified: true, badge: '📡 Tactical Commander', bountyEarned: '$5,100' },
-      { id: 105, name: 'Puck_Hunter', callsign: 'APEX-2', game: 'Slapshot: Rebound', role: '⚡ Breacher / Assault', elo: 2610, kd: '2.50', status: 'Selected for Ranked', contracts: 50, acVerified: true, badge: '🏒 Cyber Enforcer', bountyEarned: '$8,900' },
-      { id: 106, name: 'Cursed_Operator', callsign: 'PHANTOM-5', game: 'Deadlock', role: '🎯 Marksman / Sniper', elo: 2250, kd: '1.85', status: 'Available', contracts: 18, acVerified: true, badge: '🎯 Lone Wolf', bountyEarned: '$2,100' },
-      { id: 107, name: 'Arkheron_Vanguard', callsign: 'TITAN-7', game: 'Arkheron', role: '🛡️ Heavy / Tank', elo: 2310, kd: '2.05', status: 'Available', contracts: 24, acVerified: true, badge: '🛡️ Fortress Shield', bountyEarned: '$3,600' }
+      { id: 104, name: 'Shadow_K9', callsign: 'SPECTRE-4', game: 'REMATCH', role: '📻 Comms Specialist', elo: 2480, kd: '2.20', status: 'Selected for Ranked', contracts: 35, acVerified: true, badge: '📡 Tactical Commander', bountyEarned: '$5,100' }
     ];
 
-    // Registered Squad Units / Mercenary Battalions (33-Man Companies)
+    // Default Squad Units
     this.registeredSquads = [
       { id: 201, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', game: 'Counter-Strike 2', record: '18W - 2L', membersCount: 33, status: 'SELECTED FOR RANKED', bountyEarned: '$12,500', faction: '🔵 Vanguard Command' },
-      { id: 202, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', game: 'Empulse', record: '15W - 3L', membersCount: 33, status: 'ACTIVE CONTRACT', bountyEarned: '$8,200', faction: '🔴 Apex Raiders' },
-      { id: 203, name: 'Phantom Brigade Charlie', tag: '[K9-PHANTOM]', captain: 'Shadow_K9', game: 'REMATCH', record: '14W - 1L', membersCount: 33, status: 'ACTIVE CONTRACT', bountyEarned: '$9,400', faction: '🟡 Cyber Spectre' },
-      { id: 204, name: 'Slapshot Cyber Hounds', tag: '[HOUNDS]', captain: 'Puck_Hunter', game: 'Slapshot: Rebound', record: '12W - 0L', membersCount: 33, status: 'SELECTED FOR RANKED', bountyEarned: '$7,800', faction: '🔵 Vanguard Command' }
+      { id: 202, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', game: 'Empulse', record: '15W - 3L', membersCount: 33, status: 'ACTIVE CONTRACT', bountyEarned: '$8,200', faction: '🔴 Apex Raiders' }
     ];
 
-    // Active Tactical Bounties
+    // Default Tactical Bounties
     this.tacticalBounties = [
       { id: 'BNT-01', title: 'Capture Sector 33 Cyber Core', reward: '+250 🪙 CL-Points', cash: '$1,500 Cash', desc: 'Secure Sector 33-C for 5 consecutive rounds in Tri-Faction Warfare.', completed: false },
       { id: 'BNT-02', title: 'Orbital Recon Sweep', reward: '+150 🪙 CL-Points', cash: '$750 Cash', desc: 'Tag 25 enemy operatives using Thermal Recon Drones.', completed: false },
       { id: 'BNT-03', title: 'Battalion Scrim Victory', reward: '+500 🪙 CL-Points', cash: '$3,000 Cash', desc: 'Lead a 33-man Battalion to victory against 2 competing factions.', completed: true }
     ];
 
-    // Active Ranked Selection Match Rooms
+    // Match History Rooms
     this.rankedSelectionHistory = [];
+
+    this.loadState();
+  }
+
+  loadState() {
+    try {
+      const saved = localStorage.getItem('cl_wardogs_state_v2');
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.soloMercenaries) this.soloMercenaries = data.soloMercenaries;
+        if (data.registeredSquads) this.registeredSquads = data.registeredSquads;
+        if (data.tacticalBounties) this.tacticalBounties = data.tacticalBounties;
+        if (data.rankedSelectionHistory) this.rankedSelectionHistory = data.rankedSelectionHistory;
+      }
+    } catch (e) {
+      console.warn('Error loading Wardogs state:', e);
+    }
+  }
+
+  saveState() {
+    try {
+      localStorage.setItem('cl_wardogs_state_v2', JSON.stringify({
+        soloMercenaries: this.soloMercenaries,
+        registeredSquads: this.registeredSquads,
+        tacticalBounties: this.tacticalBounties,
+        rankedSelectionHistory: this.rankedSelectionHistory
+      }));
+    } catch (e) {
+      console.warn('Error saving Wardogs state:', e);
+    }
   }
 
   // Register Solo Mercenary
   registerSoloMercenary(handle, callsign, game, role, elo = 1840) {
-    const roleInfo = this.rolePresets[role] || this.rolePresets['⚡ Breacher / Assault'];
     const newMerc = {
       id: Date.now(),
       name: handle || 'Operative_X',
@@ -77,6 +101,7 @@ class WardogsEngine {
     };
 
     this.soloMercenaries.unshift(newMerc);
+    this.saveState();
     return newMerc;
   }
 
@@ -96,6 +121,7 @@ class WardogsEngine {
     };
 
     this.registeredSquads.unshift(newSquad);
+    this.saveState();
     return newSquad;
   }
 
@@ -117,6 +143,7 @@ class WardogsEngine {
     const b = this.tacticalBounties.find(item => item.id === bountyId);
     if (b) {
       b.completed = true;
+      this.saveState();
       return b;
     }
     return null;
@@ -181,6 +208,7 @@ class WardogsEngine {
     };
 
     this.rankedSelectionHistory.unshift(matchRoom);
+    this.saveState();
     return matchRoom;
   }
 }
