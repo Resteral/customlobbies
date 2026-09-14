@@ -92,7 +92,7 @@
             🛡️ Guardian AC Verified
           </span>
           <div class="mmr-badge" id="userMMRBadge" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">
-            <span>👑</span> <span id="userMMRValue">Level 8 (1840 ELO)</span>
+            <span>👑</span> <span id="userPassportTitle">💎 Diamond Veteran</span> • <span id="userMMRValue">Level 8 (1840 ELO)</span>
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: var(--accent-gold); font-weight: 700;">
@@ -206,7 +206,9 @@
               <!-- Injected via app.js -->
             </div>
           </div>
-          <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <button class="btn btn-secondary btn-sm" id="filterAllGames">🎮 All Games</button>
+            <button class="btn btn-purple btn-sm" id="filterFavsOnly">⭐ Favorites Only</button>
             <button class="btn btn-primary" id="btnJoinQueue">🎮 Quick Match Queue</button>
             <button class="btn btn-purple" id="btnJoinGameDraftPool" style="box-shadow: 0 0 15px rgba(157,78,221,0.4);">⚡ Join Game Draft Pool</button>
             <button class="btn btn-secondary" id="btnRandomPicker">🎲 Pick Random Game</button>
@@ -2097,7 +2099,7 @@
   <div class="modal-overlay" id="matchFoundModal">
     <div class="modal-card match-found-modal">
       <div style="font-size: 2.8rem; margin-bottom: 0.5rem; animation: bounce 1s infinite alternate;">🔥</div>
-      <h2 style="font-size: 1.8rem; font-weight: 900; color: var(--accent-green); margin-bottom: 0.3rem;">MATCH READY!</h2>
+      <h2 style="font-size: 1.8rem; font-weight: 900; color: var(--accent-green); margin-bottom: 0.3rem;" id="matchFoundTitle">MATCH READY!</h2>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;" id="matchFoundServerName">Counter-Strike 2 • 5v5 Premier Scrim (de_mirage)</p>
 
       <div style="background: rgba(0, 0, 0, 0.5); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid rgba(0, 230, 118, 0.3);">

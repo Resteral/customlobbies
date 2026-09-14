@@ -1778,12 +1778,32 @@ class CustomLobbiesApp {
           btnRandom.textContent = `🎉 Chosen Game: ${chosenGame}!`;
           btnRandom.disabled = false;
           this.setGameFilter(chosenGame);
-          setTimeout(() => {
-            btnRandom.textContent = '🎲 Pick Random Game';
-          }, 3000);
         }
       }, 100);
     });
+  }
+
+  setGameFilter(filterName) {
+    this.activeFilter = filterName;
+    this.renderActiveGamesBar();
+    this.renderLobbies();
+  }
+
+  setupFilterHandlers() {
+    const filterAll = document.getElementById('filterAllGames');
+    const filterFavs = document.getElementById('filterFavsOnly');
+
+    if (filterAll) {
+      filterAll.addEventListener('click', () => {
+        this.setGameFilter('all');
+      });
+    }
+
+    if (filterFavs) {
+      filterFavs.addEventListener('click', () => {
+        this.setGameFilter('favorites');
+      });
+    }
   }
 
   setupTabNavigation() {
