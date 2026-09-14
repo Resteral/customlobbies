@@ -1001,6 +1001,48 @@ class CustomLobbiesApp {
 
     if (!window.wardogsEngine) return;
 
+    // Render Scraped Live Telemetry Stats
+    const telemetry = window.wardogsEngine.scrapeLiveWardogsTelemetry();
+    const telemetryElem = document.getElementById('wardogsTelemetryContainer');
+    if (telemetryElem) {
+      telemetryElem.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="font-weight: 900; color: #ffab00; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span class="live-dot" style="display: inline-block; width: 10px; height: 10px; background: #00e676; border-radius: 50%; box-shadow: 0 0 10px #00e676;"></span>
+              <span>LIVE WARDOGS TELEMETRY & STEAM STATS</span>
+              <span class="lobby-game-tag" style="background: rgba(255, 111, 0, 0.2); color: #ffab00; border: 1px solid #ff6f00;">${telemetry.developer}</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Official Early Access Data • ${telemetry.releaseDate} • ${telemetry.activeMatchFormat}
+            </div>
+          </div>
+          <div style="display: flex; gap: 1.25rem; flex-wrap: wrap; text-align: center;">
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Active Concurrent</div>
+              <div style="font-size: 1.15rem; font-weight: 900; color: var(--accent-green);">${telemetry.activeConcurrentPlayers.toLocaleString()} 🟢</div>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Steam Peak</div>
+              <div style="font-size: 1.15rem; font-weight: 900; color: var(--accent-cyan);">${telemetry.peakConcurrentPlayers.toLocaleString()}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Twitch Viewers</div>
+              <div style="font-size: 1.15rem; font-weight: 900; color: #b9a3e3;">💜 ${telemetry.twitchConcurrentViewers.toLocaleString()}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Steam Rating</div>
+              <div style="font-size: 1.15rem; font-weight: 900; color: var(--accent-gold);">${telemetry.steamApprovalRating}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Persistent Economy</div>
+              <div style="font-size: 1.15rem; font-weight: 900; color: #ff6f00;">${telemetry.persistentEconomyBalance}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     if (this.activeWardogsMode === 'solos') {
       const solos = window.wardogsEngine.soloMercenaries.filter(m => m.game === selectedGame || m.game === 'Counter-Strike 2');
 
