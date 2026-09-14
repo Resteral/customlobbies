@@ -1224,7 +1224,72 @@ class CustomLobbiesApp {
       `).join('');
     }
 
+    // Render Player Recent Match History
+    const historyContainer = document.getElementById('passportMatchHistoryList');
+    if (historyContainer) {
+      const matchHistory = p.matchHistory || [
+        { id: 101, game: 'Counter-Strike 2', map: 'de_mirage', mode: '5v5 FACEIT Premier', score: '13 - 9', result: 'WIN', eloChange: '+26 ELO', kd: '22 / 11 / 7', hs: '64%', mvp: '👑 MVP' },
+        { id: 102, game: 'Empulse', map: 'Empulse Facility', mode: '5v5 Cyber Arena', score: '16 - 12', result: 'WIN', eloChange: '+24 ELO', kd: '25 / 10 / 8', hs: '72%', mvp: '⚡ MVP' },
+        { id: 103, game: 'REMATCH', map: 'Nexus Arena', mode: '5v5 Champion Scrim', score: '13 - 11', result: 'WIN', eloChange: '+28 ELO', kd: '28 / 14 / 6', hs: '68%', mvp: '👑 MVP' },
+        { id: 104, game: 'Valorant', map: 'Ascent', mode: '5v5 Radiant Scrim', score: '11 - 13', result: 'LOSS', eloChange: '-16 ELO', kd: '17 / 15 / 4', hs: '58%', mvp: '🎯 Top Fragger' }
+      ];
+
+      historyContainer.innerHTML = matchHistory.map(m => `
+        <div class="match-history-card ${m.result === 'WIN' ? 'match-result-win' : 'match-result-loss'}">
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <span class="${m.result === 'WIN' ? 'badge-win' : 'badge-loss'}">${m.result} (${m.score})</span>
+            <div>
+              <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">${m.game} • ${m.map}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${m.mode} • Performance: ${m.mvp}</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: 800; font-size: 0.85rem; color: var(--accent-gold);">${m.kd} (${m.hs} HS)</div>
+            <div style="font-size: 0.78rem; font-weight: 800; color: ${m.result === 'WIN' ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.eloChange}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
     modal.classList.add('active');
+  }
+
+  triggerMatchFoundModal(serverName = 'Counter-Strike 2 • 5v5 Premier Scrim (de_mirage)') {
+    const modal = document.getElementById('matchFoundModal');
+    if (!modal) return;
+
+    const label = document.getElementById('matchFoundServerName');
+    if (label) label.textContent = serverName;
+
+    const btn = document.getElementById('btnAcceptMatchAction');
+    if (btn) {
+      btn.classList.remove('accepted');
+      btn.innerHTML = '<span>✔ ACCEPT MATCH</span>';
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('match_found');
+    }
+
+    modal.classList.add('active');
+  }
+
+  acceptMatch() {
+    const btn = document.getElementById('btnAcceptMatchAction');
+    if (btn) {
+      btn.classList.add('accepted');
+      btn.innerHTML = '<span>✔ MATCH ACCEPTED! CONNECTING TO SERVER...</span>';
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('accept_match');
+    }
+
+    setTimeout(() => {
+      const modal = document.getElementById('matchFoundModal');
+      if (modal) modal.classList.remove('active');
+      alert('🚀 MATCH READY & ACCEPTED!\n\nLaunching Guardian Anti-Cheat Protected Dedicated Server Node (128-tick)...');
+    }, 1500);
   }
 
   postWrittenProfileRemark() {

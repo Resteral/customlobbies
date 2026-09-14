@@ -1394,6 +1394,18 @@
         </div>
       </div>
 
+      <!-- Player Match History & Scorecard Log -->
+      <div style="background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>📜 Player Recent Competitive Match History</span>
+          <span style="font-size: 0.75rem; color: var(--accent-green); font-weight: 800;">Verified Server Replays</span>
+        </h4>
+
+        <div class="match-history-list" id="passportMatchHistoryList">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+
       <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
         <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.6rem;">Linked Gaming Identities</h4>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; font-size: 0.85rem;" id="passportLinkedAccounts">
@@ -1405,6 +1417,38 @@
         <button class="btn btn-purple" onclick="alert('💬 MESSAGE SENT!\n\nDirect message opened on CustomLobbies Chat & Voice Hub!')">💬 Direct Message</button>
         <button class="btn btn-primary" onclick="alert('⚔️ CHALLENGE DISPATCHED!\n\n1v1 Duel challenge invite sent!')">⚔️ Challenge 1v1</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MATCH FOUND ACCEPT OVERLAY MODAL -->
+  <div class="modal-overlay" id="matchFoundModal">
+    <div class="modal-card match-found-modal">
+      <div style="font-size: 2.8rem; margin-bottom: 0.5rem; animation: bounce 1s infinite alternate;">🔥</div>
+      <h2 style="font-size: 1.8rem; font-weight: 900; color: var(--accent-green); margin-bottom: 0.3rem;">MATCH READY!</h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;" id="matchFoundServerName">Counter-Strike 2 • 5v5 Premier Scrim (de_mirage)</p>
+
+      <div style="background: rgba(0, 0, 0, 0.5); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid rgba(0, 230, 118, 0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+          <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold);">PLAYERS READY (10 / 10):</span>
+          <span style="font-size: 0.9rem; font-weight: 900; color: var(--accent-red);" id="matchAcceptTimer">⏱️ 14s</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem;" id="matchAcceptedPlayersGrid">
+          <div style="background: rgba(0,230,118,0.2); border: 1px solid var(--accent-green); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; font-weight: 800; color: var(--accent-green);">✔ Ready</div>
+          <div style="background: rgba(0,230,118,0.2); border: 1px solid var(--accent-green); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; font-weight: 800; color: var(--accent-green);">✔ Ready</div>
+          <div style="background: rgba(0,230,118,0.2); border: 1px solid var(--accent-green); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; font-weight: 800; color: var(--accent-green);">✔ Ready</div>
+          <div style="background: rgba(0,230,118,0.2); border: 1px solid var(--accent-green); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; font-weight: 800; color: var(--accent-green);">✔ Ready</div>
+          <div style="background: rgba(255,255,255,0.05); border: 1px dashed var(--text-muted); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; color: var(--text-muted);">Waiting...</div>
+          <div style="background: rgba(0,230,118,0.2); border: 1px solid var(--accent-green); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; font-weight: 800; color: var(--accent-green);">✔ Ready</div>
+          <div style="background: rgba(0,230,118,0.2); border: 1px solid var(--accent-green); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; font-weight: 800; color: var(--accent-green);">✔ Ready</div>
+          <div style="background: rgba(0,230,118,0.2); border: 1px solid var(--accent-green); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; font-weight: 800; color: var(--accent-green);">✔ Ready</div>
+          <div style="background: rgba(0,230,118,0.2); border: 1px solid var(--accent-green); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; font-weight: 800; color: var(--accent-green);">✔ Ready</div>
+          <div style="background: rgba(0,230,118,0.2); border: 1px solid var(--accent-green); border-radius: 4px; padding: 0.4rem; font-size: 0.75rem; font-weight: 800; color: var(--accent-green);">✔ Ready</div>
+        </div>
+      </div>
+
+      <button class="match-accept-btn" id="btnAcceptMatchAction" onclick="window.app.acceptMatch()">
+        <span>✔ ACCEPT MATCH</span>
+      </button>
     </div>
   </div>
 

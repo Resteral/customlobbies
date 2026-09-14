@@ -121,6 +121,25 @@ class WidgetBuilderEngine {
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
         osc.start(now);
         osc.stop(now + 0.7);
+      } else if (soundType === 'match_found') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.setValueAtTime(880.00, now + 0.15); // A5
+        osc.frequency.setValueAtTime(1174.66, now + 0.3); // D6
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        osc.start(now);
+        osc.stop(now + 0.8);
+      } else if (soundType === 'accept_match') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+        osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+        gain.gain.setValueAtTime(0.5, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
       } else if (soundType === 'fanfare') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(440, now);

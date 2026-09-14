@@ -718,3 +718,187 @@ body.obs-transparent-mode {
   background: transparent !important;
   background-image: none !important;
 }
+
+/* Match Found Overlay Banner */
+.match-found-modal {
+  background: linear-gradient(135deg, rgba(16, 20, 30, 0.98), rgba(26, 32, 48, 0.98));
+  border: 2px solid var(--accent-green);
+  box-shadow: 0 0 40px rgba(0, 230, 118, 0.4);
+  max-width: 620px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: modalPulse 2s infinite ease-in-out;
+}
+
+@keyframes modalPulse {
+  0% { box-shadow: 0 0 30px rgba(0, 230, 118, 0.3); }
+  50% { box-shadow: 0 0 50px rgba(0, 230, 118, 0.6); }
+  100% { box-shadow: 0 0 30px rgba(0, 230, 118, 0.3); }
+}
+
+.match-accept-btn {
+  background: linear-gradient(135deg, var(--accent-green), #00c853);
+  color: #000;
+  font-size: 1.4rem;
+  font-weight: 900;
+  padding: 1.2rem 3rem;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 230, 118, 0.5);
+  margin-top: 1rem;
+}
+
+.match-accept-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 30px rgba(0, 230, 118, 0.8);
+}
+
+.match-accept-btn.accepted {
+  background: rgba(0, 230, 118, 0.2);
+  color: var(--accent-green);
+  border: 2px solid var(--accent-green);
+  cursor: default;
+}
+
+/* Tournament Bracket Visualizer */
+.tournament-bracket-tree {
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  padding: 1.5rem 0;
+}
+
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 220px;
+}
+
+.bracket-round-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.bracket-match {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  margin: 0.75rem 0;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.bracket-match:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 12px rgba(30, 144, 255, 0.3);
+}
+
+.bracket-team-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bracket-team-row:last-child {
+  border-bottom: none;
+}
+
+.bracket-team-row.winner {
+  background: rgba(0, 230, 118, 0.15);
+  color: var(--accent-green);
+  font-weight: 800;
+}
+
+.bracket-score {
+  font-weight: 800;
+  font-family: monospace;
+}
+
+/* Match History Card */
+.match-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.match-history-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  transition: var(--transition-fast);
+}
+
+.match-history-card:hover {
+  border-color: var(--border-glow);
+  transform: translateX(4px);
+}
+
+.match-result-win {
+  border-left: 4px solid var(--accent-green);
+}
+
+.match-result-loss {
+  border-left: 4px solid var(--accent-red);
+}
+
+.badge-win {
+  background: rgba(0, 230, 118, 0.2);
+  color: var(--accent-green);
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+.badge-loss {
+  background: rgba(255, 82, 82, 0.2);
+  color: var(--accent-red);
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+/* Anticheat Security Dashboard */
+.telemetry-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.terminal-log-box {
+  background: #05070a;
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  color: #00e676;
+  font-family: 'Consolas', monospace;
+  font-size: 0.85rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 1rem;
+}
