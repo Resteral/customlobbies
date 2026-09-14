@@ -418,6 +418,13 @@ class CustomLobbiesApp {
     alert(`🚀 WIDGET QUEUE LAUNCHED!\n\nYou entered the matchmaking queue for ${game} (${region}) directly from the Quick Widget!\nEarned +25 🪙 CL-Points queue bonus!`);
   }
 
+  selectQueueGameTitle(gameName) {
+    const select = document.getElementById('queueSelectGame');
+    if (select) {
+      select.value = gameName;
+    }
+  }
+
   leaveQueue(silent = false) {
     this.activeQueue = false;
     clearInterval(this.queueTimerInterval);

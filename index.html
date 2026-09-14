@@ -1108,11 +1108,33 @@
         Instant match sign-up & Stream Soundboard controls.
       </div>
 
+      <!-- Quick Game Selector -->
+      <div style="margin-bottom: 0.8rem;">
+        <label style="font-size: 0.72rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase;">Select Queue Game</label>
+        <select class="input-field" style="font-size: 0.8rem; padding: 0.3rem 0.5rem; margin-top: 0.2rem;" id="floatingWidgetGameSelect">
+          <option value="Counter-Strike 2">🎯 CS2 5v5 Premier</option>
+          <option value="Empulse">⚡ Empulse 5v5 Cyber Arena</option>
+          <option value="REMATCH">🔥 REMATCH 5v5 Champion</option>
+          <option value="Arkheron">⚔️ Arkheron 12-Player Spire</option>
+          <option value="Valorant">🔴 Valorant 5v5 Ranked</option>
+          <option value="Marvel Rivals">💎 Marvel Rivals 6v6</option>
+          <option value="Deadlock">🔮 Deadlock 6v6 Scrim</option>
+          <option value="CS2 Retake (Bomb Defusal)">💣 CS2 Retake Defusal</option>
+          <option value="CS2 1v1 Arena (Aim Map)">🎯 CS2 1v1 Aim Arena</option>
+          <option value="CS2 Bhop (Auto & Scroll)">🐰 CS2 Bhop Speedrun</option>
+          <option value="CS2 Surf (Tier 1-6)">🏄 CS2 Surf Arena</option>
+          <option value="CS2 Zombie Escape">🧟 CS2 Zombie Escape</option>
+          <option value="Apex Legends">🏆 Apex Legends 3v3</option>
+          <option value="Rocket League">⚽ Rocket League 2v2</option>
+          <option value="Rainbow Six Siege">🛡️ Rainbow Six Siege</option>
+        </select>
+      </div>
+
       <div style="display: flex; gap: 0.5rem; margin-bottom: 0.8rem;">
-        <button class="btn btn-primary btn-sm" style="flex: 1; font-size: 0.78rem;" id="btnJoinQueue">
-          <span>⚡</span> Quick Queue
+        <button class="btn btn-primary btn-sm" style="flex: 1; font-size: 0.78rem;" id="btnFloatingQueueStart" onclick="window.app.startQueueFromWidget(document.getElementById('floatingWidgetGameSelect').value)">
+          <span>⚡</span> Find Match
         </button>
-        <button class="btn btn-purple btn-sm" style="flex: 1; font-size: 0.78rem;" onclick="window.app.triggerMatchFoundModal()">
+        <button class="btn btn-purple btn-sm" style="flex: 1; font-size: 0.78rem;" onclick="window.app.triggerMatchFoundModal(document.getElementById('floatingWidgetGameSelect').value)">
           <span>🔥</span> Test Pop
         </button>
       </div>
@@ -1128,26 +1150,66 @@
 
   <!-- Sign-Up Matchmaking Queue Selection Modal -->
   <div class="modal-overlay" id="signUpQueueModal">
-    <div class="modal-card" style="border-color: var(--accent-cyan);">
+    <div class="modal-card" style="border-color: var(--accent-cyan); max-width: 650px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
         <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
-          <span>🎮</span> Enter Competitive Matchmaking Queue
+          <span>🎮</span> Select Game to Enter Competitive Matchmaking Queue
         </h3>
         <button class="btn btn-secondary btn-sm" id="btnCloseQueueModal">✕ Close</button>
       </div>
 
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-        Select your game, region, and role to sign up for instant matchmaking pool queueing!
-      </p>
+      <!-- Visual Game Quick-Pick Buttons -->
+      <div style="margin-bottom: 1.2rem;">
+        <label class="input-label" style="color: var(--accent-gold);">⭐ Quick Pick Game Roster</label>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem;" id="queueGameQuickGrid">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('Counter-Strike 2')">🎯 CS2 Premier</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('Empulse')">⚡ Empulse</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('REMATCH')">🔥 REMATCH</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('Arkheron')">⚔️ Arkheron</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('Valorant')">🔴 Valorant</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('Marvel Rivals')">💎 Marvel Rivals</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('Deadlock')">🔮 Deadlock</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('CS2 Retake (Bomb Defusal)')">💣 CS2 Retake</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('CS2 1v1 Arena (Aim Map)')">🎯 CS2 1v1</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('Apex Legends')">🏆 Apex Legends</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('Rocket League')">⚽ Rocket League</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.selectQueueGameTitle('Rainbow Six Siege')">🛡️ R6 Siege</button>
+        </div>
+      </div>
 
       <div class="input-group">
-        <label class="input-label">Select Game Title</label>
+        <label class="input-label">All Game Titles (Full Roster)</label>
         <select class="input-field" id="queueSelectGame">
-          <option value="Counter-Strike 2">Counter-Strike 2 (5v5 Premier)</option>
+          <option value="Counter-Strike 2">Counter-Strike 2 (5v5 Premier Scrim)</option>
           <option value="Empulse">Empulse (5v5 Cyber Arena)</option>
           <option value="REMATCH">REMATCH (5v5 Champion Scrims)</option>
           <option value="Arkheron">Arkheron (12-Player Cyber Spire)</option>
-          <option value="Valorant">Valorant (5v5 Competitive)</option>
+          <option value="Valorant">Valorant (5v5 Competitive Ranked)</option>
+          <option value="Marvel Rivals">Marvel Rivals (6v6 Competitive)</option>
+          <option value="Deadlock">Deadlock (6v6 Lane Conquest)</option>
+          <option value="CS2 Retake (Bomb Defusal)">CS2 Retake (Bomb Defusal)</option>
+          <option value="CS2 1v1 Arena (Aim Map)">CS2 1v1 Arena (Aim Map)</option>
+          <option value="CS2 Bhop (Auto & Scroll)">CS2 Bhop (Auto & Scroll Speedrun)</option>
+          <option value="CS2 Surf (Tier 1-6)">CS2 Surf (Tier 1-6 Arena)</option>
+          <option value="CS2 Zombie Escape">CS2 Zombie Escape (20 Players)</option>
+          <option value="CS2 KZ / Climb (Bhop)">CS2 KZ / Climb (Bhop)</option>
+          <option value="CS2 Danger Zone (BR)">CS2 Danger Zone (Battle Royale)</option>
+          <option value="CS2 Gun Game (Arms Race)">CS2 Gun Game (Arms Race)</option>
+          <option value="CS2 Deathmatch (FFA DM)">CS2 Deathmatch (FFA DM)</option>
+          <option value="CS2 HNS (Hide & Seek)">CS2 HNS (Hide & Seek)</option>
+          <option value="The Finals">The Finals (Cashout Tournament)</option>
+          <option value="Apex Legends">Apex Legends (3v3 Arena)</option>
+          <option value="Rocket League">Rocket League (2v2 Competitive)</option>
+          <option value="Rainbow Six Siege">Rainbow Six Siege (5v5 Ranked)</option>
+          <option value="Dota 2">Dota 2 (Captains Mode Draft)</option>
+          <option value="Overwatch 2">Overwatch 2 (5v5 Competitive)</option>
+          <option value="League of Legends">League of Legends (5v5 Summoner's Rift)</option>
+          <option value="FiveM GTA RP">FiveM GTA RP (Custom Server Connect)</option>
+          <option value="Fortnite">Fortnite (Custom Scrims)</option>
+          <option value="StarCraft II">StarCraft II (1v1 Ladder)</option>
+          <option value="PUBG">PUBG: Battlegrounds (Squad Scrims)</option>
+        </select>
+      </div>
           <option value="Marvel Rivals">Marvel Rivals (6v6 Competitive)</option>
           <option value="Deadlock">Deadlock (6v6 Lane Conquest)</option>
           <option value="CS2 Retake (Bomb Defusal)">CS2 Retake (Bomb Defusal)</option>
