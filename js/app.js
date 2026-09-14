@@ -16,14 +16,14 @@ class CustomLobbiesApp {
     this.equippedBanner = 'Cyberpunk Neon Matrix';
     this.equippedFrame = 'Gold Crown Ring';
 
-    // Live Matchmaking Pool Feed
+    // Universal Free-Agent Player Pool Roster
     this.poolFeed = [
-      { id: 1, name: 'RadiantReaper', elo: 2540, time: 'Just Now', isCaptain: true, votes: 5, level: 11, acVerified: true },
-      { id: 2, name: 'ApexGod99', elo: 2150, time: '1m ago', isCaptain: true, votes: 4, level: 10, acVerified: true },
-      { id: 3, name: 'ShadowNinja', elo: 1920, time: '2m ago', isCaptain: false, votes: 2, level: 9, acVerified: true },
-      { id: 4, name: 'You (Host)', elo: 1840, time: '2m ago', isCaptain: false, votes: 3, level: 8, acVerified: true },
-      { id: 5, name: 'Valkyrie_CS', elo: 1790, time: '3m ago', isCaptain: false, votes: 1, level: 8, acVerified: true },
-      { id: 6, name: 'ViperQueen', elo: 1720, time: '3m ago', isCaptain: false, votes: 0, level: 7, acVerified: true }
+      { id: 1, name: 'RadiantReaper', elo: 2540, game: 'Counter-Strike 2', role: 'IGL / Shotcaller', time: 'Just Now', karma: '100% Positive', status: 'Available', acVerified: true },
+      { id: 2, name: 'ApexGod99', elo: 2150, game: 'Counter-Strike 2', role: 'Entry Fragger', time: '1m ago', karma: '98% Positive', status: 'Available', acVerified: true },
+      { id: 3, name: 'Empulse_Overlord', elo: 2450, game: 'Empulse', role: 'AWPer / Sniper', time: '2m ago', karma: '100% Positive', status: 'Available', acVerified: true },
+      { id: 4, name: 'Rematch_God', elo: 2480, game: 'REMATCH', role: 'Entry Fragger', time: '3m ago', karma: '100% Positive', status: 'Available', acVerified: true },
+      { id: 5, name: 'Valkyrie_CS', elo: 1790, game: 'Valorant', role: 'AWPer / Sniper', time: '3m ago', karma: '100% Positive', status: 'Available', acVerified: true },
+      { id: 6, name: 'ShadowNinja', elo: 1920, game: 'Arkheron', role: 'Support / Controller', time: '5m ago', karma: '95% Positive', status: 'Available', acVerified: true }
     ];
 
     // Expanded Game Roster
@@ -441,6 +441,110 @@ class CustomLobbiesApp {
     if (el) el.textContent = `${this.clPoints.toLocaleString()} Points`;
     const passportTitle = document.getElementById('userPassportTitle');
     if (passportTitle) passportTitle.textContent = this.equippedTitle;
+  }
+
+  renderPoolFeed() {
+    const container = document.getElementById('livePoolFeedContainer');
+    if (!container) return;
+
+    const gameFilter = document.getElementById('playerPoolGameFilter')?.value || 'all';
+    const roleFilter = document.getElementById('playerPoolRoleFilter')?.value || 'all';
+
+    let filtered = this.poolFeed;
+    if (gameFilter !== 'all') {
+      filtered = filtered.filter(p => p.game === gameFilter);
+    }
+    if (roleFilter !== 'all') {
+      filtered = filtered.filter(p => p.role === roleFilter);
+    }
+
+    if (filtered.length === 0) {
+      container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 1.5rem;">No free-agent players match your filter. Click "Sign Up for Player Pool" to list yourself!</div>`;
+      return;
+    }
+
+    container.innerHTML = filtered.map(p => `
+      <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-size: 0.72rem;">${p.game}</span>
+            <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-size: 0.72rem;">🟢 ${p.status || 'Available'}</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-weight: 900; border: 1px solid var(--accent-gold);">👑</div>
+            <div>
+              <h4 style="font-size: 0.95rem; font-weight: 900; margin: 0; color: var(--text-main);">${p.name}</h4>
+              <div style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 700;">${p.elo} MMR • ${p.karma || '100% Karma'}</div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+            Role: <strong style="color: var(--accent-cyan);">${p.role}</strong>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem;">
+          <button class="btn btn-primary btn-sm" style="flex: 1; font-size: 0.75rem;" onclick="window.app.recruitPoolPlayer(${p.id})">
+            ➕ Recruit Player
+          </button>
+          <button class="btn btn-secondary btn-sm" style="font-size: 0.75rem;" onclick="window.app.openPlayerPassportModal('${p.name}')">
+            🪪 Passport
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  openJoinPlayerPoolModal() {
+    const modal = document.getElementById('joinPlayerPoolModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  submitJoinPlayerPool() {
+    const game = document.getElementById('poolRegisterGame')?.value || 'Counter-Strike 2';
+    const role = document.getElementById('poolRegisterRole')?.value || 'Entry Fragger';
+    const note = document.getElementById('poolRegisterNote')?.value.trim() || 'Ready for scrims!';
+
+    const newFreeAgent = {
+      id: Date.now(),
+      name: 'You (Host)',
+      elo: 1840,
+      game: game,
+      role: role,
+      time: 'Just Now',
+      karma: '100% Positive',
+      status: 'Available',
+      acVerified: true,
+      note: note
+    };
+
+    this.poolFeed.unshift(newFreeAgent);
+    this.renderPoolFeed();
+
+    const modal = document.getElementById('joinPlayerPoolModal');
+    if (modal) modal.classList.remove('active');
+
+    // Award +25 CL-Points signup bonus
+    this.clPoints += 25;
+    this.updatePointsWidget();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    alert(`🚀 FREE-AGENT SIGNUP COMPLETE!\n\nYou listed yourself in the Universal Player Pool for ${game} as ${role}!\nEarned +25 🪙 CL-Points signup bonus!`);
+  }
+
+  recruitPoolPlayer(playerId) {
+    const player = this.poolFeed.find(p => p.id === playerId);
+    if (!player) return;
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('cheer');
+    }
+
+    alert(`➕ PLAYER RECRUITED!\n\nYou invited ${player.name} (${player.game} - ${player.role}) to join your Custom Lobby or Tournament Squad! Notification dispatched!`);
   }
 
   // FACEIT-Style Match Room & Ready Check
@@ -1557,6 +1661,15 @@ class CustomLobbiesApp {
         alert(`🔥 Active FACEIT-Style Custom Lobby created for ${game}! Protected by Guardian Anti-Cheat Engine.`);
       });
     }
+
+    const poolModal = document.getElementById('joinPlayerPoolModal');
+    const btnClosePool = document.getElementById('btnClosePlayerPoolModal');
+    const btnCancelPool = document.getElementById('btnCancelPlayerPoolModal');
+    const btnSubmitPool = document.getElementById('btnConfirmSubmitPlayerPool');
+
+    if (btnClosePool) btnClosePool.addEventListener('click', () => poolModal?.classList.remove('active'));
+    if (btnCancelPool) btnCancelPool.addEventListener('click', () => poolModal?.classList.remove('active'));
+    if (btnSubmitPool) btnSubmitPool.addEventListener('click', () => this.submitJoinPlayerPool());
   }
 }
 
