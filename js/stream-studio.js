@@ -40,8 +40,8 @@ class StreamStudioEngine {
       },
       {
         id: 503,
-        title: '🐰 CS2 Bhop bhop_badges Record Run (14.2s)',
-        game: 'CS2 Bhop (Auto & Scroll)',
+        title: '🎯 CS2 Mirage A-Site 1v4 Clutch Run',
+        game: 'Counter-Strike 2',
         trigger: '🐰 PB Speedrun Trigger',
         duration: '0:15',
         date: '1h ago',

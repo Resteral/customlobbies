@@ -29,17 +29,6 @@ class CustomLobbiesApp {
     // Expanded Game Roster
     this.allGames = [
       'Counter-Strike 2',
-      'CS2 Bhop (Auto & Scroll)',
-      'CS2 Danger Zone (BR)',
-      'CS2 Retake (Bomb Defusal)',
-      'CS2 Execute (Tactical Scrims)',
-      'CS2 1v1 Arena (Aim Map)',
-      'CS2 Gun Game (Arms Race)',
-      'CS2 Deathmatch (FFA DM)',
-      'CS2 HNS (Hide & Seek)',
-      'CS2 Surf (Tier 1-6)',
-      'CS2 KZ / Climb (Bhop)',
-      'CS2 Zombie Escape',
       'REMATCH',
       'Arkheron',
       'Valorant',
@@ -67,9 +56,7 @@ class CustomLobbiesApp {
       { id: 318, name: 'Empulse 5v5 Cyber Arena Server Node #1', game: 'Empulse', host: 'Empulse_Overlord', players: 9, max: 10, connectURL: 'steam://connect/192.168.1.120:27015', sponsoredBadge: '⚡ EMPULSE SPONSOR' },
       { id: 316, name: 'REMATCH 5v5 Competitive Arena Node #1', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, connectURL: 'steam://connect/192.168.1.110:27015', sponsoredBadge: '🔥 REMATCH SPONSOR' },
       { id: 317, name: 'Arkheron 12-Player Cyber Scrim Spire', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, connectURL: 'steam://connect/192.168.1.115:27015', sponsoredBadge: '⚔️ ARKHERON SPONSOR' },
-      { id: 314, name: 'CS2 128-Tick Auto-Bhop Speedrun Server', game: 'CS2 Bhop (Auto & Scroll)', host: 'Bhop_God', players: 18, max: 24, connectURL: 'steam://connect/192.168.1.100:27015', sponsoredBadge: '🐰 BHOP SPONSOR' },
-      { id: 315, name: 'CS2 Danger Zone Solos & Duos Arena', game: 'CS2 Danger Zone (BR)', host: 'DZ_Survivor', players: 16, max: 18, connectURL: 'steam://connect/192.168.1.105:27015', sponsoredBadge: '🪂 DZ SPONSOR' },
-      { id: 311, name: 'CS2 128-Tick Retake Server #1', game: 'CS2 Retake (Bomb Defusal)', host: 'Retake_Leader', players: 7, max: 9, connectURL: 'steam://connect/192.168.1.85:27015', sponsoredBadge: '💣 RETAKE SPONSOR' }
+      { id: 311, name: 'CS2 128-Tick Premier Server Node #1', game: 'Counter-Strike 2', host: 'Retake_Leader', players: 7, max: 10, connectURL: 'steam://connect/192.168.1.85:27015', sponsoredBadge: '🎯 CS2 SPONSOR' }
     ];
 
     this.lobbies = [

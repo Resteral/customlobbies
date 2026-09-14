@@ -149,17 +149,6 @@ class EloEngine {
     // Competitive Map Pools
     this.mapPools = {
       'Counter-Strike 2': ['Mirage', 'Inferno', 'Nuke', 'Anubis', 'Ancient', 'Dust II', 'Vertigo'],
-      'CS2 Bhop (Auto & Scroll)': ['bhop_badges', 'bhop_monster_jam', 'bhop_pro', 'bhop_ez', 'bhop_eula'],
-      'CS2 Danger Zone (BR)': ['dz_blacksite', 'dz_sirocco', 'dz_county', 'dz_vineyard'],
-      'CS2 Retake (Bomb Defusal)': ['de_mirage_retake', 'de_inferno_retake', 'de_dust2_retake', 'de_nuke_retake', 'de_anubis_retake'],
-      'CS2 Execute (Tactical Scrims)': ['de_mirage_execute', 'de_inferno_execute', 'de_nuke_execute', 'de_ancient_execute'],
-      'CS2 1v1 Arena (Aim Map)': ['am_aim_map', 'am_redline', 'am_dust2014', 'am_grass', 'am_map_v2'],
-      'CS2 Gun Game (Arms Race)': ['ar_shoots', 'ar_baggage', 'ar_monastery', 'ar_pool_day', 'ar_lunacy'],
-      'CS2 Deathmatch (FFA DM)': ['de_dust2_dm', 'de_mirage_dm', 'de_inferno_dm', 'de_nuke_dm'],
-      'CS2 HNS (Hide & Seek)': ['hns_floppytown', 'hns_dust2', 'hns_rooftops', 'hns_cbble', 'hns_bhop', 'hns_italy'],
-      'CS2 Surf (Tier 1-6)': ['surf_utopia_v3', 'surf_kitsune', 'surf_beginner', 'surf_greatriver', 'surf_ski_2'],
-      'CS2 KZ / Climb (Bhop)': ['kz_hb_man_bhop', 'kz_cliffhanger', 'kz_pro_slide', 'kz_bhop_valley'],
-      'CS2 Zombie Escape': ['ze_predator_ultimate', 'ze_paranoid', 'ze_fapescape', 'ze_minigames'],
       'Valorant': ['Ascent', 'Bind', 'Haven', 'Split', 'Lotus', 'Sunset'],
       'REMATCH': ['Nexus Arena', 'Cyber City', 'Sub-Zero Station', 'Viper Base'],
       'Arkheron': ['Arkheron Spire', 'Quantum Ruins', 'Oblivion Core'],
