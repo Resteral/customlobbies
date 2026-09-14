@@ -51,6 +51,21 @@ class CustomLobbiesApp {
     this.favoriteGames = new Set(['Counter-Strike 2', 'REMATCH', 'Arkheron', 'Valorant', 'Marvel Rivals', 'Dota 2', 'FiveM GTA RP', 'Slapshot: Rebound']);
     this.loadFavorites();
 
+    this.isAutoJoinActive = false;
+    this.autoJoinInterval = null;
+
+    this.teamLineup = [
+      { slot: 1, name: 'RadiantReaper (You)', role: 'IGL / Shotcaller', elo: 2540, avatar: '👑' },
+      { slot: 2, name: 'ApexGod99', role: 'Entry Fragger', elo: 2150, avatar: '⚡' },
+      { slot: 3, name: 'Empulse_Overlord', role: 'AWPer / Sniper', elo: 2450, avatar: '🎯' },
+      { slot: 4, name: 'Rematch_God', role: 'Support / Anchor', elo: 2480, avatar: '🛡️' },
+      { slot: 5, name: 'Valkyrie_CS', role: 'Lurker / Rifler', elo: 1790, avatar: '🦅' }
+    ];
+    this.teamBench = [
+      { id: 101, name: 'ShadowNinja', role: 'Flex Sub', elo: 1920, avatar: '🥷' },
+      { id: 102, name: 'CyberPuck_Ace', role: 'Puck Striker', elo: 1850, avatar: '🏒' }
+    ];
+
     this.sponsoredServers = [
       { id: 319, name: 'Slapshot: Rebound 3v3 Cyber Puck Arena', game: 'Slapshot: Rebound', host: 'PuckMaster99', players: 5, max: 6, connectURL: 'steam://connect/192.168.1.130:27015', sponsoredBadge: '🏒 SLAPSHOT SPONSOR' },
       { id: 318, name: 'Empulse 5v5 Cyber Arena Server Node #1', game: 'Empulse', host: 'Empulse_Overlord', players: 9, max: 10, connectURL: 'steam://connect/192.168.1.120:27015', sponsoredBadge: '⚡ EMPULSE SPONSOR' },
@@ -138,10 +153,10 @@ class CustomLobbiesApp {
           'REMATCH': { elo: 1820, wins: 65, losses: 30, winRate: 68.4, kd: '1.60', mvp: 20 },
           'Arkheron': { elo: 1650, wins: 54, losses: 28, winRate: 65.8, kd: '1.72', mvp: 18 },
           'Valorant': { elo: 1950, wins: 90, losses: 38, winRate: 70.3, kd: '1.52', mvp: 26 },
-          'Apex Legends': { elo: 1900, wins: 70, losses: 35, winRate: 66.7, kd: '2.10', mvp: 20 },
-          'Rocket League': { elo: 1600, wins: 50, losses: 32, winRate: 60.9, kd: 'N/A', mvp: 12 },
-          'Dota 2': { elo: 3300, wins: 78, losses: 45, winRate: 63.4, kd: '2.70', mvp: 18 },
-          'Rainbow Six Siege': { elo: 2850, wins: 88, losses: 30, winRate: 74.5, kd: '1.85', mvp: 25 }
+          'Apex Legends': { elo: 2100, wins: 78, losses: 30, winRate: 72.2, kd: '2.40', mvp: 30 },
+          'Rocket League': { elo: 1950, wins: 72, losses: 25, winRate: 74.2, kd: 'N/A', mvp: 22 },
+          'Dota 2': { elo: 3100, wins: 82, losses: 40, winRate: 67.2, kd: '2.65', mvp: 18 },
+          'Rainbow Six Siege': { elo: 2800, wins: 78, losses: 28, winRate: 73.6, kd: '1.80', mvp: 20 }
         }
       },
       {
@@ -226,6 +241,12 @@ class CustomLobbiesApp {
       if (savedTitle) this.equippedTitle = savedTitle;
       const savedLeaderboard = localStorage.getItem('cl_leaderboard_v2');
       if (savedLeaderboard) this.leaderboardData = JSON.parse(savedLeaderboard);
+      const savedLineup = localStorage.getItem('cl_lineup_v2');
+      if (savedLineup) {
+        const parsed = JSON.parse(savedLineup);
+        if (parsed.lineup) this.teamLineup = parsed.lineup;
+        if (parsed.bench) this.teamBench = parsed.bench;
+      }
     } catch (e) {
       console.warn('Error loading app state:', e);
     }
@@ -238,6 +259,7 @@ class CustomLobbiesApp {
       localStorage.setItem('cl_pool_v2', JSON.stringify(this.poolFeed));
       localStorage.setItem('cl_title_v2', this.equippedTitle);
       localStorage.setItem('cl_leaderboard_v2', JSON.stringify(this.leaderboardData));
+      localStorage.setItem('cl_lineup_v2', JSON.stringify({ lineup: this.teamLineup, bench: this.teamBench }));
     } catch (e) {
       console.warn('Error saving app state:', e);
     }
@@ -2383,6 +2405,208 @@ class CustomLobbiesApp {
 
       alert(`🛑 REPORT SUBMITTED!\n\nBad remark logged for ${p.name} (${label}). Sent to Guardian Anti-Cheat Moderators for review.`);
     }
+  }
+
+  // --- GUARDIAN KERNEL ANTI-CHEAT ENGINE ---
+  openAntiCheatModal() {
+    const modal = document.getElementById('antiCheatControlModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeAntiCheatModal() {
+    const modal = document.getElementById('antiCheatControlModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  runAntiCheatScan() {
+    const progressBox = document.getElementById('acScanProgressBox');
+    const progressBar = document.getElementById('acScanBar');
+    const progressText = document.getElementById('acScanText');
+
+    if (!progressBox || !progressBar || !progressText) return;
+
+    progressBox.style.display = 'block';
+    progressBar.style.width = '0%';
+    progressText.innerText = '🛡️ Initializing Ring 0 Kernel Process Scanner...';
+
+    setTimeout(() => {
+      progressBar.style.width = '45%';
+      progressText.innerText = '🔍 Scanning process memory space & verifying checksums...';
+    }, 500);
+
+    setTimeout(() => {
+      progressBar.style.width = '85%';
+      progressText.innerText = '🔒 Verifying 128-Tick dedicated server encryption keys...';
+    }, 1100);
+
+    setTimeout(() => {
+      progressBar.style.width = '100%';
+      progressText.innerText = '✅ SCAN COMPLETE: 0 Integrity Violations Found!';
+
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('success');
+      }
+
+      setTimeout(() => {
+        progressBox.style.display = 'none';
+        alert('🛡️ GUARDIAN KERNEL SCAN PASSED!\n\nSystem status: 100% Clean & Ring 0 Integrity Verified.\nYour account maintains Full Anti-Cheat Verification Badge.');
+      }, 400);
+    }, 1800);
+  }
+
+  // --- WEBSITE AUTO-JOIN SYSTEM ---
+  toggleAutoJoinSystem() {
+    this.isAutoJoinActive = !this.isAutoJoinActive;
+    const btn = document.getElementById('btnToggleAutoJoin');
+    const card = document.getElementById('autoJoinStatusCard');
+    const statusText = document.getElementById('autoJoinStatusText');
+
+    if (this.isAutoJoinActive) {
+      if (btn) {
+        btn.innerHTML = '⚡ Auto-Join: ON';
+        btn.classList.remove('btn-purple');
+        btn.classList.add('btn-success');
+      }
+      if (card) card.style.display = 'block';
+
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('queue_join');
+      }
+
+      this.autoJoinInterval = setInterval(() => {
+        if (!this.isAutoJoinActive) return;
+
+        // Scan lobbies for available slot matching favorite games
+        const openLobby = this.lobbies.find(l => this.favoriteGames.has(l.game) && l.players < l.max);
+        if (openLobby) {
+          if (statusText) statusText.innerText = `🎯 OPEN SLOT DISCOVERED! Auto-joining node "${openLobby.title}" (${openLobby.game})...`;
+          openLobby.players += 1;
+          this.saveState();
+          this.renderLobbies();
+
+          if (window.widgetBuilderEngine) {
+            window.widgetBuilderEngine.playSoundEffect('match_found');
+          }
+
+          alert(`⚡ AUTO-JOIN SUCCESSFUL!\n\nMatched open lobby slot:\n🎮 ${openLobby.game}\n🏆 ${openLobby.title}\n👤 Host: ${openLobby.host}\n\nConnecting to 128-tick dedicated server node...`);
+
+          this.launchFaceitMatchRoom(openLobby.id);
+        }
+      }, 4000);
+
+    } else {
+      if (btn) {
+        btn.innerHTML = '⚡ Auto-Join: OFF';
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-purple');
+      }
+      if (card) card.style.display = 'none';
+
+      if (this.autoJoinInterval) {
+        clearInterval(this.autoJoinInterval);
+        this.autoJoinInterval = null;
+      }
+    }
+  }
+
+  // --- TACTICAL TEAM LINEUP MANAGER ---
+  openTeamLineupModal() {
+    this.renderTeamLineupSlots();
+    const modal = document.getElementById('teamLineupModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeTeamLineupModal() {
+    const modal = document.getElementById('teamLineupModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  renderTeamLineupSlots() {
+    const grid = document.getElementById('teamLineupSlotsGrid');
+    const benchGrid = document.getElementById('teamLineupBenchGrid');
+
+    if (grid) {
+      grid.innerHTML = this.teamLineup.map((p, idx) => `
+        <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--accent-purple); border-radius: 8px; padding: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.75rem; font-weight: 800; color: var(--accent-gold);">SLOT #${p.slot}</span>
+            <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 800;">${p.elo} ELO</span>
+          </div>
+          <div style="font-size: 1rem; font-weight: 800; color: #fff;">${p.avatar} ${p.name}</div>
+          <select style="background: rgba(20,20,30,0.9); color: #fff; border: 1px solid var(--border-color); padding: 0.3rem; border-radius: 4px; font-size: 0.8rem;" onchange="window.app.updateLineupRole(${idx}, this.value)">
+            <option value="IGL / Shotcaller" ${p.role === 'IGL / Shotcaller' ? 'selected' : ''}>👑 IGL / Shotcaller</option>
+            <option value="Entry Fragger" ${p.role === 'Entry Fragger' ? 'selected' : ''}>⚡ Entry Fragger</option>
+            <option value="AWPer / Sniper" ${p.role === 'AWPer / Sniper' ? 'selected' : ''}>🎯 AWPer / Sniper</option>
+            <option value="Support / Anchor" ${p.role === 'Support / Anchor' ? 'selected' : ''}>🛡️ Support / Anchor</option>
+            <option value="Lurker / Rifler" ${p.role === 'Lurker / Rifler' ? 'selected' : ''}>🦅 Lurker / Rifler</option>
+          </select>
+        </div>
+      `).join('');
+    }
+
+    if (benchGrid) {
+      if (this.teamBench.length === 0) {
+        benchGrid.innerHTML = '<span style="font-size: 0.8rem; color: var(--text-muted);">No bench substitutes assigned.</span>';
+      } else {
+        benchGrid.innerHTML = this.teamBench.map((b, idx) => `
+          <div style="background: rgba(255,255,255,0.05); border: 1px dashed var(--accent-cyan); border-radius: 6px; padding: 0.5rem 0.8rem; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div>
+              <span style="font-weight: 800; color: #fff; font-size: 0.85rem;">${b.avatar} ${b.name}</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.5rem;">(${b.role} - ${b.elo} ELO)</span>
+            </div>
+            <button class="btn btn-purple btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="window.app.swapBenchPlayer(${idx})">Sub In</button>
+          </div>
+        `).join('');
+      }
+    }
+  }
+
+  updateLineupRole(index, newRole) {
+    if (this.teamLineup[index]) {
+      this.teamLineup[index].role = newRole;
+    }
+  }
+
+  swapBenchPlayer(benchIdx) {
+    if (this.teamBench[benchIdx]) {
+      const sub = this.teamBench[benchIdx];
+      const targetSlotIndex = prompt(`Choose Lineup Slot to sub ${sub.name} into (1-5):`, '5');
+      const slotNum = parseInt(targetSlotIndex);
+      if (!slotNum || slotNum < 1 || slotNum > 5) return;
+
+      const idx = slotNum - 1;
+      const starter = this.teamLineup[idx];
+
+      this.teamLineup[idx] = { slot: slotNum, name: sub.name, role: sub.role, elo: sub.elo, avatar: sub.avatar };
+      this.teamBench[benchIdx] = { id: sub.id, name: starter.name, role: starter.role, elo: starter.elo, avatar: starter.avatar };
+
+      this.renderTeamLineupSlots();
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('swap');
+      }
+      alert(`🔄 SUBSTITUTION COMPLETE!\n\n${sub.name} subbed in for ${starter.name} in Slot #${slotNum}.`);
+    }
+  }
+
+  autoBalanceLineup() {
+    const roles = ['IGL / Shotcaller', 'Entry Fragger', 'AWPer / Sniper', 'Support / Anchor', 'Lurker / Rifler'];
+    this.teamLineup.forEach((p, idx) => {
+      p.role = roles[idx % roles.length];
+    });
+    this.renderTeamLineupSlots();
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
+    alert('🔄 Lineup roles auto-balanced based on tactical squad positions!');
+  }
+
+  saveTeamLineup() {
+    this.saveState();
+    this.closeTeamLineupModal();
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('success');
+    }
+    alert('💾 Tactical Team Lineup & Substitutions saved successfully!');
   }
 
   setupModalHandlers() {

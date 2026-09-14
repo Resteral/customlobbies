@@ -138,15 +138,21 @@
             <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Apex Legends')">⚡ Auto-Draft Apex</button>
           </div>
         </div>
-        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-purple" onclick="window.app.openAntiCheatModal()">
+            🛡️ Guardian Anti-Cheat (Ring 0)
+          </button>
+          <button class="btn btn-purple" onclick="window.app.openTeamLineupModal()">
+            📋 Team Lineup Manager
+          </button>
+          <button class="btn btn-success" id="btnToggleAutoJoin" onclick="window.app.toggleAutoJoinSystem()">
+            ⚡ Auto-Join: OFF
+          </button>
           <button class="btn btn-purple" onclick="window.app.openChromeExtensionModal()">
             🧩 Chrome Extension Widget
           </button>
           <button class="btn btn-purple" onclick="window.app.openMapVetoModal('Counter-Strike 2')">
-            🗺️ Start Map Veto Pick/Ban Room
-          </button>
-          <button class="btn btn-purple" id="btnRandomPicker">
-            🎲 Pick Random Game
+            🗺️ Map Veto Room
           </button>
           <button class="btn btn-primary" id="btnJoinQueue">
             <span>⚡</span> Quick Queue (-join)
@@ -169,6 +175,22 @@
           </div>
           <button class="btn btn-danger btn-sm" id="btnLeaveQueue">
             <span>❌</span> Leave Queue (-leave)
+          </button>
+        </div>
+      </div>
+
+      <!-- Auto-Join Scanner Status Bar -->
+      <div id="autoJoinStatusCard" class="card" style="display: none; margin-bottom: 1.5rem; border-color: var(--accent-green); background: rgba(0, 230, 118, 0.08);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="live-dot" style="width: 14px; height: 14px; background: var(--accent-green);"></div>
+            <div>
+              <h4 style="font-size: 1.1rem; color: var(--accent-green);">⚡ Website Auto-Join Scanner: ACTIVE</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);" id="autoJoinStatusText">Scanning 128-tick nodes for open slots matching your favorited games...</p>
+            </div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="window.app.toggleAutoJoinSystem()">
+            <span>❌</span> Disable Auto-Join
           </button>
         </div>
       </div>
@@ -2422,6 +2444,94 @@
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <button class="btn btn-secondary" onclick="window.app.runWardogsRankedDraft()">🔄 Re-Select Players</button>
         <button class="btn btn-primary" onclick="alert('🚀 DEPLOYED TO 33v33v33 TRI-FACTION MATCH!\n\nConnecting all 99 selected WARDOG combatants to Dedicated 128-tick Server Node...')">🚀 Deploy to Ranked Match</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUARDIAN KERNEL ANTICHEAT CONTROL MODAL -->
+  <div class="modal-overlay" id="antiCheatControlModal">
+    <div class="modal-card" style="max-width: 650px; border-color: var(--accent-cyan);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.8rem;">🛡️</span>
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--accent-cyan); margin: 0;">Guardian Kernel Anti-Cheat Engine</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Ring 0 Kernel Telemetry & Memory Integrity Monitor</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeAntiCheatModal()">✕ Close</button>
+      </div>
+
+      <!-- Telemetry Box -->
+      <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+          <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-green);">🟢 KERNEL DRIVER ACTIVE (v4.2.0 - Ring 0 Protection)</span>
+          <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">128-Tick Heartbeat Synced</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; text-align: center; font-size: 0.8rem;">
+          <div style="background: rgba(0,0,0,0.4); padding: 0.6rem; border-radius: 6px;">
+            <div style="color: var(--text-muted);">Process Scans</div>
+            <strong style="color: var(--accent-cyan);">4,920 Scans</strong>
+          </div>
+          <div style="background: rgba(0,0,0,0.4); padding: 0.6rem; border-radius: 6px;">
+            <div style="color: var(--text-muted);">Violations</div>
+            <strong style="color: var(--accent-green);">0 Detected</strong>
+          </div>
+          <div style="background: rgba(0,0,0,0.4); padding: 0.6rem; border-radius: 6px;">
+            <div style="color: var(--text-muted);">Checksum</div>
+            <strong style="color: var(--accent-gold);">SHA256 Verified</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Scan Bar -->
+      <div id="acScanProgressBox" style="display: none; background: rgba(0,0,0,0.5); border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.25rem;">
+        <div style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 800; margin-bottom: 0.4rem;" id="acScanText">Running Deep Memory Integrity Check...</div>
+        <div style="width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden;">
+          <div id="acScanBar" style="width: 0%; background: var(--accent-cyan); height: 100%; transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="mmr-badge">Verified Kernel Checksum: 0x8F9A-RING0</span>
+        <button class="btn btn-primary" onclick="window.app.runAntiCheatScan()">🔍 Run Manual System Scan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TACTICAL TEAM LINEUP MANAGER MODAL -->
+  <div class="modal-overlay" id="teamLineupModal">
+    <div class="modal-card" style="max-width: 780px; width: 92%; border-color: var(--accent-purple);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.8rem;">📋</span>
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--accent-purple); margin: 0;">Tactical Team Lineup & Position Manager</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Manage starting lineups, combat roles, and sub substitutions for scrims</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeTeamLineupModal()">✕ Close</button>
+      </div>
+
+      <!-- Lineup Slot Grid -->
+      <div style="margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.8rem;">⚔️ Starting Lineup Roster (5v5 Tactical Fireteam)</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.8rem;" id="teamLineupSlotsGrid">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+
+      <!-- Substitutes List -->
+      <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 0.5rem;">🔄 Bench Substitutes Pool</h4>
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;" id="teamLineupBenchGrid">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn btn-secondary" onclick="window.app.autoBalanceLineup()">🔄 Auto-Balance Roles</button>
+        <button class="btn btn-primary" onclick="window.app.saveTeamLineup()">💾 Save Lineup & Lock Roster</button>
       </div>
     </div>
   </div>
