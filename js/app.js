@@ -1568,7 +1568,7 @@ class CustomLobbiesApp {
       `).join('');
     }
 
-    document.getElementById('wardogsDeploymentBanner').textContent = `🚀 WARDOGS COMMANDERS ASSIGNED BY HIGHEST PRE-FORMED MEMBER COUNT! 128-Tick Dedicated Server Reserved (${matchRoom.map})`;
+    document.getElementById('wardogsDeploymentBanner').textContent = `🚀 WARDOGS TRI-FACTION TEAMS AUTO-BALANCED! (${matchRoom.balanceRating || '99.8% Equalized'}) • 128-Tick Dedicated Server Reserved (${matchRoom.map})`;
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('match_found');

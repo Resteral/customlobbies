@@ -307,33 +307,55 @@ class WardogsEngine {
       membersCount: squad3.membersCount
     });
 
+    // Generate pool of 96 remaining draft operatives
+    const remainingDraft = [];
     for (let i = 3; i < capacity; i++) {
       let player = pool[i - 3];
       if (!player) {
-        const selectedRole = rolesList[i % rolesList.length];
+        const selectedRole = rolesList[(i - 3) % rolesList.length];
         player = {
           id: 1000 + i,
           name: `Operative_DOG_${i + 1}`,
           callsign: `DOG-${Math.floor(Math.random() * 899 + 100)}`,
           game: gameName,
           role: selectedRole,
-          elo: Math.floor(2550 - i * 6 + Math.random() * 40),
-          kd: (2.2 - i * 0.01).toFixed(2),
+          elo: Math.floor(2550 - (i - 3) * 6 + Math.random() * 35),
+          kd: (2.2 - (i - 3) * 0.01).toFixed(2),
           status: 'Selected for Ranked',
           badge: i % 5 === 0 ? '🏆 Elite Veteran' : '🛡️ Standard Operative'
         };
       } else {
         player.status = 'Selected for Ranked';
       }
-
-      if (i % 3 === 0) {
-        factionAlpha.push(player);
-      } else if (i % 3 === 1) {
-        factionBravo.push(player);
-      } else {
-        factionCharlie.push(player);
-      }
+      remainingDraft.push(player);
     }
+
+    // Sort remaining draft operatives descending by ELO
+    remainingDraft.sort((a, b) => b.elo - a.elo);
+
+    // Greedy Least-Sum Equalization Balancing across Factions (Alpha, Bravo, Charlie)
+    remainingDraft.forEach(player => {
+      const totals = [
+        { faction: factionAlpha, sum: factionAlpha.reduce((acc, p) => acc + p.elo, 0) },
+        { faction: factionBravo, sum: factionBravo.reduce((acc, p) => acc + p.elo, 0) },
+        { faction: factionCharlie, sum: factionCharlie.reduce((acc, p) => acc + p.elo, 0) }
+      ];
+
+      // Pick lowest sum faction that has less than 33 players
+      const available = totals.filter(t => t.faction.length < 33);
+      available.sort((a, b) => a.sum - b.sum);
+
+      available[0].faction.push(player);
+    });
+
+    const avgAlpha = Math.round(factionAlpha.reduce((acc, p) => acc + p.elo, 0) / factionAlpha.length);
+    const avgBravo = Math.round(factionBravo.reduce((acc, p) => acc + p.elo, 0) / factionBravo.length);
+    const avgCharlie = Math.round(factionCharlie.reduce((acc, p) => acc + p.elo, 0) / factionCharlie.length);
+
+    const maxAvg = Math.max(avgAlpha, avgBravo, avgCharlie);
+    const minAvg = Math.min(avgAlpha, avgBravo, avgCharlie);
+    const overallAvg = Math.round((avgAlpha + avgBravo + avgCharlie) / 3);
+    const balancePct = (100 - ((maxAvg - minAvg) / overallAvg) * 100).toFixed(1);
 
     const matchRoom = {
       id: `WD-TRIWAR-${Date.now().toString().slice(-4)}`,
@@ -346,12 +368,13 @@ class WardogsEngine {
       factionAlpha: factionAlpha,
       factionBravo: factionBravo,
       factionCharlie: factionCharlie,
-      avgEloAlpha: Math.round(factionAlpha.reduce((acc, p) => acc + p.elo, 0) / factionAlpha.length),
-      avgEloBravo: Math.round(factionBravo.reduce((acc, p) => acc + p.elo, 0) / factionBravo.length),
-      avgEloCharlie: Math.round(factionCharlie.reduce((acc, p) => acc + p.elo, 0) / factionCharlie.length),
+      avgEloAlpha: avgAlpha,
+      avgEloBravo: avgBravo,
+      avgEloCharlie: avgCharlie,
+      balanceRating: `${balancePct}% Equalized`,
       map: 'Sector 33 - Quantum Citadel (Tri-Zone Fortress)',
       serverNode: `US-EAST-WARNODE-${Math.floor(Math.random() * 90 + 10)} (128-Tick Tickrate)`,
-      status: 'DEPLOYED TO DEDICATED 99-PLAYER SERVER NODE (128-TICK)',
+      status: `DEPLOYED TO DEDICATED 99-PLAYER SERVER NODE (128-TICK) • ${balancePct}% BALANCED`,
       timestamp: new Date().toLocaleTimeString()
     };
 
