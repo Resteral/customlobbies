@@ -598,7 +598,23 @@ class CustomLobbiesApp {
     const serverPass = 'cl_scrim_2026';
     const connectCmd = `connect ${serverIP}; password ${serverPass}`;
 
-    alert(`🏆 FACEIT-STYLE COMPETITIVE MATCH ROOM DISPATCHED!\n\nMatch: "${lobbyTitle}" (${gameTitle})\n\n🛡️ Anti-Cheat Status: Guardian AC Verified (Active Ring 0 Driver)\n🎮 Server IP: ${serverIP}\n🔑 Password: ${serverPass}\n\n1-Click Launch Command:\n${connectCmd}`);
+    try {
+      navigator.clipboard.writeText(connectCmd);
+    } catch(e) {}
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('match_found');
+    }
+
+    const modal = document.getElementById('matchFoundModal');
+    if (modal) {
+      const titleEl = document.getElementById('matchFoundTitle');
+      if (titleEl) titleEl.textContent = `🏆 ${lobbyTitle} (${gameTitle})`;
+      modal.classList.add('active');
+    } else {
+      window.location.href = `steam://connect/${serverIP}`;
+      alert(`🏆 FACEIT COMPETITIVE MATCH ROOM DISPATCHED!\n\nMatch: "${lobbyTitle}" (${gameTitle})\n\n🛡️ Anti-Cheat Status: Guardian AC Verified (Active Ring 0 Driver)\n🎮 Server IP: ${serverIP}\n🔑 Password: ${serverPass}\n\n1-Click Launch Command:\n${connectCmd}\n\n(Command Copied to Clipboard!)`);
+    }
   }
 
   // Social Media Post Handler
@@ -1705,7 +1721,31 @@ class CustomLobbiesApp {
   }
 
   connectToServer(name, url) {
-    alert(`⚡ CONNECTING TO SPONSORED SERVER:\n\n"${name}"\n\nConnection URL: ${url}\nLaunching game client...`);
+    const ipPort = url.replace('steam://connect/', '');
+    const cmd = `connect ${ipPort}`;
+    try {
+      navigator.clipboard.writeText(cmd);
+    } catch (e) {}
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('lobby_start');
+    }
+
+    window.location.href = url;
+    alert(`⚡ CONNECTING TO DEDICATED SERVER NODE:\n\n"${name}"\n\nProtocol URL: ${url}\nConsole Command: ${cmd} (Copied to Clipboard!)\n\nLaunching Steam / Game Client...`);
+  }
+
+  copyServerIP(ipPort) {
+    const cmd = `connect ${ipPort}`;
+    try {
+      navigator.clipboard.writeText(cmd);
+    } catch (e) {}
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
+
+    alert(`📋 CONSOLE COMMAND COPIED!\n\nCommand: "${cmd}"\n\nPaste in your game console (~ key) to connect directly to the 128-tick server node!`);
   }
 
   connectLobbyVoice(lobbyTitle) {
@@ -1823,10 +1863,11 @@ class CustomLobbiesApp {
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
             <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">${l.players} / ${l.max} Players</span>
-            <div style="display: flex; gap: 0.4rem;">
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+              <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('192.168.1.85:27015')" title="Copy Console Connect Command">📋 Copy IP</button>
               <button class="btn btn-secondary btn-sm" onclick="window.app.connectLobbyVoice('${l.title}')" title="Connect WebRTC Voice Room">🎙️ Voice</button>
               <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('${l.game}')">👑 Captain Draft</button>
-              <button class="btn btn-primary btn-sm" onclick="window.app.launchFaceitMatchRoom('${l.title}', '${l.game}')">🏆 Match Room</button>
+              <button class="btn btn-primary btn-sm" onclick="window.app.launchFaceitMatchRoom('${l.title}', '${l.game}')">🏆 Direct Join</button>
             </div>
           </div>
         </div>
@@ -2212,11 +2253,16 @@ class CustomLobbiesApp {
 
     const linkedContainer = document.getElementById('passportLinkedAccounts');
     if (linkedContainer) {
+      const steamLink = p.steamId ? `<a href="https://steamcommunity.com/profiles/${p.steamId}" target="_blank" rel="noopener" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">🎮 ${p.steamId}</a>` : '<span style="color: var(--text-dim);">Not Linked</span>';
+      const riotLink = p.riotId ? `<a href="https://tracker.gg/valorant/profile/riot/${encodeURIComponent(p.riotId)}/overview" target="_blank" rel="noopener" style="color: var(--accent-gold); text-decoration: underline; font-weight: 700;">🔴 ${p.riotId}</a>` : '<span style="color: var(--text-dim);">Not Linked</span>';
+      const discordLink = p.discord ? `<a href="https://discord.gg/customlobbies" target="_blank" rel="noopener" style="color: var(--accent-purple); text-decoration: underline; font-weight: 700;">💬 ${p.discord}</a>` : '<span style="color: var(--text-dim);">Not Linked</span>';
+      const twitchLink = p.twitch ? `<a href="https://${p.twitch.replace('https://', '')}" target="_blank" rel="noopener" style="color: var(--accent-green); text-decoration: underline; font-weight: 700;">📺 ${p.twitch}</a>` : '<span style="color: var(--text-dim);">Not Linked</span>';
+
       linkedContainer.innerHTML = `
-        <div><span style="color: var(--text-muted);">Steam:</span> <strong>${p.steamId || 'Not Linked'}</strong></div>
-        <div><span style="color: var(--text-muted);">Riot ID:</span> <strong>${p.riotId || 'Not Linked'}</strong></div>
-        <div><span style="color: var(--text-muted);">Discord:</span> <strong>${p.discord || 'Not Linked'}</strong></div>
-        <div><span style="color: var(--text-muted);">Twitch:</span> <strong>${p.twitch || 'Not Linked'}</strong></div>
+        <div style="margin-bottom: 0.3rem;"><span style="color: var(--text-muted);">Steam Community:</span> ${steamLink}</div>
+        <div style="margin-bottom: 0.3rem;"><span style="color: var(--text-muted);">Riot ID Tracker:</span> ${riotLink}</div>
+        <div style="margin-bottom: 0.3rem;"><span style="color: var(--text-muted);">Discord Community:</span> ${discordLink}</div>
+        <div><span style="color: var(--text-muted);">Twitch Stream:</span> ${twitchLink}</div>
       `;
     }
 

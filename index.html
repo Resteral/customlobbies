@@ -2533,6 +2533,54 @@
     </div>
   </div>
 
+  <!-- Global Footer & Quick Resource Links -->
+  <footer style="background: rgba(10, 10, 18, 0.95); border-top: 1px solid var(--border-color); padding: 2.5rem 1.5rem; margin-top: 3rem; font-size: 0.88rem;">
+    <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem;">
+      <div>
+        <h4 style="color: var(--accent-gold); font-size: 1.1rem; font-weight: 900; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.4rem;">
+          <span>🎮</span> CustomLobbies.com
+        </h4>
+        <p style="color: var(--text-muted); font-size: 0.82rem; line-height: 1.5;">
+          The ultimate 128-tick competitive match platform. Host custom lobbies, captain snake drafts, Ring 0 Guardian anti-cheat verification, and live esports tournaments.
+        </p>
+      </div>
+
+      <div>
+        <h5 style="color: var(--accent-cyan); font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;">🔌 Server Connect & Protocols</h5>
+        <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
+          <li><a href="steam://connect/192.168.1.85:27015" style="color: var(--text-main); text-decoration: none;" onclick="window.app.copyServerIP('192.168.1.85:27015')">🎯 CS2 128-Tick Premier Server Node</a></li>
+          <li><a href="steam://connect/192.168.1.130:27015" style="color: var(--text-main); text-decoration: none;" onclick="window.app.copyServerIP('192.168.1.130:27015')">🏒 Slapshot: Rebound 3v3 Puck Arena</a></li>
+          <li><a href="steam://connect/192.168.1.110:27015" style="color: var(--text-main); text-decoration: none;" onclick="window.app.copyServerIP('192.168.1.110:27015')">🔥 REMATCH 5v5 Competitive Node</a></li>
+          <li><a href="steam://connect/192.168.1.115:27015" style="color: var(--text-main); text-decoration: none;" onclick="window.app.copyServerIP('192.168.1.115:27015')">⚔️ Arkheron 12-Player Cyber Spire</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 style="color: var(--accent-purple); font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;">💬 Community & Social Links</h5>
+        <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
+          <li><a href="https://discord.gg/customlobbies" target="_blank" rel="noopener" style="color: #5865F2; font-weight: 700; text-decoration: underline;">💬 Official Discord Community</a></li>
+          <li><a href="https://twitch.tv/CustomLobbiesHost" target="_blank" rel="noopener" style="color: #9146FF; font-weight: 700; text-decoration: underline;">📺 Twitch Stream Broadcast</a></li>
+          <li><a href="https://twitter.com/CustomLobbies" target="_blank" rel="noopener" style="color: #1DA1F2; font-weight: 700; text-decoration: underline;">🐦 Twitter / X Official Updates</a></li>
+          <li><a href="https://github.com/Resteral/customlobby" target="_blank" rel="noopener" style="color: var(--accent-cyan); font-weight: 700; text-decoration: underline;">🐙 GitHub Open-Source Core</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h5 style="color: var(--accent-green); font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;">🛡️ Guardian Anti-Cheat Engine</h5>
+        <p style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.5; margin-bottom: 0.8rem;">
+          Protected by Ring 0 Kernel telemetry and process memory integrity checks.
+        </p>
+        <button class="btn btn-purple btn-sm" onclick="window.app.openAntiCheatModal()">
+          🛡️ Run Anti-Cheat Status Scan
+        </button>
+      </div>
+    </div>
+
+    <div style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 1.5rem; padding-top: 1rem; text-align: center; color: var(--text-dim); font-size: 0.78rem;">
+      © 2026 CustomLobbies.com Esports Network. All rights reserved. 128-tick server node infrastructure & FACEIT-style Snake Draft Engine.
+    </div>
+  </footer>
+
   <!-- Firebase & Google Cloud SDK Imports -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
