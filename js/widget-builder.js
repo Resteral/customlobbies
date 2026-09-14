@@ -78,6 +78,12 @@ class WidgetBuilderEngine {
 
   playSoundEffect(soundType) {
     try {
+      if (soundType === 'lobby_start' || soundType === 'match_found' || soundType === 'accept_match' || soundType === 'lobby_created') {
+        const audio = new Audio('audio/lobby_start.wav');
+        audio.play().catch(err => console.warn('Custom audio playback issue:', err));
+        return;
+      }
+
       const ctx = this.getAudioContext();
       const now = ctx.currentTime;
       const osc = ctx.createOscillator();

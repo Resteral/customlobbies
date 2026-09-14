@@ -2637,6 +2637,9 @@ class CustomLobbiesApp {
         this.saveState();
         this.renderActiveGamesBar();
         this.renderLobbies();
+        if (window.widgetBuilderEngine) {
+          window.widgetBuilderEngine.playSoundEffect('lobby_start');
+        }
         modal.classList.remove('active');
         alert(`🔥 Active FACEIT-Style Custom Lobby created for ${game}! Protected by Guardian Anti-Cheat Engine.`);
       });
