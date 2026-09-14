@@ -971,3 +971,71 @@ body.obs-transparent-mode {
 .brand-icon {
   animation: neonPulse 3s infinite ease-in-out;
 }
+
+/* Tournament Schedule Monthly Calendar Grid */
+.calendar-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.calendar-header-day {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  padding: 0.5rem 0;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-sm);
+}
+
+.calendar-day-cell {
+  background: rgba(18, 22, 31, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  min-height: 85px;
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.calendar-day-cell:hover {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 242, 254, 0.08);
+}
+
+.calendar-day-cell.active-day {
+  border-color: var(--accent-gold);
+  background: rgba(255, 215, 0, 0.08);
+}
+
+.calendar-day-number {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.calendar-event-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  margin-top: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.event-tag-cs2 { background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); border: 1px solid rgba(0, 242, 254, 0.4); }
+.event-tag-empulse { background: rgba(0, 230, 118, 0.2); color: var(--accent-green); border: 1px solid rgba(0, 230, 118, 0.4); }
+.event-tag-rematch { background: rgba(255, 82, 82, 0.2); color: var(--accent-red); border: 1px solid rgba(255, 82, 82, 0.4); }
+.event-tag-valorant { background: rgba(157, 78, 221, 0.2); color: var(--accent-purple); border: 1px solid rgba(157, 78, 221, 0.4); }
+.event-tag-arkheron { background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); border: 1px solid rgba(255, 215, 0, 0.4); }

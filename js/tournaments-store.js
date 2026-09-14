@@ -60,7 +60,56 @@ class TournamentsStoreEngine {
     this.renderTournaments();
     this.renderTrophyCabinet();
     this.renderLeagueCalendar();
+    this.renderMonthlyCalendarGrid();
     this.setupEventListeners();
+  }
+
+  renderMonthlyCalendarGrid() {
+    const grid = document.getElementById('fullTournamentCalendarGrid');
+    if (!grid) return;
+
+    const daysOfWeek = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+    let html = daysOfWeek.map(d => `<div class="calendar-header-day">${d}</div>`).join('');
+
+    const eventMap = {
+      4: { title: '🎯 CS2 1v1 Aim Arena', class: 'event-tag-cs2' },
+      8: { title: '⚡ Empulse Cyber Scrim', class: 'event-tag-empulse' },
+      12: { title: '🏆 CS2 $1.5k Summer Scrim', class: 'event-tag-cs2' },
+      15: { title: '🔴 Valorant $500 Clash', class: 'event-tag-valorant' },
+      18: { title: '⚽ Rocket League 2v2', class: 'event-tag-rematch' },
+      22: { title: '🏆 Apex 3v3 Arena $2k', class: 'event-tag-arkheron' },
+      25: { title: '🔥 REMATCH 5v5 Finals', class: 'event-tag-rematch' },
+      29: { title: '⚔️ Arkheron Spire Scrims', class: 'event-tag-arkheron' }
+    };
+
+    for (let day = 1; day <= 30; day++) {
+      const evt = eventMap[day];
+      const isToday = (day === 14);
+
+      html += `
+        <div class="calendar-day-cell ${isToday ? 'active-day' : ''}" onclick="window.tournamentsStoreEngine.selectCalendarDay(${day})">
+          <div class="calendar-day-number">${day} ${isToday ? '⭐ TODAY' : ''}</div>
+          ${evt ? `<div class="calendar-event-tag ${evt.class}">${evt.title}</div>` : `<div style="font-size: 0.68rem; color: var(--text-dim);">No event</div>`}
+        </div>
+      `;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  selectCalendarDay(dayNumber) {
+    alert(`📅 CALENDAR DATE DETAILS (SEP ${dayNumber}, 2026):\n\nScheduled Tournament Event details, registration deadlines, and squad sign-ups active!`);
+  }
+
+  changeMonth(dir) {
+    const title = document.getElementById('calendarMonthTitle');
+    const months = ['AUGUST 2026', 'SEPTEMBER 2026', 'OCTOBER 2026', 'NOVEMBER 2026'];
+    this.currentMonthIdx = (this.currentMonthIdx !== undefined ? this.currentMonthIdx : 1) + dir;
+    if (this.currentMonthIdx < 0) this.currentMonthIdx = 0;
+    if (this.currentMonthIdx >= months.length) this.currentMonthIdx = months.length - 1;
+
+    if (title) title.textContent = months[this.currentMonthIdx];
+    this.renderMonthlyCalendarGrid();
   }
 
   advanceBracketWinner(tourneyId, round, matchIdx, winningTeamName) {

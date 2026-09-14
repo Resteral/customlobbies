@@ -871,11 +871,37 @@
 
       <!-- League Calendar Schedule Card -->
       <div class="card" style="margin-bottom: 2rem; border-color: var(--accent-cyan);">
-        <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-          <span>📅</span> Esports League & Tournament Schedule Calendar
-        </h3>
-        <div id="leagueCalendarContainer">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+              <span>📅</span> Esports League & Tournament Calendar Schedule
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">Select any date to view scheduled tournaments, registration deadlines, and prize pools.</p>
+          </div>
+          
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+            <button class="btn btn-purple btn-sm" onclick="alert('📅 EXPORT TO ICAL / GOOGLE CALENDAR:\\n\\nExported 14 upcoming CustomLobbies tournaments to customlobbies_events.ics!')">
+              <span>📅</span> Export iCal
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="alert('🔔 NOTIFICATIONS ENABLED!\\n\\nYou will receive desktop push notifications 15m before scheduled tournament starts.')">
+              <span>🔔</span> Set Reminders
+            </button>
+          </div>
+        </div>
+
+        <!-- Monthly Calendar Grid Header & Days -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 0.6rem 1rem; border-radius: 8px; margin-bottom: 0.8rem; font-weight: 800; font-size: 0.95rem;">
+          <button class="btn btn-secondary btn-sm" onclick="window.tournamentsStoreEngine.changeMonth(-1)">◀ Prev Month</button>
+          <span style="color: var(--accent-gold); font-size: 1.1rem;" id="calendarMonthTitle">SEPTEMBER 2026</span>
+          <button class="btn btn-secondary btn-sm" onclick="window.tournamentsStoreEngine.changeMonth(1)">Next Month ▶</button>
+        </div>
+
+        <div class="calendar-month-grid" id="fullTournamentCalendarGrid">
           <!-- Injected via tournaments-store.js -->
+        </div>
+
+        <div style="margin-top: 1.5rem;" id="leagueCalendarContainer">
+          <!-- Upcoming list injected via tournaments-store.js -->
         </div>
       </div>
 
