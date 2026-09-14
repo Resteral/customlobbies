@@ -44,7 +44,6 @@ class CustomLobbiesApp {
       'Rainbow Six Siege',
       'FiveM GTA RP',
       'Rocket League',
-      'Apex Legends',
       'Slapshot: Rebound'
     ];
 
@@ -106,7 +105,7 @@ class CustomLobbiesApp {
           'Empulse': { elo: 2450, wins: 105, losses: 15, winRate: 87.5, kd: '2.55', mvp: 38 },
           'Valorant': { elo: 2350, wins: 110, losses: 22, winRate: 83.3, kd: '1.98', mvp: 35 },
           'Marvel Rivals': { elo: 2400, wins: 88, losses: 15, winRate: 85.4, kd: '3.10', mvp: 30 },
-          'Apex Legends': { elo: 2650, wins: 95, losses: 18, winRate: 84.0, kd: '3.45', mvp: 42 },
+          'Slapshot: Rebound': { elo: 2650, wins: 95, losses: 18, winRate: 84.0, kd: '3.45', mvp: 42 },
           'Rocket League': { elo: 2450, wins: 88, losses: 20, winRate: 81.4, kd: 'N/A', mvp: 30 },
           'Dota 2': { elo: 4200, wins: 130, losses: 40, winRate: 76.4, kd: '3.10', mvp: 29 },
           'Rainbow Six Siege': { elo: 3100, wins: 75, losses: 15, winRate: 83.3, kd: '2.05', mvp: 22 }
@@ -130,7 +129,7 @@ class CustomLobbiesApp {
           'Arkheron': { elo: 1750, wins: 62, losses: 25, winRate: 71.2, kd: '1.90', mvp: 22 },
           'Empulse': { elo: 2150, wins: 85, losses: 20, winRate: 81.0, kd: '2.10', mvp: 28 },
           'Valorant': { elo: 2100, wins: 82, losses: 24, winRate: 77.3, kd: '1.68', mvp: 24 },
-          'Apex Legends': { elo: 2580, wins: 112, losses: 20, winRate: 84.8, kd: '3.20', mvp: 50 },
+          'Slapshot: Rebound': { elo: 2580, wins: 112, losses: 20, winRate: 84.8, kd: '3.20', mvp: 50 },
           'Rocket League': { elo: 1850, wins: 64, losses: 30, winRate: 68.1, kd: 'N/A', mvp: 18 },
           'Dota 2': { elo: 2800, wins: 55, losses: 35, winRate: 61.1, kd: '2.40', mvp: 12 },
           'Rainbow Six Siege': { elo: 2400, wins: 60, losses: 25, winRate: 70.5, kd: '1.55', mvp: 15 }
@@ -153,7 +152,7 @@ class CustomLobbiesApp {
           'REMATCH': { elo: 1820, wins: 65, losses: 30, winRate: 68.4, kd: '1.60', mvp: 20 },
           'Arkheron': { elo: 1650, wins: 54, losses: 28, winRate: 65.8, kd: '1.72', mvp: 18 },
           'Valorant': { elo: 1950, wins: 90, losses: 38, winRate: 70.3, kd: '1.52', mvp: 26 },
-          'Apex Legends': { elo: 2100, wins: 78, losses: 30, winRate: 72.2, kd: '2.40', mvp: 30 },
+          'Slapshot: Rebound': { elo: 2100, wins: 78, losses: 30, winRate: 72.2, kd: '2.40', mvp: 30 },
           'Rocket League': { elo: 1950, wins: 72, losses: 25, winRate: 74.2, kd: 'N/A', mvp: 22 },
           'Dota 2': { elo: 3100, wins: 82, losses: 40, winRate: 67.2, kd: '2.65', mvp: 18 },
           'Rainbow Six Siege': { elo: 2800, wins: 78, losses: 28, winRate: 73.6, kd: '1.80', mvp: 20 }
@@ -176,7 +175,7 @@ class CustomLobbiesApp {
           'REMATCH': { elo: 1900, wins: 72, losses: 28, winRate: 72.0, kd: '1.70', mvp: 24 },
           'Arkheron': { elo: 1850, wins: 68, losses: 24, winRate: 73.9, kd: '1.80', mvp: 21 },
           'Valorant': { elo: 1350, wins: 62, losses: 30, winRate: 67.4, kd: '1.38', mvp: 19 },
-          'Apex Legends': { elo: 2510, wins: 104, losses: 26, winRate: 80.0, kd: '3.10', mvp: 38 },
+          'Slapshot: Rebound': { elo: 2510, wins: 104, losses: 26, winRate: 80.0, kd: '3.10', mvp: 38 },
           'Rocket League': { elo: 2100, wins: 80, losses: 32, winRate: 71.4, kd: 'N/A', mvp: 21 },
           'Dota 2': { elo: 2500, wins: 60, losses: 35, winRate: 63.1, kd: '2.25', mvp: 14 },
           'Rainbow Six Siege': { elo: 2250, wins: 54, losses: 28, winRate: 65.8, kd: '1.42', mvp: 16 }
@@ -197,7 +196,7 @@ class CustomLobbiesApp {
         games: {
           'Counter-Strike 2': { elo: 1790, wins: 64, losses: 40, winRate: 61.5, kd: '1.32', mvp: 18 },
           'Valorant': { elo: 1750, wins: 72, losses: 45, winRate: 61.5, kd: '1.35', mvp: 17 },
-          'Apex Legends': { elo: 1800, wins: 65, losses: 42, winRate: 60.7, kd: '1.95', mvp: 15 },
+          'Slapshot: Rebound': { elo: 1800, wins: 65, losses: 42, winRate: 60.7, kd: '1.95', mvp: 15 },
           'Rocket League': { elo: 1500, wins: 45, losses: 35, winRate: 56.2, kd: 'N/A', mvp: 10 },
           'Dota 2': { elo: 3100, wins: 70, losses: 50, winRate: 58.3, kd: '2.50', mvp: 16 },
           'Rainbow Six Siege': { elo: 1950, wins: 48, losses: 38, winRate: 55.8, kd: '1.25', mvp: 11 }
@@ -218,7 +217,7 @@ class CustomLobbiesApp {
         games: {
           'Counter-Strike 2': { elo: 1680, wins: 52, losses: 38, winRate: 57.8, kd: '1.22', mvp: 14 },
           'Valorant': { elo: 1820, wins: 80, losses: 39, winRate: 67.2, kd: '1.48', mvp: 21 },
-          'Apex Legends': { elo: 1650, wins: 50, losses: 38, winRate: 56.8, kd: '1.75', mvp: 12 },
+          'Slapshot: Rebound': { elo: 1650, wins: 50, losses: 38, winRate: 56.8, kd: '1.75', mvp: 12 },
           'Rocket League': { elo: 1420, wins: 38, losses: 30, winRate: 55.9, kd: 'N/A', mvp: 8 },
           'Dota 2': { elo: 1900, wins: 42, losses: 38, winRate: 52.5, kd: '2.05', mvp: 9 },
           'Rainbow Six Siege': { elo: 3050, wins: 95, losses: 22, winRate: 81.2, kd: '2.10', mvp: 28 }
@@ -2018,7 +2017,7 @@ class CustomLobbiesApp {
       'Marvel Rivals',
       'Deadlock',
       'The Finals',
-      'Apex Legends',
+      'Slapshot: Rebound',
       'Rocket League',
       'Dota 2',
       'Rainbow Six Siege'

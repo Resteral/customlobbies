@@ -17,7 +17,7 @@ class TournamentsStoreEngine {
       { id: 201, date: 'AUG 12', title: 'CS2 5v5 Summer Scrim League - Week 1', game: 'CS2', time: '7:00 PM EST', prize: '$1,500', status: 'Registration Open' },
       { id: 202, date: 'AUG 15', title: 'Valorant $500 Diamond Clash Bracket', game: 'Valorant', time: '6:00 PM EST', prize: '$500', status: 'Upcoming' },
       { id: 203, date: 'AUG 18', title: 'Rocket League 2v2 Grandmaster Cup', game: 'Rocket League', time: '8:00 PM EST', prize: '$750', status: 'Upcoming' },
-      { id: 204, date: 'AUG 22', title: 'Apex Legends 3v3 Arena Championship', game: 'Apex', time: '5:00 PM EST', prize: '$2,000', status: 'Registration Open' }
+      { id: 204, date: 'AUG 22', title: 'Slapshot: Rebound 3v3 Puck Championship', game: 'Slapshot', time: '5:00 PM EST', prize: '$2,000', status: 'Registration Open' }
     ];
 
     this.banners = [

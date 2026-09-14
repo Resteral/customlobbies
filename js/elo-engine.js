@@ -52,7 +52,7 @@ class EloEngine {
       'Rainbow Six Siege': 10,
       'FiveM GTA RP': 16,
       'Rocket League': 6,
-      'Apex Legends': 6
+      'Slapshot: Rebound': 6
     };
 
     // Native Rank Systems per Game Title
@@ -98,14 +98,14 @@ class EloEngine {
         { min: 1801, max: 2200, name: 'Immortal 1 - 3', badge: '🟣 Immortal', color: '#d500f9' },
         { min: 2201, max: 9999, name: 'Radiant Leaderboard', badge: '🔴 Radiant', color: '#ff1744' }
       ],
-      'Apex Legends': [
-        { min: 0, max: 500, name: 'Bronze League', badge: '🤎 Bronze', color: '#cd7f32' },
-        { min: 501, max: 900, name: 'Silver League', badge: '🥈 Silver', color: '#c0c0c0' },
-        { min: 901, max: 1300, name: 'Gold League', badge: '🥇 Gold', color: '#ffd700' },
-        { min: 1301, max: 1700, name: 'Platinum League', badge: '🩵 Platinum', color: '#00e5ff' },
-        { min: 1701, max: 2100, name: 'Diamond League', badge: '💎 Diamond', color: '#b388ff' },
-        { min: 2101, max: 2500, name: 'Master League', badge: '🔮 Master', color: '#aa00ff' },
-        { min: 2501, max: 9999, name: 'Apex Predator Top 750', badge: '🏆 Apex Predator', color: '#ff1744' }
+      'Slapshot: Rebound': [
+        { min: 0, max: 500, name: 'Bronze Puck', badge: '🤎 Bronze Puck', color: '#cd7f32' },
+        { min: 501, max: 900, name: 'Silver Puck', badge: '🥈 Silver Puck', color: '#c0c0c0' },
+        { min: 901, max: 1300, name: 'Gold Puck', badge: '🥇 Gold Puck', color: '#ffd700' },
+        { min: 1301, max: 1700, name: 'Platinum Puck', badge: '🩵 Platinum Puck', color: '#00e5ff' },
+        { min: 1701, max: 2100, name: 'Diamond Puck', badge: '💎 Diamond Puck', color: '#b388ff' },
+        { min: 2101, max: 2500, name: 'Master Puck', badge: '🔮 Master Puck', color: '#aa00ff' },
+        { min: 2501, max: 9999, name: 'Slapshot Legend Top 50', badge: '🏒 Slapshot Legend', color: '#ff1744' }
       ],
       'Rocket League': [
         { min: 0, max: 500, name: 'Bronze I - III', badge: '🤎 Bronze', color: '#cd7f32' },
