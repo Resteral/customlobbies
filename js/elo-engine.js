@@ -32,11 +32,18 @@ class EloEngine {
       'CS2 KZ / Climb (Bhop)': 12,
       'CS2 Zombie Escape': 20,
       'Valorant': 10,
+      'REMATCH': 10,
+      'Arkheron': 12,
+      'Empulse': 10,
+      'Marvel Rivals': 12,
+      'Deadlock': 12,
+      'The Finals': 6,
+      'Overwatch 2': 10,
+      'League of Legends': 10,
+      'Fortnite': 16,
       'Dota 2': 10,
       'StarCraft II': 2,
       'PUBG': 16,
-      'Arkheron': 12,
-      'Empulse': 10,
       'Rainbow Six Siege': 10,
       'FiveM GTA RP': 16,
       'Rocket League': 6,
@@ -45,6 +52,34 @@ class EloEngine {
 
     // Native Rank Systems per Game Title
     this.gameRankSystems = {
+      'REMATCH': [
+        { min: 0, max: 400, name: 'Rookie Tier', badge: '⚪ Rookie', color: '#a0a0a0' },
+        { min: 401, max: 800, name: 'Challenger Tier', badge: '🩵 Challenger', color: '#00e5ff' },
+        { min: 801, max: 1400, name: 'Elite Tier', badge: '💎 Elite', color: '#b388ff' },
+        { min: 1401, max: 2000, name: 'Master Division', badge: '🔮 Master', color: '#aa00ff' },
+        { min: 2001, max: 9999, name: 'Rematch Champion', badge: '🔥 Rematch Champ', color: '#ff1744' }
+      ],
+      'Arkheron': [
+        { min: 0, max: 500, name: 'Initiated Gladiator', badge: '🤎 Initiated', color: '#cd7f32' },
+        { min: 501, max: 1100, name: 'Cyber Gladiator', badge: '⚔️ Cyber Gladiator', color: '#00e5ff' },
+        { min: 1101, max: 1800, name: 'Apex Archon', badge: '🏛️ Apex Archon', color: '#ffd700' },
+        { min: 1801, max: 9999, name: 'Arkheron Overlord', badge: '👑 Arkheron Overlord', color: '#ff1744' }
+      ],
+      'Empulse': [
+        { min: 0, max: 500, name: 'Empulse Cadet', badge: '⚪ Cadet', color: '#a0a0a0' },
+        { min: 501, max: 1200, name: 'Specialist Operative', badge: '🩵 Specialist', color: '#00e5ff' },
+        { min: 1201, max: 1900, name: 'Empulse Commando', badge: '🟢 Commando', color: '#00e676' },
+        { min: 1901, max: 9999, name: 'Empulse Legend', badge: '⚡ Empulse Legend', color: '#ff1744' }
+      ],
+      'Marvel Rivals': [
+        { min: 0, max: 400, name: 'Bronze Rank', badge: '🤎 Bronze', color: '#cd7f32' },
+        { min: 401, max: 800, name: 'Silver Rank', badge: '🥈 Silver', color: '#c0c0c0' },
+        { min: 801, max: 1200, name: 'Gold Rank', badge: '🥇 Gold', color: '#ffd700' },
+        { min: 1201, max: 1600, name: 'Platinum Rank', badge: '🩵 Platinum', color: '#00e5ff' },
+        { min: 1601, max: 2000, name: 'Diamond Rank', badge: '💎 Diamond', color: '#b388ff' },
+        { min: 2001, max: 2500, name: 'Grandmaster', badge: '🔮 Grandmaster', color: '#aa00ff' },
+        { min: 2501, max: 9999, name: 'Eternity Leaderboard', badge: '⚡ Eternity', color: '#ff1744' }
+      ],
       'Valorant': [
         { min: 0, max: 200, name: 'Iron 1 - 3', badge: '⚪ Iron', color: '#a0a0a0' },
         { min: 201, max: 400, name: 'Bronze 1 - 3', badge: '🤎 Bronze', color: '#cd7f32' },
@@ -112,6 +147,12 @@ class EloEngine {
       'CS2 KZ / Climb (Bhop)': ['kz_hb_man_bhop', 'kz_cliffhanger', 'kz_pro_slide', 'kz_bhop_valley'],
       'CS2 Zombie Escape': ['ze_predator_ultimate', 'ze_paranoid', 'ze_fapescape', 'ze_minigames'],
       'Valorant': ['Ascent', 'Bind', 'Haven', 'Split', 'Lotus', 'Sunset'],
+      'REMATCH': ['Nexus Arena', 'Cyber City', 'Sub-Zero Station', 'Viper Base'],
+      'Arkheron': ['Arkheron Spire', 'Quantum Ruins', 'Oblivion Core'],
+      'Empulse': ['Empulse Facility', 'Neon Skyline', 'Pulse Station'],
+      'Marvel Rivals': ['Tokyo 2099', 'Yggsgard', 'Wakanda Imperial'],
+      'Deadlock': ['Cursed City Canyons', 'Midtown Lanes'],
+      'The Finals': ['Monaco', 'Seoul', 'Las Vegas', 'Skyway Stadium'],
       'Rainbow Six Siege': ['Clubhouse', 'Oregon', 'Bank', 'Kafe', 'Chalet', 'Consulate'],
       'Dota 2': ['Radiant Side', 'Dire Side', 'Captains Mode Draft']
     };

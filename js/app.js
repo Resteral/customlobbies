@@ -40,11 +40,17 @@ class CustomLobbiesApp {
       'CS2 Surf (Tier 1-6)',
       'CS2 KZ / Climb (Bhop)',
       'CS2 Zombie Escape',
+      'REMATCH',
+      'Arkheron',
       'Valorant',
+      'Marvel Rivals',
+      'Deadlock',
+      'The Finals',
+      'Overwatch 2',
+      'League of Legends',
       'Dota 2',
       'StarCraft II',
       'PUBG',
-      'Arkheron',
       'Empulse',
       'Rainbow Six Siege',
       'FiveM GTA RP',
@@ -52,20 +58,22 @@ class CustomLobbiesApp {
       'Apex Legends'
     ];
 
-    this.favoriteGames = new Set(['Counter-Strike 2', 'CS2 Bhop (Auto & Scroll)', 'CS2 Retake (Bomb Defusal)', 'Valorant', 'Dota 2', 'FiveM GTA RP']);
+    this.favoriteGames = new Set(['Counter-Strike 2', 'REMATCH', 'Arkheron', 'Valorant', 'Marvel Rivals', 'Dota 2', 'FiveM GTA RP']);
     this.loadFavorites();
 
     this.sponsoredServers = [
+      { id: 316, name: 'REMATCH 5v5 Competitive Arena Node #1', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, connectURL: 'steam://connect/192.168.1.110:27015', sponsoredBadge: '🔥 REMATCH SPONSOR' },
+      { id: 317, name: 'Arkheron 12-Player Cyber Scrim Spire', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, connectURL: 'steam://connect/192.168.1.115:27015', sponsoredBadge: '⚔️ ARKHERON SPONSOR' },
       { id: 314, name: 'CS2 128-Tick Auto-Bhop Speedrun Server', game: 'CS2 Bhop (Auto & Scroll)', host: 'Bhop_God', players: 18, max: 24, connectURL: 'steam://connect/192.168.1.100:27015', sponsoredBadge: '🐰 BHOP SPONSOR' },
       { id: 315, name: 'CS2 Danger Zone Solos & Duos Arena', game: 'CS2 Danger Zone (BR)', host: 'DZ_Survivor', players: 16, max: 18, connectURL: 'steam://connect/192.168.1.105:27015', sponsoredBadge: '🪂 DZ SPONSOR' },
-      { id: 311, name: 'CS2 128-Tick Retake Server #1', game: 'CS2 Retake (Bomb Defusal)', host: 'Retake_Leader', players: 7, max: 9, connectURL: 'steam://connect/192.168.1.85:27015', sponsoredBadge: '💣 RETAKE SPONSOR' },
-      { id: 309, name: 'CS2 Gun Game Arms Race Shoots Server', game: 'CS2 Gun Game (Arms Race)', host: 'GunGame_Master', players: 12, max: 16, connectURL: 'steam://connect/192.168.1.75:27015', sponsoredBadge: '🔫 GUN GAME SPONSOR' }
+      { id: 311, name: 'CS2 128-Tick Retake Server #1', game: 'CS2 Retake (Bomb Defusal)', host: 'Retake_Leader', players: 7, max: 9, connectURL: 'steam://connect/192.168.1.85:27015', sponsoredBadge: '💣 RETAKE SPONSOR' }
     ];
 
     this.lobbies = [
+      { id: 12, title: 'REMATCH 5v5 High ELO Champion Scrims', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, region: 'NA East', draftType: 'Captain Draft' },
+      { id: 11, title: 'Arkheron Cyber Spire Battle Scrims', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, region: 'NA East', draftType: 'Battle Draft' },
       { id: 9, title: 'CS2 FACEIT Level 8-10 Premier Scrims', game: 'Counter-Strike 2', host: 'ApexGod99', players: 9, max: 10, region: 'NA East', draftType: 'FACEIT Pro League' },
-      { id: 8, title: 'CS2 3v4 Retake Mirage A/B Site Scrims', game: 'CS2 Retake (Bomb Defusal)', host: 'Retake_Leader', players: 7, max: 9, region: 'NA East', draftType: 'Retakers vs Defenders' },
-      { id: 6, title: 'CS2 Surf Utopia v3 Tier 2 Speedrun Scrims', game: 'CS2 Surf (Tier 1-6)', host: 'SurfGod', players: 16, max: 32, region: 'NA East', draftType: 'Surf Timer Race' }
+      { id: 8, title: 'CS2 3v4 Retake Mirage A/B Site Scrims', game: 'CS2 Retake (Bomb Defusal)', host: 'Retake_Leader', players: 7, max: 9, region: 'NA East', draftType: 'Retakers vs Defenders' }
     ];
 
     this.selectedLeaderboardGame = 'Counter-Strike 2';
@@ -87,7 +95,10 @@ class CustomLobbiesApp {
         badRemarks: { toxic: 1, afk: 0, griefing: 0, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 2540, wins: 142, losses: 28, winRate: 83.5, kd: '2.14', mvp: 48 },
+          'REMATCH': { elo: 2480, wins: 115, losses: 20, winRate: 85.1, kd: '2.30', mvp: 40 },
+          'Arkheron': { elo: 2200, wins: 95, losses: 18, winRate: 84.0, kd: '2.45', mvp: 35 },
           'Valorant': { elo: 2350, wins: 110, losses: 22, winRate: 83.3, kd: '1.98', mvp: 35 },
+          'Marvel Rivals': { elo: 2400, wins: 88, losses: 15, winRate: 85.4, kd: '3.10', mvp: 30 },
           'Apex Legends': { elo: 2650, wins: 95, losses: 18, winRate: 84.0, kd: '3.45', mvp: 42 },
           'Rocket League': { elo: 2450, wins: 88, losses: 20, winRate: 81.4, kd: 'N/A', mvp: 30 },
           'Dota 2': { elo: 4200, wins: 130, losses: 40, winRate: 76.4, kd: '3.10', mvp: 29 },
@@ -108,6 +119,8 @@ class CustomLobbiesApp {
         badRemarks: { toxic: 2, afk: 1, griefing: 0, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 2150, wins: 98, losses: 31, winRate: 76.0, kd: '1.75', mvp: 32 },
+          'REMATCH': { elo: 1950, wins: 70, losses: 28, winRate: 71.4, kd: '1.85', mvp: 25 },
+          'Arkheron': { elo: 1750, wins: 62, losses: 25, winRate: 71.2, kd: '1.90', mvp: 22 },
           'Valorant': { elo: 2100, wins: 82, losses: 24, winRate: 77.3, kd: '1.68', mvp: 24 },
           'Apex Legends': { elo: 2580, wins: 112, losses: 20, winRate: 84.8, kd: '3.20', mvp: 50 },
           'Rocket League': { elo: 1850, wins: 64, losses: 30, winRate: 68.1, kd: 'N/A', mvp: 18 },
@@ -129,6 +142,8 @@ class CustomLobbiesApp {
         badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 1920, wins: 85, losses: 42, winRate: 66.9, kd: '1.45', mvp: 28 },
+          'REMATCH': { elo: 1820, wins: 65, losses: 30, winRate: 68.4, kd: '1.60', mvp: 20 },
+          'Arkheron': { elo: 1650, wins: 54, losses: 28, winRate: 65.8, kd: '1.72', mvp: 18 },
           'Valorant': { elo: 1950, wins: 90, losses: 38, winRate: 70.3, kd: '1.52', mvp: 26 },
           'Apex Legends': { elo: 1900, wins: 70, losses: 35, winRate: 66.7, kd: '2.10', mvp: 20 },
           'Rocket League': { elo: 1600, wins: 50, losses: 32, winRate: 60.9, kd: 'N/A', mvp: 12 },
@@ -150,6 +165,8 @@ class CustomLobbiesApp {
         badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 1840, wins: 76, losses: 34, winRate: 69.1, kd: '1.40', mvp: 22 },
+          'REMATCH': { elo: 1900, wins: 72, losses: 28, winRate: 72.0, kd: '1.70', mvp: 24 },
+          'Arkheron': { elo: 1850, wins: 68, losses: 24, winRate: 73.9, kd: '1.80', mvp: 21 },
           'Valorant': { elo: 1350, wins: 62, losses: 30, winRate: 67.4, kd: '1.38', mvp: 19 },
           'Apex Legends': { elo: 2510, wins: 104, losses: 26, winRate: 80.0, kd: '3.10', mvp: 38 },
           'Rocket League': { elo: 2100, wins: 80, losses: 32, winRate: 71.4, kd: 'N/A', mvp: 21 },
@@ -975,7 +992,12 @@ class CustomLobbiesApp {
 
     const gamesList = [
       'Counter-Strike 2',
+      'REMATCH',
+      'Arkheron',
       'Valorant',
+      'Marvel Rivals',
+      'Deadlock',
+      'The Finals',
       'Apex Legends',
       'Rocket League',
       'Dota 2',
