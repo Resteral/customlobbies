@@ -2070,6 +2070,7 @@ class CustomLobbiesApp {
             <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
               <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('192.168.1.85:27015')" title="Copy Console Connect Command">📋 Copy IP</button>
               <button class="btn btn-secondary btn-sm" onclick="window.app.connectLobbyVoice('${l.title}')" title="Connect WebRTC Voice Room">🎙️ Voice</button>
+              <button class="btn btn-secondary btn-sm" style="border-color: var(--accent-gold); color: var(--accent-gold);" onclick="window.app.openPostGameHonorModal('${l.title}')" title="After Game Honor & Misconduct Flags">🏁 Post-Game Honor</button>
               <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('${l.game}')">👑 Captain Draft</button>
               <button class="btn btn-primary btn-sm" onclick="window.app.launchFaceitMatchRoom('${l.title}', '${l.game}')">🏆 Direct Join</button>
             </div>
@@ -2569,7 +2570,12 @@ class CustomLobbiesApp {
     setTimeout(() => {
       const modal = document.getElementById('matchFoundModal');
       if (modal) modal.classList.remove('active');
-      alert('🚀 MATCH READY & ACCEPTED!\n\nLaunching Guardian Anti-Cheat Protected Dedicated Server Node (128-tick)...');
+      alert('🚀 MATCH READY & CONNECTED!\n\n128-tick server node session started. Guardian Anti-Cheat Active.\n\nPost-match honor assessment will launch automatically upon game completion.');
+
+      // Automatically launch post-game honor screen after match concludes
+      setTimeout(() => {
+        this.openPostGameHonorModal('CS2 Premier 5v5 Scrim');
+      }, 2500);
     }, 1500);
   }
 
