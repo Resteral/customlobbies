@@ -76,6 +76,9 @@
       <!-- Player Level & XP Badge -->
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
         <div style="display: flex; gap: 0.4rem; align-items: center;">
+          <div class="mmr-badge" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); border-color: var(--accent-gold); padding: 0.35rem 0.7rem; font-size: 0.82rem; font-weight: 900;" title="Earn +50 Points per match played & +100 Points per win!">
+            <span>🪙</span> <span id="userCLPointsValue">2,450 Points</span>
+          </div>
           <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 0.2rem 0.5rem; font-size: 0.75rem; font-weight: 800;" title="Guardian Kernel Anti-Cheat Engine Active">
             🛡️ Guardian AC Verified
           </span>
@@ -385,6 +388,52 @@
             <button class="btn btn-purple btn-sm" style="width: 100%;" onclick="alert('🎮 LINK GAME ACCOUNTS:\n\nConnecting Steam OpenID, Discord OAuth2, and Riot API for instant rank synchronization...')">
               🔗 Connect Game Accounts
             </button>
+          </div>
+
+          <!-- Profile Customization & Rewards Shop Card -->
+          <div class="card" style="margin-top: 1.5rem; border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="font-size: 1.15rem; font-weight: 900; color: var(--accent-gold); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                <span>🛍️</span> Profile Points Shop
+              </h3>
+              <span class="mmr-badge" style="background: rgba(255,215,0,0.15); color: var(--accent-gold);">🪙 2,450 CL-Points</span>
+            </div>
+
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem;">Earn +50 Points per match & +100 per win to unlock badges & banners!</p>
+
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 0.6rem 0.8rem; border-radius: 6px;">
+                <div>
+                  <div style="font-weight: 800; color: var(--accent-gold);">🔥 Title: Clutch Master</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Gamer Passport Title</div>
+                </div>
+                <button class="btn btn-primary btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="window.app.buyProfileUpgrade('🔥 Clutch Master', 500, 'title')">🪙 500 Pts</button>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 0.6rem 0.8rem; border-radius: 6px;">
+                <div>
+                  <div style="font-weight: 800; color: var(--accent-cyan);">🎯 Title: Aim God</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Gamer Passport Title</div>
+                </div>
+                <button class="btn btn-primary btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="window.app.buyProfileUpgrade('🎯 Aim God', 1000, 'title')">🪙 1,000 Pts</button>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 0.6rem 0.8rem; border-radius: 6px;">
+                <div>
+                  <div style="font-weight: 800; color: var(--accent-purple);">✨ Neon Cyberpunk Banner</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Animated Profile Banner</div>
+                </div>
+                <button class="btn btn-purple btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="window.app.buyProfileUpgrade('Cyberpunk Neon', 1500, 'banner')">🪙 1,500 Pts</button>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 0.6rem 0.8rem; border-radius: 6px;">
+                <div>
+                  <div style="font-weight: 800; color: #ff007f;">💎 Holographic Avatar Ring</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Prism Crown Ring</div>
+                </div>
+                <button class="btn btn-purple btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="window.app.buyProfileUpgrade('Prism Crown Ring', 2000, 'frame')">🪙 2,000 Pts</button>
+              </div>
+            </div>
           </div>
 
           <!-- Trending Gaming Hashtags Card -->

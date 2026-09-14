@@ -1,4 +1,4 @@
-/* CustomLobbies.com - ELO Engine, FACEIT-Style Level 1-10 Rank System, CPL Pro League & Guardian AC */
+/* CustomLobbies.com - ELO Engine, Play-to-Earn CL-Points Economy, FACEIT Level 1-10 & Guardian AC */
 
 class EloEngine {
   constructor() {
@@ -63,6 +63,19 @@ class EloEngine {
     };
   }
 
+  // Calculate CL-Points Reward per Match
+  calculateMatchPointsRewards(isWin = true, isMVP = false, isTournament = false) {
+    let points = 50; // Base participation reward
+    if (isWin) points += 100;
+    if (isMVP) points += 50;
+    if (isTournament) points += 200;
+
+    return {
+      pointsEarned: points,
+      breakdown: `${isWin ? '+100 Win Bonus' : '+50 Match Played'}${isMVP ? ' | +50 MVP' : ''}${isTournament ? ' | +200 Tourney' : ''}`
+    };
+  }
+
   getGameCapacity(gameName) {
     return this.gameCapacities[gameName] || 10;
   }
@@ -109,7 +122,7 @@ class EloEngine {
     const team2 = [];
 
     let sum1 = 0;
-    let sum2 = 0;
+    let sum2 =- 0;
 
     sorted.forEach((p, idx) => {
       if (idx % 2 === 0) {

@@ -11,6 +11,10 @@ class CustomLobbiesApp {
     this.selectedMatchMap = null;
     this.passedFirstPick = false;
     this.acStatus = 'ACTIVE_RING0';
+    this.clPoints = 2450;
+    this.equippedTitle = '💎 Diamond Veteran';
+    this.equippedBanner = 'Cyberpunk Neon Matrix';
+    this.equippedFrame = 'Gold Crown Ring';
 
     // Live Matchmaking Pool Feed
     this.poolFeed = [
@@ -117,6 +121,30 @@ class CustomLobbiesApp {
     this.renderFavoriteStarTags();
     this.renderActiveGamesBar();
     this.renderLobbies();
+  }
+
+  // Buy & Equip Profile Customization Upgrade
+  buyProfileUpgrade(itemName, cost, type) {
+    if (this.clPoints < cost) {
+      alert(`❌ INSUFFICIENT CL-POINTS!\n\nYou need ${cost} 🪙 CL-Points for "${itemName}". Play more custom lobbies or win scrims to earn points!`);
+      return;
+    }
+
+    this.clPoints -= cost;
+
+    if (type === 'title') this.equippedTitle = itemName;
+    if (type === 'banner') this.equippedBanner = itemName;
+    if (type === 'frame') this.equippedFrame = itemName;
+
+    this.updatePointsWidget();
+    alert(`🎉 UNLOCKED & EQUIPPED!\n\nYou unlocked "${itemName}" for ${cost} 🪙 CL-Points!\nEquipped to your Gamer Profile Passport.`);
+  }
+
+  updatePointsWidget() {
+    const el = document.getElementById('userCLPointsValue');
+    if (el) el.textContent = `${this.clPoints.toLocaleString()} Points`;
+    const passportTitle = document.getElementById('userPassportTitle');
+    if (passportTitle) passportTitle.textContent = this.equippedTitle;
   }
 
   // FACEIT-Style Match Room & Ready Check
