@@ -1090,6 +1090,97 @@ class CustomLobbiesApp {
           </div>
         </div>
       `;
+    } else if (this.activeWardogsMode === 'circuit') {
+      const divisions = window.wardogsEngine.circuitDivisions || [];
+      const ops = window.wardogsEngine.operationsCalendar || [];
+
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <!-- Circuit Header Banner -->
+          <div class="card" style="border-color: var(--accent-gold); background: radial-gradient(circle at top right, rgba(255,215,0,0.15), rgba(0,0,0,0.6));">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); font-weight: 900;">🏆 WARDOGS OFFICIAL COMPETITIVE CIRCUIT</span>
+                <h2 style="font-size: 1.5rem; font-weight: 900; color: #fff; margin: 0.3rem 0 0 0;">Season 4: Operation Amber Strike ($50,000 USD Bounties)</h2>
+              </div>
+              <button class="btn btn-primary" onclick="window.app.openWardogsTeamModal()">🛡️ Register Battalion for Circuit</button>
+            </div>
+          </div>
+
+          <!-- Divisions Grid -->
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            ${divisions.map(div => `
+              <div class="card" style="border-color: rgba(255, 111, 0, 0.4);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                  <h3 style="font-size: 1.2rem; font-weight: 900; color: #ffab00;">${div.name}</h3>
+                  <span style="font-size: 1rem; font-weight: 900; color: var(--accent-gold);">${div.prizePool}</span>
+                </div>
+
+                <div style="overflow-x: auto;">
+                  <table class="leaderboard-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                    <thead>
+                      <tr style="text-align: left; border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+                        <th style="padding: 0.6rem;">Rank</th>
+                        <th style="padding: 0.6rem;">Battalion Name & Tag</th>
+                        <th style="padding: 0.6rem;">Commander</th>
+                        <th style="padding: 0.6rem;">Record (W-L)</th>
+                        <th style="padding: 0.6rem;">Points</th>
+                        <th style="padding: 0.6rem;">Sector Control</th>
+                        <th style="padding: 0.6rem;">Rating</th>
+                        <th style="padding: 0.6rem; text-align: right;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${div.teams.map(t => `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                          <td style="padding: 0.6rem; font-weight: 900; color: ${t.rank === 1 ? 'var(--accent-gold)' : 'inherit'};">#${t.rank}</td>
+                          <td style="padding: 0.6rem;">
+                            <strong style="color: #fff;">${t.name}</strong>
+                            <span style="font-size: 0.75rem; color: #ffab00; margin-left: 0.3rem;">${t.tag}</span>
+                          </td>
+                          <td style="padding: 0.6rem; color: var(--accent-cyan); font-weight: 700;">${t.captain}</td>
+                          <td style="padding: 0.6rem; color: var(--accent-green); font-weight: 800;">${t.wins} - ${t.losses}</td>
+                          <td style="padding: 0.6rem; color: var(--accent-gold); font-weight: 900;">${t.points} Pts</td>
+                          <td style="padding: 0.6rem; color: var(--accent-cyan);">${t.sectorControl}</td>
+                          <td style="padding: 0.6rem; font-weight: 800; color: var(--accent-purple);">${t.elo} ELO</td>
+                          <td style="padding: 0.6rem; text-align: right;">
+                            <button class="btn btn-secondary btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;" onclick="window.app.challengeWardogsSquad('${t.name}')">⚔️ Challenge</button>
+                          </td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Live Scheduled Operations -->
+          <div class="card" style="border-color: rgba(255, 111, 0, 0.4);">
+            <h3 style="font-size: 1.15rem; font-weight: 900; color: #ffab00; margin-bottom: 1rem;">📅 Live Scheduled Major Operations & Scrims</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+              ${ops.map(o => `
+                <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.9rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
+                  <div>
+                    <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.3rem;">
+                      <span class="lobby-game-tag" style="background: rgba(255, 111, 0, 0.2); color: #ffab00;">${o.week}</span>
+                      <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">${o.status}</span>
+                    </div>
+                    <h4 style="font-size: 1.05rem; font-weight: 900; color: #fff; margin: 0 0 0.2rem 0;">${o.title}</h4>
+                    <div style="font-size: 0.82rem; color: var(--text-muted);">
+                      Matchup: <strong style="color: var(--accent-cyan);">${o.teamA}</strong> vs <strong style="color: #ffab00;">${o.teamB}</strong> vs <strong style="color: #ffd700;">${o.teamC}</strong> | Arena: <strong style="color: #fff;">${o.map}</strong>
+                    </div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-weight: 900; color: var(--accent-gold); font-size: 0.95rem; margin-bottom: 0.4rem;">${o.prize}</div>
+                    <button class="btn btn-purple btn-sm" onclick="window.app.openMapVetoModal('${o.map}')">🗺️ Map Veto</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
     } else if (this.activeWardogsMode === 'bounties') {
       const bounties = window.wardogsEngine.tacticalBounties;
 
@@ -1123,6 +1214,16 @@ class CustomLobbiesApp {
         </div>
       `;
     }
+  }
+
+  challengeWardogsSquad(squadName) {
+    if (!window.wardogsEngine) return;
+    const fixture = window.wardogsEngine.challengeSquadUnit(squadName);
+    this.renderWardogsView();
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+    alert(`⚔️ COMPETITIVE SCRIM DISPATCHED!\n\nOfficial Scrim fixture scheduled against "${squadName}"!\nAdded to WARDOGS Operations Calendar.`);
   }
 
   triggerTacticalStrike(strikeType) {

@@ -1,4 +1,4 @@
-/* CustomLobbies.com - WARDOGS 33v33v33 (99-Player) Tri-Faction Tactical Engine with Local Storage Persistence */
+/* CustomLobbies.com - WARDOGS Competitive Esports Engine (33v33v33 Tri-Faction Circuit) */
 class WardogsEngine {
   constructor() {
     this.divisionName = 'WARDOGS 33 v 33 v 33 Tri-Faction Mercenary League';
@@ -11,6 +11,44 @@ class WardogsEngine {
       bravo: { name: 'Apex Raiders', code: 'BRAVO-RED', accent: '#ffab00', hex: '#ff6f00', perk: '⚡ Rapid Flank & Heavy Breaching Charges', sector: 'Sector B: Orbital Refinery' },
       charlie: { name: 'Cyber Spectre Unit', code: 'CHARLIE-GOLD', accent: '#ffd700', hex: '#ffd700', perk: '🧠 Orbital EMP & Drone Recon Scan', sector: 'Sector C: Data Core Vault' }
     };
+
+    // Official Competitive Circuit Divisions ($50,000 Prize Pool)
+    this.circuitDivisions = [
+      {
+        id: 'apex-master',
+        name: '🏆 Apex Master League (ELO 2200+)',
+        prizePool: '$25,000 USD',
+        teams: [
+          { rank: 1, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', wins: 18, losses: 2, points: 54, sectorControl: '42%', elo: 2680, status: '1st Place • Qualified' },
+          { rank: 2, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', wins: 15, losses: 3, points: 45, sectorControl: '36%', elo: 2450, status: '2nd Place • Qualified' },
+          { rank: 3, name: 'Phantom Brigade Charlie', tag: '[K9-PHANTOM]', captain: 'Shadow_K9', wins: 14, losses: 4, points: 42, sectorControl: '32%', elo: 2380, status: 'Contender' },
+          { rank: 4, name: 'Slapshot Cyber Hounds', tag: '[HOUNDS]', captain: 'Puck_Hunter', wins: 12, losses: 6, points: 36, sectorControl: '28%', elo: 2290, status: 'Contender' }
+        ]
+      },
+      {
+        id: 'dreadnought',
+        name: '🥇 Dreadnought Division (ELO 1800+)',
+        prizePool: '$15,000 USD',
+        teams: [
+          { rank: 1, name: 'Valkyrie Vanguard', tag: '[VALK]', captain: 'Valkyrie_Merc', wins: 11, losses: 2, points: 33, sectorControl: '38%', elo: 2150, status: 'Division Leader' },
+          { rank: 2, name: 'Titan Armor Corps', tag: '[TITAN]', captain: 'Arkheron_Vanguard', wins: 9, losses: 4, points: 27, sectorControl: '30%', elo: 1980, status: 'Challenger' }
+        ]
+      },
+      {
+        id: 'vanguard-open',
+        name: '🥉 Vanguard Open Division (Free Entry)',
+        prizePool: '$10,000 USD',
+        teams: [
+          { rank: 1, name: 'Rookie Mercenaries', tag: '[RM]', wins: 7, losses: 1, points: 21, sectorControl: '45%', elo: 1650, status: 'Open Leader' }
+        ]
+      }
+    ];
+
+    // Scheduled Live Operations & Scrim Fixtures
+    this.operationsCalendar = [
+      { id: 'OP-401', week: 'WEEK 4 TRI-FACTION SIEGE', title: 'Operation Amber Strike: Citadel Core Siege', teamA: 'WARDOG Company Alpha', teamB: 'Iron Claw Battalion', teamC: 'Phantom Brigade', date: 'Tonight 20:00 EST', map: 'Sector 33 - Quantum Citadel', status: '🔴 LIVE BROADCAST', prize: '$5,000 Bounty Match' },
+      { id: 'OP-402', week: 'WEEK 5 BATTALION SCRIM', title: 'Operation Cobalt Dawn: Sector B Assault', teamA: 'Valkyrie Vanguard', teamB: 'Titan Armor Corps', teamC: 'Slapshot Cyber Hounds', date: 'Tomorrow 21:00 EST', map: 'Sector 33 - Orbital Core', status: 'UPCOMING', prize: '$2,500 Bounty Match' }
+    ];
 
     // Tactical Sector Capture Map Telemetry
     this.sectors = [
@@ -64,6 +102,8 @@ class WardogsEngine {
         if (data.registeredSquads) this.registeredSquads = data.registeredSquads;
         if (data.tacticalBounties) this.tacticalBounties = data.tacticalBounties;
         if (data.rankedSelectionHistory) this.rankedSelectionHistory = data.rankedSelectionHistory;
+        if (data.circuitDivisions) this.circuitDivisions = data.circuitDivisions;
+        if (data.operationsCalendar) this.operationsCalendar = data.operationsCalendar;
       }
     } catch (e) {
       console.warn('Error loading Wardogs state:', e);
@@ -76,7 +116,9 @@ class WardogsEngine {
         soloMercenaries: this.soloMercenaries,
         registeredSquads: this.registeredSquads,
         tacticalBounties: this.tacticalBounties,
-        rankedSelectionHistory: this.rankedSelectionHistory
+        rankedSelectionHistory: this.rankedSelectionHistory,
+        circuitDivisions: this.circuitDivisions,
+        operationsCalendar: this.operationsCalendar
       }));
     } catch (e) {
       console.warn('Error saving Wardogs state:', e);
@@ -105,7 +147,7 @@ class WardogsEngine {
     return newMerc;
   }
 
-  // Register Squad Unit
+  // Register Squad Unit for Competitive Circuit
   registerSquadUnit(squadName, tag, captainHandle, game, squadSize = 33) {
     const newSquad = {
       id: Date.now(),
@@ -121,8 +163,46 @@ class WardogsEngine {
     };
 
     this.registeredSquads.unshift(newSquad);
+
+    // Also add team to Vanguard Open Division standings
+    if (this.circuitDivisions[2]) {
+      this.circuitDivisions[2].teams.push({
+        rank: this.circuitDivisions[2].teams.length + 1,
+        name: squadName,
+        tag: newSquad.tag,
+        captain: captainHandle,
+        wins: 0,
+        losses: 0,
+        points: 0,
+        sectorControl: '0%',
+        elo: 1600,
+        status: 'Enlisted Challenger'
+      });
+    }
+
     this.saveState();
     return newSquad;
+  }
+
+  // Challenge Squad Unit to Official Competitive Scrim
+  challengeSquadUnit(squadId, dateStr = 'Tonight 21:00 EST', mapName = 'Sector 33 - Quantum Citadel') {
+    const sq = this.registeredSquads.find(s => s.id === squadId) || this.registeredSquads[0];
+    const newOp = {
+      id: `OP-${Date.now().toString().slice(-3)}`,
+      week: 'OFFICIAL SCRIM CHALLENGE',
+      title: `Tactical Scrim: You (Host) VS ${sq.name}`,
+      teamA: 'Your Company',
+      teamB: sq.name,
+      teamC: 'Vanguard Patrol',
+      date: dateStr,
+      map: mapName,
+      status: 'SCHEDULED',
+      prize: '$1,000 Scrim Bounty'
+    };
+
+    this.operationsCalendar.unshift(newOp);
+    this.saveState();
+    return newOp;
   }
 
   // Trigger Tactical Strike
