@@ -130,6 +130,9 @@
           </div>
         </div>
         <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-purple" onclick="window.app.openChromeExtensionModal()">
+            🧩 Chrome Extension Widget
+          </button>
           <button class="btn btn-purple" onclick="window.app.openMapVetoModal('Counter-Strike 2')">
             🗺️ Start Map Veto Pick/Ban Room
           </button>
@@ -1900,6 +1903,51 @@
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <button class="btn btn-secondary" onclick="window.app.resetMapVetoSession()">🔄 Reset Veto</button>
         <button class="btn btn-primary" onclick="window.app.confirmVetoAndLaunchMatch()">🎮 Lock Map & Launch Server</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Chrome Extension & Widget Modal -->
+  <div class="modal-overlay" id="chromeExtensionModal">
+    <div class="modal-card" style="max-width: 650px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.6rem;">🧩</span>
+          <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan); margin: 0;">CustomLobbies Chrome Extension Widget</h3>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeChromeExtensionModal()">✕ Close</button>
+      </div>
+
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+        Queue for competitive 5v5/2v2 scrims, view live streams, ban maps, and inject floating widgets on <strong>ANY webpage</strong> (Twitch, YouTube, FACEIT, Reddit) directly from your Google Chrome toolbar!
+      </p>
+
+      <!-- Feature Grid -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.2rem;">
+        <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 0.8rem;">
+          <div style="font-weight: 800; color: var(--accent-cyan); font-size: 0.9rem; margin-bottom: 0.3rem;">⚡ 1-Click Queue Toolbar Widget</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Join matchmaking queues instantly for 28 games without switching browser tabs.</div>
+        </div>
+        <div style="background: rgba(157, 78, 221, 0.08); border: 1px solid var(--accent-purple); border-radius: 8px; padding: 0.8rem;">
+          <div style="font-weight: 800; color: var(--accent-purple); font-size: 0.9rem; margin-bottom: 0.3rem;">📌 Drag & Drop Floating On-Page HUD</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Inject a floating queue telemetry widget on any website you are currently browsing.</div>
+        </div>
+      </div>
+
+      <!-- Installation Instructions Box -->
+      <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 1.2rem;">
+        <div style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 0.5rem;">📥 4-Step Chrome Installation Guide:</div>
+        <ol style="font-size: 0.85rem; color: var(--text-main); margin-left: 1.2rem; line-height: 1.6;">
+          <li>Open <code>chrome://extensions</code> in Google Chrome.</li>
+          <li>Toggle ON <strong>Developer mode</strong> in top-right corner.</li>
+          <li>Click <strong>Load unpacked</strong> button.</li>
+          <li>Select folder: <code>c:\Users\Sean\Documents\Downloads\HelixGame\chrome-extension</code></li>
+        </ol>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="mmr-badge">Manifest V3 Certified • Version 2.0.0</span>
+        <button class="btn btn-primary" onclick="alert('🚀 Extension Ready!\n\nOpen chrome://extensions in Chrome, enable Developer mode, and click Load unpacked to load the extension folder!')">Got It! 🚀</button>
       </div>
     </div>
   </div>

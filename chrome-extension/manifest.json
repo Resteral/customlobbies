@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "CustomLobbies.com - Screen Capture & Queue Assistant",
-  "version": "1.0.0",
-  "description": "Stream gameplay, trigger follower alerts, inject stream overlay HUD, and join custom lobbies directly from your browser toolbar.",
+  "name": "CustomLobbies.com - Competitive Matchmaking Widget",
+  "version": "2.0.0",
+  "description": "Join competitive 5v5/2v2 matchmaking queues, track FACEIT ELO ratings, inspect free-agent rosters, ban maps, and inject floating widgets on any website.",
   "permissions": [
     "desktopCapture",
     "activeTab",
@@ -11,14 +11,16 @@
   ],
   "host_permissions": [
     "https://customlobbies.com/*",
-    "http://localhost/*"
+    "http://localhost/*",
+    "<all_urls>"
   ],
   "action": {
     "default_popup": "popup.html",
+    "default_title": "CustomLobbies Esports Widget",
     "default_icon": {
-      "16": "icon.png",
-      "48": "icon.png",
-      "128": "icon.png"
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
     }
   },
   "background": {
@@ -29,5 +31,10 @@
       "matches": ["<all_urls>"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
 }

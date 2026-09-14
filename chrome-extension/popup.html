@@ -2,94 +2,382 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <title>CustomLobbies Chrome Extension Widget</title>
   <style>
-    body {
-      width: 320px;
-      margin: 0;
-      padding: 1rem;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #0d1117;
-      color: #f0f4f8;
+    :root {
+      --bg-dark: #090c10;
+      --bg-card: rgba(22, 27, 34, 0.95);
+      --accent-cyan: #00e5ff;
+      --accent-purple: #9d4edd;
+      --accent-green: #00e676;
+      --accent-gold: #ffd700;
+      --accent-red: #ff5252;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --text-main: #f0f4f8;
+      --text-muted: #8b949e;
     }
-    .header {
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      width: 380px;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      padding: 0.85rem;
+      user-select: none;
+    }
+
+    .widget-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding-bottom: 0.8rem;
-      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
     }
-    .title {
-      font-weight: 800;
-      font-size: 1.1rem;
-      background: linear-gradient(135deg, #00f2fe, #4facfe);
+
+    .brand-title {
+      font-weight: 900;
+      font-size: 1.15rem;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
-    .badge {
-      background: rgba(0, 242, 254, 0.15);
-      color: #00f2fe;
-      padding: 0.3rem 0.6rem;
+
+    .mmr-badge {
+      background: rgba(0, 229, 255, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      padding: 0.25rem 0.6rem;
       border-radius: 12px;
       font-size: 0.75rem;
-      font-weight: 700;
+      font-weight: 800;
     }
+
+    /* Tabs Navigation */
+    .tab-bar {
+      display: flex;
+      gap: 0.3rem;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.25rem;
+      border-radius: 8px;
+      margin-bottom: 0.85rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.45rem 0.2rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-purple);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(157, 78, 221, 0.4);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Input & Select */
+    .input-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+
+    .input-field {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-main);
+      padding: 0.5rem 0.6rem;
+      font-size: 0.82rem;
+      margin-bottom: 0.65rem;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    /* Buttons */
     .btn {
       width: 100%;
-      padding: 0.7rem;
-      margin-bottom: 0.6rem;
+      padding: 0.65rem;
       border-radius: 8px;
       border: none;
-      font-weight: 700;
-      font-size: 0.88rem;
+      font-weight: 800;
+      font-size: 0.85rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
+      transition: transform 0.1s ease, filter 0.2s ease;
+      margin-bottom: 0.5rem;
     }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
     .btn-primary {
-      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      background: linear-gradient(135deg, var(--accent-cyan), #0091ea);
       color: #000;
     }
+
     .btn-purple {
-      background: linear-gradient(135deg, #9d4edd, #7b2cbf);
+      background: linear-gradient(135deg, var(--accent-purple), #7b2cbf);
       color: #fff;
     }
+
+    .btn-green {
+      background: linear-gradient(135deg, var(--accent-green), #00c853);
+      color: #000;
+    }
+
     .btn-danger {
-      background: #ff5252;
+      background: var(--accent-red);
       color: #fff;
     }
-    .status-box {
-      background: rgba(255,255,255,0.05);
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Card Box */
+    .card-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 0.8rem;
-      margin-top: 1rem;
-      font-size: 0.8rem;
-      color: #8a99ad;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Status Bar */
+    .status-banner {
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.78rem;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .player-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.78rem;
+    }
+
+    .player-row:last-child {
+      border-bottom: none;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+    }
+
+    .map-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.4rem;
+      text-align: center;
+      font-size: 0.72rem;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .map-chip.banned {
+      background: rgba(255, 82, 82, 0.15);
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+      text-decoration: line-through;
+    }
+
+    .map-chip.picked {
+      background: rgba(0, 230, 118, 0.2);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="title">CustomLobbies Ext</div>
-    <div class="badge" id="extMMRBadge">1840 MMR</div>
+
+  <!-- Header Banner -->
+  <div class="widget-header">
+    <div class="brand-title">
+      <span>🎮</span> CustomLobbies Widget
+    </div>
+    <div class="mmr-badge" id="extMMRDisplay">💎 1840 MMR</div>
   </div>
 
-  <button class="btn btn-primary" id="extBtnStartCapture">
-    <span>🖥️</span> Start Tab / Desktop Capture
-  </button>
+  <!-- Navigation Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="tab-queue">⚡ Queue</button>
+    <button class="tab-btn" data-tab="tab-veto">🗺️ Veto</button>
+    <button class="tab-btn" data-tab="tab-pool">👥 Roster</button>
+    <button class="tab-btn" data-tab="tab-live">📺 Streams</button>
+  </div>
 
-  <button class="btn btn-purple" id="extBtnJoinQueue">
-    <span>⚡</span> Join Quick Queue (-join)
-  </button>
+  <!-- TAB 1: MATCHMAKING QUEUE -->
+  <div class="tab-content active" id="tab-queue">
+    <div class="card-box">
+      <label class="input-label">Select Game Title</label>
+      <select class="input-field" id="extGameSelect">
+        <option value="Counter-Strike 2" selected>Counter-Strike 2</option>
+        <option value="Valorant">Valorant</option>
+        <option value="Empulse">Empulse</option>
+        <option value="REMATCH">REMATCH</option>
+        <option value="Arkheron">Arkheron</option>
+        <option value="Marvel Rivals">Marvel Rivals</option>
+        <option value="Deadlock">Deadlock</option>
+        <option value="The Finals">The Finals</option>
+        <option value="Apex Legends">Apex Legends</option>
+        <option value="Rocket League">Rocket League</option>
+      </select>
 
-  <button class="btn btn-danger" id="extBtnInjectOverlay">
-    <span>✨</span> Inject In-Game HUD Overlay
-  </button>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+        <div>
+          <label class="input-label">Match Mode</label>
+          <select class="input-field" id="extModeSelect">
+            <option value="5v5 Premier Scrim">5v5 Premier</option>
+            <option value="2v2 Wingman">2v2 Wingman</option>
+            <option value="1v1 Aim Arena">1v1 Aim Duel</option>
+          </select>
+        </div>
+        <div>
+          <label class="input-label">Server Region</label>
+          <select class="input-field">
+            <option value="US East">US East (12ms)</option>
+            <option value="US West">US West (45ms)</option>
+            <option value="EU Central">EU Central (85ms)</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-  <div class="status-box" id="extStatusText">
-    Status: Connected to CustomLobbies.com
+    <!-- Active Queue Status Card -->
+    <div class="status-banner" id="extQueueStatusBanner">
+      <span>Status: Ready to Matchmake</span>
+      <span style="font-weight: 800; color: var(--accent-gold);" id="extQueueTimer">⏱️ 00:00</span>
+    </div>
+
+    <button class="btn btn-primary" id="extBtnToggleQueue">
+      <span>⚡</span> JOIN MATCHMAKING QUEUE (-join)
+    </button>
+
+    <button class="btn btn-purple" id="extBtnInjectWidget">
+      <span>📌</span> Inject On-Page Floating Widget
+    </button>
+  </div>
+
+  <!-- TAB 2: INTERACTIVE MAP VETO -->
+  <div class="tab-content" id="tab-veto">
+    <div class="card-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.8rem; font-weight: 800; color: var(--accent-gold);">Captain Coin Toss</span>
+        <button class="btn btn-secondary btn-sm" id="extBtnFlipCoin" style="width: auto; padding: 0.2rem 0.5rem; font-size: 0.7rem;">🪙 Flip Coin</button>
+      </div>
+      <div style="font-size: 0.75rem; color: var(--accent-cyan); text-align: center; margin-bottom: 0.6rem;" id="extVetoTurnText">
+        🔵 TURN: Team Alpha Ban Phase
+      </div>
+
+      <div class="map-grid" id="extMapGrid">
+        <div class="map-chip" data-map="Mirage">Mirage</div>
+        <div class="map-chip" data-map="Inferno">Inferno</div>
+        <div class="map-chip" data-map="Nuke">Nuke</div>
+        <div class="map-chip" data-map="Anubis">Anubis</div>
+        <div class="map-chip" data-map="Ancient">Ancient</div>
+        <div class="map-chip" data-map="Dust II">Dust II</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: FREE AGENT PLAYER POOL -->
+  <div class="tab-content" id="tab-pool">
+    <div class="card-box">
+      <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-purple); margin-bottom: 0.5rem;">🔥 Solo-Queue Free Agents</div>
+      <div class="player-row">
+        <div>
+          <div style="font-weight: 800; color: #fff;">RadiantReaper</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">CS2 • 🎯 AWPer (2540 ELO)</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="width: auto; padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="alert('➕ Party invite sent!')">➕ Invite</button>
+      </div>
+      <div class="player-row">
+        <div>
+          <div style="font-weight: 800; color: #fff;">Empulse_Overlord</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">Empulse • ⚡ Entry (2450 ELO)</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="width: auto; padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="alert('➕ Party invite sent!')">➕ Invite</button>
+      </div>
+      <div class="player-row">
+        <div>
+          <div style="font-weight: 800; color: #fff;">Rematch_God</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">REMATCH • 🧠 IGL (2480 ELO)</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="width: auto; padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="alert('➕ Party invite sent!')">➕ Invite</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: STREAMERS & HYPE -->
+  <div class="tab-content" id="tab-live">
+    <div class="card-box">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+        <span style="font-size: 1.2rem;">🔴</span>
+        <div>
+          <div style="font-weight: 900; font-size: 0.85rem;">Valkyrie_CS Live Stream</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">Counter-Strike 2 • 3,420 Viewers</div>
+        </div>
+      </div>
+      <button class="btn btn-green" id="extBtnClaimPoints">
+        🎁 Claim Streamer Giveaway (+100 CL-Points)
+      </button>
+      <button class="btn btn-purple" id="extBtnStartCapture">
+        🖥️ Start Desktop Stream Capture
+      </button>
+    </div>
   </div>
 
   <script src="popup.js"></script>

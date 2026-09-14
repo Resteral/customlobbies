@@ -784,6 +784,16 @@ class CustomLobbiesApp {
     if (modal) modal.classList.remove('active');
   }
 
+  openChromeExtensionModal() {
+    const modal = document.getElementById('chromeExtensionModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeChromeExtensionModal() {
+    const modal = document.getElementById('chromeExtensionModal');
+    if (modal) modal.classList.remove('active');
+  }
+
   flipCaptainCoin() {
     const winner = Math.random() < 0.5 ? 'Team Alpha' : 'Team Bravo';
     this.vetoTurn = winner;
