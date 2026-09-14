@@ -1096,6 +1096,77 @@
 
   </main>
 
+  <!-- Sign-Up Matchmaking Queue Selection Modal -->
+  <div class="modal-overlay" id="signUpQueueModal">
+    <div class="modal-card" style="border-color: var(--accent-cyan);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+          <span>🎮</span> Enter Competitive Matchmaking Queue
+        </h3>
+        <button class="btn btn-secondary btn-sm" id="btnCloseQueueModal">✕ Close</button>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Select your game, region, and role to sign up for instant matchmaking pool queueing!
+      </p>
+
+      <div class="input-group">
+        <label class="input-label">Select Game Title</label>
+        <select class="input-field" id="queueSelectGame">
+          <option value="Counter-Strike 2">Counter-Strike 2 (5v5 Premier)</option>
+          <option value="Empulse">Empulse (5v5 Cyber Arena)</option>
+          <option value="REMATCH">REMATCH (5v5 Champion Scrims)</option>
+          <option value="Arkheron">Arkheron (12-Player Cyber Spire)</option>
+          <option value="Valorant">Valorant (5v5 Competitive)</option>
+          <option value="Marvel Rivals">Marvel Rivals (6v6 Competitive)</option>
+          <option value="Deadlock">Deadlock (6v6 Lane Conquest)</option>
+          <option value="CS2 Retake (Bomb Defusal)">CS2 Retake (Bomb Defusal)</option>
+          <option value="CS2 1v1 Arena (Aim Map)">CS2 1v1 Arena (Aim Map)</option>
+          <option value="Apex Legends">Apex Legends (3v3 Arena)</option>
+          <option value="Rocket League">Rocket League (2v2 Arena)</option>
+        </select>
+      </div>
+
+      <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label class="input-label">Server Region</label>
+          <select class="input-field" id="queueSelectRegion">
+            <option value="NA East">🇺🇸 NA East (Virginia)</option>
+            <option value="NA West">🇺🇸 NA West (Oregon)</option>
+            <option value="EU West">🇪🇺 EU West (Frankfurt)</option>
+            <option value="SA Brazil">🇧🇷 SA (São Paulo)</option>
+            <option value="APAC Tokyo">🌏 APAC (Tokyo)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="input-label">Preferred Role</label>
+          <select class="input-field" id="queueSelectRole">
+            <option value="Any Role">Any Role</option>
+            <option value="Entry Fragger">Entry Fragger</option>
+            <option value="AWPer / Sniper">AWPer / Sniper</option>
+            <option value="IGL / Shotcaller">IGL / Shotcaller</option>
+            <option value="Support / Controller">Support / Controller</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="background: rgba(0, 230, 118, 0.08); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.25rem; border: 1px solid rgba(0, 230, 118, 0.25); font-size: 0.82rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: var(--accent-green); font-weight: 800;">🛡️ GUARDIAN KERNEL ANTICHEAT: ACTIVE</span>
+          <span style="color: var(--accent-gold); font-weight: 800;">🪙 +25 CL-Points per Match Queued</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
+        <button class="btn btn-secondary" id="btnCancelQueueModal">Cancel</button>
+        <button class="btn btn-primary" id="btnConfirmEnterQueue" style="font-size: 1.1rem; padding: 0.8rem 1.5rem;">
+          <span>⚡</span> ENTER MATCHMAKING QUEUE
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Create Lobby Modal -->
   <div class="modal-overlay" id="createLobbyModal">
     <div class="modal-card">

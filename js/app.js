@@ -302,6 +302,89 @@ class CustomLobbiesApp {
     alert(`🎉 UNLOCKED & EQUIPPED!\n\nYou unlocked "${itemName}" for ${cost} 🪙 CL-Points!\nEquipped to your Gamer Profile Passport.`);
   }
 
+  setupQueueButtons() {
+    const queueBtns = document.querySelectorAll('#btnJoinQueue');
+    const queueModal = document.getElementById('signUpQueueModal');
+    const btnCloseModal = document.getElementById('btnCloseQueueModal');
+    const btnCancelModal = document.getElementById('btnCancelQueueModal');
+    const btnConfirm = document.getElementById('btnConfirmEnterQueue');
+    const btnLeave = document.getElementById('btnLeaveQueue');
+    const queueCard = document.getElementById('queueStatusCard');
+    const queueTimer = document.getElementById('queueTimer');
+
+    queueBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (this.activeQueue) {
+          alert('⚠️ ALREADY IN MATCHMAKING QUEUE!\n\nYour queue is currently searching for a balanced match. Click "Leave Queue" to exit.');
+          return;
+        }
+        if (queueModal) queueModal.classList.add('active');
+      });
+    });
+
+    if (btnCloseModal) btnCloseModal.addEventListener('click', () => queueModal.classList.remove('active'));
+    if (btnCancelModal) btnCancelModal.addEventListener('click', () => queueModal.classList.remove('active'));
+
+    if (btnConfirm) {
+      btnConfirm.addEventListener('click', () => {
+        const game = document.getElementById('queueSelectGame')?.value || 'Counter-Strike 2';
+        const region = document.getElementById('queueSelectRegion')?.value || 'NA East';
+        const role = document.getElementById('queueSelectRole')?.value || 'Any Role';
+
+        this.activeQueue = true;
+        this.queueSeconds = 0;
+        this.queuedGame = game;
+        this.queuedRegion = region;
+
+        if (queueModal) queueModal.classList.remove('active');
+        if (queueCard) queueCard.style.display = 'block';
+
+        // Award +25 CL-Points queue bonus
+        this.clPoints += 25;
+        this.updatePointsWidget();
+
+        if (window.widgetBuilderEngine) {
+          window.widgetBuilderEngine.playSoundEffect('ggwp');
+        }
+
+        clearInterval(this.queueTimerInterval);
+        this.queueTimerInterval = setInterval(() => {
+          this.queueSeconds++;
+          const mins = String(Math.floor(this.queueSeconds / 60)).padStart(2, '0');
+          const secs = String(this.queueSeconds % 60).padStart(2, '0');
+          const foundPlayers = Math.min(10, 6 + Math.floor(this.queueSeconds / 1.5));
+
+          if (queueTimer) {
+            queueTimer.textContent = `🎯 Searching for ${game} [${region}] • Role: ${role} | Time: ${mins}:${secs} | Est: ~00:15 | Pool: ${foundPlayers}/10 Players`;
+          }
+
+          // Trigger Match Ready when 10 players found (~6s)
+          if (this.queueSeconds >= 6 && this.activeQueue) {
+            this.leaveQueue(true);
+            this.triggerMatchFoundModal(`${game} • 5v5 Premier Match [${region}]`);
+          }
+        }, 1000);
+
+        alert(`🚀 QUEUE SIGN-UP CONFIRMED!\n\nSearching for balanced 5v5 match in ${game} (${region}) as ${role}!\nEarned +25 🪙 CL-Points queue bonus!`);
+      });
+    }
+
+    if (btnLeave) {
+      btnLeave.addEventListener('click', () => this.leaveQueue());
+    }
+  }
+
+  leaveQueue(silent = false) {
+    this.activeQueue = false;
+    clearInterval(this.queueTimerInterval);
+    const queueCard = document.getElementById('queueStatusCard');
+    if (queueCard) queueCard.style.display = 'none';
+
+    if (!silent) {
+      alert('🔴 LEFT MATCHMAKING QUEUE\n\nYou exited the matchmaking search queue.');
+    }
+  }
+
   updatePointsWidget() {
     const el = document.getElementById('userCLPointsValue');
     if (el) el.textContent = `${this.clPoints.toLocaleString()} Points`;
