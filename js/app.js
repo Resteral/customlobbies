@@ -340,6 +340,49 @@ class CustomLobbiesApp {
     alert('🚀 POST PUBLISHED!\n\nYour post was published live to The Gamers Wall Social Media feed!');
   }
 
+  // Publish Auto-Farmed Clip to The Gamers Wall Feed
+  postAutoClipToGamersWall(clipTitle, gameTitle, triggerName) {
+    const container = document.getElementById('gamersWallFeedContainer');
+    if (!container) return;
+
+    const postElement = document.createElement('div');
+    postElement.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid var(--accent-cyan); border-radius: 10px; padding: 1.2rem; box-shadow: 0 0 15px rgba(0, 242, 254, 0.15); margin-bottom: 1.2rem;';
+
+    postElement.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid var(--accent-gold);">👑</div>
+          <div>
+            <h4 style="font-weight: 800; margin: 0;">You (Host) <span class="mmr-badge" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">1840 MMR</span></h4>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Posted Just Now • Auto-Farmed Clip</p>
+          </div>
+        </div>
+        <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">🎥 ${triggerName}</span>
+      </div>
+
+      <p style="font-size: 0.95rem; margin-bottom: 0.8rem;">🔥 Auto-Farmed Highlight Clip from <strong>${gameTitle}</strong>: "${clipTitle}"! Harvested automatically using CustomLobbies Auto-Clip Engine! 🎬</p>
+
+      <div style="background: #000; border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; border: 1px solid var(--accent-cyan);">
+        <div style="font-size: 2.5rem; margin-bottom: 0.4rem;">🎬</div>
+        <div style="font-weight: 700; color: var(--accent-cyan);">[CustomLobbies Auto-Farmed Video Highlight Stream - 1080p 60FPS]</div>
+      </div>
+
+      <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem;">
+        <button class="btn btn-secondary btn-sm" onclick="alert('🔥 UPVOTED! Post Hype +1')">🔥 Hype Upvote (1)</button>
+        <button class="btn btn-purple btn-sm" onclick="alert('🔁 REPOSTED to your profile!')">🔁 Repost Clip</button>
+        <button class="btn btn-primary btn-sm" onclick="alert('💬 Opening Reply Thread...')">💬 Reply (0)</button>
+      </div>
+    `;
+
+    container.insertBefore(postElement, container.firstChild);
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    alert(`🚀 FARMED CLIP PUBLISHED!\n\nClip "${clipTitle}" was posted to The Gamers Wall feed!`);
+  }
+
   setupGameDraftPoolButton() {
     const btnDraftPool = document.getElementById('btnJoinGameDraftPool');
     if (!btnDraftPool) return;

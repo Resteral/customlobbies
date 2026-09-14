@@ -862,87 +862,105 @@
       </div>
     </section>
 
-    <!-- 5. CROSS-PLATFORM INTEGRATIONS VIEW (Twitch, Streamlabs, Discord) -->
+    <!-- 5. PROPRIETARY CUSTOM LOBBIES STREAMING & AUTO-CLIP FARMING SUITE -->
     <section id="integrations-view" class="view-section">
       <div style="margin-bottom: 1.5rem;">
-        <h1 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 0.4rem;">4-Way Integration Suite</h1>
-        <p style="color: var(--text-muted); font-size: 0.95rem;">Combine Discord, CustomLobbies, Twitch, and Streamlabs into one unified live stream and lobby ecosystem.</p>
+        <h1 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 0.4rem; color: var(--text-main); display: flex; align-items: center; gap: 0.6rem;">
+          <span>🎥</span> Proprietary Stream Infrastructure & Auto-Clip Farmer
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          <strong style="color: var(--accent-gold);">🔒 Exclusive Native Platform:</strong> Third-party streaming services (Twitch/YouTube) are restricted. All game broadcasts run exclusively via CustomLobbies Native WebRTC & RTMP Stream Infrastructure with Auto-Clip Farming enabled.
+        </p>
       </div>
 
-      <div class="grid-3" style="margin-bottom: 2rem;">
-        <!-- Card 1: Twitch Integration -->
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <h3 style="font-size: 1.2rem; font-weight: 800; color: #9146ff; display: flex; align-items: center; gap: 0.5rem;">
-                <span>📺</span> Twitch Live
-              </h3>
-              <span class="lobby-game-tag" id="twitchStatusBadge" style="background: rgba(255, 82, 82, 0.2); color: var(--accent-red);">NOT CONNECTED</span>
-            </div>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-              Sync Twitch live stream status, embed live player and chat box, and stream follower alert triggers.
-            </p>
-            <div class="input-group">
-              <label class="input-label">Twitch Channel Name</label>
-              <input type="text" class="input-field" id="twitchUsernameInput" value="ProStreamer_2026">
-            </div>
-          </div>
-          <button class="btn btn-purple" id="btnConnectTwitch" style="width: 100%; margin-top: 1rem;">
-            Connect Twitch Account
-          </button>
+      <!-- Card 1: CustomLobbies Native Stream Server Node -->
+      <div class="card" style="margin-bottom: 2rem; border-color: var(--accent-cyan);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 style="font-size: 1.25rem; font-weight: 900; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
+            <span>🎥</span> CustomLobbies Proprietary RTMP & WebRTC Stream Node
+          </h3>
+          <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-weight: 900;">🟢 NATIVE STREAM SERVER ONLINE</span>
         </div>
 
-        <!-- Card 2: Streamlabs OBS Integration -->
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Stream directly to CustomLobbies.com with 0.2s ultra-low latency. Use our native Electron Desktop Program, OBS Studio, or Web browser screen capture.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; font-size: 0.88rem; margin-bottom: 1rem;">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <h3 style="font-size: 1.2rem; font-weight: 800; color: #31c3a6; display: flex; align-items: center; gap: 0.5rem;">
-                <span>🧪</span> Streamlabs OBS
-              </h3>
-              <span class="lobby-game-tag" id="streamlabsStatusBadge" style="background: rgba(255, 82, 82, 0.2); color: var(--accent-red);">NOT CONNECTED</span>
-            </div>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-              Connect your Streamlabs Socket API Token to sync follower alerts, donations, sub alerts, and custom lobby ELO badges.
-            </p>
-            <div class="input-group">
-              <label class="input-label">Streamlabs Socket API Token</label>
-              <input type="password" class="input-field" id="streamlabsTokenInput" placeholder="eyJ0eXAiOiJKV1QiLCJhbGci...">
-            </div>
+            <span style="color: var(--text-muted);">RTMP Ingest Server:</span>
+            <div style="font-family: monospace; font-weight: 800; color: var(--accent-cyan); margin-top: 0.2rem;">rtmp://live.customlobbies.com/app</div>
           </div>
-          <button class="btn btn-primary" id="btnConnectStreamlabs" style="width: 100%; margin-top: 1rem;">
-            Connect Streamlabs API
-          </button>
+          <div>
+            <span style="color: var(--text-muted);">Stream Key:</span>
+            <div style="font-family: monospace; font-weight: 800; color: var(--accent-gold); margin-top: 0.2rem;">live_usr_892341_customlobbies</div>
+          </div>
         </div>
 
-        <!-- Card 3: Discord Integration -->
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <h3 style="font-size: 1.2rem; font-weight: 800; color: #5865f2; display: flex; align-items: center; gap: 0.5rem;">
-                <span>🤖</span> Discord Webhooks
-              </h3>
-              <span class="lobby-game-tag" id="discordStatusBadge" style="background: rgba(255, 82, 82, 0.2); color: var(--accent-red);">NOT CONNECTED</span>
-            </div>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-              Auto-broadcast "Going Live" announcements, match popped alerts, and MMR win notifications to your Discord channels.
-            </p>
-            <div class="input-group">
-              <label class="input-label">Discord Channel Webhook URL</label>
-              <input type="text" class="input-field" id="discordWebhookInput" placeholder="https://discord.com/api/webhooks/...">
-            </div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
-            <button class="btn btn-secondary btn-sm" id="btnSaveDiscordWebhook">Save Webhook</button>
-            <button class="btn btn-purple btn-sm" id="btnTestDiscordAnnouncement">📢 Test Going Live Announcement</button>
-          </div>
+        <div style="display: flex; gap: 0.8rem;">
+          <button class="btn btn-primary" id="btnCopyStreamURL">📋 Copy Stream Key</button>
+          <button class="btn btn-purple" onclick="alert('💻 LAUNCHING NATIVE DESKTOP STREAM PROGRAM!\n\nLaunching CustomLobbies.exe Stream Studio with GPU hardware encoding...')">💻 Launch Desktop Stream Program</button>
         </div>
       </div>
 
-      <!-- Twitch Embedded Stream & Chat Player Container -->
-      <div class="card">
-        <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem;">Live Stream & Chat Embed Preview</h3>
-        <div id="twitchEmbedContainer">
-          <p style="color: var(--text-muted);">Connect your Twitch account above to embed your live stream and chat directly inside CustomLobbies.com!</p>
+      <!-- Card 2: Auto Clip Farming Engine Dashboard -->
+      <div class="card" style="border-color: var(--accent-gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--accent-gold); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+              <span>🤖</span> Auto Clip Farming Engine (Background Gameplay Highlight Harvest)
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">Automatically detects multi-kills, aces, 1vX clutches, and audio hype spikes during games to farm clips!</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <span class="lobby-game-tag" style="background: rgba(255, 82, 82, 0.2); color: var(--accent-red); font-weight: 900;" id="autoFarmStatusBadge">🔴 AUTO-FARMER PAUSED</span>
+            <button class="btn btn-primary" id="btnToggleAutoFarm">
+              🚀 Start Auto-Clip Farmer
+            </button>
+          </div>
+        </div>
+
+        <!-- Auto Farm Trigger Preferences -->
+        <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.85rem;">
+          <div style="font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 0.6rem;">⚡ Auto-Farm Highlight Triggers</div>
+          <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+              <input type="checkbox" checked style="accent-color: var(--accent-cyan);">
+              <span>🎯 5K Ace & Multi-Kill Detector</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+              <input type="checkbox" checked style="accent-color: var(--accent-cyan);">
+              <span>⚡ 1vX Clutch Scenario</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+              <input type="checkbox" checked style="accent-color: var(--accent-cyan);">
+              <span>🔊 Mic Hype Level Spike</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+              <input type="checkbox" checked style="accent-color: var(--accent-cyan);">
+              <span>🏆 Match Victory / Tournament Win</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Auto Farmed Clips Reel Grid -->
+        <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.8rem;">🎬 Harvested Auto-Farm Clips Reel</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;" id="farmedClipsGrid">
+          <!-- Injected via stream-studio.js -->
+        </div>
+      </div>
+    </section>
+
+      <!-- CustomLobbies Native Live Stream & Chat Player Container -->
+      <div class="card" style="margin-top: 1.5rem; border-color: var(--accent-cyan);">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>📺</span> CustomLobbies Proprietary Live Stream Player & WebRTC Chat
+        </h3>
+        <div id="customLobbiesStreamEmbedContainer" style="background: #000; border-radius: 8px; padding: 2rem; text-align: center; border: 1px solid var(--border-color);">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎥</div>
+          <h4 style="font-size: 1.2rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 0.4rem;">CustomLobbies Native Stream Node Active</h4>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">Broadcasting via RTMP / WebRTC Ingest Node • 1080p 60FPS Low Latency (0.2s)</p>
+          <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-weight: 900;">🟢 LIVE • 247 Viewers</span>
         </div>
       </div>
     </section>
