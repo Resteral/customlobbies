@@ -231,6 +231,13 @@ class WardogsEngine {
 
   // Perform Ranked Selection Draft for 33 v 33 v 33 (99 Players)
   generateRankedSelectionMatch(gameName = 'Counter-Strike 2') {
+    // Sort registered pre-formed squads by highest member count created before entry
+    const sortedSquads = [...this.registeredSquads].sort((a, b) => (b.membersCount || 0) - (a.membersCount || 0));
+
+    const squad1 = sortedSquads[0] || { name: 'WARDOG Company Alpha', captain: 'Ghost_Dog_99', membersCount: 33 };
+    const squad2 = sortedSquads[1] || { name: 'Iron Claw Battalion Bravo', captain: 'Sargeant_Iron', membersCount: 33 };
+    const squad3 = sortedSquads[2] || { name: 'Phantom Brigade Charlie', captain: 'Shadow_K9', membersCount: 28 };
+
     const eligibleSolos = this.soloMercenaries.filter(m => m.game === gameName || m.game === 'Counter-Strike 2');
     const pool = [...eligibleSolos].sort((a, b) => b.elo - a.elo);
 
@@ -242,8 +249,54 @@ class WardogsEngine {
 
     const rolesList = ['🎯 Marksman / Sniper', '⚡ Breacher / Assault', '🧠 Recon / Scout', '🛡️ Heavy / Tank', '📻 Comms Specialist'];
 
-    for (let i = 0; i < capacity; i++) {
-      let player = pool[i];
+    // Ensure squad captains (highest member count leaders) are placed at slot 0 of each faction
+    factionAlpha.push({
+      id: 901,
+      name: squad1.captain,
+      callsign: 'COMMANDER-ALPHA',
+      game: gameName,
+      role: '👑 Battalion Commander (Highest Roster: ' + squad1.membersCount + ' Members)',
+      elo: 2680,
+      kd: '2.45',
+      status: 'Commander Selected',
+      badge: '👑 Commander (Roster Size: ' + squad1.membersCount + ')',
+      isCommander: true,
+      squadName: squad1.name,
+      membersCount: squad1.membersCount
+    });
+
+    factionBravo.push({
+      id: 902,
+      name: squad2.captain,
+      callsign: 'COMMANDER-BRAVO',
+      game: gameName,
+      role: '👑 Battalion Commander (Roster: ' + squad2.membersCount + ' Members)',
+      elo: 2450,
+      kd: '2.15',
+      status: 'Commander Selected',
+      badge: '👑 Commander (Roster Size: ' + squad2.membersCount + ')',
+      isCommander: true,
+      squadName: squad2.name,
+      membersCount: squad2.membersCount
+    });
+
+    factionCharlie.push({
+      id: 903,
+      name: squad3.captain,
+      callsign: 'COMMANDER-CHARLIE',
+      game: gameName,
+      role: '👑 Battalion Commander (Roster: ' + squad3.membersCount + ' Members)',
+      elo: 2380,
+      kd: '2.10',
+      status: 'Commander Selected',
+      badge: '👑 Commander (Roster Size: ' + squad3.membersCount + ')',
+      isCommander: true,
+      squadName: squad3.name,
+      membersCount: squad3.membersCount
+    });
+
+    for (let i = 3; i < capacity; i++) {
+      let player = pool[i - 3];
       if (!player) {
         const selectedRole = rolesList[i % rolesList.length];
         player = {
@@ -275,6 +328,9 @@ class WardogsEngine {
       game: gameName,
       format: '33 v 33 v 33 Tri-Faction War (99 Operatives)',
       capacity: 99,
+      commanderAlpha: squad1,
+      commanderBravo: squad2,
+      commanderCharlie: squad3,
       factionAlpha: factionAlpha,
       factionBravo: factionBravo,
       factionCharlie: factionCharlie,
