@@ -129,7 +129,10 @@
             <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Apex Legends')">⚡ Auto-Draft Apex</button>
           </div>
         </div>
-        <div style="display: flex; gap: 1rem; align-items: center;">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-purple" onclick="window.app.openMapVetoModal('Counter-Strike 2')">
+            🗺️ Start Map Veto Pick/Ban Room
+          </button>
           <button class="btn btn-purple" id="btnRandomPicker">
             🎲 Pick Random Game
           </button>
@@ -1835,6 +1838,69 @@
       <button class="match-accept-btn" id="btnAcceptMatchAction" onclick="window.app.acceptMatch()">
         <span>✔ ACCEPT MATCH</span>
       </button>
+    </div>
+  </div>
+
+  <!-- Interactive Map Veto & Pick/Ban Overlay Modal -->
+  <div class="modal-overlay" id="mapVetoModal">
+    <div class="modal-card" style="max-width: 780px; width: 92%;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.5rem;">🗺️</span>
+            <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-gold); margin: 0;">Interactive Map Veto & Pick/Ban Room</h3>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Official FACEIT & VCT Competitive Map Selection Engine</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeMapVetoModal()">✕ Close</button>
+      </div>
+
+      <!-- Control Bar: Game Selector + Captain Coin Flip -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; background: rgba(0, 0, 0, 0.4); padding: 0.8rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; display: block; margin-bottom: 0.3rem;">Select Competitive Title</label>
+          <select class="input-field" id="vetoGameSelect" onchange="window.app.openMapVetoModal(this.value)">
+            <option value="Counter-Strike 2">Counter-Strike 2 (7 Maps)</option>
+            <option value="Valorant">Valorant (6 Maps)</option>
+            <option value="Empulse">Empulse (7 Maps)</option>
+            <option value="REMATCH">REMATCH (4 Maps)</option>
+            <option value="Arkheron">Arkheron (3 Maps)</option>
+            <option value="Marvel Rivals">Marvel Rivals (3 Maps)</option>
+            <option value="Deadlock">Deadlock (2 Maps)</option>
+            <option value="The Finals">The Finals (4 Maps)</option>
+            <option value="Rainbow Six Siege">Rainbow Six Siege (6 Maps)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; display: block; margin-bottom: 0.3rem;">Captain First Ban Coin Flip</label>
+          <button class="btn btn-purple btn-block" onclick="window.app.flipCaptainCoin()" style="display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <span>🪙</span> Flip Captain Coin (<span id="coinFlipStatusText">Team Alpha Wins</span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- Turn & Match Status Banner -->
+      <div style="background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 0.75rem; text-align: center; margin-bottom: 1rem;" id="vetoTurnBanner">
+        <span style="font-weight: 900; font-size: 0.95rem; color: var(--accent-cyan);" id="vetoTurnText">🔵 TURN: Team Alpha Ban Phase</span>
+      </div>
+
+      <!-- Interactive Map Cards Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; margin-bottom: 1.2rem; max-height: 320px; overflow-y: auto; padding: 0.2rem;" id="modalMapVetoGrid">
+        <!-- Injected dynamically via JS -->
+      </div>
+
+      <!-- Veto Activity Audit Log -->
+      <div style="background: rgba(0, 0, 0, 0.5); border-radius: 8px; padding: 0.8rem; border: 1px solid var(--border-color); margin-bottom: 1.2rem;">
+        <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-purple); text-transform: uppercase; margin-bottom: 0.4rem;">📜 Veto Activity History</div>
+        <div id="vetoHistoryLog" style="font-size: 0.8rem; color: var(--text-muted); max-height: 90px; overflow-y: auto; font-family: monospace;">
+          <div>• Map veto session initialized</div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn btn-secondary" onclick="window.app.resetMapVetoSession()">🔄 Reset Veto</button>
+        <button class="btn btn-primary" onclick="window.app.confirmVetoAndLaunchMatch()">🎮 Lock Map & Launch Server</button>
+      </div>
     </div>
   </div>
 

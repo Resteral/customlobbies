@@ -731,11 +731,14 @@ class CustomLobbiesApp {
   banMap(mapName) {
     if (this.bannedMaps.has(mapName)) {
       this.bannedMaps.delete(mapName);
+      this.addVetoLog(`• Map "${mapName}" was unbanned.`);
     } else {
       this.bannedMaps.add(mapName);
       if (window.widgetBuilderEngine) {
         window.widgetBuilderEngine.playSoundEffect('hitmarker');
       }
+      this.addVetoLog(`• [${this.vetoTurn || 'Team Alpha'}] BANNED map "${mapName}".`);
+      this.vetoTurn = this.vetoTurn === 'Team Alpha' ? 'Team Bravo' : 'Team Alpha';
     }
     this.renderMapVetoGrid();
   }
@@ -745,38 +748,125 @@ class CustomLobbiesApp {
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('fanfare');
     }
+    this.addVetoLog(`• [${this.vetoTurn || 'Team Alpha'}] SELECTED OFFICIAL MATCH MAP: "${mapName}"!`);
     this.renderMapVetoGrid();
     alert(`🎮 DECIDED MATCH MAP!\n\nMap "${mapName}" selected for ${this.currentDraftGame}!`);
   }
 
+  addVetoLog(msg) {
+    if (!this.vetoLogs) this.vetoLogs = [];
+    this.vetoLogs.unshift(msg);
+    const logContainer = document.getElementById('vetoHistoryLog');
+    if (logContainer) {
+      logContainer.innerHTML = this.vetoLogs.map(l => `<div>${l}</div>`).join('');
+    }
+  }
+
+  openMapVetoModal(gameName) {
+    if (gameName) {
+      this.currentDraftGame = gameName;
+    }
+    const gameSelect = document.getElementById('vetoGameSelect');
+    if (gameSelect) {
+      gameSelect.value = this.currentDraftGame;
+    }
+    if (!this.vetoTurn) this.vetoTurn = 'Team Alpha';
+    if (!this.vetoLogs || this.vetoLogs.length === 0) {
+      this.vetoLogs = [`• Map veto session initialized for ${this.currentDraftGame}.`];
+    }
+    this.renderMapVetoGrid();
+    const modal = document.getElementById('mapVetoModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeMapVetoModal() {
+    const modal = document.getElementById('mapVetoModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  flipCaptainCoin() {
+    const winner = Math.random() < 0.5 ? 'Team Alpha' : 'Team Bravo';
+    this.vetoTurn = winner;
+    const txt = document.getElementById('coinFlipStatusText');
+    if (txt) txt.textContent = `${winner} Wins`;
+    this.addVetoLog(`• 🪙 Coin flip result: ${winner} wins first ban phase choice!`);
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+    this.renderMapVetoGrid();
+  }
+
+  resetMapVetoSession() {
+    this.bannedMaps.clear();
+    this.selectedMatchMap = null;
+    this.vetoTurn = 'Team Alpha';
+    this.vetoLogs = [`• Map veto session reset.`];
+    this.renderMapVetoGrid();
+  }
+
+  confirmVetoAndLaunchMatch() {
+    const maps = window.eloEngine.mapPools[this.currentDraftGame] || window.eloEngine.mapPools['Counter-Strike 2'];
+    const remaining = maps.filter(m => !this.bannedMaps.has(m));
+
+    let finalMap = this.selectedMatchMap;
+    if (!finalMap && remaining.length > 0) {
+      finalMap = remaining[0];
+      this.selectedMatchMap = finalMap;
+    }
+
+    this.closeMapVetoModal();
+    if (finalMap) {
+      this.triggerMatchFoundModal(`${this.currentDraftGame} • Premier Scrim (${finalMap})`);
+    } else {
+      alert('⚠️ All maps were banned! Reset the veto session to start over.');
+    }
+  }
+
   renderMapVetoGrid() {
     const container = document.getElementById('mapVetoGridContainer');
-    if (!container) return;
+    const modalContainer = document.getElementById('modalMapVetoGrid');
+    const turnBannerText = document.getElementById('vetoTurnText');
+
+    if (turnBannerText) {
+      turnBannerText.textContent = this.selectedMatchMap 
+        ? `🏆 MATCH MAP SELECTED: ${this.selectedMatchMap}`
+        : `${this.vetoTurn === 'Team Alpha' ? '🔵' : '🔴'} TURN: ${this.vetoTurn} Ban Phase`;
+    }
 
     const maps = window.eloEngine.mapPools[this.currentDraftGame] || window.eloEngine.mapPools['Counter-Strike 2'];
 
-    container.innerHTML = maps.map(m => {
+    const renderHTML = (m) => {
       const isBanned = this.bannedMaps.has(m);
       const isPick = this.selectedMatchMap === m;
 
       return `
         <div style="background: ${isPick ? 'rgba(0, 230, 118, 0.15)' : isBanned ? 'rgba(255, 82, 82, 0.1)' : 'rgba(255, 255, 255, 0.05)'}; border: 1px solid ${isPick ? 'var(--accent-green)' : isBanned ? '#ff5252' : 'var(--border-color)'}; border-radius: 8px; padding: 0.6rem; text-align: center;">
-          <div style="font-weight: 800; font-size: 0.9rem; margin-bottom: 0.4rem; color: ${isBanned ? '#ff5252' : isPick ? 'var(--accent-green)' : 'inherit'};">
-            ${isBanned ? '🚫 BAN: ' : isPick ? '🎮 MATCH MAP: ' : ''}${m}
+          <div style="font-weight: 800; font-size: 0.85rem; margin-bottom: 0.4rem; color: ${isBanned ? '#ff5252' : isPick ? 'var(--accent-green)' : 'inherit'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            ${isBanned ? '🚫 BAN: ' : isPick ? '🎮 MAP: ' : ''}${m}
           </div>
           <div style="display: flex; gap: 0.3rem; justify-content: center;">
             <button class="btn ${isBanned ? 'btn-secondary' : 'btn-danger'} btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.7rem;" onclick="window.app.banMap('${m}')">
-              ${isBanned ? 'Unban' : 'Ban Map'}
+              ${isBanned ? 'Unban' : 'Ban'}
             </button>
             ${!isBanned ? `
               <button class="btn btn-primary btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.7rem;" onclick="window.app.selectMatchMap('${m}')">
-                Pick Map
+                Pick
               </button>
             ` : ''}
           </div>
         </div>
       `;
-    }).join('');
+    };
+
+    const htmlContent = maps.map(renderHTML).join('');
+
+    if (container) container.innerHTML = htmlContent;
+    if (modalContainer) modalContainer.innerHTML = htmlContent;
+
+    const logContainer = document.getElementById('vetoHistoryLog');
+    if (logContainer && this.vetoLogs) {
+      logContainer.innerHTML = this.vetoLogs.map(l => `<div>${l}</div>`).join('');
+    }
   }
 
   renderPoolFeed() {
