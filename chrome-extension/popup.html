@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 320px;
+      margin: 0;
+      padding: 1rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0d1117;
+      color: #f0f4f8;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .badge {
+      background: rgba(0, 242, 254, 0.15);
+      color: #00f2fe;
+      padding: 0.3rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .btn {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 0.6rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      color: #000;
+    }
+    .btn-purple {
+      background: linear-gradient(135deg, #9d4edd, #7b2cbf);
+      color: #fff;
+    }
+    .btn-danger {
+      background: #ff5252;
+      color: #fff;
+    }
+    .status-box {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 0.8rem;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #8a99ad;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">CustomLobbies Ext</div>
+    <div class="badge" id="extMMRBadge">1840 MMR</div>
+  </div>
+
+  <button class="btn btn-primary" id="extBtnStartCapture">
+    <span>🖥️</span> Start Tab / Desktop Capture
+  </button>
+
+  <button class="btn btn-purple" id="extBtnJoinQueue">
+    <span>⚡</span> Join Quick Queue (-join)
+  </button>
+
+  <button class="btn btn-danger" id="extBtnInjectOverlay">
+    <span>✨</span> Inject In-Game HUD Overlay
+  </button>
+
+  <div class="status-box" id="extStatusText">
+    Status: Connected to CustomLobbies.com
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

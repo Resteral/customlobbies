@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Munchies Delivery - Underground Mobile Dispensary</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="truck-app" class="hidden">
+        <!-- Floating Particle Smoke Canvas -->
+        <canvas id="ambient-smoke-canvas"></canvas>
+
+        <div class="truck-container">
+            <!-- Bullet Hole Distresses on the Truck Frame -->
+            <div class="truck-bullet-hole hole-tr"></div>
+            <div class="truck-bullet-hole hole-bl"></div>
+
+            <!-- Header with Munchies Street Theme -->
+            <header class="truck-header">
+                <div class="header-brand">
+                    <div class="brand-avatar" id="brand-avatar">
+                        <i class="fa-solid fa-ice-cream brand-ico-ice"></i>
+                        <i class="fa-solid fa-cannabis brand-ico-weed hidden"></i>
+                    </div>
+                    <div>
+                        <div class="brand-title-wrap">
+                            <h1 id="brand-title">MUNCHIES <span class="drip-purple">DELIVERY</span></h1>
+                            <span class="munchies-slogan" id="munchies-slogan">WE BRING THE GOODS • YOU BRING THE MONEY</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Street Dealer Badges Ribbon -->
+                <div class="street-badges-ribbon">
+                    <span class="badge-item"><i class="fa-solid fa-skull"></i> TRUST NO ONE</span>
+                    <span class="badge-item cash"><i class="fa-solid fa-money-bill-wave"></i> CASH ONLY</span>
+                    <span class="badge-item nosnitch"><i class="fa-solid fa-eye-slash"></i> NO SNITCHES</span>
+                    <span class="badge-item delivery"><i class="fa-solid fa-box-open"></i> DISCREET DELIVERY</span>
+                </div>
+
+                <div class="header-actions">
+                    <button class="secret-toggle-btn" id="secret-toggle-btn" title="Toggle Underground Contraband Stash">
+                        <div class="fingerprint-scan-icon"><i class="fa-solid fa-fingerprint"></i></div>
+                        <span id="secret-btn-text">SMUGGLER STASH: LOCKED</span>
+                    </button>
+                    <button class="close-btn" id="close-btn" title="Close Menu [ESC]"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </header>
+
+            <!-- Main Body -->
+            <div class="truck-main">
+                <!-- Navigation Tabs -->
+                <nav class="truck-nav">
+                    <div class="nav-left">
+                        <button class="tab-btn active" data-tab="icecream"><i class="fa-solid fa-ice-cream"></i> ICE CREAM PARLOR</button>
+                        <button class="tab-btn" data-tab="crafting" id="crafting-tab-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> SOFT SERVE STATION</button>
+                        <button class="tab-btn hidden" id="weed-tab-btn" data-tab="weed"><i class="fa-solid fa-cannabis"></i> WEED & EDIBLES</button>
+                        <button class="tab-btn hidden" id="hard-drugs-tab-btn" data-tab="hard_drugs"><i class="fa-solid fa-pills"></i> HARD ILLICITS</button>
+                        <button class="tab-btn hidden" id="sell-drugs-tab-btn" data-tab="sell_drugs"><i class="fa-solid fa-hand-holding-dollar"></i> SELL TO WEED MAN</button>
+                    </div>
+                    <div class="nav-right" id="driver-nav-wrapper">
+                        <button class="tab-btn mgmt-tab" data-tab="management"><i class="fa-solid fa-sliders"></i> TRUCK DASHBOARD</button>
+                    </div>
+                </nav>
+
+                <!-- Tab: Realistic Soft Serve Creation Station -->
+                <section class="tab-content hidden" id="tab-crafting">
+                    <div class="creation-station-container">
+                        <!-- Top Machine Header -->
+                        <div class="machine-header-bar">
+                            <div class="machine-brand-lbl"><i class="fa-solid fa-snowflake"></i> TAYLOR ICE-MASTER 3000 • DUAL-HOPPER CHURN</div>
+                            <div class="machine-temp-gauge"><span class="temp-dot"></span> TEMP: -4.5°C [FROZEN READY]</div>
+                        </div>
+
+                        <!-- Main Commercial Dispenser Stage -->
+                        <div class="soft-serve-station-grid">
+                            <!-- Left: Flavor Levers & Soft-Serve Swirl Stage -->
+                            <div class="dispenser-machine-housing">
+                                <!-- Top Flavor Selector Badges -->
+                                <div class="flavor-badges-row">
+                                    <div class="flavor-pill vanilla active" data-flavor="vanilla">
+                                        <span class="flavor-icon">🍦</span>
+                                        <span>VANILLA CREAM</span>
+                                    </div>
+                                    <div class="flavor-pill mint" data-flavor="mint">
+                                        <span class="flavor-icon">🌿</span>
+                                        <span>MINT THC CANNABIS</span>
+                                    </div>
+                                    <div class="flavor-pill chocolate" data-flavor="chocolate">
+                                        <span class="flavor-icon">🍫</span>
+                                        <span>DUTCH CHOCOLATE</span>
+                                    </div>
+                                    <div class="flavor-pill swirl" data-flavor="swirl">
+                                        <span class="flavor-icon">🌀</span>
+                                        <span>DUAL TWIST SWIRL</span>
+                                    </div>
+                                </div>
+
+                                <!-- Chrome Lever & Nozzle Housing -->
+                                <div class="chrome-spout-assembly">
+                                    <!-- 3 Physical Pull Levers -->
+                                    <div class="levers-row">
+                                        <div class="lever-arm-wrap" id="lever-vanilla" data-flavor="vanilla">
+                                            <div class="lever-knob"></div>
+                                            <div class="lever-rod"></div>
+                                            <div class="lever-base"></div>
+                                            <span class="lever-lbl">VANILLA</span>
+                                        </div>
+                                        <div class="lever-arm-wrap" id="lever-mint" data-flavor="mint">
+                                            <div class="lever-knob green"></div>
+                                            <div class="lever-rod"></div>
+                                            <div class="lever-base"></div>
+                                            <span class="lever-lbl">MINT THC</span>
+                                        </div>
+                                        <div class="lever-arm-wrap" id="lever-chocolate" data-flavor="chocolate">
+                                            <div class="lever-knob choco"></div>
+                                            <div class="lever-rod"></div>
+                                            <div class="lever-base"></div>
+                                            <span class="lever-lbl">CHOCO</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Extrusion Nozzles -->
+                                    <div class="nozzles-bar">
+                                        <div class="nozzle n1"></div>
+                                        <div class="nozzle n2 center-nozzle">
+                                            <div class="cream-stream hidden" id="cream-stream"></div>
+                                        </div>
+                                        <div class="nozzle n3"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Soft-Serve Swirl & Cone Visualizer -->
+                                <div class="cone-dispense-stage">
+                                    <div class="interactive-cone-assembly" id="cone-assembly">
+                                        <!-- Cherry on Top -->
+                                        <div class="cone-cherry hidden" id="cone-cherry">🍒</div>
+
+                                        <!-- Realistic Soft-Serve Swirl Layers -->
+                                        <div class="swirl-stack-container" id="swirl-stack">
+                                            <div class="swirl-layer l-tip hidden" id="swirl-tip"></div>
+                                            <div class="swirl-layer l-top hidden" id="swirl-top"></div>
+                                            <div class="swirl-layer l-mid hidden" id="swirl-mid"></div>
+                                            <div class="swirl-layer l-base hidden" id="swirl-base"></div>
+                                        </div>
+
+                                        <!-- Syrups Drizzle Overlay Canvas -->
+                                        <canvas class="syrup-drizzle-canvas" id="syrup-canvas"></canvas>
+
+                                        <!-- Crisp Waffle Cone Base -->
+                                        <div class="waffle-cone-body">
+                                            <div class="cone-rim"></div>
+                                            <div class="cone-waffle-pattern"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cone Fill Progress Bar -->
+                                    <div class="pour-progress-bar-wrap">
+                                        <div class="pour-progress-bar" id="pour-progress-bar" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Pour Controller Button -->
+                                <div class="pour-controls-bar">
+                                    <button class="pour-btn" id="pour-hold-btn">
+                                        <i class="fa-solid fa-hand-holding-hand"></i> HOLD TO POUR SOFT-SERVE
+                                    </button>
+                                    <button class="reset-cone-btn" id="reset-cone-btn" title="Start New Cone">
+                                        <i class="fa-solid fa-rotate-left"></i> RESET
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Right: Syrups, THC Infusions, Toppings & Packaging -->
+                            <div class="toppings-craft-panel">
+                                <!-- Section 1: Artisanal Squeeze Syrups -->
+                                <div class="craft-group">
+                                    <div class="group-title"><i class="fa-solid fa-droplet"></i> ARTISANAL SYRUPS & THC DRIZZLE</div>
+                                    <div class="syrups-grid">
+                                        <button class="syrup-bottle-btn" data-syrup="chocolate">
+                                            <div class="bottle-icon" style="background: #3e2723; color: #d7ccc8;">🍫</div>
+                                            <div class="bottle-meta">
+                                                <strong>HOT FUDGE</strong>
+                                                <small>Belgian Dark</small>
+                                            </div>
+                                        </button>
+                                        <button class="syrup-bottle-btn" data-syrup="strawberry">
+                                            <div class="bottle-icon" style="background: #c2185b; color: #f8bbd0;">🍓</div>
+                                            <div class="bottle-meta">
+                                                <strong>STRAWBERRY</strong>
+                                                <small>Sweet Glaze</small>
+                                            </div>
+                                        </button>
+                                        <button class="syrup-bottle-btn thc-syrup" data-syrup="thc_honey">
+                                            <div class="bottle-icon" style="background: #2e7d32; color: #a5d6a7;">🍯</div>
+                                            <div class="bottle-meta">
+                                                <strong>THC DISTILLATE</strong>
+                                                <small>50mg Live Resin</small>
+                                            </div>
+                                        </button>
+                                        <button class="syrup-bottle-btn" data-syrup="caramel">
+                                            <div class="bottle-icon" style="background: #ff8f00; color: #ffe082;">🍬</div>
+                                            <div class="bottle-meta">
+                                                <strong>SALTED CARAMEL</strong>
+                                                <small>Warm Drizzle</small>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Section 2: Crunchy Toppings -->
+                                <div class="craft-group">
+                                    <div class="group-title"><i class="fa-solid fa-cookie"></i> CRUNCHY TOPPINGS & CRUMBS</div>
+                                    <div class="toppings-grid">
+                                        <button class="topping-jar-btn" data-topping="sprinkles">
+                                            <div class="jar-icon">🌈</div>
+                                            <span>RAINBOW SPRINKLES</span>
+                                        </button>
+                                        <button class="topping-jar-btn" data-topping="oreo">
+                                            <div class="jar-icon">🍪</div>
+                                            <span>OREO CRUMB</span>
+                                        </button>
+                                        <button class="topping-jar-btn" data-topping="peanuts">
+                                            <div class="jar-icon">🥜</div>
+                                            <span>ROASTED PEANUTS</span>
+                                        </button>
+                                        <button class="topping-jar-btn" data-topping="cherry">
+                                            <div class="jar-icon">🍒</div>
+                                            <span>MARASCHINO CHERRY</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Section 3: Completed Ice Cream Recipe Summary -->
+                                <div class="recipe-summary-card">
+                                    <div class="summary-head">
+                                        <span><i class="fa-solid fa-receipt"></i> CURRENT CREATION:</span>
+                                        <span class="recipe-val" id="craft-summary-name">MINT THC CANNABIS CONE</span>
+                                    </div>
+                                    <div class="added-ingredients-list" id="craft-ingredients-list">
+                                        <span class="ingredient-tag">Crispy Waffle Cone</span>
+                                    </div>
+                                </div>
+
+                                <!-- Serve / Pack Button -->
+                                <button class="serve-customer-btn" id="serve-customer-btn">
+                                    <i class="fa-solid fa-hand-holding-heart"></i> SERVE CUSTOMER / PACK CONE (+$65)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tab 1, 2, 3: Holographic Showroom & Drug Dossier -->
+                <section class="tab-content active" id="tab-catalog">
+                    <!-- HUD Search & Filter Bar -->
+                    <div class="hud-buy-filter-bar">
+                        <div class="hud-search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="hud-search-input" placeholder="Quick search treats, weed strains, edibles, illicits..." autocomplete="off">
+                            <button id="hud-clear-search-btn" class="hud-clear-btn hidden"><i class="fa-solid fa-circle-xmark"></i></button>
+                        </div>
+                        <div class="hud-category-chips" id="hud-category-chips">
+                            <button class="hud-chip-btn active" data-filter="all"><i class="fa-solid fa-border-all"></i> ALL PRODUCTS</button>
+                            <button class="hud-chip-btn" data-filter="cones"><i class="fa-solid fa-ice-cream"></i> CONES & GELATOS</button>
+                            <button class="hud-chip-btn" data-filter="edibles"><i class="fa-solid fa-cannabis"></i> WEED & EDIBLES</button>
+                            <button class="hud-chip-btn" data-filter="illicits"><i class="fa-solid fa-pills"></i> STREET DRUGS</button>
+                        </div>
+                    </div>
+
+                    <div class="split-catalog-layout">
+                        <!-- Left: Scrollable Product Cards Stream -->
+                        <div class="catalog-cards-list" id="catalog-grid">
+                            <!-- Injected dynamically -->
+                        </div>
+
+                        <!-- Right: Interactive Product Showroom & Quality Lab -->
+                        <div class="drug-inspector-panel" id="drug-inspector-panel">
+                            <!-- 3D Holographic Stage Pedestal -->
+                            <div class="holo-stage">
+                                <div class="holo-pedestal-ring"></div>
+                                <div class="holo-pedestal-glow"></div>
+                                <div class="holo-item-display" id="inspect-icon">🌿</div>
+                                <div class="holo-light-beam"></div>
+                            </div>
+
+                            <!-- Title & Strain Header -->
+                            <div class="inspector-hero-card">
+                                <div class="inspector-title-wrap">
+                                    <div class="inspect-type-badge" id="inspect-type">DRIED CANNABIS FLOWER</div>
+                                    <h2 id="inspect-title">OG Kush Baggie (1g)</h2>
+                                    <span class="inspect-strain" id="inspect-strain"><i class="fa-solid fa-dna"></i> Strain: OG Kush (Indica Dominant)</span>
+                                </div>
+                                <div class="inspect-price-box">
+                                    <div class="price-val" id="inspect-price">$110</div>
+                                    <div class="price-lbl">STREET VALUE</div>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <p class="inspector-desc" id="inspect-desc">
+                                Hand-trimmed, sticky indoor cannabis colas cured with dense trichomes.
+                            </p>
+
+                            <!-- Potency & Purity Gauge -->
+                            <div class="potency-gauge-card">
+                                <div class="gauge-header">
+                                    <span><i class="fa-solid fa-chart-line"></i> POTENCY / PURITY PROFILE</span>
+                                    <span class="potency-text" id="inspect-potency-val">THC: 28.5% • Grade: A+</span>
+                                </div>
+                                <div class="potency-bar-bg">
+                                    <div class="potency-bar-fill" id="inspect-potency-fill" style="width: 80%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Pharmacology Buffs & Effects -->
+                            <div class="effects-section">
+                                <div class="effects-header"><i class="fa-solid fa-sparkles"></i> PHARMACOLOGICAL EFFECTS & BUFFS</div>
+                                <div class="effects-chips-grid" id="inspect-effects-chips">
+                                    <!-- Injected dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Multi-Quantity Action Controller -->
+                            <div class="inspector-action-bar">
+                                <div class="qty-selector">
+                                    <span class="qty-label">QTY:</span>
+                                    <button class="qty-btn active" data-qty="1">1x</button>
+                                    <button class="qty-btn" data-qty="5">5x</button>
+                                    <button class="qty-btn" data-qty="10">10x</button>
+                                    <button class="qty-btn" data-qty="25">25x</button>
+                                </div>
+
+                                <button class="inspect-purchase-btn" id="inspect-purchase-btn">
+                                    <i class="fa-solid fa-cart-shopping"></i> <span id="purchase-btn-text">PURCHASE (1x) • $110</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tab 4: Wholesale Sell to Weed Man -->
+                <section class="tab-content hidden" id="tab-sell-drugs">
+                    <div class="sell-drugs-banner">
+                        <div class="banner-icon">🌿</div>
+                        <div>
+                            <h3>WHOLESALE STREET DROPOFF & BUYBACK</h3>
+                            <p>Sell your harvested flower, cocaine cuts, meth batches, and edibles directly to the Weed Man for instant cash payouts.</p>
+                        </div>
+                    </div>
+                    <div class="catalog-grid" id="sell-drugs-grid">
+                        <!-- Injected dynamically -->
+                    </div>
+                </section>
+
+                <!-- Tab 5: Truck Dashboard & Management -->
+                <section class="tab-content hidden" id="tab-management">
+                    <div class="mgmt-grid">
+                        <div class="mgmt-card">
+                            <h3><i class="fa-solid fa-music"></i> JINGLE CHIME SYSTEM</h3>
+                            <p>Play the signature Mr. Tasty chime to attract neighborhood pedestrians and block customers.</p>
+                            <button class="toggle-switch-btn" id="toggle-jingle-btn">
+                                <i class="fa-solid fa-volume-high"></i> <span id="jingle-btn-text">START JINGLE CHIME</span>
+                            </button>
+                        </div>
+
+                        <div class="mgmt-card">
+                            <h3><i class="fa-solid fa-people-arrows"></i> NPC STREET SALES</h3>
+                            <p>Park near neighborhood sidewalks and open sales. Civilians will approach the service window.</p>
+                            <button class="toggle-switch-btn" id="toggle-selling-btn">
+                                <i class="fa-solid fa-shop"></i> <span id="selling-btn-text">ENABLE SELLING MODE</span>
+                            </button>
+                        </div>
+
+                        <div class="mgmt-card">
+                            <h3><i class="fa-solid fa-palette"></i> TRUCK LIVERY & BODY</h3>
+                            <p>Change truck wrap & enable roof ice cream cone extra:</p>
+                            <div style="display: flex; gap: 8px; margin-top: auto;">
+                                <button class="toggle-switch-btn" id="prev-livery-btn" style="flex: 1;"><i class="fa-solid fa-chevron-left"></i> PREV</button>
+                                <button class="toggle-switch-btn active" id="apply-munchies-livery-btn" style="flex: 2;"><i class="fa-solid fa-wand-magic-sparkles"></i> LIVERY #<span id="cur-livery-num">0</span></button>
+                                <button class="toggle-switch-btn" id="next-livery-btn" style="flex: 1;">NEXT <i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mgmt-card">
+                            <h3><i class="fa-solid fa-sack-dollar"></i> REVENUE METRICS</h3>
+                            <p>Total cash earned from civilian and player transactions this session:</p>
+                            <div class="sales-stat-display" id="total-sales-stat">$0</div>
+                        </div>
+                    </div>
+
+                    <!-- Stock Inventory Table -->
+                    <div class="stock-mgmt-section">
+                        <h3><i class="fa-solid fa-boxes-stacked"></i> FREEZER STOCK & INVENTORY</h3>
+                        <table class="stock-table">
+                            <thead>
+                                <tr>
+                                    <th>ITEM</th>
+                                    <th>CATEGORY</th>
+                                    <th>FREEZER STOCK</th>
+                                    <th>PRICE</th>
+                                    <th>RESTOCK</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stock-table-body">
+                                <!-- Injected dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Floating HUD Purchase Notification Toast -->
+        <div id="hud-purchase-toast" class="hud-toast hidden">
+            <div class="hud-toast-icon">🍦</div>
+            <div class="hud-toast-content">
+                <strong id="hud-toast-title">PURCHASE COMPLETE</strong>
+                <span id="hud-toast-desc">+1x Item added to pockets (-$0 Cash)</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

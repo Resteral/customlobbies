@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Sims MLO House Builder</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="sims-hud" class="hidden">
+        <!-- SIMS TOP BAR -->
+        <header class="sims-header">
+            <div class="sims-brand">
+                <div class="sims-plumbob">💎</div>
+                <div class="brand-info">
+                    <span class="title">SIMS HOUSE BUILDER <span class="badge-sims">MLO STUDIO</span></span>
+                    <span class="sub">1-Click Rooms, Walls, Floors & Furnished Sets</span>
+                </div>
+            </div>
+
+            <!-- Central Mode Bar (Build Mode vs Buy Mode vs Erase) -->
+            <div class="sims-mode-selector">
+                <button class="mode-tab active" data-mode="rooms">
+                    <span class="tab-icon">🏠</span>
+                    <span>Room Builder</span>
+                </button>
+                <button class="mode-tab" data-mode="room_sets">
+                    <span class="tab-icon">🛋️</span>
+                    <span>Furnished Rooms</span>
+                </button>
+                <button class="mode-tab" data-mode="walls_doors">
+                    <span class="tab-icon">🧱</span>
+                    <span>Walls & Doors</span>
+                </button>
+                <button class="mode-tab" data-mode="buy_mode">
+                    <span class="tab-icon">🪑</span>
+                    <span>Buy Furniture</span>
+                </button>
+                <button class="mode-tab erase-tab" data-mode="erase_world">
+                    <span class="tab-icon">❌</span>
+                    <span>Erase Building</span>
+                </button>
+            </div>
+
+            <div class="sims-header-actions">
+                <button class="btn btn-save" id="btn-save-sims">
+                    <span>💾 Save House</span>
+                </button>
+                <button class="btn btn-close" id="btn-close-sims">
+                    <span>✕ Exit (ESC)</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- CENTER AIM TARGET NOTIFICATION -->
+        <div id="sims-target-pill" class="sims-target-pill hidden">
+            <span class="target-icon">🎯</span>
+            <span id="sims-target-text">Aim at ground to place room</span>
+        </div>
+
+        <!-- RIGHT SIDE: SIMS ACTION CONTROLS -->
+        <aside class="sims-quick-controls">
+            <div class="sims-card">
+                <div class="card-header">
+                    <span>HOUSE CONTROLS</span>
+                </div>
+                <div class="card-body">
+                    <!-- Big 1-Click Placement Stamp Button -->
+                    <button class="btn-stamp-main" id="btn-stamp-now">
+                        <span class="stamp-icon">🔨</span>
+                        <div class="stamp-text">
+                            <span class="main-txt" id="stamp-button-text">PLACE ROOM HERE</span>
+                            <span class="sub-txt">Press [E] or Click to Stamp</span>
+                        </div>
+                    </button>
+
+                    <div class="control-row">
+                        <span class="lbl">Rotation:</span>
+                        <div class="btn-group">
+                            <button class="sm-btn" id="btn-rot-left">↺ -45°</button>
+                            <span id="val-rot-yaw" class="val-pill">0°</span>
+                            <button class="sm-btn" id="btn-rot-right">+45° ↻</button>
+                        </div>
+                    </div>
+
+                    <div class="control-row">
+                        <span class="lbl">Elevation:</span>
+                        <div class="btn-group">
+                            <button class="sm-btn" id="btn-elev-down">-0.5m</button>
+                            <span id="val-elev-z" class="val-pill">+0.0m</span>
+                            <button class="sm-btn" id="btn-elev-up">+0.5m</button>
+                        </div>
+                    </div>
+
+                    <button class="btn-undo" id="btn-undo-last">
+                        <span>↩️ Undo Last Placed</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- BOTTOM SIMS CATALOG DRAWER -->
+        <footer class="sims-catalog-drawer">
+            <!-- Category Sub-tabs -->
+            <div class="sims-subtabs" id="sims-subtabs">
+                <!-- Dynamically injected -->
+            </div>
+
+            <!-- Cards Slider -->
+            <div class="sims-cards-slider" id="sims-cards-slider">
+                <!-- Dynamically injected with clickable cards -->
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

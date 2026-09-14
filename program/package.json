@@ -1,0 +1,27 @@
+{
+  "name": "customlobbies-desktop-program",
+  "version": "2.0.0",
+  "description": "CustomLobbies.com Standalone Desktop Program & Streamer Studio",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "relay": "node index.js",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac"
+  },
+  "keywords": [
+    "customlobbies",
+    "desktop-app",
+    "esports",
+    "matchmaking",
+    "streaming"
+  ],
+  "author": "CustomLobbies Team",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}

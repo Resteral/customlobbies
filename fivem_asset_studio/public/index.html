@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FiveM 3D Asset Studio &bull; AI Server Copilot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- Three.js and Loaders -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+</head>
+<body>
+    <div class="studio-app">
+        <!-- Top Navbar -->
+        <header class="studio-header">
+            <div class="header-branding">
+                <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <h1>FIVEM 3D ASSET STUDIO</h1>
+                    <span class="sub-tag">AI SERVER COPILOT &bull; TRIPO PIPELINE &bull; AUTO INJECTOR</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="action-quick-btn" id="btn-inject-ox" title="Auto-add item definition to ox_inventory/data/items.lua">
+                    <i class="fa-solid fa-bolt"></i> INJECT OX ITEM
+                </button>
+                <button class="action-quick-btn" id="btn-add-cfg" title="Auto-add ensure statement to server.cfg">
+                    <i class="fa-solid fa-file-code"></i> ADD TO SERVER.CFG
+                </button>
+                <button class="deploy-btn" id="deploy-btn">
+                    <i class="fa-solid fa-rocket"></i> 1-CLICK DEPLOY TO FIVEM
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Studio Split Workspace -->
+        <main class="studio-workspace">
+            <!-- Left: 3D Three.js Viewport & Model Inspector -->
+            <section class="viewport-panel">
+                <div class="viewport-header">
+                    <div class="viewport-title">
+                        <i class="fa-solid fa-eye"></i> 3D MODEL VIEWPORT &bull; TRIPO VIEWER
+                    </div>
+                    <div class="viewport-controls-bar">
+                        <button class="vp-tool-btn" id="btn-wireframe" title="Toggle Wireframe"><i class="fa-solid fa-vector-square"></i></button>
+                        <button class="vp-tool-btn" id="btn-autorotate" title="Toggle Auto Rotation"><i class="fa-solid fa-arrows-rotate"></i></button>
+                        <button class="vp-tool-btn" id="btn-reset-cam" title="Reset Camera"><i class="fa-solid fa-camera"></i></button>
+                    </div>
+                </div>
+
+                <!-- 3D Canvas Container -->
+                <div class="canvas-container" id="canvas-container">
+                    <div class="dropzone-overlay" id="dropzone-overlay">
+                        <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <h3>DRAG & DROP TRIPO 3D MODEL HERE</h3>
+                        <p>Supports <strong>.GLB</strong>, <strong>.GLTF</strong>, or <strong>.OBJ</strong> files</p>
+                        <label class="browse-file-btn">
+                            <i class="fa-solid fa-folder-open"></i> BROWSE 3D FILE
+                            <input type="file" id="file-input" accept=".glb,.gltf,.obj" style="display: none;">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Model Stats & GTA Scale Inspector -->
+                <div class="model-stats-footer">
+                    <div class="stat-item">
+                        <span class="stat-lbl">MODEL:</span>
+                        <span class="stat-val" id="stat-filename">Default 3D Prop</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-lbl">DIMENSIONS:</span>
+                        <span class="stat-val" id="stat-dimensions">0.8m x 1.2m x 0.7m</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-lbl">SERVER STATUS:</span>
+                        <span class="stat-val text-cyan">ONLINE (Qbox_861B84)</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right: AI Copilot & System Configurator -->
+            <section class="config-panel">
+                <!-- AI Bot Prompt Banner -->
+                <div class="ai-bot-banner">
+                    <div class="bot-header">
+                        <span class="bot-badge"><i class="fa-solid fa-brain"></i> AI SERVER COPILOT</span>
+                        <span class="bot-status">Connected to server resources</span>
+                    </div>
+                    <div class="bot-prompt-row">
+                        <input type="text" id="bot-prompt-input" class="bot-input" placeholder="Ask Bot to design a system (e.g. 'Build a rosin dab press table' or 'Make a luxury moonshine still')...">
+                        <button class="bot-send-btn" id="bot-send-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> DESIGN</button>
+                    </div>
+                    <div class="quick-prompts-pills">
+                        <span class="prompt-chip" data-prompt="Build an automated weed rosin dab press station">🌿 Rosin Dab Press</span>
+                        <span class="prompt-chip" data-prompt="Create a soft-serve ice cream vending dispenser">🍦 Soft-Serve Stand</span>
+                        <span class="prompt-chip" data-prompt="Make a cocaine cutting and packing bench">💎 Cocaine Bench</span>
+                        <span class="prompt-chip" data-prompt="Build a moonshine distilling barrel station">🥃 Moonshine Still</span>
+                        <span class="prompt-chip" data-prompt="Create a secure syndicate vault storage stash">🔒 Vault Stash</span>
+                    </div>
+                </div>
+
+                <!-- Studio Navigation Tabs -->
+                <div class="panel-tabs">
+                    <button class="tab-btn active" data-tab="tab-factory"><i class="fa-solid fa-industry"></i> 🏭 STANDALONE SCRIPT FACTORY</button>
+                    <button class="tab-btn" data-tab="tab-system"><i class="fa-solid fa-sliders"></i> 3D BLUEPRINT</button>
+                    <button class="tab-btn" data-tab="tab-code"><i class="fa-solid fa-code"></i> LIVE LUA CODE</button>
+                    <button class="tab-btn" data-tab="tab-pipeline"><i class="fa-solid fa-book-open"></i> TRIPO GUIDE</button>
+                </div>
+
+                <!-- Tab 0: Standalone Script Factory -->
+                <div class="tab-content active" id="tab-factory">
+                    <div class="form-scroll-body">
+                        <div class="factory-header-box">
+                            <div class="fh-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
+                            <div>
+                                <h3>STANDALONE FIVEM RESOURCE CREATOR</h3>
+                                <p>Build complete, production-ready standalone scripts with zero framework dependencies (supports Qbox, QB-Core, ESX, or Standalone).</p>
+                            </div>
+                        </div>
+
+                        <!-- Script Archetype -->
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-layer-group"></i> SCRIPT ARCHETYPE / SYSTEM TEMPLATE:</label>
+                            <select id="factory-template-select" class="studio-select" onchange="onFactoryTemplateChange()">
+                                <option value="business_empire">🏢 Commercial Business & Empire System (Turfs, Passive Revenue, Vault, Supplies, Guards, Missions)</option>
+                                <option value="mobile_truck">🚚 Mobile Dispensary & Job Truck (Mr. Tasty Custom Wrap, Roof Props, Chime Music, NPC Sales, Lab)</option>
+                                <option value="crafting_lab">🌿 Drug Processing & Crafting Lab (Target Interacts, Progress Bars, Recipes, Prop Spawners)</option>
+                                <option value="delivery_smuggle">💼 Contraband Logistics & Delivery (Cargo Depots, GPS Routes, Tiered Payouts, Police Dispatch)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>RESOURCE FOLDER NAME:</label>
+                                <input type="text" id="fac-res-name" class="studio-input" value="standalone_business_empire">
+                            </div>
+                            <div class="form-group">
+                                <label>PRIMARY SYSTEM / JOB LABEL:</label>
+                                <input type="text" id="fac-system-label" class="studio-input" value="Commercial Business Empire">
+                            </div>
+                        </div>
+
+                        <!-- Modular Feature Toggles -->
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-puzzle-piece"></i> MODULAR FEATURE PACKS (CHECK TO INCLUDE):</label>
+                            <div class="factory-checkbox-grid">
+                                <label class="fac-chk-item">
+                                    <input type="checkbox" id="fac-feat-nui" checked>
+                                    <span>🖥️ Interactive NUI Visual HUD & Notifications</span>
+                                </label>
+                                <label class="fac-chk-item">
+                                    <input type="checkbox" id="fac-feat-supplies" checked>
+                                    <span>📦 Supply Chain Meter (Decay + +35% Boost)</span>
+                                </label>
+                                <label class="fac-chk-item">
+                                    <input type="checkbox" id="fac-feat-vault" checked>
+                                    <span>💰 Vault Safe Cracking Heists & Alarms</span>
+                                </label>
+                                <label class="fac-chk-item">
+                                    <input type="checkbox" id="fac-feat-guards" checked>
+                                    <span>💂 Armed Security Guard Details & Upgrades</span>
+                                </label>
+                                <label class="fac-chk-item">
+                                    <input type="checkbox" id="fac-feat-missions" checked>
+                                    <span>🚚 Multi-Run Mission Dispatcher (3 Routes)</span>
+                                </label>
+                                <label class="fac-chk-item">
+                                    <input type="checkbox" id="fac-feat-npcsell" checked>
+                                    <span>👥 NPC Customer Pedestrian Sales</span>
+                                </label>
+                                <label class="fac-chk-item">
+                                    <input type="checkbox" id="fac-feat-livery" checked>
+                                    <span>🎨 Custom Vehicle Wrap & Extra Spawner</span>
+                                </label>
+                                <label class="fac-chk-item">
+                                    <input type="checkbox" id="fac-feat-bridge" checked>
+                                    <span>🌐 Universal Framework Bridge (Ox/QB/ESX/Pure)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 1-Click Generate & Deploy -->
+                        <div class="factory-action-bar">
+                            <button class="factory-gen-btn" onclick="generateAndDeployFactoryScript()">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> COMPILE & 1-CLICK DEPLOY STANDALONE SCRIPT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 1: System Blueprint & Parameters -->
+                <div class="tab-content hidden" id="tab-system">
+                    <div class="form-scroll-body">
+                        <!-- Preset Templates -->
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-layer-group"></i> SYSTEM BLUEPRINT PRESET:</label>
+                            <select id="preset-select" class="studio-select">
+                                <option value="crafting_station">🛠️ Interactive Crafting / Processing Station (Target + Animation + Recipe)</option>
+                                <option value="usable_item">🍃 Usable / Consumable Inventory Item (Ox/QB Item + Hand Prop + Buffs)</option>
+                                <option value="vending_dispenser">🏪 Vending Machine / Dispensary Counter (Shop + Cash + Stock)</option>
+                                <option value="storage_stash">📦 Secure Storage Stash / Safe (Ox Inventory Stash + Target)</option>
+                                <option value="world_prop">📍 World Map Prop Spawner (Coords + Heading + Collision Freeze)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>RESOURCE FOLDER NAME:</label>
+                                <input type="text" id="cfg-res-name" class="studio-input" value="tripo_rosin_press">
+                            </div>
+                            <div class="form-group">
+                                <label>3D PROP MODEL HASH / NAME:</label>
+                                <input type="text" id="cfg-prop-name" class="studio-input" value="prop_weed_press_01">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>TARGET FRAMEWORK:</label>
+                                <select id="cfg-framework" class="studio-select">
+                                    <option value="ox_target">Qbox / Ox Target (Recommended)</option>
+                                    <option value="qb-target">QBCore / QB-Target</option>
+                                    <option value="standalone">Standalone Keypress [E]</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>INVENTORY SYSTEM:</label>
+                                <select id="cfg-inventory" class="studio-select">
+                                    <option value="ox_inventory">Ox Inventory</option>
+                                    <option value="qb-inventory">QB-Inventory</option>
+                                    <option value="standalone">Standalone Cash / Native</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Config Fields -->
+                        <div id="dynamic-fields-container">
+                            <div class="form-group">
+                                <label>INTERACTION PROMPT LABEL:</label>
+                                <input type="text" id="cfg-target-label" class="studio-input" value="Press Rosin Extract">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>ACTION TIME (SECONDS):</label>
+                                    <input type="number" id="cfg-action-time" class="studio-input" value="6">
+                                </div>
+                                <div class="form-group">
+                                    <label>ANIMATION DICT / CLIP:</label>
+                                    <input type="text" id="cfg-anim-dict" class="studio-input" value="anim@amb@business@weed@weed_inspecting_high_p1@">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>REQUIRED INGREDIENT ITEM:</label>
+                                    <input type="text" id="cfg-input-item" class="studio-input" value="weed_baggy">
+                                </div>
+                                <div class="form-group">
+                                    <label>OUTPUT CRAFTED ITEM:</label>
+                                    <input type="text" id="cfg-output-item" class="studio-input" value="rosin_dabs">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prop World Placement Coordinates -->
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-location-dot"></i> DEFAULT SPAWN COORDINATES (X, Y, Z, Heading):</label>
+                            <div class="coords-inputs-row">
+                                <input type="number" step="0.01" id="cfg-coord-x" class="studio-input" placeholder="X" value="149.95">
+                                <input type="number" step="0.01" id="cfg-coord-y" class="studio-input" placeholder="Y" value="-1040.59">
+                                <input type="number" step="0.01" id="cfg-coord-z" class="studio-input" placeholder="Z" value="29.37">
+                                <input type="number" step="0.1" id="cfg-coord-h" class="studio-input" placeholder="Heading" value="90.0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Live Code Previewer -->
+                <div class="tab-content hidden" id="tab-code">
+                    <div class="code-sub-tabs">
+                        <button class="code-sub-btn active" data-file="cl_main.lua">client/cl_main.lua</button>
+                        <button class="code-sub-btn" data-file="sv_main.lua">server/sv_main.lua</button>
+                        <button class="code-sub-btn" data-file="fxmanifest.lua">fxmanifest.lua</button>
+                        <button class="code-sub-btn" data-file="config.lua">config.lua</button>
+                        <button class="code-sub-btn" data-file="items.lua">items.lua</button>
+                    </div>
+                    <div class="code-viewer-wrap">
+                        <pre><code id="code-display">-- Auto-generating FiveM Lua...</code></pre>
+                        <button class="copy-code-btn" id="copy-code-btn"><i class="fa-solid fa-copy"></i> COPY CODE</button>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Tripo to FiveM Conversion Guide -->
+                <div class="tab-content hidden" id="tab-pipeline">
+                    <div class="guide-scroll-body">
+                        <h2><i class="fa-solid fa-graduation-cap"></i> 3-Step Tripo3D to FiveM Conversion Pipeline</h2>
+                        
+                        <div class="guide-card">
+                            <div class="step-badge">STEP 1</div>
+                            <h3>Export Model from Tripo3D</h3>
+                            <p>In Tripo3D (<a href="https://www.tripo3d.ai" target="_blank" style="color: var(--turf-cyan);">tripo3d.ai</a>), click <strong>Download &bull; GLB / OBJ</strong> with Embedded Textures.</p>
+                        </div>
+
+                        <div class="guide-card">
+                            <div class="step-badge">STEP 2</div>
+                            <h3>Convert with Blender & Sollumz</h3>
+                            <p>Open Blender with the free <strong>Sollumz</strong> FiveM addon installed. Import your Tripo <code>.glb</code>, click <strong>Create YDR & YTD</strong>, and export directly as GTA V Drawable files (<code>.ydr</code> and <code>.ytd</code>).</p>
+                        </div>
+
+                        <div class="guide-card">
+                            <div class="step-badge">STEP 3</div>
+                            <h3>Drop into the Stream Folder & Click Deploy</h3>
+                            <p>Place your exported <code>.ydr</code> and <code>.ytd</code> into the resource's <code>stream/</code> folder, click <strong>1-Click Deploy</strong> above, and run <code>ensure [resource_name]</code> in FiveM!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="studio-toast" class="studio-toast hidden">
+        <i class="fa-solid fa-circle-check"></i> <span id="toast-message">Deployed Successfully!</span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

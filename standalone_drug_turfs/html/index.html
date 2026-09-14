@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turf & Business Control System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Real-Time Glassmorphic UI Pop-up Notification Stack (Top Center) -->
+    <div id="ui-popup-container" class="ui-popup-container"></div>
+
+    <!-- Floating Level-Up & Rep Gain Notification Toast (Top Center) -->
+    <div id="turf-level-toast" class="turf-level-toast hidden">
+        <div class="toast-icon-wrap"><i class="fa-solid fa-crown" id="toast-icon"></i></div>
+        <div class="toast-content">
+            <div class="toast-title" id="toast-title">⭐ PROTECTION INTEGRITY INCREASED!</div>
+            <div class="toast-sub" id="toast-sub">+1% REP GAINED (85% Fortress) • +$360 / MIN BOOST</div>
+        </div>
+        <div class="toast-gain-badge" id="toast-gain-badge">+1% REP</div>
+    </div>
+
+    <!-- Minimal Collapsed Corner Pill (When full HUD fades out) -->
+    <div id="turf-mini-pill" class="turf-mini-pill hidden">
+        <div class="mini-shield"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="mini-info">
+            <span class="mini-title" id="mini-title">FORUM DRIVE</span>
+            <div class="mini-sub-row">
+                <span class="mini-rep" id="mini-rep">100% REP (LVL 5)</span>
+                <span class="mini-point-dot hidden" id="mini-point-dot"></span>
+                <span class="mini-point-txt" id="mini-point-txt">+1 PT IN 4:30</span>
+            </div>
+        </div>
+        <span class="mini-hint"><kbd>Z</kbd></span>
+    </div>
+
+    <!-- Above Mini-Map Territory & Syndicate Ownership Pill -->
+    <div id="turf-radar-banner" class="turf-radar-banner hidden">
+        <div class="radar-top-row">
+            <div class="radar-live-dot"></div>
+            <span class="radar-zone-title" id="radar-zone-title">FORUM DRIVE DISPENSARY</span>
+            <span class="radar-street-txt" id="radar-street-txt">STRAWBERRY AVE</span>
+        </div>
+        <div class="radar-owner-row">
+            <span class="radar-tag-item"><i class="fa-solid fa-crown" style="color: var(--gold);"></i> <strong id="radar-owner-tag">FAMILIES</strong></span>
+            <span class="radar-tag-item"><i class="fa-solid fa-shield-halved" style="color: var(--turf-cyan);"></i> <strong id="radar-protect-tag">GROVE GANG</strong></span>
+            <span class="radar-rep-badge" id="radar-rep-badge">100% REP</span>
+        </div>
+    </div>
+
+    <!-- Floating Turf Status HUD Widget (Top Right) -->
+    <div id="turf-hud" class="turf-hud hidden">
+        <!-- Bullet Holes Passing Through the Metal Plate -->
+        <div class="bullet-hole hole-top-right">
+            <div class="hole-core"></div>
+            <div class="hole-fracture f1"></div>
+            <div class="hole-fracture f2"></div>
+            <div class="hole-fracture f3"></div>
+        </div>
+        <div class="bullet-hole hole-bottom-left">
+            <div class="hole-core"></div>
+            <div class="hole-fracture f1"></div>
+            <div class="hole-fracture f2"></div>
+        </div>
+        <div class="bullet-hole hole-mid-right">
+            <div class="hole-core"></div>
+            <div class="hole-fracture f1"></div>
+            <div class="hole-fracture f2"></div>
+        </div>
+
+        <!-- Gangster Header Banner -->
+        <div class="turf-badge-header">
+            <div class="turf-shield-icon"><i class="fa-solid fa-skull-crossbones"></i></div>
+            <div class="title-wrap">
+                <span class="turf-title" id="turf-title">FORUM DRIVE BLOCK</span>
+                <div class="turf-sub" id="turf-sub">COMMERCIAL PREMISE • DRUG CORNER</div>
+            </div>
+            <!-- Close Cursor Button (Only visible when interactive cursor is active) -->
+            <button class="hud-close-cursor-btn hidden" id="hud-close-cursor-btn" title="Exit Cursor Mode [ESC]">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Live In-Zone Status Banner -->
+        <div class="in-zone-status-banner">
+            <div class="in-zone-dot"></div>
+            <span>📍 YOU ARE IN THE ZONE BOUNDARY</span>
+        </div>
+
+        <!-- Controlling Crew Row -->
+        <div class="turf-status-row">
+            <span class="status-label"><i class="fa-solid fa-crosshairs"></i> SYNDICATE / CREW:</span>
+            <span class="crew-name" id="crew-name">FAMILIES GANG</span>
+        </div>
+
+        <!-- Protection Rep / Defense Level Section -->
+        <div class="protection-rep-section">
+            <div class="rep-label-row">
+                <span><i class="fa-solid fa-shield-halved"></i> PROTECTION INTEGRITY:</span>
+                <span class="rep-val" id="rep-val">100% (Level 5 Fortress)</span>
+            </div>
+            <div class="rep-bar-bg">
+                <div class="rep-bar-fill" id="rep-fill" style="width: 100%;"></div>
+            </div>
+            <!-- Live Points Accumulation Status -->
+            <div class="rep-accum-bar" id="rep-accum-bar">
+                <div class="accum-pulse-dot" id="accum-dot"></div>
+                <span id="accum-text">⚡ EARNING POINTS &bull; +1 REP IN 4m 30s</span>
+            </div>
+        </div>
+
+        <!-- Supply Chain / Raw Material Restock Meter -->
+        <div class="supplies-section" id="supplies-section">
+            <div class="supplies-label-row">
+                <span><i class="fa-solid fa-boxes-stacked"></i> RAW MATERIAL SUPPLIES:</span>
+                <span class="supplies-val" id="supplies-val">100% (Optimal +35% Boost)</span>
+            </div>
+            <div class="supplies-bar-bg">
+                <div class="supplies-bar-fill" id="supplies-fill" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Passive Yield Metric -->
+        <div class="revenue-metric-row">
+            <span class="metric-lbl"><i class="fa-solid fa-sack-dollar"></i> PASSIVE YIELD:</span>
+            <span class="metric-val" id="payout-val">+$300 / min <small id="multiplier-tag">(2.0x Boost)</small></span>
+        </div>
+
+        <!-- Import & Export Logistics Metric Widget -->
+        <div class="logistics-trade-card">
+            <div class="trade-stat-col">
+                <span class="trade-stat-num" id="hud-imports-val" style="color: var(--turf-cyan);">0</span>
+                <span class="trade-stat-lbl"><i class="fa-solid fa-boxes-packing"></i> IMPORTS</span>
+            </div>
+            <div class="trade-stat-divider"></div>
+            <div class="trade-stat-col">
+                <span class="trade-stat-num" id="hud-exports-val" style="color: var(--gold);">0</span>
+                <span class="trade-stat-lbl"><i class="fa-solid fa-ship"></i> EXPORTS</span>
+            </div>
+            <div class="trade-stat-divider"></div>
+            <div class="trade-stat-col">
+                <span class="trade-stat-num" id="hud-volume-val" style="color: var(--success);">$0</span>
+                <span class="trade-stat-lbl"><i class="fa-solid fa-chart-simple"></i> TRADE VOL</span>
+            </div>
+        </div>
+
+        <!-- Bank Connection & Vault Status -->
+        <div class="bank-connection-section">
+            <div class="bank-status-row">
+                <span class="bank-status-lbl"><i class="fa-solid fa-building-columns"></i> BANK CONNECTION:</span>
+                <span class="bank-status-val" id="bank-status-val">ACTIVE (18m Left) 🏦</span>
+            </div>
+            <div class="vault-accumulated-row">
+                <span>ON-SITE VAULT:</span>
+                <span class="vault-cash-val" id="vault-cash-val">$2,450 CASH</span>
+            </div>
+        </div>
+
+        <!-- Multi-Run Mission Dispatch Operations Board (For Owners) -->
+        <div class="mission-board-section hidden" id="mission-board-section">
+            <div class="mission-board-header">
+                <div><i class="fa-solid fa-truck-fast"></i> COMMERCIAL OPERATIONS & RUNS</div>
+                <div class="jobs-limit-badge" id="jobs-limit-badge">0/2 JOBS ACTIVE</div>
+            </div>
+            <div class="mission-buttons-grid">
+                <!-- 1. Restock Cargo Run -->
+                <button class="mission-action-btn restock-btn" id="start-restock-btn">
+                    <div class="btn-icon-wrap"><i class="fa-solid fa-boxes-packing"></i></div>
+                    <div class="mission-btn-text">
+                        <span class="mission-main-lbl">CARGO RESTOCK RUN</span>
+                        <span class="mission-sub-lbl">100% SUPPLIES • +$3,000 CASH</span>
+                    </div>
+                </button>
+
+                <!-- 2. Bank Money Laundering Run -->
+                <button class="mission-action-btn bank-run-btn" id="bank-run-btn">
+                    <div class="btn-icon-wrap"><i class="fa-solid fa-briefcase"></i></div>
+                    <div class="mission-btn-text">
+                        <span class="mission-main-lbl">BANK MONEY RUN</span>
+                        <span class="mission-sub-lbl" id="bank-sub-lbl">DELIVER VAULT (+20% BONUS)</span>
+                    </div>
+                    <span class="hotkey-pill green"><kbd>B</kbd></span>
+                </button>
+
+                <!-- 3. Dirty Gun Smuggle Run (Weapons Crate) -->
+                <button class="mission-action-btn gun-run-btn" onclick="startGunRun('lsia_airfield')">
+                    <div class="btn-icon-wrap" style="background: linear-gradient(135deg, #e63946, #7209b7);"><i class="fa-solid fa-gun"></i></div>
+                    <div class="mission-btn-text">
+                        <span class="mission-main-lbl">DIRTY GUN SMUGGLE</span>
+                        <span class="mission-sub-lbl">+$8.5k–$16k • FIREARM CRATE</span>
+                    </div>
+                </button>
+
+                <!-- 4. B2B Wholesale Trade Deal -->
+                <button class="mission-action-btn b2b-deal-btn" onclick="startB2BTrade('dispensary_chemical')">
+                    <div class="btn-icon-wrap" style="background: linear-gradient(135deg, #2ec4b6, #0077b6);"><i class="fa-solid fa-handshake"></i></div>
+                    <div class="mission-btn-text">
+                        <span class="mission-main-lbl">B2B IMPORT/EXPORT</span>
+                        <span class="mission-sub-lbl">+$4,500 CASH • +35% SUPPLIES</span>
+                    </div>
+                </button>
+
+                <!-- 5. VIP Contraband Smuggle Delivery -->
+                <button class="mission-action-btn vip-btn" id="start-vip-btn">
+                    <div class="btn-icon-wrap"><i class="fa-solid fa-plane-departure"></i></div>
+                    <div class="mission-btn-text">
+                        <span class="mission-main-lbl">VIP SMUGGLE DEAL</span>
+                        <span class="mission-sub-lbl">+$11,500 CASH • +25% REP</span>
+                    </div>
+                </button>
+
+                <!-- 6. Hire Armed Security Upgrade -->
+                <button class="mission-action-btn security-btn" id="hire-guard-btn">
+                    <div class="btn-icon-wrap"><i class="fa-solid fa-user-shield"></i></div>
+                    <div class="mission-btn-text">
+                        <span class="mission-main-lbl" id="guard-title-lbl">HIRE GUARDS (LVL 1)</span>
+                        <span class="mission-sub-lbl" id="guard-cost-lbl">$5,000 • ARMED DEFENSE</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Buy Business Deed Button (Unlocked upon 100% Full Rep) -->
+        <div class="buy-deed-section hidden" id="buy-deed-section">
+            <button class="buy-deed-btn" id="buy-deed-btn">
+                <div class="btn-icon-wrap"><i class="fa-solid fa-file-contract"></i></div>
+                <div class="deed-btn-text">
+                    <span class="deed-main-lbl">ACQUIRE TITLE DEED (100% REP)</span>
+                    <span class="deed-cost" id="deed-cost-lbl">$12,000 CASH</span>
+                </div>
+                <span class="hotkey-pill gold"><kbd>E</kbd></span>
+            </button>
+        </div>
+
+        <!-- Official Purchased Badge -->
+        <div class="purchased-badge hidden" id="purchased-badge">
+            <i class="fa-solid fa-crown"></i> OFFICIAL TITLE DEED SECURED (2.5x MAX REVENUE)
+        </div>
+
+        <!-- Rob Business Vault Button (For Rivals/Intruders) -->
+        <div class="rob-biz-section hidden" id="rob-biz-section">
+            <button class="rob-biz-btn" id="rob-biz-btn">
+                <div class="btn-icon-wrap"><i class="fa-solid fa-gun"></i></div>
+                <div class="rob-btn-text">
+                    <span class="rob-main-lbl">ROB BUSINESS VAULT</span>
+                    <span class="rob-sub-lbl">LOOT $3,000 - $8,500 + CONTRABAND</span>
+                </div>
+                <span class="hotkey-pill red"><kbd>G</kbd></span>
+            </button>
+        </div>
+
+        <!-- Vault Cooldown Badge -->
+        <div class="vault-cooldown-badge hidden" id="vault-cooldown-badge">
+            <i class="fa-solid fa-lock"></i> <span id="cooldown-text">VAULT EMPTIED • 9m COOLDOWN</span>
+        </div>
+
+        <!-- Active Robbery / Safe Cracking Progress Meter -->
+        <div class="robbery-heist-section hidden" id="robbery-heist-section">
+            <div class="heist-label-row">
+                <span class="heist-alert-txt"><i class="fa-solid fa-triangle-exclamation"></i> SAFE CRACKING IN PROGRESS</span>
+                <span class="heist-time-txt" id="rob-time-text">35s / 35s</span>
+            </div>
+            <div class="progress-bar-bg heist-bar">
+                <div class="progress-bar-fill heist-fill" id="rob-fill" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Syndicate Defense & Vandalism Action Row -->
+        <div class="syndicate-ops-row" id="syndicate-ops-row">
+            <button class="synd-action-btn tag-btn" id="btn-tag-graffiti" title="Spray Gang Tag (-15% Rep)">
+                <i class="fa-solid fa-spray-can"></i> <span>TAG GRAFFITI</span>
+            </button>
+            <button class="synd-action-btn clean-btn" id="btn-clean-graffiti" title="Clean Tag (+$800 / +10% Rep)">
+                <i class="fa-solid fa-broom"></i> <span>SCRUB TAG</span>
+            </button>
+            <button class="synd-action-btn hack-btn" id="btn-hack-terminal" title="Hack Terminal ($3,500 Bounty)">
+                <i class="fa-solid fa-laptop-code"></i> <span>HACK DATA</span>
+            </button>
+            <button class="synd-action-btn reboot-btn" id="btn-reboot-terminal" title="Reboot Cyber Firewall">
+                <i class="fa-solid fa-shield-virus"></i> <span>REBOOT FIREWALL</span>
+            </button>
+        </div>
+
+        <!-- Contraband Risk & Raid Section -->
+        <div class="contraband-risk-section" id="contraband-risk-section">
+            <div class="risk-badge-row">
+                <span><i class="fa-solid fa-biohazard"></i> CONTRABAND STATUS:</span>
+                <span class="risk-badge-txt" id="contraband-risk-txt">CLEAN (DEED SAFE)</span>
+            </div>
+            <div class="contraband-btn-row">
+                <button class="contraband-toggle-btn" id="btn-toggle-contraband">
+                    <i class="fa-solid fa-box-archive"></i> <span id="toggle-contra-txt">TOGGLE NARCOTICS VAULT</span>
+                </button>
+                <button class="raid-contra-btn" id="btn-raid-business" title="Raid Contraband (Deed Forfeiture)">
+                    <i class="fa-solid fa-handcuffs"></i> <span>RAID SEIZURE</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Corporate Fleet Spawner Row -->
+        <div class="company-fleet-row" id="company-fleet-row">
+            <div class="fleet-header-lbl"><i class="fa-solid fa-car-side"></i> COMPANY WORK FLEET (1-CLICK SPAWN)</div>
+            <div class="fleet-quick-btns">
+                <button class="fleet-btn" onclick="spawnCompanyFleet('speedo', 'SPEED1')"><i class="fa-solid fa-van-shuttle"></i> SPEEDO</button>
+                <button class="fleet-btn" onclick="spawnCompanyFleet('burrito3', 'BURR3')"><i class="fa-solid fa-truck"></i> BURRITO</button>
+                <button class="fleet-btn" onclick="spawnCompanyFleet('mule', 'MULE1')"><i class="fa-solid fa-truck-moving"></i> MULE</button>
+                <button class="fleet-btn" onclick="spawnCompanyFleet('sultan', 'EXEC1')"><i class="fa-solid fa-car"></i> SULTAN</button>
+            </div>
+        </div>
+
+        <!-- Stand-On Capture / Seizure Progress Meter -->
+        <div class="capture-section" id="capture-section">
+            <div class="capture-label-row">
+                <span id="capture-status-text">PROTECTED PREMISE (HOLDING)</span>
+                <span id="capture-time-text">40s / 40s</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="capture-fill" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Contested Warning -->
+        <div class="contested-badge hidden" id="contested-badge">
+            <i class="fa-solid fa-triangle-exclamation"></i> RIVALS ON PREMISE! DEFENSE DRAINING!
+        </div>
+
+        <!-- Interactive Cursor Mode Quick Hint -->
+        <div class="cursor-hint-bar" id="cursor-hint-bar">
+            <i class="fa-solid fa-arrow-pointer"></i> Press <kbd>Z</kbd> or <kbd>H</kbd> for Mouse Cursor
+        </div>
+    </div>
+
+    <!-- Active Corner Selling Badge (Top Center) -->
+    <div id="selling-badge" class="selling-badge hidden">
+        <div class="selling-dot"></div>
+        <div class="selling-info">
+            <span class="selling-title"><i class="fa-solid fa-people-arrows"></i> CORNER SELLING ACTIVE</span>
+            <span class="selling-hint">Press <kbd>F7</kbd> to Stop • Stand on block for buyers</span>
+        </div>
+    </div>
+
+    <!-- UNIFIED MASTER ADMIN DASHBOARD (ALL SYSTEMS IN ONE) -->
+    <div id="admin-creator-modal" class="admin-creator-modal hidden">
+        <div class="master-admin-container">
+            <!-- Header -->
+            <header class="master-header">
+                <div class="master-branding">
+                    <div class="master-icon"><i class="fa-solid fa-crown"></i></div>
+                    <div>
+                        <h2>EXECUTIVE SYSTEM CONTROLLER &bull; ALL-IN-ONE MENU</h2>
+                        <span>CLICK ANY ACTION BELOW TO EXECUTE INSTANTLY &bull; ZERO COMMANDS REQUIRED</span>
+                    </div>
+                </div>
+                <div class="master-header-right">
+                    <div class="coords-badge" id="form-coords-text">
+                        <i class="fa-solid fa-location-crosshairs"></i> X: 0.00 | Y: 0.00 | Z: 0.00
+                    </div>
+                    <button class="creator-close-btn" id="creator-close-btn" title="Close Menu (ESC / F9)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Quick Filter Bar (3 Distinct Business Empires) -->
+            <div class="master-tabs-bar">
+                <button class="m-tab-btn active" data-filter="all"><i class="fa-solid fa-grid-2"></i> ALL SYSTEMS (HUB)</button>
+                <button class="m-tab-btn green-tab" data-filter="weed_biz"><i class="fa-solid fa-cannabis"></i> 🌿 1. DISPENSARY & WEED</button>
+                <button class="m-tab-btn cyan-tab" data-filter="nightclub_biz"><i class="fa-solid fa-martini-glass-citron"></i> 🍸 2. VIP NIGHTCLUB</button>
+                <button class="m-tab-btn red-tab" data-filter="arms_biz"><i class="fa-solid fa-gun"></i> 🔫 3. ARMS & CHOP SHOP</button>
+                <button class="m-tab-btn gold-tab" data-filter="crafting"><i class="fa-solid fa-hammer"></i> 🛠️ 4. WEAPON CRAFTING</button>
+                <button class="m-tab-btn" data-filter="jobs"><i class="fa-solid fa-briefcase"></i> 💼 HIRING JOB BOARD</button>
+                <button class="m-tab-btn" data-filter="invest"><i class="fa-solid fa-chart-line"></i> 📈 REAL ESTATE INVEST</button>
+                <button class="m-tab-btn" data-filter="cheats"><i class="fa-solid fa-bolt"></i> ⚡ GODMODE & CHEATS</button>
+                <button class="m-tab-btn" data-filter="registry"><i class="fa-solid fa-list-check"></i> 📍 ACTIVE REGISTRY (<span id="total-biz-count">35</span>)</button>
+            </div>
+
+            <!-- Master Scrollable Action Grid Body -->
+            <main class="master-body-scroll">
+                <!-- Executive KPI Metrics Overview Bar -->
+                <div class="kpi-overview-bar">
+                    <div class="kpi-card cyan-glow">
+                        <div class="kpi-icon-box cyan"><i class="fa-solid fa-vault"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-title">TOTAL VAULT LIQUIDITY</span>
+                            <span class="kpi-val" id="kpi-vault-val">$0 CASH</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card gold-glow">
+                        <div class="kpi-icon-box gold"><i class="fa-solid fa-city"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-title">ACTIVE STREET PROPERTIES</span>
+                            <span class="kpi-val" id="kpi-biz-val">35 LIVE</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card green-glow">
+                        <div class="kpi-icon-box green"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-title">PROTECTION INTEGRITY</span>
+                            <span class="kpi-val" id="kpi-rep-val">100% FORTRESS</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card purple-glow">
+                        <div class="kpi-icon-box purple"><i class="fa-solid fa-boxes-stacked"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-title">SUPPLY CHAIN HEALTH</span>
+                            <span class="kpi-val" id="kpi-supply-val">100% RESTOCKED</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==========================================================
+                     BUSINESS 1: DISPENSARY & WEED COMMERCIAL EMPIRE
+                     ========================================================== -->
+                <div class="action-section" data-category="weed_biz">
+                    <div class="section-title" style="color: var(--success);">
+                        <i class="fa-solid fa-cannabis"></i> 1. CANNABIS DISPENSARIES, GROW LABS & MUNCHIES TRUCK
+                    </div>
+                    <div class="actions-grid-3">
+                        <!-- Dispensary Front -->
+                        <div class="action-card green-theme">
+                            <div class="card-top">
+                                <div class="c-icon" style="background: rgba(124, 255, 77, 0.2); color: var(--success);"><i class="fa-solid fa-cannabis"></i></div>
+                                <div>
+                                    <h4>Forum Drive Dispensary Front</h4>
+                                    <span class="c-tag">$450/min &bull; 18m Radius</span>
+                                </div>
+                            </div>
+                            <p>Commercial storefront dispensary with high street foot traffic, supply restock docks, and automated bank drops.</p>
+                            <button class="c-act-btn green" onclick="adminQuickSpawnBiz('Forum Drive Dispensary', 450, 18, 45, 'weedlab')">
+                                <i class="fa-solid fa-plus-circle"></i> SPAWN DISPENSARY HERE
+                            </button>
+                        </div>
+
+                        <!-- Munchies Mobile Truck & Street Travel Request -->
+                        <div class="action-card green-theme">
+                            <div class="card-top">
+                                <div class="c-icon" style="background: rgba(124, 255, 77, 0.2); color: var(--success);"><i class="fa-solid fa-truck"></i></div>
+                                <div>
+                                    <h4>Munchies Mobile Weed Truck</h4>
+                                    <span class="c-tag">+50% Street Surge &bull; Jingle</span>
+                                </div>
+                            </div>
+                            <p>Request the roaming dispensary truck to travel to this business street, initiating corner sales and +50% revenue surge.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn green" onclick="requestTruckToStreet()"><i class="fa-solid fa-location-arrow"></i> DISPATCH TO STREET</button>
+                                <button class="c-act-btn green" onclick="adminSpawnTruck()"><i class="fa-solid fa-car"></i> SPAWN</button>
+                            </div>
+                        </div>
+
+                        <!-- 1-Click Takeover Business Front Deployer -->
+                        <div class="action-card gold-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-building-flag"></i></div>
+                                <div>
+                                    <h4>Deploy Takeover Business Front</h4>
+                                    <span class="c-tag">Unclaimed &bull; 0% Rep &bull; $350/min</span>
+                                </div>
+                            </div>
+                            <p>Build a brand new unclaimed business front right here. Rival players can hold the premise to take it over!</p>
+                            <button class="c-act-btn gold" onclick="adminQuickSpawnBiz('Street Corner Storefront', 350, 18, 45, 'store')">
+                                <i class="fa-solid fa-hammer"></i> BUILD TAKEOVER FRONT HERE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==========================================================
+                     BUSINESS 2: VIP NIGHTCLUB & HOSPITALITY ENTERPRISE
+                     ========================================================== -->
+                <div class="action-section" data-category="nightclub_biz">
+                    <div class="section-title" style="color: var(--turf-cyan);">
+                        <i class="fa-solid fa-martini-glass-citron"></i> 2. VIP NIGHTCLUBS, LOUNGES & HOSPITALITY
+                    </div>
+                    <div class="actions-grid-3">
+                        <!-- Vanilla Unicorn -->
+                        <div class="action-card cyan-theme">
+                            <div class="card-top">
+                                <div class="c-icon" style="background: rgba(46, 196, 182, 0.2); color: var(--turf-cyan);"><i class="fa-solid fa-martini-glass-citron"></i></div>
+                                <div>
+                                    <h4>Vanilla Unicorn VIP Lounge</h4>
+                                    <span class="c-tag">$550/min &bull; 20m Radius</span>
+                                </div>
+                            </div>
+                            <p>Luxury nightlife nightclub venue with celebrity foot-traffic, high-yield vault cash, and VIP service.</p>
+                            <button class="c-act-btn cyan" onclick="adminQuickSpawnBiz('Vanilla Unicorn VIP Lounge', 550, 20, 50, 'nightclub')">
+                                <i class="fa-solid fa-plus-circle"></i> SPAWN VIP CLUB HERE
+                            </button>
+                        </div>
+
+                        <!-- VIP Smuggle Delivery -->
+                        <div class="action-card pink-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-plane-departure"></i></div>
+                                <div>
+                                    <h4>VIP Contraband Smuggle</h4>
+                                    <span class="c-tag">+$11.5k–$13.5k Cash &bull; +25% Rep</span>
+                                </div>
+                            </div>
+                            <p>High-stakes private courier delivery to high-profile VIP clients across Vinewood mansions.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn pink" onclick="adminStartMission('vip', 'observatory_helipad')">GALILEO</button>
+                                <button class="c-act-btn pink" onclick="adminStartMission('vip', 'vinewood_estate')">VINEWOOD</button>
+                            </div>
+                        </div>
+
+                        <!-- Executive VIP Fleet -->
+                        <div class="action-card cyan-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-car-side"></i></div>
+                                <div>
+                                    <h4>Executive Transport Fleet</h4>
+                                    <span class="c-tag">1-Click Vehicle Spawner</span>
+                                </div>
+                            </div>
+                            <p>Deploy high-speed luxury transport for VIP client escorts and executive couriers.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn cyan" onclick="spawnCompanyFleet('sultan', 'VIP1')">SULTAN</button>
+                                <button class="c-act-btn cyan" onclick="spawnCompanyFleet('baller', 'VIP2')">BALLER</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==========================================================
+                     BUSINESS 3: BLACK MARKET ARMS & CHOP SHOP SYNDICATE
+                     ========================================================== -->
+                <div class="action-section" data-category="arms_biz">
+                    <div class="section-title" style="color: var(--red-alert);">
+                        <i class="fa-solid fa-gun"></i> 3. BLACK MARKET ARMS & CHOP SHOP SYNDICATE
+                    </div>
+                    <div class="actions-grid-3">
+                        <!-- Chop Shop -->
+                        <div class="action-card red-theme" style="border-color: rgba(230, 57, 70, 0.4);">
+                            <div class="card-top">
+                                <div class="c-icon" style="background: rgba(230, 57, 70, 0.2); color: var(--red-alert);"><i class="fa-solid fa-wrench"></i></div>
+                                <div>
+                                    <h4>Strawberry Auto Chop & Salvage</h4>
+                                    <span class="c-tag">$480/min &bull; 20m Radius</span>
+                                </div>
+                            </div>
+                            <p>Stolen vehicle dismantling, parts stripping, and underground chop shop with steady syndicate income.</p>
+                            <button class="c-act-btn red" style="background: var(--red-alert); color: #fff;" onclick="adminQuickSpawnBiz('Strawberry Auto Chop', 480, 20, 50, 'chopshop')">
+                                <i class="fa-solid fa-plus-circle"></i> SPAWN CHOP SHOP HERE
+                            </button>
+                        </div>
+
+                        <!-- Dirty Gun Run -->
+                        <div class="action-card red-theme" style="border-color: rgba(230, 57, 70, 0.4);">
+                            <div class="card-top">
+                                <div class="c-icon" style="background: rgba(230, 57, 70, 0.2); color: var(--red-alert);"><i class="fa-solid fa-gun"></i></div>
+                                <div>
+                                    <h4>Dirty Gun Smuggle Run</h4>
+                                    <span class="c-tag">+$8.5k–$16k &bull; Weapon Crate</span>
+                                </div>
+                            </div>
+                            <p>Smuggle military arms crates from LSIA, Terminal Depot, or Chumash. High payout with police alert risk.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn red" style="background: var(--red-alert); color: #fff;" onclick="startGunRun('lsia_airfield')">LSIA</button>
+                                <button class="c-act-btn red" style="background: var(--red-alert); color: #fff;" onclick="startGunRun('terminal_depot')">DEPOT</button>
+                                <button class="c-act-btn red" style="background: var(--red-alert); color: #fff;" onclick="startGunRun('chumash_cove')">COVE</button>
+                            </div>
+                        </div>
+
+                        <!-- Heavy Cargo Fleet -->
+                        <div class="action-card red-theme" style="border-color: rgba(230, 57, 70, 0.4);">
+                            <div class="card-top">
+                                <div class="c-icon" style="background: rgba(230, 57, 70, 0.2); color: var(--red-alert);"><i class="fa-solid fa-truck-moving"></i></div>
+                                <div>
+                                    <h4>Heavy Freight Fleet</h4>
+                                    <span class="c-tag">Burrito &bull; Mule</span>
+                                </div>
+                            </div>
+                            <p>Spawn heavy armored transport vans and commercial freight trucks for heavy cargo runs.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn red" style="background: #331518; border: 1px solid var(--red-alert); color: #ff758f;" onclick="spawnCompanyFleet('burrito3', 'ARMS1')">BURRITO</button>
+                                <button class="c-act-btn red" style="background: #331518; border: 1px solid var(--red-alert); color: #ff758f;" onclick="spawnCompanyFleet('mule', 'ARMS2')">MULE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==========================================================
+                     BUSINESS 4: ARMS & ITEM CRAFTING WORKBENCH
+                     ========================================================== -->
+                <div class="action-section" data-category="crafting">
+                    <div class="section-title" style="color: var(--gold);">
+                        <i class="fa-solid fa-screwdriver-wrench"></i> 4. ARMS & ITEM CRAFTING WORKBENCH (RAW MATERIALS PIPELINE)
+                    </div>
+
+                    <!-- Live Materials Inventory Stash Bar -->
+                    <div class="materials-stash-container">
+                        <div class="m-stash-head">
+                            <span><i class="fa-solid fa-boxes-stacked"></i> ON-SITE MATERIALS STASH (STOREFRONT VAULT)</span>
+                            <span class="m-stash-hint">Supplied via Chop Shops, Cargo Restocks & Labs</span>
+                        </div>
+                        <div class="materials-chips-grid">
+                            <div class="mat-chip"><i class="fa-solid fa-tree" style="color: #b08968;"></i> Wood: <strong id="mat-wood-val">20</strong></div>
+                            <div class="mat-chip"><i class="fa-solid fa-cubes-stacked" style="color: #adb5bd;"></i> Iron: <strong id="mat-iron-val">15</strong></div>
+                            <div class="mat-chip"><i class="fa-solid fa-bolt" style="color: #f48c06;"></i> Copper: <strong id="mat-copper-val">10</strong></div>
+                            <div class="mat-chip"><i class="fa-solid fa-bottle-water" style="color: #06d6a0;"></i> Plastic: <strong id="mat-plastic-val">15</strong></div>
+                            <div class="mat-chip"><i class="fa-solid fa-shield-halved" style="color: #4cc9f0;"></i> Steel: <strong id="mat-steel-val">8</strong></div>
+                            <div class="mat-chip"><i class="fa-solid fa-fire-flame-curved" style="color: #e63946;"></i> Gunpowder: <strong id="mat-gunpowder-val">6</strong></div>
+                            <div class="mat-chip"><i class="fa-solid fa-ring" style="color: #8338ec;"></i> Rubber: <strong id="mat-rubber-val">5</strong></div>
+                            <div class="mat-chip"><i class="fa-solid fa-layer-group" style="color: #e0aaff;"></i> Aluminum: <strong id="mat-aluminum-val">4</strong></div>
+                            <div class="mat-chip"><i class="fa-solid fa-microchip" style="color: #ffd166;"></i> Micro-Kits: <strong id="mat-electronic_kit-val">2</strong></div>
+                        </div>
+                    </div>
+
+                    <!-- Blueprints Grid -->
+                    <div class="actions-grid-3" style="margin-top: 15px;">
+                        <!-- Hardwood Baseball Bat -->
+                        <div class="action-card gold-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-baseball-bat-ball"></i></div>
+                                <div>
+                                    <h4>Hardwood Baseball Bat</h4>
+                                    <span class="c-tag">8 Wood &bull; 4 Iron</span>
+                                </div>
+                            </div>
+                            <p>Solid treated hardwood slugger bat for street disputes and melee defense.</p>
+                            <button class="c-act-btn gold" onclick="craftBlueprint('weapon_bat')">
+                                <i class="fa-solid fa-hammer"></i> CARVE BASEBALL BAT
+                            </button>
+                        </div>
+
+                        <!-- Tactical Machete -->
+                        <div class="action-card red-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-hand-back-fist"></i></div>
+                                <div>
+                                    <h4>Hardwood Tactical Machete</h4>
+                                    <span class="c-tag">6 Wood &bull; 8 Steel</span>
+                                </div>
+                            </div>
+                            <p>Tempered high-carbon steel blade with ergonomic polished hardwood grip.</p>
+                            <button class="c-act-btn red" onclick="craftBlueprint('weapon_machete')">
+                                <i class="fa-solid fa-hammer"></i> FORGE MACHETE
+                            </button>
+                        </div>
+
+                        <!-- Pump Shotgun -->
+                        <div class="action-card red-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-gun"></i></div>
+                                <div>
+                                    <h4>Pump Shotgun (Wood Stock)</h4>
+                                    <span class="c-tag">12 Wood &bull; 16 Steel &bull; 8 Iron &bull; 6 Powder</span>
+                                </div>
+                            </div>
+                            <p>Classic 12-gauge tactical pump shotgun with handcrafted walnut stock (+60 Shells).</p>
+                            <button class="c-act-btn red" onclick="craftBlueprint('weapon_pumpshotgun')">
+                                <i class="fa-solid fa-hammer"></i> ASSEMBLE PUMP SHOTGUN
+                            </button>
+                        </div>
+
+                        <!-- 12-Gauge Shells -->
+                        <div class="action-card green-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-box-archive"></i></div>
+                                <div>
+                                    <h4>12ga Shotgun Shells (60 Rnds)</h4>
+                                    <span class="c-tag">4 Wood &bull; 8 Copper &bull; 10 Powder &bull; 4 Iron</span>
+                                </div>
+                            </div>
+                            <p>Heavy buckshot shell batch with treated hardwood wadding.</p>
+                            <button class="c-act-btn green" onclick="craftBlueprint('ammo_shotgun')">
+                                <i class="fa-solid fa-hammer"></i> CRAFT 60 SHELLS
+                            </button>
+                        </div>
+                        <!-- Lockpick -->
+                        <div class="action-card gold-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-wrench"></i></div>
+                                <div>
+                                    <h4>Advanced Lockpick</h4>
+                                    <span class="c-tag">5 Iron &bull; 3 Plastic</span>
+                                </div>
+                            </div>
+                            <p>Reinforced precision pick set for breaking into security vaults and vehicles.</p>
+                            <button class="c-act-btn gold" onclick="craftBlueprint('lockpick')">
+                                <i class="fa-solid fa-hammer"></i> CRAFT LOCKPICK
+                            </button>
+                        </div>
+
+                        <!-- Heavy Armor -->
+                        <div class="action-card cyan-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-shield"></i></div>
+                                <div>
+                                    <h4>Heavy Tactical Armor Vest</h4>
+                                    <span class="c-tag">8 Steel &bull; 6 Plastic &bull; 4 Rubber</span>
+                                </div>
+                            </div>
+                            <p>Full-coverage ceramic-reinforced tactical vest providing 100% body armor protection.</p>
+                            <button class="c-act-btn cyan" onclick="craftBlueprint('body_armor')">
+                                <i class="fa-solid fa-hammer"></i> CRAFT BODY ARMOR
+                            </button>
+                        </div>
+
+                        <!-- Combat Pistol 9mm -->
+                        <div class="action-card red-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-gun"></i></div>
+                                <div>
+                                    <h4>Combat Pistol 9mm</h4>
+                                    <span class="c-tag">14 Iron &bull; 8 Copper &bull; 10 Plastic &bull; 6 Steel</span>
+                                </div>
+                            </div>
+                            <p>High-reliability semi-automatic handgun with custom rifled barrel (+100 Rnds Ammo).</p>
+                            <button class="c-act-btn red" onclick="craftBlueprint('weapon_pistol')">
+                                <i class="fa-solid fa-hammer"></i> FORGE PISTOL
+                            </button>
+                        </div>
+
+                        <!-- 9mm Ammo Crate -->
+                        <div class="action-card green-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-box-archive"></i></div>
+                                <div>
+                                    <h4>9mm Ammo Crate (100 Rnds)</h4>
+                                    <span class="c-tag">6 Copper &bull; 8 Gunpowder &bull; 4 Iron</span>
+                                </div>
+                            </div>
+                            <p>Full metal jacket 9x19mm parabellum ammunition batch.</p>
+                            <button class="c-act-btn green" onclick="craftBlueprint('ammo_9mm')">
+                                <i class="fa-solid fa-hammer"></i> CRAFT 100 RNDS
+                            </button>
+                        </div>
+
+                        <!-- Micro SMG -->
+                        <div class="action-card red-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-gun"></i></div>
+                                <div>
+                                    <h4>Micro SMG Machine Gun</h4>
+                                    <span class="c-tag">20 Iron &bull; 12 Steel &bull; 14 Copper &bull; 15 Plastic</span>
+                                </div>
+                            </div>
+                            <p>High cyclic rate compact machine gun for drive-bys and close-quarters turf defense.</p>
+                            <button class="c-act-btn red" onclick="craftBlueprint('weapon_microsmg')">
+                                <i class="fa-solid fa-hammer"></i> ASSEMBLE MICRO SMG
+                            </button>
+                        </div>
+
+                        <!-- Combat PDW -->
+                        <div class="action-card gold-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-gun"></i></div>
+                                <div>
+                                    <h4>Combat PDW Military Grade</h4>
+                                    <span class="c-tag">24 Steel &bull; 16 Aluminum &bull; 18 Copper &bull; 2 Kits</span>
+                                </div>
+                            </div>
+                            <p>Integrated suppressor personal defense weapon with high-capacity magazine.</p>
+                            <button class="c-act-btn gold" onclick="craftBlueprint('weapon_combatpdw')">
+                                <i class="fa-solid fa-hammer"></i> FORGE COMBAT PDW
+                            </button>
+                        </div>
+
+                        <!-- AK-47 Assault Rifle -->
+                        <div class="action-card red-theme" style="border-color: rgba(230, 57, 70, 0.5);">
+                            <div class="card-top">
+                                <div class="c-icon" style="background: rgba(230, 57, 70, 0.2); color: var(--red-alert);"><i class="fa-solid fa-fire"></i></div>
+                                <div>
+                                    <h4>AK-47 Assault Rifle</h4>
+                                    <span class="c-tag">32 Steel &bull; 22 Aluminum &bull; 20 Copper &bull; 3 Kits</span>
+                                </div>
+                            </div>
+                            <p>High-caliber fully automatic syndicate assault rifle. Heavy firepower (+200 Rnds).</p>
+                            <button class="c-act-btn red" onclick="craftBlueprint('weapon_assaultrifle')">
+                                <i class="fa-solid fa-hammer"></i> FORGE AK-47
+                            </button>
+                        </div>
+
+                        <!-- Tactical Pipe Bomb -->
+                        <div class="action-card red-theme" style="border-color: rgba(230, 57, 70, 0.5);">
+                            <div class="card-top">
+                                <div class="c-icon" style="background: rgba(230, 57, 70, 0.2); color: var(--red-alert);"><i class="fa-solid fa-bomb"></i></div>
+                                <div>
+                                    <h4>Tactical Pipe Bomb</h4>
+                                    <span class="c-tag">12 Steel &bull; 20 Gunpowder &bull; 1 Micro-Kit</span>
+                                </div>
+                            </div>
+                            <p>High-explosive ordnance for blasting fortified rival bank safes and roadblocks.</p>
+                            <button class="c-act-btn red" onclick="craftBlueprint('weapon_pipebomb')">
+                                <i class="fa-solid fa-hammer"></i> ASSEMBLE PIPE BOMB
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: HIRING JOB BOARD & QUEST DISPATCHER -->
+                <div class="action-section" data-category="jobs">
+                    <div class="section-title">
+                        <i class="fa-solid fa-briefcase"></i> PUBLIC HIRING JOB BOARD & CUSTOM CONTRACTS
+                    </div>
+                    <div class="job-creator-bar">
+                        <input type="text" id="job-title-input" class="job-input" placeholder="Contract Title (e.g. Escort Cargo from Docks)..." />
+                        <select id="job-type-select" class="job-select">
+                            <option value="restock">📦 Cargo Supply Escort ($2,500 Bounty)</option>
+                            <option value="patrol">🛡️ Premise Guard Detail ($3,000 Bounty)</option>
+                            <option value="clean_tag">🧹 Graffiti Scrubbing ($1,200 Bounty)</option>
+                            <option value="bank_escort">🏦 Bank Wire Escort ($3,500 Bounty)</option>
+                        </select>
+                        <input type="number" id="job-bounty-input" class="job-input-num" value="2500" placeholder="Bounty $" />
+                        <button class="c-act-btn green" onclick="postJobFromAdmin()"><i class="fa-solid fa-plus-circle"></i> POST CONTRACT</button>
+                    </div>
+                    <div class="jobs-list-grid" id="jobs-list-container">
+                        <!-- Dynamic Job Cards injected here -->
+                    </div>
+                </div>
+
+                <!-- SECTION: REAL ESTATE DISTRICT INVESTMENTS -->
+                <div class="action-section" data-category="invest">
+                    <div class="section-title">
+                        <i class="fa-solid fa-chart-line"></i> DISTRICT REAL ESTATE INVESTMENTS (+8% PASSIVE DIVIDENDS)
+                    </div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+                        Invest corporate vault cash into other street businesses across the city to earn passive 8% dividend yields every payout cycle while they remain secure.
+                    </p>
+                    <div class="actions-grid-3">
+                        <div class="action-card green-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-building-circle-check"></i></div>
+                                <div>
+                                    <h4>Forum Drive Commercial Hub</h4>
+                                    <span class="c-tag">8% Dividend Yield</span>
+                                </div>
+                            </div>
+                            <p>Invest capital in South Central's highest-traffic cannabis dispensary.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn green" onclick="investInDistrict('forum_drive', 10000)">INVEST $10k</button>
+                                <button class="c-act-btn green" onclick="investInDistrict('forum_drive', 25000)">INVEST $25k</button>
+                            </div>
+                        </div>
+                        <div class="action-card cyan-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-city"></i></div>
+                                <div>
+                                    <h4>Legion Square Enterprise</h4>
+                                    <span class="c-tag">8% Dividend Yield</span>
+                                </div>
+                            </div>
+                            <p>Prime downtown financial district location with high commercial footfall.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn cyan" onclick="investInDistrict('legion_square_front', 10000)">INVEST $10k</button>
+                                <button class="c-act-btn cyan" onclick="investInDistrict('legion_square_front', 25000)">INVEST $25k</button>
+                            </div>
+                        </div>
+                        <div class="action-card pink-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-martini-glass"></i></div>
+                                <div>
+                                    <h4>Vinewood Boulevard VIP</h4>
+                                    <span class="c-tag">8% Dividend Yield</span>
+                                </div>
+                            </div>
+                            <p>High-end entertainment and nightlife venue in upper Vinewood.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn pink" onclick="investInDistrict('vinewood_cockatoos', 10000)">INVEST $10k</button>
+                                <button class="c-act-btn pink" onclick="investInDistrict('vinewood_cockatoos', 25000)">INVEST $25k</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: MUNCHIES DRUG TRUCK -->
+                <div class="action-section" data-category="truck">
+                    <div class="section-title">
+                        <i class="fa-solid fa-ice-cream"></i> MUNCHIES MOBILE DRUG TRUCK & DISPENSARY
+                    </div>
+                    <div class="actions-grid-3">
+                        <!-- Spawn Truck -->
+                        <div class="action-card green-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-truck"></i></div>
+                                <div>
+                                    <h4>Spawn Munchies Truck</h4>
+                                    <span class="c-tag">Mr. Tasty &bull; Roof Extras & Wraps</span>
+                                </div>
+                            </div>
+                            <p>Instantly spawns the mobile dispensary truck in front of your player with functioning jingle and kitchen counter.</p>
+                            <button class="c-act-btn green" onclick="adminSpawnTruck()">
+                                <i class="fa-solid fa-key"></i> SPAWN TRUCK NOW
+                            </button>
+                        </div>
+
+                        <!-- Cycle Wraps -->
+                        <div class="action-card purple-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-palette"></i></div>
+                                <div>
+                                    <h4>Cycle Truck Livery Wraps</h4>
+                                    <span class="c-tag">Native, Mod 48, Extra 1-14</span>
+                                </div>
+                            </div>
+                            <p>1-Click instant livery wrap switcher on the nearest ice cream truck without needing mechanic shops.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn purple" onclick="adminSetLivery(0)">LIVERY 0</button>
+                                <button class="c-act-btn purple" onclick="adminSetLivery(1)">LIVERY 1</button>
+                                <button class="c-act-btn purple" onclick="adminSetLivery(2)">LIVERY 2</button>
+                            </div>
+                        </div>
+
+                        <!-- Jingle & Sales -->
+                        <div class="action-card gold-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-music"></i></div>
+                                <div>
+                                    <h4>Audio Chime & Street Sales</h4>
+                                    <span class="c-tag">Munchies Chime &bull; NPC Handshakes</span>
+                                </div>
+                            </div>
+                            <p>Play the signature ice cream truck chime and toggle pedestrian street selling mode.</p>
+                            <div class="multi-btn-row">
+                                <button class="c-act-btn gold" onclick="adminToggleJingle()"><i class="fa-solid fa-volume-high"></i> JINGLE</button>
+                                <button class="c-act-btn gold" onclick="adminToggleSelling()"><i class="fa-solid fa-shop"></i> SELLING</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: GODMODE & CHEATS -->
+                <div class="action-section" data-category="cheats">
+                    <div class="section-title">
+                        <i class="fa-solid fa-bolt"></i> SERVER OVERRIDES & GODMODE UTILITIES
+                    </div>
+                    <div class="actions-grid-4">
+                        <div class="action-card green-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-shield"></i></div>
+                                <div>
+                                    <h4>100% Fortress Rep</h4>
+                                    <span class="c-tag">Level 5 Fortress</span>
+                                </div>
+                            </div>
+                            <button class="c-act-btn green" onclick="adminQuickCheat('max_rep')">
+                                <i class="fa-solid fa-shield-check"></i> SET 100% REP
+                            </button>
+                        </div>
+
+                        <div class="action-card gold-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                                <div>
+                                    <h4>100% Raw Supplies</h4>
+                                    <span class="c-tag">+35% Profit Boost</span>
+                                </div>
+                            </div>
+                            <button class="c-act-btn gold" onclick="adminQuickCheat('max_supplies')">
+                                <i class="fa-solid fa-box"></i> REFILL SUPPLIES
+                            </button>
+                        </div>
+
+                        <div class="action-card cyan-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                                <div>
+                                    <h4>+$10,000 Vault Cash</h4>
+                                    <span class="c-tag">Inject On-Site Cash</span>
+                                </div>
+                            </div>
+                            <button class="c-act-btn cyan" onclick="adminQuickCheat('add_vault_cash')">
+                                <i class="fa-solid fa-dollar-sign"></i> +$10k VAULT CASH
+                            </button>
+                        </div>
+
+                        <div class="action-card red-theme">
+                            <div class="card-top">
+                                <div class="c-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                <div>
+                                    <h4>Trigger Vault Heist</h4>
+                                    <span class="c-tag">Force Robbery Alarm</span>
+                                </div>
+                            </div>
+                            <button class="c-act-btn red" onclick="adminQuickCheat('force_robbery')">
+                                <i class="fa-solid fa-gun"></i> TRIGGER HEIST
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: ACTIVE PROPERTIES & TELEPORT REGISTRY -->
+                <div class="action-section" data-category="registry">
+                    <div class="section-title">
+                        <i class="fa-solid fa-city"></i> ACTIVE SERVER PROPERTIES & 1-CLICK TELEPORT
+                    </div>
+                    <div class="registry-table-card">
+                        <table class="biz-table">
+                            <thead>
+                                <tr>
+                                    <th>PROPERTY NAME</th>
+                                    <th>PAYOUT ($/min)</th>
+                                    <th>OWNER / CREW</th>
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="biz-table-body">
+                                <!-- Injected dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+{
+  "mapId": "pacifica_crime_world",
+  "name": "Pacifica City & Outskirts",
+  "version": "1.0.0",
+  "description": "High-density open world map designed for HELIX platform features financial districts, industrial docks, commercial nightlife strips, and suburban crime hideouts.",
+  "environment": {
+    "timeOfDay": "18:00",
+    "weather": "ClearNight",
+    "fogDensity": 0.02,
+    "ambientLighting": "CyberpunkNeon"
+  },
+  "spawns": {
+    "playerDefault": { "x": 120.0, "y": 450.0, "z": 15.0, "heading": 90 },
+    "policeHQ": { "x": -850.0, "y": 1200.0, "z": 20.0, "heading": 180 },
+    "blackMarketAlley": { "x": 450.0, "y": -920.0, "z": 8.0, "heading": 270 }
+  },
+  "districts": [
+    {
+      "id": "downtown_finance",
+      "name": "Downtown Financial District",
+      "color": "#00ffc8",
+      "bounds": { "minX": -500, "maxX": 500, "minY": 0, "maxY": 1000 },
+      "poi": [
+        { "name": "First National Bank Vault", "type": "vault", "x": 0.0, "y": 750.0, "z": 10.0 },
+        { "name": "Security Control Terminal A", "type": "terminal", "x": -120.0, "y": 680.0, "z": 10.0 },
+        { "name": "Security Control Terminal B", "type": "terminal", "x": 150.0, "y": 810.0, "z": 10.0 }
+      ]
+    },
+    {
+      "id": "industrial_docks",
+      "name": "Industrial Docks & Warehouses",
+      "color": "#ff6432",
+      "bounds": { "minX": 500, "maxX": 1500, "minY": -1000, "maxY": 0 },
+      "poi": [
+        { "name": "Underground Meth Laboratory", "type": "meth_lab", "x": 950.0, "y": -450.0, "z": 5.0 },
+        { "name": "Hydroponic Cannabis Warehouse", "type": "weed_farm", "x": 1100.0, "y": -720.0, "z": 5.0 },
+        { "name": "Crypto GPU Mining Facility", "type": "crypto_farm", "x": 800.0, "y": -200.0, "z": 5.0 }
+      ]
+    },
+    {
+      "id": "nightlife_strip",
+      "name": "Neon Strip Commercial District",
+      "color": "#b450f0",
+      "bounds": { "minX": -1500, "maxX": -500, "minY": -1000, "maxY": 0 },
+      "poi": [
+        { "name": "Velvet Lounge Nightclub", "type": "business", "x": -950.0, "y": -350.0, "z": 12.0 },
+        { "name": "Downtown Pawn & Vault", "type": "business", "x": -1200.0, "y": -600.0, "z": 12.0 },
+        { "name": "Black Market Dealer Alley", "type": "black_market", "x": -750.0, "y": -800.0, "z": 8.0 }
+      ]
+    }
+  ]
+}

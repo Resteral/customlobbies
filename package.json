@@ -1,0 +1,19 @@
+{
+  "name": "helixgame-crime-system",
+  "version": "1.0.0",
+  "description": "Comprehensive Drugs, Meth Synthesis, Crypto Farms, USB Siphoning, Bank Vault Heists, and Black Market system for HELIX (Unreal Engine 5 platform by Hypersonic Laboratories)",
+  "author": "HelixGame",
+  "main": "js/index.js",
+  "scripts": {
+    "import-models": "node tools/auto_model_importer.js",
+    "watch-models": "node tools/auto_model_importer.js --watch",
+    "generate-meshy": "node tools/meshy_model_generator.js",
+    "generate-tripo": "node tools/tripo_model_generator.js",
+    "helix:system": "node tools/helix-system-builder.js system",
+    "helix:station": "node tools/helix-system-builder.js station",
+    "helix:client": "node tools/helix-system-builder.js client",
+    "helix:ui": "node tools/helix-system-builder.js ui",
+    "helix:help": "node tools/helix-system-builder.js help"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,12 @@
+{
+  "name": "HelixCrimeSystem",
+  "enabled": true,
+  "minPoliceForHeist": 2,
+  "heistCooldown": 600,
+  "weedGrowthMultiplier": 1.0,
+  "database": {
+    "enabled": false,
+    "host": "localhost",
+    "database": "helix_crime"
+  }
+}

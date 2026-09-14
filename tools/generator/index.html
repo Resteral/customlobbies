@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helix Game Studio - Visual Script & System Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0f1218;
+            --bg-card: #171c26;
+            --bg-card-hover: #1e2433;
+            --bg-input: #0d1015;
+            --border-color: #2a3344;
+            --accent-primary: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(180deg, #182030 0%, #111622 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-badge {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .brand h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            background: #0b0e14;
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 24px;
+            flex: 1;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-header {
+            padding: 1rem 1.25rem;
+            background: #131720;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .panel-body {
+            padding: 1.25rem;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .preview-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        pre {
+            background: #0a0d12;
+            padding: 1.25rem;
+            flex: 1;
+            overflow: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #d1d5db;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-green { background: var(--accent-green); }
+        .btn-purple { background: var(--accent-purple); }
+        .btn-amber { background: var(--accent-amber); }
+        .btn-dark { background: #232b3b; color: #e2e8f0; }
+
+        .preset-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #11151e;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--accent-green);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="brand-badge">HELIX STUDIO</div>
+            <h1>Visual Script & System Generator</h1>
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('item')">📦 Item Builder</button>
+            <button class="tab-btn" onclick="switchTab('recipe')">🔨 Crafting Recipe</button>
+            <button class="tab-btn" onclick="switchTab('station')">⚙ Custom Station</button>
+            <button class="tab-btn" onclick="switchTab('entity')">🏛 Entity Generator</button>
+            <button class="tab-btn" onclick="switchTab('plugin')">🧩 Plugin Scaffold</button>
+            <button class="tab-btn" onclick="switchTab('command')">💬 Chat Command</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Form Builder Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2 id="builder-title">Configure Item Parameters</h2>
+                <div class="preset-bar">
+                    <span>⚡ Presets:</span>
+                    <select id="preset-select" onchange="loadPreset()">
+                        <option value="">-- Load Preset --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="panel-body" id="form-container">
+                <!-- Dynamic form fields injected by JS -->
+            </div>
+        </div>
+
+        <!-- Live Code Output Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Generated Helix Lua Code</h2>
+                <div class="btn-group">
+                    <button class="btn btn-dark" onclick="copyCode()">📋 Copy Code</button>
+                    <button class="btn btn-green" onclick="downloadLua()">💾 Download .lua</button>
+                </div>
+            </div>
+
+            <div class="preview-container">
+                <pre><code id="code-output">-- Select options to generate Lua code</code></pre>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="notification">Code copied to clipboard!</div>
+
+    <script>
+        let currentTab = 'item';
+
+        const Presets = {
+            item: [
+                { name: 'First Aid Medkit', id: 'medkit', itemName: 'Tactical Medkit', type: 'consumable', model: 'models/healthkit.mdl', w: 2, h: 2, cat: 'Medical', price: 150, heal: 50 },
+                { name: 'Glock 18 Pistol', id: 'glock18', itemName: 'Glock 18 Sidearm', type: 'weapon', model: 'models/weapons/w_pist_glock18.mdl', w: 2, h: 1, cat: 'Weapons', price: 650, weaponClass: 'weapon_glock' },
+                { name: 'Bobby Pin Lockpick', id: 'lockpick', itemName: 'Bobby Pin Lockpick', type: 'crafting', model: 'models/props_c17/tools_pliers01a.mdl', w: 1, h: 1, cat: 'Burglary & Tools', price: 75 }
+            ],
+            recipe: [
+                { name: 'Industrial Thermal Drill', id: 'thermal_drill', recipeName: 'Thermal Vault Drill', result: 'thermal_drill', time: 10, skill: 'crafting', level: 4, xp: 80, ing: 'scrap_metal:5,crypto_usb:1' },
+                { name: 'Military Thermite', id: 'thermite', recipeName: 'Thermite Charge', result: 'thermite', time: 6, skill: 'chemistry', level: 3, xp: 50, ing: 'meth_chemicals:3,scrap_metal:2' }
+            ],
+            station: [
+                { name: 'Weed Packaging Station', id: 'weed_processor', sysName: 'Hydroponic Weed Packaging', model: 'models/props_c17/furnituretable002a.mdl', cat: 'Drug Processing', time: 5, skill: 'botany', level: 2, xp: 40, in: 'weed_plant:2', out: 'packaged_weed:1' },
+                { name: 'Crypto Decryption Rig', id: 'crypto_miner', sysName: 'Quantum Crypto Decryption Node', model: 'models/props_lab/reciever01a.mdl', cat: 'Cyber & Hacking', time: 8, skill: 'crafting', level: 3, xp: 60, in: 'crypto_usb:1', out: 'clean_cash:250' }
+            ]
+        };
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            updatePresetDropdown();
+            renderForm();
+            generateCode();
+        }
+
+        function updatePresetDropdown() {
+            const select = document.getElementById('preset-select');
+            select.innerHTML = '<option value="">-- Load Preset --</option>';
+            const list = Presets[currentTab] || [];
+            list.forEach((p, idx) => {
+                select.innerHTML += `<option value="${idx}">${p.name}</option>`;
+            });
+        }
+
+        function loadPreset() {
+            const idx = document.getElementById('preset-select').value;
+            if (idx === '') return;
+            const data = Presets[currentTab][idx];
+
+            for (const [key, val] of Object.entries(data)) {
+                const el = document.getElementById(`f_${key}`);
+                if (el) el.value = val;
+            }
+            generateCode();
+        }
+
+        function renderForm() {
+            const container = document.getElementById('form-container');
+            const title = document.getElementById('builder-title');
+
+            if (currentTab === 'item') {
+                title.innerText = 'Configure Helix Item';
+                container.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Unique Item ID</label>
+                            <input id="f_id" value="bandage" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input id="f_itemName" value="Sterile Bandage" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Item Type</label>
+                            <select id="f_type" onchange="generateCode()">
+                                <option value="consumable">Consumable (Food / Meds / Drink)</option>
+                                <option value="weapon">Equippable Weapon</option>
+                                <option value="crafting">Crafting Material</option>
+                                <option value="general">Generic Usable</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input id="f_cat" value="Medical" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>World Model Path</label>
+                        <input id="f_model" value="models/props_junk/garbage_plasticbottle003a.mdl" oninput="generateCode()">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Grid Width</label>
+                            <input id="f_w" type="number" value="1" min="1" max="6" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Grid Height</label>
+                            <input id="f_h" type="number" value="1" min="1" max="6" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Store Price</label>
+                            <input id="f_price" type="number" value="50" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Health Restore (If Consumable)</label>
+                            <input id="f_heal" type="number" value="25" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Weapon Class (If Weapon)</label>
+                        <input id="f_weaponClass" value="weapon_glock" oninput="generateCode()">
+                    </div>
+                `;
+            } else if (currentTab === 'recipe') {
+                title.innerText = 'Configure Crafting Recipe';
+                container.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Recipe Identifier</label>
+                            <input id="f_id" value="lockpick" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Recipe Title</label>
+                            <input id="f_recipeName" value="Bobby Pin Lockpick" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Result Item ID</label>
+                            <input id="f_result" value="lockpick" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Craft Time (Seconds)</label>
+                            <input id="f_time" type="number" value="5" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Required Skill</label>
+                            <input id="f_skill" value="crafting" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Required Skill Level</label>
+                            <input id="f_level" type="number" value="1" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>XP Granted</label>
+                            <input id="f_xp" type="number" value="30" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Ingredients (item:count, comma separated)</label>
+                        <input id="f_ing" value="scrap_metal:2,plastic:1" oninput="generateCode()">
+                    </div>
+                `;
+            } else if (currentTab === 'station') {
+                title.innerText = 'Configure Custom Station / Engine';
+                container.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Station ID</label>
+                            <input id="f_id" value="ammo_press" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input id="f_sysName" value="Ammo Press Station" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Prop Model</label>
+                        <input id="f_model" value="models/props_c17/furnituretable001a.mdl" oninput="generateCode()">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input id="f_cat" value="Armory & Ballistics" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Process Time (Seconds)</label>
+                            <input id="f_time" type="number" value="6" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Required Skill</label>
+                            <input id="f_skill" value="crafting" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Skill Level</label>
+                            <input id="f_level" type="number" value="2" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Inputs (Consumed)</label>
+                            <input id="f_in" value="scrap_metal:2,gunpowder:1" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Outputs (Awarded)</label>
+                            <input id="f_out" value="pistol_ammo:1" oninput="generateCode()">
+                        </div>
+                    </div>
+                `;
+            } else if (currentTab === 'entity') {
+                title.innerText = 'Configure Interactive Entity';
+                container.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Entity Classname</label>
+                            <input id="f_id" value="ix_repair_station" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Print Name</label>
+                            <input id="f_name" value="Vehicle Repair Bench" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Model Path</label>
+                        <input id="f_model" value="models/props_c17/furnituretable002a.mdl" oninput="generateCode()">
+                    </div>
+                    <div class="form-group">
+                        <label>Interaction Text</label>
+                        <input id="f_text" value="Repairing Engine..." oninput="generateCode()">
+                    </div>
+                `;
+            } else if (currentTab === 'plugin') {
+                title.innerText = 'Configure Helix Plugin Scaffold';
+                container.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Plugin Title</label>
+                            <input id="f_name" value="Helix Burglary System" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Author</label>
+                            <input id="f_author" value="HelixGame" oninput="generateCode()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="f_desc" rows="3" oninput="generateCode()">Complete burglary and lockpicking progression system.</textarea>
+                    </div>
+                `;
+            } else if (currentTab === 'command') {
+                title.innerText = 'Configure Chat Command';
+                container.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Command Name</label>
+                            <input id="f_name" value="HeistStart" oninput="generateCode()">
+                        </div>
+                        <div class="form-group">
+                            <label>Admin Only?</label>
+                            <select id="f_admin" onchange="generateCode()">
+                                <option value="false">No (All Players)</option>
+                                <option value="true">Yes (Admin Only)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input id="f_desc" value="Initiate a high-stakes vault burglary." oninput="generateCode()">
+                    </div>
+                `;
+            }
+        }
+
+        function generateCode() {
+            const out = document.getElementById('code-output');
+
+            if (currentTab === 'item') {
+                const id = document.getElementById('f_id').value || 'item';
+                const name = document.getElementById('f_itemName').value || 'Item Name';
+                const type = document.getElementById('f_type').value;
+                const cat = document.getElementById('f_cat').value || 'General';
+                const model = document.getElementById('f_model').value || 'models/props_junk/garbage_plasticbottle003a.mdl';
+                const w = document.getElementById('f_w').value || 1;
+                const h = document.getElementById('f_h').value || 1;
+                const price = document.getElementById('f_price').value || 50;
+                const heal = document.getElementById('f_heal').value || 25;
+                const weaponClass = document.getElementById('f_weaponClass').value || 'weapon_glock';
+
+                let extra = '';
+                if (type === 'consumable') {
+                    extra = `
+ITEM.functions.Consume = {
+    name = "Consume",
+    tip = "useTip",
+    icon = "icon16/cup.png",
+    OnRun = function(item)
+        local client = item.player
+        local char = client:GetCharacter()
+        if not char then return false end
+
+        client:SetHealth(math.min(client:GetMaxHealth(), client:Health() + ${heal}))
+        client:EmitSound("npc/barnacle/barnacle_gulp1.wav")
+        client:Notify("You consumed " .. item.name .. " (+${heal} HP).")
+        return true
+    end
+}`;
+                } else if (type === 'weapon') {
+                    extra = `
+ITEM.isWeapon = true
+ITEM.class = "${weaponClass}"
+
+ITEM.functions.Equip = {
+    name = "Equip",
+    tip = "equipTip",
+    icon = "icon16/tick.png",
+    OnRun = function(item)
+        local client = item.player
+        if client:HasWeapon(item.class) then
+            client:Notify("You already have this equipped!")
+            return false
+        end
+        client:Give(item.class)
+        client:SelectWeapon(item.class)
+        return true
+    end
+}`;
+                }
+
+                out.innerText = `-- Helix Item: ${name} (Save as items/sh_${id}.lua)
+ITEM.name = "${name}"
+ITEM.description = "A useful item in the world."
+ITEM.model = "${model}"
+ITEM.width = ${w}
+ITEM.height = ${h}
+ITEM.category = "${cat}"
+ITEM.price = ${price}
+${extra}
+`;
+            } else if (currentTab === 'recipe') {
+                const id = document.getElementById('f_id').value || 'recipe';
+                const name = document.getElementById('f_recipeName').value || 'Recipe Name';
+                const result = document.getElementById('f_result').value || 'item';
+                const time = document.getElementById('f_time').value || 5;
+                const skill = document.getElementById('f_skill').value || 'crafting';
+                const level = document.getElementById('f_level').value || 1;
+                const xp = document.getElementById('f_xp').value || 30;
+                const rawIng = document.getElementById('f_ing').value || 'scrap_metal:2';
+
+                const lines = rawIng.split(',').map(s => {
+                    const [k, v] = s.split(':');
+                    return `        ["${(k || '').trim()}"] = ${parseInt(v || 1, 10)}`;
+                }).join(',\n');
+
+                out.innerText = `["${id}"] = {
+    name = "${name}",
+    desc = "Craftable specialized item.",
+    category = "General",
+    result = "${result}",
+    amount = 1,
+    craftTime = ${time},
+    reqSkills = { ${skill} = ${level} },
+    ingredients = {
+${lines}
+    },
+    xp = { skill = "${skill}", amount = ${xp} }
+},`;
+            } else if (currentTab === 'station') {
+                const id = document.getElementById('f_id').value || 'custom_station';
+                const name = document.getElementById('f_sysName').value || 'Custom Station';
+                const model = document.getElementById('f_model').value || 'models/props_c17/furnituretable002a.mdl';
+                const cat = document.getElementById('f_cat').value || 'Workbenches';
+                const time = document.getElementById('f_time').value || 5;
+                const skill = document.getElementById('f_skill').value || 'crafting';
+                const level = document.getElementById('f_level').value || 1;
+                const rawIn = document.getElementById('f_in').value || 'scrap_metal:2';
+                const rawOut = document.getElementById('f_out').value || 'pistol_ammo:1';
+
+                const inLines = rawIn.split(',').map(s => {
+                    const [k, v] = s.split(':');
+                    return `["${(k || '').trim()}"] = ${parseInt(v || 1, 10)}`;
+                }).join(', ');
+
+                const outLines = rawOut.split(',').map(s => {
+                    const [k, v] = s.split(':');
+                    return `["${(k || '').trim()}"] = ${parseInt(v || 1, 10)}`;
+                }).join(', ');
+
+                out.innerText = `ix.customSystems.Register("${id}", {
+    name = "${name}",
+    category = "${cat}",
+    model = "${model}",
+    processTime = ${time},
+    reqSkills = { ${skill} = ${level} },
+    inputs = { ${inLines} },
+    outputs = { ${outLines} },
+    xp = { skill = "${skill}", amount = 35 }
+})`;
+            } else if (currentTab === 'entity') {
+                const id = document.getElementById('f_id').value || 'ix_station';
+                const name = document.getElementById('f_name').value || 'Custom Entity';
+                const model = document.getElementById('f_model').value || 'models/props_c17/furnituretable002a.mdl';
+
+                out.innerText = `-- File: entities/entities/${id}/init.lua
+AddCSLuaFile("cl_init.lua")
+AddCSLuaFile("shared.lua")
+include("shared.lua")
+
+function ENT:Initialize()
+    self:SetModel("${model}")
+    self:PhysicsInit(SOLID_VPHYSICS)
+    self:SetMoveType(MOVETYPE_VPHYSICS)
+    self:SetSolid(SOLID_VPHYSICS)
+    self:SetUseType(SIMPLE_USE)
+
+    local phys = self:GetPhysicsObject()
+    if IsValid(phys) then
+        phys:Wake()
+        phys:EnableMotion(false)
+    end
+end
+
+function ENT:Use(activator, caller)
+    if not IsValid(activator) or not activator:IsPlayer() then return end
+    activator:Notify("Interacted with ${name}!")
+end
+`;
+            } else if (currentTab === 'plugin') {
+                const name = document.getElementById('f_name').value || 'PluginName';
+                const author = document.getElementById('f_author').value || 'HelixGame';
+                const desc = document.getElementById('f_desc').value || 'Plugin Description';
+
+                out.innerText = `local PLUGIN = PLUGIN or {}
+PLUGIN.name = "${name}"
+PLUGIN.author = "${author}"
+PLUGIN.description = "${desc}"
+
+ix.util.Include("sh_plugin.lua")
+ix.util.Include("sv_plugin.lua")
+ix.util.Include("cl_plugin.lua")
+
+function PLUGIN:InitializedPlugins()
+    print("[Helix] Initialized ${name} Plugin.")
+end
+`;
+            } else if (currentTab === 'command') {
+                const name = document.getElementById('f_name').value || 'CustomCommand';
+                const admin = document.getElementById('f_admin').value;
+                const desc = document.getElementById('f_desc').value || 'Description';
+
+                out.innerText = `ix.command.Add("${name}", {
+    description = "${desc}",
+    adminOnly = ${admin},
+    arguments = {
+        ix.type.player,
+        ix.type.string
+    },
+    OnRun = function(self, client, target, reason)
+        local char = target:GetCharacter()
+        if not char then return "@invalidChar" end
+
+        target:Notify("Action from " .. client:Name() .. ": " .. reason)
+        return "Executed ${name} successfully."
+    end
+})
+`;
+            }
+        }
+
+        function copyCode() {
+            const code = document.getElementById('code-output').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast("Lua code copied to clipboard!");
+            });
+        }
+
+        function downloadLua() {
+            const code = document.getElementById('code-output').innerText;
+            let filename = 'script.lua';
+            if (currentTab === 'item') {
+                filename = 'sh_' + (document.getElementById('f_id').value || 'item') + '.lua';
+            } else if (currentTab === 'station') {
+                filename = 'sh_system_' + (document.getElementById('f_id').value || 'station') + '.lua';
+            } else if (currentTab === 'entity') {
+                filename = 'init.lua';
+            } else if (currentTab === 'plugin') {
+                filename = 'sh_plugin.lua';
+            }
+
+            const blob = new Blob([code], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            showToast("Downloaded " + filename);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // Initialize default tab
+        updatePresetDropdown();
+        renderForm();
+        generateCode();
+    </script>
+</body>
+</html>

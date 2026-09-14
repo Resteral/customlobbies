@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Helix Hospitality & Mixology Tycoon</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,700;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Global Audio Player for DJ Booth -->
+  <audio id="djAudioPlayer" preload="none"></audio>
+
+  <!-- MIXOLOGY CRAFTING STATION -->
+  <div id="mixologyStation" class="app-window hidden">
+    <!-- Top Bar -->
+    <div class="station-header">
+      <div class="header-left">
+        <div class="brand-badge-icon">
+          <i class="fa-solid fa-martini-glass-citrus logo-icon"></i>
+        </div>
+        <div>
+          <h2>ARTISAN MIXOLOGY SUITE</h2>
+          <p id="stationVenueSubtitle">BAHAMA MAMAS WEST • MAIN BAR STATION #1</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="live-status-pill">
+          <span class="pulse-dot"></span>
+          <span>BAR LAB ACTIVE</span>
+        </div>
+        <button class="btn-close" onclick="closeAllUI()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+
+    <div class="station-body">
+      <!-- Left: Recipe Selector -->
+      <div class="recipe-sidebar">
+        <div class="sidebar-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="recipeSearchInput" placeholder="Search branded cocktails, shots..." oninput="filterRecipes()">
+        </div>
+        <div class="recipe-tabs">
+          <button class="tab-btn active" onclick="switchRecipeTab('all')">All</button>
+          <button class="tab-btn" onclick="switchRecipeTab('cocktails')">Cocktails</button>
+          <button class="tab-btn" onclick="switchRecipeTab('shots')">Shots</button>
+          <button class="tab-btn" onclick="switchRecipeTab('mocktails')">Mocktails</button>
+        </div>
+        <div id="recipeList" class="recipe-list">
+          <!-- Dynamic recipe cards -->
+        </div>
+      </div>
+
+      <!-- Right: Ultra-Realistic Mixology Lab Stage -->
+      <div class="mixology-workspace">
+        <div id="mixologyEmptyState" class="workspace-empty">
+          <div class="empty-icon-ring">
+            <i class="fa-solid fa-whiskey-glass"></i>
+          </div>
+          <h3>SELECT A COCKTAIL FROM THE MENU</h3>
+          <p>Master precise free-pouring, rhythm aeration shaking, and artisanal garnish styling.</p>
+        </div>
+
+        <div id="mixologyActiveCraft" class="workspace-active hidden">
+          <!-- Crafting Top Stats -->
+          <div class="craft-header">
+            <div>
+              <h3 id="craftDrinkTitle">Grey Goose Dirty Olive Martini</h3>
+              <div class="badge-row">
+                <span id="craftCategoryBadge" class="badge">Cocktail</span>
+                <span id="craftBuffBadge" class="badge badge-buff"><i class="fa-solid fa-bolt"></i> +Charisma</span>
+                <span id="craftGlassBadge" class="badge badge-glass"><i class="fa-solid fa-wine-glass"></i> Coupe</span>
+              </div>
+            </div>
+            <div class="live-cocktail-telemetry">
+              <div class="telemetry-item">
+                <span class="lbl">VOLUME</span>
+                <span id="telemetryVolume" class="val">0 / 75 ml</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="lbl">DILUTION</span>
+                <span id="telemetryDilution" class="val">0%</span>
+              </div>
+              <div class="telemetry-item">
+                <span class="lbl">TEMP</span>
+                <span id="telemetryTemp" class="val">18°C</span>
+              </div>
+              <div class="rating-preview">
+                <span class="lbl">EST. QUALITY</span>
+                <div id="starRatingDisplay" class="stars">
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Realistic Bar Counter Stage with Luxury Drip Mat -->
+          <div class="craft-center-stage">
+            <div class="bar-counter-ambient">
+              <!-- Backlit Bottle Shadows -->
+              <div class="bar-ambient-glow"></div>
+            </div>
+
+            <!-- Realistic Tilting Pour Bottle -->
+            <div id="pourBottleVisual" class="pour-bottle-visual hidden">
+              <div class="bottle-pour-spout">
+                <div class="metal-speed-pourer"></div>
+                <div id="liquidStream" class="liquid-stream"></div>
+              </div>
+              <div class="bottle-glass-body">
+                <div class="bottle-neck-band"></div>
+                <div id="bottleLabelText" class="bottle-real-label">GREY GOOSE</div>
+                <div class="bottle-foil-accent"></div>
+              </div>
+            </div>
+
+            <!-- Photorealistic 3D Glassware Unit -->
+            <div class="glass-stage-pedestal">
+              <div id="glassUnit" class="glass-unit coupe">
+                <!-- Crystal Bowl Top -->
+                <div class="glass-bowl-wrapper">
+                  <!-- Salt/Sugar/Peppermint Rim Crystals -->
+                  <div id="glassRimDressing" class="glass-rim-dressing"></div>
+
+                  <!-- Glass Specular Reflection Highlight -->
+                  <div class="glass-specular-sheen"></div>
+                  <div class="glass-rim-highlight"></div>
+
+                  <!-- Inner Liquid Bowl -->
+                  <div class="glass-bowl-interior">
+                    <!-- Floating Frosted 3D Ice Cubes -->
+                    <div id="iceContainer" class="ice-container">
+                      <div class="ice-cube cube-1"><span class="ice-bubble"></span></div>
+                      <div class="ice-cube cube-2"><span class="ice-bubble"></span></div>
+                      <div class="ice-cube cube-3"><span class="ice-bubble"></span></div>
+                    </div>
+
+                    <!-- Realistic Fluid Wave & Foam -->
+                    <div id="glassLiquid" class="glass-liquid">
+                      <div class="liquid-meniscus-curve"></div>
+                      <div class="liquid-surface-wave"></div>
+                      <div class="liquid-effervescence"></div>
+                    </div>
+
+                    <!-- Target Sweetspot Overlay -->
+                    <div class="pour-target-line">
+                      <span class="target-badge">SWEET SPOT 80%</span>
+                    </div>
+                  </div>
+
+                  <!-- Physical Garnish Display -->
+                  <div id="glassGarnishDisplay" class="glass-garnish-display"></div>
+                </div>
+
+                <!-- Crystal Stem & Base (for stemmed glasses) -->
+                <div class="glass-stem-structure">
+                  <div class="crystal-stem"></div>
+                  <div class="crystal-foot"></div>
+                </div>
+
+                <!-- Glass Base Shadow on Bar Mat -->
+                <div class="glass-mat-shadow"></div>
+              </div>
+
+              <!-- Brushed Metal Cobbler Shaker (Shaking Step) -->
+              <div id="cobblerShakerVisual" class="cobbler-shaker-visual hidden">
+                <div class="shaker-top-cap"></div>
+                <div class="shaker-strainer-collar"></div>
+                <div class="shaker-tin-body">
+                  <div id="shakerFrostOverlay" class="shaker-frost"></div>
+                  <div class="shaker-metal-reflection"></div>
+                  <span class="shaker-emboss">HELIX ARTISAN</span>
+                </div>
+                <div class="shaker-mat-shadow"></div>
+              </div>
+
+              <!-- Bar Mat Grid underneath -->
+              <div class="bar-drip-mat">
+                <div class="mat-ribs"></div>
+              </div>
+            </div>
+
+            <!-- Dynamic Pour & Rhythm Controls -->
+            <div class="craft-controls">
+              <div class="ingredient-progress">
+                <div class="ingredient-info-row">
+                  <span id="currentIngredientLabel">Current: Grey Goose Vodka</span>
+                  <span id="currentIngredientRatio" class="ratio-counter">0 ml / 75 ml</span>
+                </div>
+                <div class="meter-bar">
+                  <div id="pourMeterFill" class="meter-fill"></div>
+                  <div class="meter-sweetspot">
+                    <span class="sweetspot-pin">OPTIMAL</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="control-actions">
+                <button id="btnHoldPour" class="btn-pour" onmousedown="startPouring()" onmouseup="stopPouring()" onmouseleave="stopPouring()">
+                  <i class="fa-solid fa-faucet-drip"></i> HOLD TO FREE-POUR
+                </button>
+                <button id="btnShakerRhythm" class="btn-shake hidden" onclick="hitShakerBeat()">
+                  <i class="fa-solid fa-hand-fist"></i> RHYTHM SHAKE (SPACEBAR)
+                </button>
+              </div>
+
+              <!-- Real Shaker Rhythm Visualizer -->
+              <div id="shakerRhythmContainer" class="shaker-rhythm hidden">
+                <div class="rhythm-track">
+                  <div id="rhythmBeat" class="rhythm-beat"></div>
+                  <div class="rhythm-target-zone">
+                    <span class="hit-label">HIT</span>
+                  </div>
+                </div>
+                <div class="rhythm-meta-row">
+                  <span id="rhythmStreakCounter">Aeration: 0/3 Beats</span>
+                  <span class="rhythm-hint">Press SPACEBAR when the pulse aligns with the neon target!</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Summary Bar -->
+          <div class="craft-footer">
+            <div class="ingredients-needed-list" id="craftIngredientsSummary">
+              <!-- Required branded items -->
+            </div>
+            <button id="btnFinishCraft" class="btn-action primary" onclick="finishCrafting()" disabled>
+              <i class="fa-solid fa-glass-cheers"></i> COMPLETE & SERVE COCKTAIL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENUE MANAGEMENT TABLET -->
+  <div id="venueTablet" class="app-window tablet-shell hidden">
+    <div class="tablet-sidebar">
+      <div class="tablet-brand">
+        <i class="fa-solid fa-champagne-glasses"></i>
+        <span>HELIX OS</span>
+      </div>
+      <nav class="tablet-nav">
+        <button class="nav-item active" onclick="switchTabletTab('overview')"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+        <button class="nav-item" onclick="switchTabletTab('employees')"><i class="fa-solid fa-users"></i> Staff & Payroll</button>
+        <button class="nav-item" onclick="switchTabletTab('stock')"><i class="fa-solid fa-boxes-stacked"></i> Wholesale Stock</button>
+        <button class="nav-item" onclick="switchTabletTab('signatures')"><i class="fa-solid fa-flask-vial"></i> Signature Lab</button>
+        <button class="nav-item" onclick="switchTabletTab('ledger')"><i class="fa-solid fa-receipt"></i> Accounting</button>
+      </nav>
+      <button class="btn-tablet-close" onclick="closeAllUI()"><i class="fa-solid fa-power-off"></i> Exit System</button>
+    </div>
+
+    <div class="tablet-content">
+      <!-- TAB: DASHBOARD -->
+      <div id="tabOverview" class="tablet-tab-pane active">
+        <div class="pane-header">
+          <div>
+            <h2 id="tabletVenueName">Bahama Mamas West</h2>
+            <p id="tabletOwnerName">Owner: Alexander Pierce</p>
+          </div>
+          <div class="hype-badge">
+            <i class="fa-solid fa-fire"></i>
+            <div>
+              <span class="hype-val" id="tabletHypeVal">88%</span>
+              <span class="hype-lbl">VENUE HYPE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-cards-grid">
+          <div class="stat-card">
+            <span class="card-title">SAFE BALANCE</span>
+            <h3 id="statSafeBalance">$142,500</h3>
+            <span class="card-trend text-green"><i class="fa-solid fa-arrow-up"></i> +12% this week</span>
+          </div>
+          <div class="stat-card">
+            <span class="card-title">ACTIVE EMPLOYEES</span>
+            <h3 id="statActiveEmployees">6 Staff</h3>
+            <span class="card-trend text-blue">Payroll: $2,400 / shift</span>
+          </div>
+          <div class="stat-card">
+            <span class="card-title">COVER CHARGE</span>
+            <h3 id="statCoverCharge">$50</h3>
+            <span class="card-trend text-purple">Standard Entry Fee</span>
+          </div>
+        </div>
+
+        <div class="quick-actions-bar">
+          <h4>Venue Quick Controls</h4>
+          <div class="btn-group">
+            <button class="btn-action secondary" onclick="openSafeFromTablet()"><i class="fa-solid fa-vault"></i> Safe Operations</button>
+            <button class="btn-action secondary" onclick="switchTabletTab('stock')"><i class="fa-solid fa-truck-ramp-box"></i> Order Supplies</button>
+            <button class="btn-action secondary" onclick="switchTabletTab('signatures')"><i class="fa-solid fa-plus"></i> New Signature Cocktail</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: EMPLOYEES -->
+      <div id="tabEmployees" class="tablet-tab-pane hidden">
+        <div class="pane-header">
+          <h2>Staff Roster & Payroll</h2>
+          <button class="btn-action primary" onclick="openHireModal()"><i class="fa-solid fa-user-plus"></i> Hire Staff</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Rank</th>
+                <th>Hourly Pay</th>
+                <th>Total Earned</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="employeeTableBody">
+              <!-- Dynamically rendered employees -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: WHOLESALE STOCK -->
+      <div id="tabStock" class="tablet-tab-pane hidden">
+        <div class="pane-header">
+          <h2>Wholesale Real-Branded Liquor & Supply Ordering</h2>
+          <p>Orders are charged directly to the Venue Safe and delivered to your inventory.</p>
+        </div>
+        <div id="wholesaleGrid" class="wholesale-grid">
+          <!-- Dynamically rendered wholesale items -->
+        </div>
+      </div>
+
+      <!-- TAB: SIGNATURE LAB -->
+      <div id="tabSignatures" class="tablet-tab-pane hidden">
+        <div class="pane-header">
+          <h2>Custom Signature Cocktail Lab</h2>
+          <p>Blend real branded spirits, craft liqueurs, artisan mixers, and specialty garnishes.</p>
+        </div>
+
+        <div class="signature-builder">
+          <div class="form-group">
+            <label>Signature Cocktail Name</label>
+            <input type="text" id="sigNameInput" placeholder="e.g. Midnight Peppermint Velvet">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Primary Branded Spirit</label>
+              <select id="sigPrimarySpiritSelect">
+                <option value="grey_goose_vodka">Grey Goose Vodka</option>
+                <option value="belvedere_vodka">Belvedere Pure Vodka</option>
+                <option value="titos_vodka">Tito's Handmade Vodka</option>
+                <option value="absolut_vodka">Absolut Vodka</option>
+                <option value="patron_silver">Patrón Silver Tequila</option>
+                <option value="casamigos_blanco">Casamigos Blanco Tequila</option>
+                <option value="don_julio_blanco">Don Julio Blanco</option>
+                <option value="del_maguey_mezcal">Del Maguey Vida Mezcal</option>
+                <option value="hennessy_vs">Hennessy V.S Cognac</option>
+                <option value="macallan_12">The Macallan 12 Scotch</option>
+                <option value="jameson_whiskey">Jameson Irish Whiskey</option>
+                <option value="jack_daniels">Jack Daniel's Old No. 7</option>
+                <option value="bulleit_bourbon">Bulleit Frontier Bourbon</option>
+                <option value="crown_royal">Crown Royal Whisky</option>
+                <option value="fireball_whiskey">Fireball Cinnamon Whisky</option>
+                <option value="bombay_sapphire">Bombay Sapphire Gin</option>
+                <option value="hendricks_gin">Hendrick's Botanical Gin</option>
+                <option value="tanqueray_gin">Tanqueray London Dry Gin</option>
+                <option value="bacardi_superior">Bacardi Superior Rum</option>
+                <option value="captain_morgan">Captain Morgan Spiced Rum</option>
+                <option value="malibu_rum">Malibu Coconut Rum</option>
+                <option value="havana_club_7">Havana Club 7 Year Rum</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Secondary Liqueur / Modifier</label>
+              <select id="sigLiqueurSelect">
+                <option value="cointreau_orange">Cointreau Triple Sec</option>
+                <option value="baileys_irish_cream">Baileys Irish Cream</option>
+                <option value="kahlua_coffee">Kahlúa Coffee Liqueur</option>
+                <option value="peppermint_schnapps">Rumple Minze Peppermint Schnapps</option>
+                <option value="jagermeister">Jägermeister Herbal Liqueur</option>
+                <option value="aperol_aperitivo">Aperol Aperitivo</option>
+                <option value="campari_bitter">Campari Red Bitter</option>
+                <option value="blue_curacao">DeKuyper Blue Curaçao</option>
+                <option value="midori_melon">Midori Melon Liqueur</option>
+                <option value="angostura_bitters">Angostura Aromatic Bitters</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Artisan Mixer / Juice</label>
+              <select id="sigMixerSelect">
+                <option value="fevertree_tonic">Fever-Tree Tonic Water</option>
+                <option value="fevertree_gingerbeer">Fever-Tree Spiced Ginger Beer</option>
+                <option value="red_bull_energy">Red Bull Energy Drink</option>
+                <option value="sparkling_prosecco">La Marca Prosecco</option>
+                <option value="ocean_spray_cranberry">Ocean Spray Cranberry Juice</option>
+                <option value="fresh_orange_juice">Fresh Orange Juice</option>
+                <option value="fresh_pineapple_juice">Dole Pineapple Juice</option>
+                <option value="fresh_lime_juice">Fresh Lime Juice</option>
+                <option value="fresh_lemon_juice">Eureka Lemon Juice</option>
+                <option value="coconut_cream_coco">Coco López Cream of Coconut</option>
+                <option value="clamato_tomato_juice">Clamato Tomato Juice</option>
+                <option value="club_soda_syrup">Club Soda Syrup</option>
+                <option value="cola_syrup">Classic Cola Draft</option>
+                <option value="simple_syrup">Pure Cane Syrup</option>
+                <option value="grenadine_syrup">Pomegranate Grenadine</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Garnish, Salt, Sugar & Rim Infusion</label>
+              <select id="sigGarnishSelect">
+                <option value="cocktail_olives">Castelvetrano Cocktail Olives</option>
+                <option value="margarita_salt">Coarse Sea Salt Rim</option>
+                <option value="cane_sugar_rim">Raw Cane Sugar Rim</option>
+                <option value="crushed_peppermint">Crushed Peppermint Candy Rim</option>
+                <option value="fresh_mint_sprig">Fresh Mint Sprig</option>
+                <option value="maraschino_cherries">Luxardo Maraschino Cherries</option>
+                <option value="lime_wedges">Fresh Lime Wedges</option>
+                <option value="orange_slices">Dehydrated Orange Slices</option>
+                <option value="cinnamon_sticks">Ceylon Cinnamon Sticks</option>
+                <option value="whipped_cream">Vanilla Whipped Cream</option>
+                <option value="chocolate_syrup">Dark Chocolate Drizzle</option>
+                <option value="tabasco_hot_sauce">Tabasco Pepper Sauce</option>
+                <option value="cocktail_umbrellas">Tropical Paper Umbrella</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Glassware</label>
+              <select id="sigGlassSelect">
+                <option value="coupe">Coupe Champagne / Martini Glass</option>
+                <option value="rocks">Heavy Rocks Tumbler</option>
+                <option value="highball">Tall Crystal Highball</option>
+                <option value="hurricane">Flared Hurricane Glass</option>
+                <option value="shot">Shot Glass</option>
+                <option value="mug">Copper Moscow Mule Mug</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Special Player Perk</label>
+              <select id="sigBuffSelect">
+                <option value="stamina">Stamina Surge (+Endurance)</option>
+                <option value="pain_relief">Pain Relief (Damage Absorption)</option>
+                <option value="speed">Adrenaline Rush (+Sprint Speed)</option>
+                <option value="charisma">VIP Charisma & Aura</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Retail Menu Price ($)</label>
+              <input type="number" id="sigPriceInput" value="65">
+            </div>
+          </div>
+
+          <button class="btn-action primary" onclick="submitSignatureDrink()"><i class="fa-solid fa-save"></i> Register Signature Drink to Venue Menu</button>
+        </div>
+
+        <h3 style="margin-top: 25px;">Active Signature Drinks</h3>
+        <div id="signatureDrinksList" class="signature-list">
+          <!-- Active signature cards -->
+        </div>
+      </div>
+
+      <!-- TAB: ACCOUNTING & LEDGER -->
+      <div id="tabLedger" class="tablet-tab-pane hidden">
+        <div class="pane-header">
+          <h2>Financial Ledger & Audit Trail</h2>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerTableBody">
+              <!-- Dynamically rendered ledger entries -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POS CASH REGISTER MODAL -->
+  <div id="posModal" class="app-window modal-box hidden">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-cash-register"></i> BAR CASH REGISTER</h3>
+      <button class="btn-close" onclick="closeAllUI()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Select Customer / Nearby Patron</label>
+        <select id="posCustomerSelect" onchange="onSelectCustomerChange()">
+          <!-- Populated with nearby players -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Or Enter Customer Server ID Manually</label>
+        <input type="number" id="posManualIdInput" placeholder="Server ID (e.g. 1)">
+      </div>
+      <div class="form-group">
+        <label>Item / Order Description</label>
+        <input type="text" id="posDescriptionInput" placeholder="e.g. 2x Grey Goose Martinis, 1x Hennessy Sidecar">
+      </div>
+      <div class="form-group">
+        <label>Total Bill Amount ($)</label>
+        <input type="number" id="posAmountInput" placeholder="100">
+      </div>
+      <button class="btn-action primary full-width" onclick="submitPOSCharge()"><i class="fa-solid fa-credit-card"></i> CHARGE CUSTOMER</button>
+    </div>
+  </div>
+
+  <!-- BUSINESS SAFE MODAL -->
+  <div id="safeModal" class="app-window modal-box hidden">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-vault"></i> VENUE BUSINESS SAFE</h3>
+      <button class="btn-close" onclick="closeAllUI()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="safe-balance-display">
+        <span>CURRENT SAFE BALANCE</span>
+        <h2 id="modalSafeBalance">$0</h2>
+      </div>
+
+      <div class="form-group">
+        <label>Security PIN Code</label>
+        <input type="password" id="safePinInput" maxlength="6" placeholder="Enter PIN">
+      </div>
+
+      <div class="form-group">
+        <label>Amount ($)</label>
+        <input type="number" id="safeAmountInput" placeholder="Amount">
+      </div>
+
+      <div class="safe-quick-buttons">
+        <button onclick="setSafeAmount(500)">+$500</button>
+        <button onclick="setSafeAmount(1000)">+$1,000</button>
+        <button onclick="setSafeAmount(5000)">+$5,000</button>
+        <button onclick="setSafeAmount(20000)">+$20,000</button>
+      </div>
+
+      <div class="modal-btn-row">
+        <button class="btn-action primary" onclick="submitSafeAction('deposit')"><i class="fa-solid fa-arrow-down"></i> Deposit Cash</button>
+        <button class="btn-action secondary" onclick="submitSafeAction('withdraw')"><i class="fa-solid fa-arrow-up"></i> Withdraw Cash</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POLICE BREATHALYZER HUD -->
+  <div id="breathalyzerModal" class="app-window breathalyzer-shell hidden">
+    <div class="breathalyzer-device">
+      <div class="device-screen">
+        <div class="screen-header">DIGITAL BREATHALYZER PRO</div>
+        <div class="patron-name" id="breathalyzerTargetName">PATRON: JOHN DOE</div>
+        <div class="bac-big-display" id="breathalyzerBACVal">0.00%</div>
+        <div class="status-indicator" id="breathalyzerStatus">SOBER - LEGAL TO DRIVE</div>
+        <div class="bac-scale-bar">
+          <div class="scale-zone safe"></div>
+          <div class="scale-zone warn"></div>
+          <div class="scale-zone danger"></div>
+        </div>
+      </div>
+      <button class="btn-breathalyzer-dismiss" onclick="closeAllUI()">DISMISS READOUT</button>
+    </div>
+  </div>
+
+  <!-- DJ BOOTH CONTROLLER -->
+  <div id="djModal" class="app-window modal-box hidden">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-compact-disc fa-spin"></i> DJ SOUND BOOTH</h3>
+      <button class="btn-close" onclick="closeAllUI()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Audio Stream / Direct MP3 URL</label>
+        <input type="text" id="djUrlInput" placeholder="https://example.com/audio/nightclub-set.mp3">
+      </div>
+      <div class="form-group">
+        <label>Volume Level</label>
+        <input type="range" id="djVolumeInput" min="0.1" max="1.0" step="0.05" value="0.8">
+      </div>
+      <div class="modal-btn-row">
+        <button class="btn-action primary" onclick="playDJTrack()"><i class="fa-solid fa-play"></i> Broadcast Audio</button>
+        <button class="btn-action secondary" onclick="stopDJTrack()"><i class="fa-solid fa-stop"></i> Stop Audio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/audio_synth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/mixology.js"></script>
+  <script src="js/tablet.js"></script>
+  <script src="js/pos.js"></script>
+  <script src="js/breathalyzer.js"></script>
+</body>
+</html>

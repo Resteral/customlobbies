@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CustomLobbies.com - OBS Studio Transparent Overlay</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      background: transparent !important;
+      background-image: none !important;
+      overflow: hidden;
+      margin: 0;
+      padding: 2rem;
+    }
+    .obs-hud-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+  </style>
+</head>
+<body class="obs-transparent-mode">
+
+  <!-- Transparent OBS HUD Badge -->
+  <div class="obs-hud-container">
+    <div class="mmr-badge" style="font-size: 1.1rem; padding: 0.6rem 1.2rem; background: rgba(18, 22, 31, 0.9); border: 2px solid var(--accent-cyan);">
+      <span>💎</span> <strong>1840 MMR (Diamond II)</strong>
+    </div>
+    <div class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); font-weight: 800; font-size: 0.9rem; text-align: center;">
+      CustomLobbies 5v5 Live
+    </div>
+  </div>
+
+  <!-- Center Follower & Subscriber Alert Box -->
+  <div style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);">
+    <div class="follower-alert-container" id="obsAlertBox">
+      <div class="alert-title" id="obsAlertTitle">🎉 NEW FOLLOWER!</div>
+      <div class="alert-subtext" id="obsAlertText">NightHawk99 just followed the stream!</div>
+    </div>
+  </div>
+
+  <script src="js/widget-builder.js"></script>
+  <script>
+    // Listen for alert triggers via WebSocket / BroadcastChannel
+    const channel = new BroadcastChannel('cl_alerts_channel');
+    channel.onmessage = (event) => {
+      if (event.data && event.data.type === 'TRIGGER_ALERT') {
+        window.widgetBuilderEngine.triggerAlert(event.data.username, event.data.alertType);
+      }
+    };
+  </script>
+</body>
+</html>

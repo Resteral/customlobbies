@@ -1,0 +1,489 @@
+:root {
+    --sims-blue: #0284c7;
+    --sims-emerald: #10b981;
+    --sims-plumbob: #22c55e;
+    --sims-bg: rgba(15, 23, 42, 0.82);
+    --sims-bg-card: rgba(30, 41, 59, 0.88);
+    --sims-bg-hover: rgba(51, 65, 85, 0.95);
+    --sims-border: rgba(255, 255, 255, 0.12);
+    --sims-text-high: #f8fafc;
+    --sims-text-medium: #cbd5e1;
+    --sims-text-low: #94a3b8;
+    --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --shadow-sims: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+body {
+    font-family: var(--font-ui);
+    background: transparent;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    color: var(--sims-text-high);
+}
+
+#sims-hud {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+#sims-hud.hidden {
+    display: none;
+    opacity: 0;
+}
+
+/* Allow mouse interaction on panels */
+.sims-header, .sims-quick-controls, .sims-catalog-drawer {
+    pointer-events: auto;
+}
+
+/* =========================================================================
+   SIMS TOP BAR
+   ========================================================================= */
+.sims-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--sims-bg);
+    backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid var(--sims-border);
+    border-radius: var(--radius-lg);
+    padding: 8px 18px;
+    box-shadow: var(--shadow-sims);
+    z-index: 100;
+}
+
+.sims-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sims-plumbob {
+    font-size: 26px;
+    animation: plumbobSpin 3s infinite ease-in-out;
+    filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.8));
+}
+
+@keyframes plumbobSpin {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.15) translateY(-3px); }
+}
+
+.brand-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-info .title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.5px;
+}
+
+.badge-sims {
+    font-size: 9px;
+    font-weight: 800;
+    background: rgba(34, 197, 94, 0.25);
+    color: #4ade80;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.brand-info .sub {
+    font-size: 10px;
+    color: var(--sims-text-low);
+    font-weight: 500;
+}
+
+/* Mode Selector */
+.sims-mode-selector {
+    display: flex;
+    background: rgba(0, 0, 0, 0.45);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--sims-border);
+    gap: 4px;
+}
+
+.mode-tab {
+    background: transparent;
+    border: none;
+    color: var(--sims-text-medium);
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    font-family: var(--font-ui);
+}
+
+.mode-tab:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.mode-tab.active {
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: #fff;
+    box-shadow: 0 0 14px rgba(2, 132, 199, 0.5);
+}
+
+.mode-tab.erase-tab.active {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    box-shadow: 0 0 14px rgba(225, 29, 72, 0.5);
+}
+
+.sims-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn {
+    border: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-ui);
+    transition: all 0.15s ease;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+.btn-save:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
+}
+
+.btn-close {
+    background: rgba(244, 63, 94, 0.15);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    color: #fda4af;
+}
+.btn-close:hover {
+    background: rgba(244, 63, 94, 0.3);
+    color: #fff;
+}
+
+/* =========================================================================
+   CENTER AIM TARGET PILL
+   ========================================================================= */
+.sims-target-pill {
+    position: absolute;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--sims-border);
+    border-radius: 20px;
+    padding: 6px 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    z-index: 80;
+}
+.sims-target-pill.hidden { display: none; }
+
+/* =========================================================================
+   RIGHT SIDE: SIMS QUICK CONTROLS
+   ========================================================================= */
+.sims-quick-controls {
+    position: absolute;
+    top: 86px;
+    right: 16px;
+    z-index: 90;
+}
+
+.sims-card {
+    background: var(--sims-bg);
+    backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid var(--sims-border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    width: 260px;
+    box-shadow: var(--shadow-sims);
+}
+
+.card-header {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: var(--sims-text-low);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--sims-border);
+    margin-bottom: 10px;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Big 1-Click Placement Stamp Button */
+.btn-stamp-main {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+    transition: all 0.15s ease;
+}
+
+.btn-stamp-main:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(34, 197, 94, 0.6);
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+}
+
+.stamp-icon {
+    font-size: 24px;
+}
+
+.stamp-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.stamp-text .main-txt {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.stamp-text .sub-txt {
+    font-size: 9px;
+    opacity: 0.9;
+    font-family: var(--font-mono);
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+}
+
+.control-row .lbl {
+    color: var(--sims-text-medium);
+    font-weight: 600;
+}
+
+.btn-group {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--sims-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.sm-btn {
+    background: transparent;
+    border: none;
+    color: var(--sims-text-high);
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.sm-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.val-pill {
+    padding: 0 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: #38bdf8;
+}
+
+.btn-undo {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--sims-border);
+    color: var(--sims-text-medium);
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.btn-undo:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+/* =========================================================================
+   BOTTOM SIMS CATALOG DRAWER
+   ========================================================================= */
+.sims-catalog-drawer {
+    align-self: center;
+    width: 92vw;
+    max-width: 1300px;
+    background: var(--sims-bg);
+    backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid var(--sims-border);
+    border-radius: var(--radius-lg);
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: var(--shadow-sims);
+    z-index: 100;
+}
+
+.sims-subtabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
+.subtab-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    color: var(--sims-text-medium);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.subtab-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.subtab-pill.active {
+    background: rgba(2, 132, 199, 0.25);
+    border-color: #38bdf8;
+    color: #38bdf8;
+    box-shadow: 0 0 12px rgba(2, 132, 199, 0.3);
+}
+
+.sims-cards-slider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 4px 2px 6px 2px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.sims-card-item {
+    min-width: 140px;
+    max-width: 140px;
+    height: 105px;
+    background: var(--sims-bg-card);
+    border: 1px solid var(--sims-border);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 8px;
+    cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.sims-card-item:hover {
+    background: var(--sims-bg-hover);
+    border-color: #38bdf8;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.sims-card-item.selected {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.15);
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+}
+
+.card-icon {
+    font-size: 28px;
+}
+
+.card-info {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.card-tag {
+    font-size: 9px;
+    font-weight: 700;
+    color: #38bdf8;
+    font-family: var(--font-mono);
+}

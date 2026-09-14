@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logitech Trackball Dedicated Stream Overlay (OBS & Streamlabs)</title>
+  <!-- Three.js for 3D WebGL rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      background: transparent !important;
+      background-color: transparent !important;
+      overflow: hidden;
+    }
+
+    .stream-overlay-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 16px;
+      background: rgba(11, 15, 25, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      width: fit-content;
+      transition: all 0.3s ease;
+    }
+
+    body.layout-ball-only .stream-overlay-wrapper {
+      background: transparent;
+      backdrop-filter: none;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    body.layout-ball-only .hud-card:not(.card-3d),
+    body.layout-ball-only .telemetry-bar,
+    body.layout-ball-only .action-feed-bar {
+      display: none !important;
+    }
+
+    .overlay-card {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+
+    .overlay-3d-box {
+      width: 220px;
+      height: 200px;
+      position: relative;
+    }
+
+    .overlay-hud-box {
+      width: 180px;
+      height: 180px;
+      position: relative;
+    }
+  </style>
+</head>
+<body class="theme-logitech transparent-mode">
+
+  <!-- Stream Overlay Container -->
+  <div class="stream-overlay-wrapper" id="overlayWrapper">
+
+    <!-- 3D Lookalike Trackball Model Viewport -->
+    <div class="overlay-card card-3d">
+      <div class="overlay-3d-box">
+        <canvas id="canvas3d"></canvas>
+      </div>
+    </div>
+
+    <!-- Ergonomic Logitech Button Click HUD -->
+    <div class="overlay-card card-hud" id="hudCard">
+      <div class="overlay-hud-box">
+
+        <!-- Click Ripple Container -->
+        <div id="rippleContainer"></div>
+
+        <!-- Scroll Wheel Spin Pulse Arrows -->
+        <div class="scroll-pulse-arrow" id="scrollUpArrow" style="top: 10px;"><i data-feather="chevron-up"></i></div>
+        <div class="scroll-pulse-arrow" id="scrollDownArrow" style="bottom: 10px;"><i data-feather="chevron-down"></i></div>
+
+        <!-- SVG Vector Layout of Logitech MX Ergo Trackball -->
+        <svg class="trackball-svg-hud" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 180px; height: 180px;">
+          <!-- Chassis Outline -->
+          <path d="M70 210 C40 180 30 130 40 80 C50 35 90 20 140 25 C185 30 205 65 200 120 C195 170 170 215 125 220 Z" 
+                fill="#101624" stroke="rgba(255,255,255,0.25)" stroke-width="3" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.6))"/>
+
+          <!-- Socket -->
+          <circle cx="85" cy="115" r="42" fill="#090d16" stroke="var(--accent-color)" stroke-width="2" opacity="0.8"/>
+
+          <!-- Button: LMB -->
+          <path id="btn-left" class="btn-part" d="M122 30 C135 28 152 32 158 75 L130 80 L122 30 Z"/>
+
+          <!-- Button: RMB -->
+          <path id="btn-right" class="btn-part" d="M164 34 C185 45 198 65 192 110 L166 100 L164 34 Z"/>
+
+          <!-- Button: Scroll Wheel -->
+          <rect id="btn-wheel" class="btn-part" x="156" y="52" width="10" height="26" rx="5"/>
+
+          <!-- Button: M4 -->
+          <path id="btn-back" class="btn-part" d="M115 88 L126 86 L124 106 L113 108 Z"/>
+
+          <!-- Button: M5 -->
+          <path id="btn-forward" class="btn-part" d="M113 114 L124 112 L122 132 L111 134 Z"/>
+
+          <!-- Button: DPI -->
+          <circle id="btn-dpi" class="btn-part" cx="72" cy="62" r="8"/>
+        </svg>
+
+      </div>
+    </div>
+
+    <!-- Aim Direction Reticle Gauge -->
+    <div class="overlay-card card-radar" id="radarCard">
+      <div style="width: 180px; height: 180px; position: relative;">
+        <canvas id="radarCanvas"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    feather.replace();
+  </script>
+</body>
+</html>

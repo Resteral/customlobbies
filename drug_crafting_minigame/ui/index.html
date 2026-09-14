@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Synthesizer Minigame</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="minigame-container" class="hidden">
+        <div class="lab-frame">
+            
+            <!-- Header Section -->
+            <header class="lab-header">
+                <div class="status-indicator">
+                    <span class="pulse-dot red"></span>
+                    <span class="status-text">REACTOR ACTIVE</span>
+                </div>
+                <div class="title-block">
+                    <h1 id="recipe-title">CRYSTAL METH SYNTHESIS</h1>
+                    <p id="recipe-subtitle">Maintain temperature & vent pressure to synthesize pure batch.</p>
+                </div>
+                <div class="timer-block">
+                    <span class="timer-label">TIME REMAINING</span>
+                    <span id="timer-display">00:30</span>
+                </div>
+            </header>
+
+            <!-- Main Control Grid -->
+            <main class="lab-grid">
+                
+                <!-- Left Panel: Temperature Reactor -->
+                <section class="panel temp-panel">
+                    <div class="panel-header">
+                        <h2>THERMAL REACTOR</h2>
+                        <span id="temp-readout" class="digital-readout">090°C</span>
+                    </div>
+
+                    <div class="gauge-vertical">
+                        <div class="temp-bar-bg">
+                            <!-- Target Green Zone overlay -->
+                            <div id="temp-target-zone" class="target-zone"></div>
+                            <!-- Live Temperature Fill -->
+                            <div id="temp-fill" class="temp-fill"></div>
+                            <!-- Temperature Pointer -->
+                            <div id="temp-pointer" class="temp-pointer"></div>
+                        </div>
+                        <div class="gauge-labels">
+                            <span>300°C - REDLINE</span>
+                            <span id="target-temp-label">180°C - TARGET</span>
+                            <span>0°C - COLD</span>
+                        </div>
+                    </div>
+
+                    <div class="valve-controls">
+                        <button id="btn-heat" class="control-btn heat-btn">
+                            <span class="icon">🔥</span> HEAT VALVE [W / Up]
+                        </button>
+                        <button id="btn-cool" class="control-btn cool-btn">
+                            <span class="icon">❄️</span> COOL VALVE [S / Down]
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Center Panel: Reagent Dosing & Reactor Core -->
+                <section class="panel core-panel">
+                    <div class="panel-header">
+                        <h2>REAGENT DOSING CHAMBER</h2>
+                        <span id="purity-readout" class="purity-badge">PURITY: 100%</span>
+                    </div>
+
+                    <div class="vessel-container">
+                        <div class="vessel-glass">
+                            <div id="vessel-fluid" class="vessel-fluid"></div>
+                            <div class="bubbles"></div>
+                        </div>
+                    </div>
+
+                    <!-- Prompt Notification Banner -->
+                    <div id="reagent-prompt" class="reagent-prompt hidden">
+                        <div class="prompt-pulse"></div>
+                        <span id="prompt-text">INJECT PSEUDOAPHEDRINE LIQUID</span>
+                        <button id="btn-inject" class="inject-btn">INJECT [E / CLICK]</button>
+                    </div>
+
+                    <!-- Reagent Checklist -->
+                    <div class="reagent-list" id="reagent-list">
+                        <!-- Dynamically generated list -->
+                    </div>
+                </section>
+
+                <!-- Right Panel: Pressure & Venting -->
+                <section class="panel pressure-panel">
+                    <div class="panel-header">
+                        <h2>PRESSURE MANIFOLD</h2>
+                        <span id="pressure-readout" class="digital-readout alert-green">015 PSI</span>
+                    </div>
+
+                    <div class="gauge-vertical">
+                        <div class="pressure-bar-bg">
+                            <!-- Target Zone -->
+                            <div id="pressure-target-zone" class="target-zone pressure-target"></div>
+                            <!-- Live Pressure Fill -->
+                            <div id="pressure-fill" class="pressure-fill"></div>
+                            <!-- Pressure Pointer -->
+                            <div id="pressure-pointer" class="pressure-pointer"></div>
+                        </div>
+                        <div class="gauge-labels">
+                            <span class="hazard-text">100 PSI - RUPTURE</span>
+                            <span id="target-pressure-label">40 PSI - TARGET</span>
+                            <span>0 PSI - VACUUM</span>
+                        </div>
+                    </div>
+
+                    <div class="valve-controls">
+                        <button id="btn-vent" class="control-btn vent-btn">
+                            <span class="icon">💨</span> VENT PRESSURE [SPACE]
+                        </button>
+                    </div>
+                </section>
+
+            </main>
+
+            <!-- Footer / Controls Hint -->
+            <footer class="lab-footer">
+                <div class="keybind-hints">
+                    <span><kbd>W</kbd> / <kbd>S</kbd> Temp</span>
+                    <span><kbd>SPACE</kbd> Vent Pressure</span>
+                    <span><kbd>E</kbd> Inject Chemical</span>
+                    <span><kbd>ESC</kbd> Abort</span>
+                </div>
+            </footer>
+
+        </div>
+
+        <!-- Completion Modal -->
+        <div id="result-modal" class="modal-backdrop hidden">
+            <div class="modal-card">
+                <div id="modal-status-icon" class="status-icon success">✓</div>
+                <h2 id="modal-title">SYNTHESIS COMPLETE</h2>
+                <div class="grade-display">
+                    <span class="grade-label">FINAL GRADE</span>
+                    <span id="modal-grade" class="grade-value">S+</span>
+                </div>
+                <div class="result-stats">
+                    <div class="stat-row">
+                        <span>Purity Level:</span>
+                        <strong id="modal-purity">98%</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Quality Rating:</span>
+                        <strong id="modal-rating">Masterpiece Batch</strong>
+                    </div>
+                </div>
+                <button id="modal-close-btn" class="modal-btn">CLAIM BATCH</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

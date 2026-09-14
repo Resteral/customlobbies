@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fishing</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="game" class="hidden">
+        <!-- The animated water / rod / fish scene -->
+        <canvas id="scene"></canvas>
+
+        <!-- Top status text -->
+        <div id="hud">
+            <div id="rod-label"></div>
+            <div id="phase-text">Casting...</div>
+        </div>
+
+        <!-- Bite reaction prompt -->
+        <div id="bite-prompt" class="hidden">
+            <div class="bite-flash">!</div>
+            <div class="bite-key">SPACE</div>
+            <div class="bite-sub">HOOK IT!</div>
+            <div class="bite-timer"><span id="bite-timer-fill"></span></div>
+        </div>
+
+        <!-- Reel / fight catch bar -->
+        <div id="reel-ui" class="hidden">
+            <div class="reel-hint">Hold <b>SPACE</b> to reel &mdash; keep the bar on the fish.<br>When it <b>STRUGGLES</b>, ease off or the line snaps!</div>
+            <div id="catch-bar">
+                <!-- line tension meter -->
+                <div id="tension-wrap" title="Line tension">
+                    <div id="tension-track"><div id="tension-fill"></div></div>
+                    <div id="tension-label">TENSION</div>
+                </div>
+                <div id="progress-track"><div id="progress-fill"></div></div>
+                <div id="bar-track">
+                    <div id="control-zone"></div>
+                    <div id="fish-marker"></div>
+                </div>
+            </div>
+            <!-- struggle warning flashes when the fish thrashes -->
+            <div id="struggle-warn" class="hidden">FISH STRUGGLING &mdash; EASE OFF!</div>
+        </div>
+
+        <!-- Result banner -->
+        <div id="result" class="hidden">
+            <div id="result-title"></div>
+            <div id="result-sub"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

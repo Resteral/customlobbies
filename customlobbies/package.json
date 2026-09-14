@@ -1,0 +1,12 @@
+{
+  "name": "customlobbies",
+  "version": "1.0.0",
+  "description": "CustomLobbies.com - Game Lobbies, Streaming Channels, Friends, and 5-Second Publicity Vote Gatekeeper",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve -l 3000 ."
+  },
+  "keywords": ["gaming", "lobbies", "matchmaking", "streaming", "social", "publicity-vote"],
+  "author": "CustomLobbies Team",
+  "license": "MIT"
+}

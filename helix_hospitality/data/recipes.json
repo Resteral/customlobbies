@@ -1,0 +1,432 @@
+{
+  "recipes": [
+    {
+      "id": "grey_goose_dirty_martini",
+      "label": "Grey Goose Dirty Olive Martini",
+      "category": "cocktails",
+      "glassType": "coupe",
+      "iceType": "none",
+      "ingredients": [
+        { "item": "grey_goose_vodka", "amount": 75, "label": "Grey Goose Vodka", "color": "rgba(240, 245, 255, 0.4)" },
+        { "item": "cocktail_olives", "amount": 1, "label": "Olive Brine Essence", "color": "rgba(160, 180, 100, 0.5)" }
+      ],
+      "shaken": true,
+      "garnish": "cocktail_olives",
+      "basePrice": 55,
+      "alcoholStrength": 1.4,
+      "buffType": "charisma",
+      "buffDuration": 240,
+      "color": "rgba(230, 240, 230, 0.6)",
+      "description": "Ultra-smooth Grey Goose vodka shaken with olive brine and garnished with three Castelvetrano olives."
+    },
+    {
+      "id": "patron_classic_margarita",
+      "label": "Patrón Silver Sea Salt Margarita",
+      "category": "cocktails",
+      "glassType": "coupe",
+      "iceType": "crushed",
+      "ingredients": [
+        { "item": "patron_silver", "amount": 60, "label": "Patrón Silver Tequila", "color": "rgba(245, 240, 210, 0.5)" },
+        { "item": "cointreau_orange", "amount": 30, "label": "Cointreau Liqueur", "color": "rgba(255, 180, 50, 0.6)" },
+        { "item": "fresh_lime_juice", "amount": 30, "label": "Key Lime Juice", "color": "rgba(160, 230, 60, 0.8)" },
+        { "item": "margarita_salt", "amount": 1, "label": "Coarse Sea Salt Rim", "color": "rgba(255, 255, 255, 0.8)" }
+      ],
+      "shaken": true,
+      "garnish": "lime_wedges",
+      "basePrice": 48,
+      "alcoholStrength": 1.2,
+      "buffType": "speed",
+      "buffDuration": 200,
+      "color": "rgba(215, 240, 120, 0.75)",
+      "description": "Crisp 100% blue agave Patrón tequila shaken over ice with Cointreau, fresh lime, and a flaked sea salt rim."
+    },
+    {
+      "id": "casamigos_paloma",
+      "label": "Casamigos Blanco Ruby Paloma",
+      "category": "cocktails",
+      "glassType": "highball",
+      "iceType": "cubed",
+      "ingredients": [
+        { "item": "casamigos_blanco", "amount": 60, "label": "Casamigos Blanco Tequila", "color": "rgba(240, 235, 210, 0.4)" },
+        { "item": "fresh_lime_juice", "amount": 25, "label": "Fresh Lime Juice", "color": "rgba(170, 230, 70, 0.7)" },
+        { "item": "club_soda_syrup", "amount": 90, "label": "Sparkling Club Soda", "color": "rgba(240, 250, 255, 0.3)" },
+        { "item": "margarita_salt", "amount": 1, "label": "Sea Salt Rim", "color": "rgba(255, 255, 255, 0.7)" }
+      ],
+      "shaken": false,
+      "garnish": "lime_wedges",
+      "basePrice": 52,
+      "alcoholStrength": 1.1,
+      "buffType": "stamina",
+      "buffDuration": 220,
+      "color": "rgba(255, 175, 175, 0.7)",
+      "description": "Smooth Casamigos Blanco mixed with sparkling citrus, lime, and a saline rim."
+    },
+    {
+      "id": "macallan_smoked_old_fashioned",
+      "label": "The Macallan 12 Smoked Old Fashioned",
+      "category": "cocktails",
+      "glassType": "rocks",
+      "iceType": "cubed",
+      "ingredients": [
+        { "item": "macallan_12", "amount": 75, "label": "The Macallan 12 Double Cask", "color": "rgba(180, 85, 20, 0.9)" },
+        { "item": "angostura_bitters", "amount": 10, "label": "Angostura Bitters", "color": "rgba(120, 30, 10, 0.95)" },
+        { "item": "cane_sugar_rim", "amount": 1, "label": "Raw Demerara Cane Sugar", "color": "rgba(200, 140, 70, 0.8)" }
+      ],
+      "shaken": false,
+      "garnish": "maraschino_cherries",
+      "basePrice": 75,
+      "alcoholStrength": 1.6,
+      "buffType": "pain_relief",
+      "buffDuration": 360,
+      "color": "rgba(170, 75, 15, 0.88)",
+      "description": "Prestigious Macallan 12 single malt scotch whisky muddled with raw cane sugar, bitters, and Luxardo cherries."
+    },
+    {
+      "id": "peppermint_bark_martini",
+      "label": "Winter Peppermint Bark Martini",
+      "category": "cocktails",
+      "glassType": "coupe",
+      "iceType": "none",
+      "ingredients": [
+        { "item": "grey_goose_vodka", "amount": 45, "label": "Grey Goose Vodka", "color": "rgba(255, 255, 255, 0.4)" },
+        { "item": "peppermint_schnapps", "amount": 30, "label": "Rumple Minze Peppermint", "color": "rgba(230, 255, 255, 0.5)" },
+        { "item": "baileys_irish_cream", "amount": 40, "label": "Baileys Irish Cream", "color": "rgba(220, 200, 180, 0.9)" },
+        { "item": "chocolate_syrup", "amount": 1, "label": "Dark Chocolate Drizzle", "color": "rgba(50, 25, 15, 0.95)" },
+        { "item": "crushed_peppermint", "amount": 1, "label": "Crushed Peppermint Candy Rim", "color": "rgba(255, 100, 120, 0.9)" }
+      ],
+      "shaken": true,
+      "garnish": "crushed_peppermint",
+      "basePrice": 62,
+      "alcoholStrength": 1.5,
+      "buffType": "speed",
+      "buffDuration": 240,
+      "color": "rgba(235, 220, 210, 0.9)",
+      "description": "Rich Baileys and 100-proof Rumple Minze peppermint schnapps with an artisan chocolate swirl and candy rim."
+    },
+    {
+      "id": "hennessy_sidecar",
+      "label": "Hennessy V.S Golden Sidecar",
+      "category": "cocktails",
+      "glassType": "coupe",
+      "iceType": "none",
+      "ingredients": [
+        { "item": "hennessy_vs", "amount": 60, "label": "Hennessy V.S Cognac", "color": "rgba(190, 95, 30, 0.85)" },
+        { "item": "cointreau_orange", "amount": 30, "label": "Cointreau Triple Sec", "color": "rgba(255, 180, 50, 0.7)" },
+        { "item": "fresh_lemon_juice", "amount": 25, "label": "Eureka Lemon Juice", "color": "rgba(250, 230, 80, 0.8)" },
+        { "item": "cane_sugar_rim", "amount": 1, "label": "Sugar Rim", "color": "rgba(255, 255, 255, 0.8)" }
+      ],
+      "shaken": true,
+      "garnish": "orange_slices",
+      "basePrice": 58,
+      "alcoholStrength": 1.3,
+      "buffType": "charisma",
+      "buffDuration": 260,
+      "color": "rgba(230, 150, 45, 0.8)",
+      "description": "Smooth Hennessy cognac balanced with sweet orange liqueur and tart lemon over a sugared coupe rim."
+    },
+    {
+      "id": "aperol_spritz_classic",
+      "label": "Venetian Aperol Spritz",
+      "category": "cocktails",
+      "glassType": "coupe",
+      "iceType": "cubed",
+      "ingredients": [
+        { "item": "aperol_aperitivo", "amount": 60, "label": "Aperol Aperitivo", "color": "rgba(255, 90, 20, 0.9)" },
+        { "item": "sparkling_prosecco", "amount": 90, "label": "La Marca Prosecco", "color": "rgba(255, 250, 200, 0.6)" },
+        { "item": "club_soda_syrup", "amount": 30, "label": "Club Soda Splash", "color": "rgba(240, 250, 255, 0.3)" }
+      ],
+      "shaken": false,
+      "garnish": "orange_slices",
+      "basePrice": 42,
+      "alcoholStrength": 0.8,
+      "buffType": "stamina",
+      "buffDuration": 180,
+      "color": "rgba(255, 110, 35, 0.85)",
+      "description": "Italian aperitif sparkling with dry prosecco, bitter-sweet orange botanicals, and fresh orange wheels."
+    },
+    {
+      "id": "titos_moscow_mule",
+      "label": "Tito's Copper Moscow Mule",
+      "category": "cocktails",
+      "glassType": "mug",
+      "iceType": "crushed",
+      "ingredients": [
+        { "item": "titos_vodka", "amount": 60, "label": "Tito's Handmade Vodka", "color": "rgba(245, 245, 255, 0.4)" },
+        { "item": "fevertree_gingerbeer", "amount": 100, "label": "Fever-Tree Ginger Beer", "color": "rgba(240, 220, 180, 0.7)" },
+        { "item": "fresh_lime_juice", "amount": 20, "label": "Key Lime Juice", "color": "rgba(160, 230, 70, 0.7)" }
+      ],
+      "shaken": false,
+      "garnish": "fresh_mint_sprig",
+      "basePrice": 38,
+      "alcoholStrength": 1.0,
+      "buffType": "stamina",
+      "buffDuration": 210,
+      "color": "rgba(235, 215, 175, 0.75)",
+      "description": "Handmade Texas vodka mixed with fiery spiced ginger beer and aromatic spearmint in a chilled mug."
+    },
+    {
+      "id": "fireball_cinnamon_toast",
+      "label": "Fireball Cinnamon Toast Crunch",
+      "category": "shots",
+      "glassType": "shot",
+      "iceType": "none",
+      "ingredients": [
+        { "item": "fireball_whiskey", "amount": 30, "label": "Fireball Cinnamon Whisky", "color": "rgba(210, 60, 10, 0.9)" },
+        { "item": "baileys_irish_cream", "amount": 25, "label": "Baileys Irish Cream", "color": "rgba(220, 200, 180, 0.9)" },
+        { "item": "cane_sugar_rim", "amount": 1, "label": "Cinnamon Sugar Rim", "color": "rgba(210, 150, 80, 0.8)" }
+      ],
+      "shaken": true,
+      "garnish": "cinnamon_sticks",
+      "basePrice": 28,
+      "alcoholStrength": 1.3,
+      "buffType": "speed",
+      "buffDuration": 150,
+      "color": "rgba(215, 140, 70, 0.9)",
+      "description": "Tastes exactly like the breakfast cereal with spicy cinnamon whiskey and creamy Irish liqueur."
+    },
+    {
+      "id": "hendricks_botanical_tonic",
+      "label": "Hendrick's Garden Tonic",
+      "category": "cocktails",
+      "glassType": "highball",
+      "iceType": "cubed",
+      "ingredients": [
+        { "item": "hendricks_gin", "amount": 60, "label": "Hendrick's Botanical Gin", "color": "rgba(240, 250, 255, 0.4)" },
+        { "item": "fevertree_tonic", "amount": 110, "label": "Fever-Tree Tonic Water", "color": "rgba(230, 245, 255, 0.3)" }
+      ],
+      "shaken": false,
+      "garnish": "fresh_mint_sprig",
+      "basePrice": 44,
+      "alcoholStrength": 1.0,
+      "buffType": "stamina",
+      "buffDuration": 200,
+      "color": "rgba(225, 245, 240, 0.65)",
+      "description": "Scottish gin infused with rose petal and cucumber botanicals paired with effervescent tonic."
+    },
+    {
+      "id": "malibu_tropical_colada",
+      "label": "Malibu Caribbean Piña Colada",
+      "category": "cocktails",
+      "glassType": "hurricane",
+      "iceType": "crushed",
+      "ingredients": [
+        { "item": "malibu_rum", "amount": 45, "label": "Malibu Coconut Rum", "color": "rgba(255, 255, 250, 0.5)" },
+        { "item": "bacardi_superior", "amount": 30, "label": "Bacardi White Rum", "color": "rgba(245, 245, 255, 0.3)" },
+        { "item": "fresh_pineapple_juice", "amount": 75, "label": "Pineapple Juice", "color": "rgba(255, 225, 60, 0.9)" },
+        { "item": "coconut_cream_coco", "amount": 35, "label": "Coco López Cream", "color": "rgba(255, 255, 255, 0.95)" }
+      ],
+      "shaken": true,
+      "garnish": "cocktail_umbrellas",
+      "basePrice": 46,
+      "alcoholStrength": 1.1,
+      "buffType": "stamina",
+      "buffDuration": 260,
+      "color": "rgba(255, 245, 190, 0.95)",
+      "description": "Rich coconut cream and juicy pineapple shaken with rum and finished with a paper umbrella."
+    },
+    {
+      "id": "jagerbomb_rush",
+      "label": "Jägermeister Turbo Bomb",
+      "category": "shots",
+      "glassType": "shot",
+      "iceType": "none",
+      "ingredients": [
+        { "item": "jagermeister", "amount": 45, "label": "Jägermeister Herbal Liqueur", "color": "rgba(45, 20, 10, 0.95)" },
+        { "item": "red_bull_energy", "amount": 60, "label": "Red Bull Energy", "color": "rgba(235, 180, 30, 0.85)" }
+      ],
+      "shaken": false,
+      "garnish": null,
+      "basePrice": 32,
+      "alcoholStrength": 1.4,
+      "buffType": "speed",
+      "buffDuration": 300,
+      "color": "rgba(80, 40, 15, 0.9)",
+      "description": "A shot of 56-herb German liqueur dropped straight into cold Red Bull for an instant rush."
+    },
+    {
+      "id": "jack_daniels_lynchburg",
+      "label": "Jack Daniel's Lynchburg Lemonade",
+      "category": "cocktails",
+      "glassType": "highball",
+      "iceType": "cubed",
+      "ingredients": [
+        { "item": "jack_daniels", "amount": 60, "label": "Jack Daniel's Old No. 7", "color": "rgba(180, 95, 25, 0.85)" },
+        { "item": "cointreau_orange", "amount": 25, "label": "Cointreau Triple Sec", "color": "rgba(255, 180, 50, 0.6)" },
+        { "item": "fresh_lemon_juice", "amount": 30, "label": "Lemon Juice", "color": "rgba(250, 230, 80, 0.8)" },
+        { "item": "club_soda_syrup", "amount": 60, "label": "Soda Top", "color": "rgba(240, 250, 255, 0.3)" }
+      ],
+      "shaken": true,
+      "garnish": "lime_wedges",
+      "basePrice": 36,
+      "alcoholStrength": 1.1,
+      "buffType": "pain_relief",
+      "buffDuration": 210,
+      "color": "rgba(225, 165, 55, 0.8)",
+      "description": "Tennessee sour mash whiskey blended with triple sec and sweet-tart lemonade over cracked ice."
+    },
+    {
+      "id": "peppermint_spiked_cocoa",
+      "label": "Alpine Spiked Peppermint Cocoa",
+      "category": "cocktails",
+      "glassType": "mug",
+      "iceType": "none",
+      "ingredients": [
+        { "item": "peppermint_schnapps", "amount": 40, "label": "Rumple Minze Peppermint", "color": "rgba(230, 255, 255, 0.4)" },
+        { "item": "baileys_irish_cream", "amount": 40, "label": "Baileys Irish Cream", "color": "rgba(220, 200, 180, 0.9)" },
+        { "item": "chocolate_syrup", "amount": 1, "label": "Dark Chocolate Fudge", "color": "rgba(45, 20, 10, 0.95)" },
+        { "item": "whipped_cream", "amount": 1, "label": "Vanilla Whipped Cream", "color": "rgba(255, 255, 255, 0.95)" }
+      ],
+      "shaken": false,
+      "garnish": "crushed_peppermint",
+      "basePrice": 50,
+      "alcoholStrength": 1.4,
+      "buffType": "stamina",
+      "buffDuration": 280,
+      "color": "rgba(90, 50, 30, 0.95)",
+      "description": "Steaming hot cocoa spiked with Rumple Minze schnapps, Baileys, mountain whipped cream, and candy."
+    },
+    {
+      "id": "bloody_caesar_spicy",
+      "label": "Absolut Spicy Bloody Caesar",
+      "category": "cocktails",
+      "glassType": "highball",
+      "iceType": "cubed",
+      "ingredients": [
+        { "item": "absolut_vodka", "amount": 60, "label": "Absolut Vodka", "color": "rgba(245, 245, 255, 0.4)" },
+        { "item": "clamato_tomato_juice", "amount": 120, "label": "Mott's Clamato Juice", "color": "rgba(190, 30, 20, 0.9)" },
+        { "item": "tabasco_hot_sauce", "amount": 1, "label": "Tabasco Pepper Sauce", "color": "rgba(220, 40, 10, 0.95)" },
+        { "item": "margarita_salt", "amount": 1, "label": "Spiced Rim", "color": "rgba(255, 255, 255, 0.8)" }
+      ],
+      "shaken": true,
+      "garnish": "cocktail_olives",
+      "basePrice": 40,
+      "alcoholStrength": 1.0,
+      "buffType": "pain_relief",
+      "buffDuration": 240,
+      "color": "rgba(180, 25, 20, 0.92)",
+      "description": "Savory tomato and clam juice with Absolut vodka, fiery Tabasco, celery salt rim, and an olive spear."
+    },
+    {
+      "id": "blue_hawaiian_curacao",
+      "label": "Blue Curaçao Neon Wave",
+      "category": "cocktails",
+      "glassType": "hurricane",
+      "iceType": "crushed",
+      "ingredients": [
+        { "item": "bacardi_superior", "amount": 45, "label": "Bacardi Rum", "color": "rgba(245, 245, 255, 0.3)" },
+        { "item": "blue_curacao", "amount": 35, "label": "DeKuyper Blue Curaçao", "color": "rgba(0, 150, 255, 0.95)" },
+        { "item": "fresh_pineapple_juice", "amount": 60, "label": "Pineapple Juice", "color": "rgba(255, 230, 60, 0.8)" },
+        { "item": "coconut_cream_coco", "amount": 25, "label": "Cream of Coconut", "color": "rgba(255, 255, 255, 0.95)" }
+      ],
+      "shaken": true,
+      "garnish": "cocktail_umbrellas",
+      "basePrice": 48,
+      "alcoholStrength": 1.1,
+      "buffType": "speed",
+      "buffDuration": 220,
+      "color": "rgba(0, 180, 235, 0.9)",
+      "description": "Glowing electric blue cocktail packed with tropical coconut, tart pineapple, and crisp white rum."
+    },
+    {
+      "id": "midori_green_tea_shot",
+      "label": "Jameson & Midori Green Tea Shot",
+      "category": "shots",
+      "glassType": "shot",
+      "iceType": "none",
+      "ingredients": [
+        { "item": "jameson_whiskey", "amount": 25, "label": "Jameson Irish Whiskey", "color": "rgba(190, 100, 30, 0.85)" },
+        { "item": "midori_melon", "amount": 25, "label": "Midori Melon Liqueur", "color": "rgba(100, 230, 50, 0.95)" },
+        { "item": "fresh_lemon_juice", "amount": 15, "label": "Sour Mix", "color": "rgba(240, 230, 70, 0.7)" }
+      ],
+      "shaken": true,
+      "garnish": null,
+      "basePrice": 30,
+      "alcoholStrength": 1.2,
+      "buffType": "speed",
+      "buffDuration": 180,
+      "color": "rgba(130, 225, 45, 0.88)",
+      "description": "Vibrant emerald green shooter that tastes like sweet peach green tea."
+    },
+    {
+      "id": "havana_dark_and_stormy",
+      "label": "Havana 7 Dark & Stormy",
+      "category": "cocktails",
+      "glassType": "highball",
+      "iceType": "cubed",
+      "ingredients": [
+        { "item": "havana_club_7", "amount": 60, "label": "Havana Club 7 Year Rum", "color": "rgba(140, 60, 10, 0.95)" },
+        { "item": "fevertree_gingerbeer", "amount": 100, "label": "Fever-Tree Ginger Beer", "color": "rgba(240, 220, 180, 0.7)" },
+        { "item": "fresh_lime_juice", "amount": 20, "label": "Lime Juice", "color": "rgba(160, 230, 70, 0.7)" }
+      ],
+      "shaken": false,
+      "garnish": "lime_wedges",
+      "basePrice": 46,
+      "alcoholStrength": 1.3,
+      "buffType": "pain_relief",
+      "buffDuration": 250,
+      "color": "rgba(160, 80, 25, 0.85)",
+      "description": "Rich barrel-aged dark rum floated over spicy ginger beer with a splash of key lime."
+    },
+    {
+      "id": "b52_layered_shooter",
+      "label": "B-52 Triple Layer Shooter",
+      "category": "shots",
+      "glassType": "shot",
+      "iceType": "none",
+      "ingredients": [
+        { "item": "kahlua_coffee", "amount": 20, "label": "Kahlúa Coffee Liqueur", "color": "rgba(45, 20, 10, 0.95)" },
+        { "item": "baileys_irish_cream", "amount": 20, "label": "Baileys Irish Cream", "color": "rgba(220, 200, 180, 0.9)" },
+        { "item": "cointreau_orange", "amount": 20, "label": "Cointreau Triple Sec", "color": "rgba(255, 180, 50, 0.7)" }
+      ],
+      "shaken": false,
+      "garnish": null,
+      "basePrice": 34,
+      "alcoholStrength": 1.4,
+      "buffType": "stamina",
+      "buffDuration": 200,
+      "color": "rgba(170, 120, 70, 0.95)",
+      "description": "Carefully layered shot with dark coffee liqueur at the base, Irish cream in the middle, and orange liqueur on top."
+    },
+    {
+      "id": "virgin_peppermint_frost",
+      "label": "Winter Peppermint Frost Mocktail",
+      "category": "mocktails",
+      "glassType": "mug",
+      "iceType": "none",
+      "ingredients": [
+        { "item": "crushed_peppermint", "amount": 1, "label": "Crushed Peppermint Candy", "color": "rgba(255, 100, 120, 0.8)" },
+        { "item": "chocolate_syrup", "amount": 1, "label": "Artisan Chocolate", "color": "rgba(50, 25, 15, 0.9)" },
+        { "item": "whipped_cream", "amount": 1, "label": "Whipped Cream", "color": "rgba(255, 255, 255, 0.95)" }
+      ],
+      "shaken": false,
+      "garnish": "crushed_peppermint",
+      "basePrice": 22,
+      "alcoholStrength": 0.0,
+      "buffType": "stamina",
+      "buffDuration": 150,
+      "color": "rgba(120, 60, 40, 0.9)",
+      "description": "Zero alcohol rich hot chocolate topped with vanilla cream and sweet crushed peppermint sprinkles."
+    },
+    {
+      "id": "virgin_tropical_paradise",
+      "label": "Tropical Sunset Breeze Mocktail",
+      "category": "mocktails",
+      "glassType": "hurricane",
+      "iceType": "crushed",
+      "ingredients": [
+        { "item": "fresh_orange_juice", "amount": 60, "label": "Orange Juice", "color": "rgba(255, 160, 30, 0.85)" },
+        { "item": "fresh_pineapple_juice", "amount": 60, "label": "Pineapple Juice", "color": "rgba(255, 230, 60, 0.8)" },
+        { "item": "grenadine_syrup", "amount": 20, "label": "Pomegranate Grenadine", "color": "rgba(220, 20, 50, 0.9)" },
+        { "item": "cane_sugar_rim", "amount": 1, "label": "Sugar Rim", "color": "rgba(255, 255, 255, 0.8)" }
+      ],
+      "shaken": false,
+      "garnish": "cocktail_umbrellas",
+      "basePrice": 20,
+      "alcoholStrength": 0.0,
+      "buffType": "speed",
+      "buffDuration": 120,
+      "color": "rgba(255, 90, 40, 0.85)",
+      "description": "Layered virgin sunrise mocktail with a sugared rim, tropical juice layers, and a paper umbrella."
+    }
+  ]
+}

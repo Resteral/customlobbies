@@ -1,0 +1,11 @@
+MUNCHIES LIVERY STATUS
+======================
+
+This combined resource includes the uploaded Taco Van texture dictionaries:
+- stream/taco.ytd
+- stream/taco+hi.ytd
+
+They are packaged so FiveM can stream them with the standalone Munchies UI/truck script.
+
+IMPORTANT:
+The neon black/green/purple Munchies concept artwork has NOT yet been UV-baked into these .ytd files. The uploaded YTDs are included exactly as provided. To create the final custom livery, export the Taco Van exterior texture/UV from either YTD as PNG/DDS, apply the Munchies artwork to that texture, then import it back into both texture dictionaries.

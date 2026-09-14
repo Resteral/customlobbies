@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELIX Studio - UE5 Sandbox Script & System Generator (helixgame.com)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0a0d14;
+      --bg-card: #121824;
+      --bg-card-hover: #1a2232;
+      --bg-input: #080a10;
+      --border-color: #242f44;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(180deg, #141c2b 0%, #0c111c 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      letter-spacing: 0.5px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: #06090e;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-cyan);
+      font-weight: 600;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+      flex: 1;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-header {
+      padding: 0.9rem 1.25rem;
+      background: #0f1420;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .panel-body {
+      padding: 1.25rem;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input, select, textarea {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 9px 12px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+    }
+
+    pre {
+      background: #06080d;
+      padding: 1.25rem;
+      flex: 1;
+      overflow: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.84rem;
+      line-height: 1.55;
+      color: #cbd5e1;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-cyan { background: var(--accent-cyan); color: #05101a; font-weight: 700; }
+    .btn-emerald { background: var(--accent-emerald); }
+    .btn-dark { background: #1f293d; color: #e2e8f0; }
+
+    .notification {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--accent-emerald);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+
+    .notification.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-badge">HELIX UE5</div>
+      <div>
+        <div class="brand-title">HELIX Platform Script & System Studio</div>
+        <div class="brand-subtitle">Hypersonic Laboratories Unreal Engine 5 Sandbox (helixgame.com)</div>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('station')">⚙ Interactive Station</button>
+      <button class="tab-btn" onclick="switchTab('server')">🖥 Server System</button>
+      <button class="tab-btn" onclick="switchTab('client')">🎮 Client HUD & Keys</button>
+      <button class="tab-btn" onclick="switchTab('webui')">🖼 WebUI Overlay</button>
+      <button class="tab-btn" onclick="switchTab('endpoint')">⚡ RPC Endpoint</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Left Configuration Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2 id="builder-title">Configure Interactive Station</h2>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:0.8rem; color:var(--text-muted);">Preset:</span>
+          <select id="preset-select" onchange="loadPreset()">
+            <option value="">-- Choose Preset --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="panel-body" id="form-container">
+        <!-- Injected Form Fields -->
+      </div>
+    </div>
+
+    <!-- Right Live Code Output Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Generated HelixJS Code</h2>
+        <div class="btn-group">
+          <button class="btn btn-dark" onclick="copyCode()">📋 Copy Code</button>
+          <button class="btn btn-cyan" onclick="downloadFile()">💾 Download File</button>
+        </div>
+      </div>
+
+      <pre><code id="code-output">// Code will generate here</code></pre>
+    </div>
+  </main>
+
+  <div id="toast" class="notification">Code copied to clipboard!</div>
+
+  <script>
+    let currentTab = 'station';
+
+    const Presets = {
+      station: [
+        { name: 'Meth Cooking Lab', id: 'meth_lab', title: 'Chemical Meth Synthesizer', model: 'assets/models/meth_lab.glb', cat: 'Illegal Chemistry', time: 8, cash: 600, xp: 80, in: 'meth_chemicals:3,acetone:1', out: 'pure_meth:1' },
+        { name: 'Vault Thermal Drill', id: 'thermal_drill', title: 'Industrial Vault Safe Drill', model: 'assets/models/drill.glb', cat: 'Heists', time: 12, cash: 1500, xp: 120, in: 'thermite:2,drill_bit:1', out: 'vault_bonds:3' },
+        { name: 'Vehicle Mod Bench', id: 'vehicle_tuner', title: 'ECU Turbo Tuner Desk', model: 'assets/models/tuner_desk.glb', cat: 'Automotive', time: 5, cash: 250, xp: 40, in: 'tuner_chip:1,scrap_metal:2', out: 'tuned_ecu:1' }
+      ],
+      server: [
+        { name: 'Bounty Hunting System', id: 'bounties', title: 'Bounty Hunting Board', interval: 3000 },
+        { name: 'Bank Heist Alarm Controller', id: 'bank_heist', title: 'Bank Vault Alarm System', interval: 1000 }
+      ]
+    };
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      updatePresets();
+      renderForm();
+      generateCode();
+    }
+
+    function updatePresets() {
+      const select = document.getElementById('preset-select');
+      select.innerHTML = '<option value="">-- Choose Preset --</option>';
+      const list = Presets[currentTab] || [];
+      list.forEach((p, idx) => {
+        select.innerHTML += `<option value="${idx}">${p.name}</option>`;
+      });
+    }
+
+    function loadPreset() {
+      const idx = document.getElementById('preset-select').value;
+      if (idx === '') return;
+      const data = Presets[currentTab][idx];
+      for (const [k, v] of Object.entries(data)) {
+        const el = document.getElementById(`f_${k}`);
+        if (el) el.value = v;
+      }
+      generateCode();
+    }
+
+    function renderForm() {
+      const container = document.getElementById('form-container');
+      const title = document.getElementById('builder-title');
+
+      if (currentTab === 'station') {
+        title.innerText = 'Configure Interactive Station';
+        container.innerHTML = `
+          <div class="form-row">
+            <div class="form-group">
+              <label>Station ID</label>
+              <input id="f_id" value="weed_processor" oninput="generateCode()">
+            </div>
+            <div class="form-group">
+              <label>Station Name</label>
+              <input id="f_title" value="Hydroponic Weed Packaging Rig" oninput="generateCode()">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Unreal 3D Model Path (.glb / .gltf)</label>
+            <input id="f_model" value="assets/models/weed_bench.glb" oninput="generateCode()">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <input id="f_cat" value="Drug Processing" oninput="generateCode()">
+            </div>
+            <div class="form-group">
+              <label>Processing Duration (Seconds)</label>
+              <input id="f_time" type="number" value="5" oninput="generateCode()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Input Ingredients (item:count)</label>
+              <input id="f_in" value="weed_buds:3,plastic_bag:1" oninput="generateCode()">
+            </div>
+            <div class="form-group">
+              <label>Output Yield (item:count)</label>
+              <input id="f_out" value="packaged_weed:1" oninput="generateCode()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Reward Cash ($)</label>
+              <input id="f_cash" type="number" value="120" oninput="generateCode()">
+            </div>
+            <div class="form-group">
+              <label>Reward XP</label>
+              <input id="f_xp" type="number" value="30" oninput="generateCode()">
+            </div>
+          </div>
+        `;
+      } else if (currentTab === 'server') {
+        title.innerText = 'Configure HELIX Server Module';
+        container.innerHTML = `
+          <div class="form-row">
+            <div class="form-group">
+              <label>System Identifier</label>
+              <input id="f_id" value="crypto_farm" oninput="generateCode()">
+            </div>
+            <div class="form-group">
+              <label>System Display Title</label>
+              <input id="f_title" value="Crypto Server Mining Farm" oninput="generateCode()">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tick Interval (Milliseconds)</label>
+            <input id="f_interval" type="number" value="2000" oninput="generateCode()">
+          </div>
+        `;
+      } else if (currentTab === 'client') {
+        title.innerText = 'Configure Client Controller & HUD';
+        container.innerHTML = `
+          <div class="form-row">
+            <div class="form-group">
+              <label>Controller Name</label>
+              <input id="f_name" value="BlackMarket" oninput="generateCode()">
+            </div>
+            <div class="form-group">
+              <label>Toggle Keybind</label>
+              <input id="f_key" value="K" oninput="generateCode()">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>WebUI Overlay Path</label>
+            <input id="f_html" value="ui/blackmarket.html" oninput="generateCode()">
+          </div>
+        `;
+      } else if (currentTab === 'webui') {
+        title.innerText = 'Configure WebUI HTML/CSS Modal';
+        container.innerHTML = `
+          <div class="form-group">
+            <label>UI Window Title</label>
+            <input id="f_title" value="Underground Black Market" oninput="generateCode()">
+          </div>
+          <div class="form-group">
+            <label>Event Name Triggered</label>
+            <input id="f_event" value="PurchaseBlackMarketItem" oninput="generateCode()">
+          </div>
+        `;
+      } else if (currentTab === 'endpoint') {
+        title.innerText = 'Configure HELIX Server RPC Endpoint';
+        container.innerHTML = `
+          <div class="form-group">
+            <label>Endpoint Name</label>
+            <input id="f_name" value="transferCryptoFunds" oninput="generateCode()">
+          </div>
+          <div class="form-group">
+            <label>Payload Parameter Name</label>
+            <input id="f_param" value="amount, targetPlayerId" oninput="generateCode()">
+          </div>
+        `;
+      }
+    }
+
+    function generateCode() {
+      const out = document.getElementById('code-output');
+
+      if (currentTab === 'station') {
+        const id = document.getElementById('f_id').value || 'station';
+        const title = document.getElementById('f_title').value || 'Station';
+        const model = document.getElementById('f_model').value || 'assets/models/workbench.glb';
+        const cat = document.getElementById('f_cat').value || 'Processing';
+        const time = document.getElementById('f_time').value || 5;
+        const rawIn = document.getElementById('f_in').value || 'weed_buds:3';
+        const rawOut = document.getElementById('f_out').value || 'packaged_weed:1';
+        const cash = document.getElementById('f_cash').value || 100;
+        const xp = document.getElementById('f_xp').value || 25;
+
+        const parseItems = (str) => {
+          const obj = {};
+          str.split(',').forEach(p => {
+            const [k, v] = p.split(':');
+            if (k) obj[k.trim()] = parseInt(v || 1, 10);
+          });
+          return JSON.stringify(obj, null, 2).replace(/"/g, "'");
+        };
+
+        out.innerText = `/**
+ * HELIX Platform (helixgame.com) - ${title} Station
+ * Add to js/server/system_engine.js or custom server module
+ */
+
+HelixSystems.registerStation('${id}', {
+  name: '${title}',
+  category: '${cat}',
+  model: '${model}',
+  processTime: ${time},
+  inputs: ${parseItems(rawIn)},
+  outputs: ${parseItems(rawOut)},
+  rewardCash: ${cash},
+  rewardXP: ${xp},
+  onStart: (playerId, station) => {
+    console.log(\`[HELIX] Player \${playerId} began processing at \${station.name}\`);
+  },
+  onComplete: (playerId, station) => {
+    console.log(\`[HELIX] Player \${playerId} finished processing at \${station.name}\`);
+  }
+});`;
+      } else if (currentTab === 'server') {
+        const id = document.getElementById('f_id').value || 'system';
+        const title = document.getElementById('f_title').value || 'System';
+        const interval = document.getElementById('f_interval').value || 2000;
+
+        out.innerText = `/**
+ * HELIX Platform (helixgame.com) - ${title} Server Module
+ * File: js/server/${id}.js
+ */
+
+Helix.server(async () => {
+  console.log('[HELIX SERVER] Initializing ${title}...');
+
+  const stateStore = new Map();
+
+  // Primary Server Endpoint
+  Helix.endpoint('${id}Action', async (playerId, data) => {
+    const { action, payload } = data || {};
+    console.log(\`[${title}] Player \${playerId} executed \${action}:\`, payload);
+
+    let state = stateStore.get(playerId) || { level: 1, active: false };
+
+    if (action === 'activate') {
+      state.active = true;
+      stateStore.set(playerId, state);
+      Helix.emit('${id}StateUpdate', { playerId, state });
+      return { success: true, message: '${title} activated', state };
+    }
+
+    return { success: true, state };
+  });
+
+  // Background Processing Loop
+  setInterval(() => {
+    stateStore.forEach((state, playerId) => {
+      if (state.active) {
+        // Continuous server logic
+      }
+    });
+  }, ${interval});
+});`;
+      } else if (currentTab === 'client') {
+        const name = document.getElementById('f_name').value || 'CustomHUD';
+        const key = document.getElementById('f_key').value || 'K';
+        const html = document.getElementById('f_html').value || 'ui/index.html';
+
+        out.innerText = `/**
+ * HELIX Platform (helixgame.com) - ${name} Client Module
+ * File: js/client/${name.toLowerCase()}.js
+ */
+
+Helix.client(() => {
+  console.log('[HELIX CLIENT] Initializing ${name} Controller...');
+
+  const ui = new Helix.WebUI('${name}UI', 'file://${html}');
+
+  function setFocus(enabled) {
+    if (typeof Helix.Input !== 'undefined') {
+      if (Helix.Input.SetMouseEnabled) Helix.Input.SetMouseEnabled(enabled);
+      if (Helix.Input.SetInputEnabled) Helix.Input.SetInputEnabled(!enabled);
+    }
+  }
+
+  // Keybind Toggle
+  if (typeof Helix.Input !== 'undefined' && Helix.Input.OnKeyDown) {
+    Helix.Input.OnKeyDown('${key}', () => {
+      ui.CallEvent('toggleUI');
+      setFocus(true);
+    });
+  }
+
+  // Handle Close event from WebUI
+  Helix.on('Close${name}UI', () => {
+    setFocus(false);
+  });
+});`;
+      } else if (currentTab === 'webui') {
+        const title = document.getElementById('f_title').value || 'Modal';
+        const eventName = document.getElementById('f_event').value || 'CustomEvent';
+
+        out.innerText = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${title} - HELIX WebUI</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: transparent;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+    }
+    .card {
+      background: rgba(14, 19, 30, 0.95);
+      border: 1px solid rgba(6, 182, 212, 0.4);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      width: 460px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+    }
+    h2 { font-size: 1.2rem; color: #38bdf8; margin-bottom: 8px; }
+    p { color: #94a3b8; font-size: 0.88rem; margin-bottom: 20px; }
+    .btn-action {
+      background: #0284c7;
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn-action:hover { background: #0369a1; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>${title}</h2>
+    <p>HELIX In-Game WebUI Overlay</p>
+    <button class="btn-action" onclick="sendAction()">Activate Action</button>
+  </div>
+
+  <script>
+    function sendAction() {
+      if (typeof Helix !== 'undefined' && Helix.emit) {
+        Helix.emit('${eventName}', { timestamp: Date.now() });
+      }
+    }
+  </script>
+</body>
+</html>`;
+      } else if (currentTab === 'endpoint') {
+        const name = document.getElementById('f_name').value || 'customEndpoint';
+        const params = document.getElementById('f_param').value || 'data';
+
+        out.innerText = `// HELIX Server Endpoint (docs.helixgame.com)
+Helix.endpoint('${name}', async (playerId, ${params}) => {
+  const player = Helix.getPlayer(playerId);
+  if (!player) {
+    return { success: false, error: 'Invalid Player Session' };
+  }
+
+  console.log(\`[HELIX RPC] ${name} called by \${playerId}\`);
+  
+  // Custom server business logic here...
+
+  return { success: true, message: 'Processed ${name}' };
+});`;
+      }
+    }
+
+    function copyCode() {
+      const code = document.getElementById('code-output').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const toast = document.getElementById('toast');
+        toast.innerText = "HelixJS Code copied to clipboard!";
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      });
+    }
+
+    function downloadFile() {
+      const code = document.getElementById('code-output').innerText;
+      let filename = 'helix_script.js';
+      if (currentTab === 'station') filename = 'station_def.js';
+      else if (currentTab === 'server') filename = (document.getElementById('f_id').value || 'server') + '.js';
+      else if (currentTab === 'client') filename = (document.getElementById('f_name').value || 'client').toLowerCase() + '.js';
+      else if (currentTab === 'webui') filename = 'overlay.html';
+
+      const blob = new Blob([code], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+
+    // Initialize
+    updatePresets();
+    renderForm();
+    generateCode();
+  </script>
+</body>
+</html>

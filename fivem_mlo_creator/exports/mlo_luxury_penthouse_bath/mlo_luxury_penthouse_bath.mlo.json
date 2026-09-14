@@ -1,0 +1,552 @@
+{
+  "name": "mlo_luxury_penthouse_bath",
+  "displayName": "Luxury Penthouse with Spa & Curtains",
+  "archetype": "hei_dlc_mlo_penthouse",
+  "position": {
+    "x": -75,
+    "y": -800,
+    "z": 243
+  },
+  "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "w": 1
+  },
+  "rooms": [
+    {
+      "id": 0,
+      "name": "limbo",
+      "bbMin": [
+        -30,
+        -30,
+        -5
+      ],
+      "bbMax": [
+        30,
+        30,
+        10
+      ],
+      "timecycle": "default",
+      "blend": 0,
+      "flags": 0
+    },
+    {
+      "id": 1,
+      "name": "living_lounge",
+      "bbMin": [
+        -8,
+        -8,
+        0
+      ],
+      "bbMax": [
+        8,
+        8,
+        4
+      ],
+      "timecycle": "int_clothes_high",
+      "blend": 1,
+      "flags": 0
+    },
+    {
+      "id": 2,
+      "name": "bathroom_suite",
+      "bbMin": [
+        10,
+        -1.75,
+        0
+      ],
+      "bbMax": [
+        14,
+        1.75,
+        3
+      ],
+      "timecycle": "int_hospital",
+      "blend": 1,
+      "flags": 0,
+      "floorId": 0
+    }
+  ],
+  "portals": [
+    {
+      "id": 0,
+      "fromRoom": 1,
+      "toRoom": 2,
+      "flags": 0,
+      "vertices": [
+        {
+          "x": 11.5,
+          "y": -1.75,
+          "z": 0
+        },
+        {
+          "x": 11.5,
+          "y": -1.75,
+          "z": 2.2
+        },
+        {
+          "x": 12.5,
+          "y": -1.75,
+          "z": 2.2
+        },
+        {
+          "x": 12.5,
+          "y": -1.75,
+          "z": 0
+        }
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "model": "v_ilev_cd_wall01",
+      "name": "Wall Sill (drywall_white)",
+      "room": 1,
+      "pos": {
+        "x": 0,
+        "y": 8,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 0.3
+      },
+      "materialId": "drywall_white",
+      "customWall": true
+    },
+    {
+      "model": "v_ilev_cd_wall01",
+      "name": "Wall Header (drywall_white)",
+      "room": 1,
+      "pos": {
+        "x": 0,
+        "y": 8,
+        "z": 2.5
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 0.167
+      },
+      "materialId": "drywall_white",
+      "customWall": true
+    },
+    {
+      "model": "v_ilev_cd_wall01",
+      "name": "Wall Left Flank (drywall_white)",
+      "room": 1,
+      "pos": {
+        "x": -1.45,
+        "y": 8,
+        "z": 0.9
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 0.275,
+        "y": 1,
+        "z": 0.533
+      },
+      "materialId": "drywall_white",
+      "customWall": true
+    },
+    {
+      "model": "v_ilev_cd_wall01",
+      "name": "Wall Right Flank (drywall_white)",
+      "room": 1,
+      "pos": {
+        "x": 1.45,
+        "y": 8,
+        "z": 0.9
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 0.275,
+        "y": 1,
+        "z": 0.533
+      },
+      "materialId": "drywall_white",
+      "customWall": true
+    },
+    {
+      "model": "v_ilev_bank_glass01",
+      "name": "Window Glass Pane",
+      "room": 1,
+      "pos": {
+        "x": 0,
+        "y": 8,
+        "z": 0.9
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 0.9,
+        "y": 1,
+        "z": 1.067
+      },
+      "isWindowGlass": true
+    },
+    {
+      "model": "prop_curtain_open_01",
+      "name": "Luxury Velvet Curtains (Open)",
+      "room": 1,
+      "pos": {
+        "x": 0,
+        "y": 8.08,
+        "z": 0.7
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 0.9,
+        "y": 1,
+        "z": 0.727
+      },
+      "isCurtain": true,
+      "curtainState": "open",
+      "curtainGroup": "curtain_win_1788319495198"
+    },
+    {
+      "model": "v_ilev_floor_tile01",
+      "name": "Bathroom Floor (marble_carrara)",
+      "pos": {
+        "x": 12,
+        "y": 0,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 0.88,
+        "z": 1
+      },
+      "materialId": "marble_carrara",
+      "room": 2
+    },
+    {
+      "model": "v_ilev_floor_tile01",
+      "name": "Bathroom Ceiling",
+      "pos": {
+        "x": 12,
+        "y": 0,
+        "z": 3
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 0.88,
+        "z": 1
+      },
+      "materialId": "drywall_white",
+      "room": 2
+    },
+    {
+      "model": "v_ilev_cd_wall01",
+      "name": "Wall North (tile_ceramic_black)",
+      "pos": {
+        "x": 12,
+        "y": 1.75,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "materialId": "tile_ceramic_black",
+      "room": 2
+    },
+    {
+      "model": "v_ilev_cd_wall01",
+      "name": "Wall South (tile_ceramic_black)",
+      "pos": {
+        "x": 12,
+        "y": -1.75,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "materialId": "tile_ceramic_black",
+      "room": 2
+    },
+    {
+      "model": "v_ilev_cd_wall01",
+      "name": "Wall East (tile_ceramic_black)",
+      "pos": {
+        "x": 14,
+        "y": 0,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0.7071,
+        "w": 0.7071
+      },
+      "scale": {
+        "x": 0.88,
+        "y": 1,
+        "z": 1
+      },
+      "materialId": "tile_ceramic_black",
+      "room": 2
+    },
+    {
+      "model": "v_ilev_cd_wall01",
+      "name": "Wall West (tile_ceramic_black)",
+      "pos": {
+        "x": 10,
+        "y": 0,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0.7071,
+        "w": 0.7071
+      },
+      "scale": {
+        "x": 0.88,
+        "y": 1,
+        "z": 1
+      },
+      "materialId": "tile_ceramic_black",
+      "room": 2
+    },
+    {
+      "model": "v_res_mp_soakertub",
+      "name": "Freestanding Luxury Soaker Tub",
+      "pos": {
+        "x": 13,
+        "y": 0,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0.7071,
+        "w": 0.7071
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "room": 2
+    },
+    {
+      "model": "v_res_mp_shower",
+      "name": "Walk-In Frameless Glass Shower",
+      "pos": {
+        "x": 10.9,
+        "y": 0.85,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "room": 2
+    },
+    {
+      "model": "v_res_mp_vanity",
+      "name": "Double Marble Vanity Unit",
+      "pos": {
+        "x": 12.2,
+        "y": 1.35,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 1,
+        "w": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "room": 2
+    },
+    {
+      "model": "v_res_mp_mirror",
+      "name": "LED Vanity Mirror",
+      "pos": {
+        "x": 12.2,
+        "y": 1.7,
+        "z": 1.2
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 1,
+        "w": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "room": 2
+    },
+    {
+      "model": "prop_toilet_01",
+      "name": "Porcelain Toilet",
+      "pos": {
+        "x": 10.6,
+        "y": -1.15,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "room": 2
+    },
+    {
+      "model": "prop_towel_rail_01",
+      "name": "Heated Chrome Towel Rail",
+      "pos": {
+        "x": 10.05,
+        "y": 0,
+        "z": 0.9
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0.7071,
+        "w": 0.7071
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "room": 2
+    },
+    {
+      "model": "prop_toilet_roll_01",
+      "name": "Toilet Paper Dispenser",
+      "pos": {
+        "x": 10.05,
+        "y": -1.15,
+        "z": 0.6
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0.7071,
+        "w": 0.7071
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "room": 2
+    },
+    {
+      "model": "v_ilev_bath_door",
+      "name": "Bathroom Privacy Door",
+      "pos": {
+        "x": 12,
+        "y": -1.75,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "room": 2
+    }
+  ],
+  "entitySets": [
+    {
+      "name": "curtains_open",
+      "entities": [
+        4
+      ]
+    },
+    {
+      "name": "curtains_closed",
+      "entities": []
+    }
+  ]
+}

@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CustomLobbies.com - Esports Hub, Stream Studio & Captain Drafts</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00f2fe">
+  <link rel="stylesheet" href="css/styles.css">
+  <meta name="description" content="Host custom lobbies, stream your gameplay with custom follower alert widgets, screen audio capture, track ELO MMR, and join queues via Web & Discord bot.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="brand">
+      <div class="brand-icon">🎮</div>
+      <span>CustomLobbies.com</span>
+    </div>
+
+    <nav class="nav-links">
+      <button class="nav-btn active" data-tab="lobbies-view">
+        <span>🎮</span> Lobbies & Queue
+      </button>
+      <button class="nav-btn" data-tab="gamers-hub-view">
+        <span>🌐</span> Gamers Hub & LFG
+      </button>
+      <button class="nav-btn" data-tab="servers-view">
+        <span>🖥️</span> Sponsored Servers (FiveM)
+      </button>
+      <button class="nav-btn" data-tab="community-view">
+        <span>💬</span> Chat & Voice Hub
+      </button>
+      <button class="nav-btn" data-tab="tournaments-view">
+        <span>🏆</span> Tournaments
+      </button>
+      <button class="nav-btn" data-tab="store-view">
+        <span>🛍️</span> Banner Store
+      </button>
+      <button class="nav-btn" data-tab="studio-view">
+        <span>🎥</span> Stream Studio
+      </button>
+      <button class="nav-btn" data-tab="widgets-view">
+        <span>🎨</span> Widgets & Alerts
+      </button>
+      <button class="nav-btn" data-tab="integrations-view">
+        <span>🔌</span> Integrations
+      </button>
+      <button class="nav-btn" data-tab="leaderboard-view">
+        <span>👑</span> ELO Leaderboard
+      </button>
+    </nav>
+
+    <div class="user-profile-widget">
+      <button class="btn btn-purple btn-sm" id="btnLaunchDesktopProgram" onclick="alert('💻 LAUNCHING NATIVE DESKTOP PROGRAM!\n\nLaunching CustomLobbies.exe Studio Program with GPU screen capturer & system tray overlay...')">
+        <span>💻</span> Desktop Program
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btnInstallPWAApp" onclick="alert('📥 INSTALL STANDALONE APP!\n\nClick your browser URL bar Install button to save CustomLobbies directly to your desktop or phone home screen!')">
+        <span>📥</span> Install App
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btnGoogleSignIn" style="gap: 0.4rem;">
+        <span>🔴</span> Sign in with Google
+      </button>
+
+      <!-- Player Level & XP Badge -->
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
+        <div class="mmr-badge" id="userMMRBadge" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">
+          <span>💎</span> <span id="userMMRValue">1840 MMR</span> (Diamond II)
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: var(--accent-gold); font-weight: 700;">
+          <span>⭐ Lv. 17 (170/200 XP)</span>
+          <div style="width: 60px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+            <div style="width: 85%; height: 100%; background: var(--accent-gold);"></div>
+          </div>
+        </div>
+      </div>
+
+      <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="profile-avatar" id="userAvatar">
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="app-container">
+
+    <!-- 1. LOBBIES & MATCHMAKING QUEUE VIEW -->
+    <section id="lobbies-view" class="view-section active">
+      <div class="lobby-header-banner">
+        <div>
+          <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;">Competitive Matchmaking & Custom Lobbies</h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Join queues, auto-balance 5v5 / 2v2 teams with ELO MMR rating, or host your own streamable lobby.</p>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Counter-Strike 2')">⚡ Auto-Draft CS2</button>
+            <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Valorant')">⚡ Auto-Draft Valorant</button>
+            <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Rocket League')">⚡ Auto-Draft Rocket League</button>
+            <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Apex Legends')">⚡ Auto-Draft Apex</button>
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <button class="btn btn-purple" id="btnRandomPicker">
+            🎲 Pick Random Game
+          </button>
+          <button class="btn btn-primary" id="btnJoinQueue">
+            <span>⚡</span> Quick Queue (-join)
+          </button>
+          <button class="btn btn-secondary" id="btnCreateLobby">
+            <span>➕</span> Host Custom Lobby
+          </button>
+        </div>
+      </div>
+
+      <!-- Queue Status Bar (Hidden until joining queue) -->
+      <div id="queueStatusCard" class="card" style="display: none; margin-bottom: 1.5rem; border-color: var(--accent-cyan);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="live-dot" style="width: 14px; height: 14px; background: var(--accent-cyan);"></div>
+            <div>
+              <h4 style="font-size: 1.1rem; color: var(--accent-cyan);">Searching for Balanced Match...</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);" id="queueTimer">Time in queue: 00:14 | Players in Pool: 8/10</p>
+            </div>
+          </div>
+          <button class="btn btn-danger btn-sm" id="btnLeaveQueue">
+            <span>❌</span> Leave Queue (-leave)
+          </button>
+        </div>
+      </div>
+
+      <!-- Favorite Games Priority Bar -->
+      <div class="card" style="margin-bottom: 1.5rem; padding: 1rem; border-color: var(--accent-gold);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <span style="font-size: 1rem; font-weight: 800; color: var(--accent-gold); display: flex; align-items: center; gap: 0.4rem;">
+              <span>⭐</span> Favorited Games:
+            </span>
+            <div id="favoriteGamesTagsContainer" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <!-- Injected via app.js -->
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+            <button class="btn btn-primary" id="btnJoinQueue">🎮 Quick Match Queue</button>
+            <button class="btn btn-purple" id="btnJoinGameDraftPool" style="box-shadow: 0 0 15px rgba(157,78,221,0.4);">⚡ Join Game Draft Pool</button>
+            <button class="btn btn-secondary" id="btnRandomPicker">🎲 Pick Random Game</button>
+            <button class="btn btn-success" id="btnCreateLobby">➕ Create Custom Lobby</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Matchmaking Pool Feed & Captain Mode Switcher -->
+      <div class="card" style="margin-bottom: 1.5rem; border-color: var(--accent-cyan);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
+            <span>⚡</span> Live Matchmaking Pool Feed
+          </h3>
+          
+          <!-- Captain Selection Mode Switcher -->
+          <div style="display: flex; gap: 0.4rem; background: rgba(0, 0, 0, 0.4); padding: 0.3rem; border-radius: 20px; border: 1px solid var(--border-color);">
+            <button class="btn btn-primary btn-sm" id="btnModeHighestMMR">👑 Highest MMR Captains</button>
+            <button class="btn btn-secondary btn-sm" id="btnModeSelectedCap">🗳️ Selected Captains</button>
+          </div>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Toggle between auto-assigning Top 2 Highest MMR players or voting for Selected Captains!</p>
+
+        <div id="livePoolFeedContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8rem;">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+
+      <!-- Live Active Lobbies Bar -->
+      <div class="card" style="margin-bottom: 1.5rem; padding: 1rem; border-color: var(--accent-green);">
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+          <span style="font-size: 0.95rem; font-weight: 800; color: var(--accent-green); display: flex; align-items: center; gap: 0.4rem;">
+            <span>🔥</span> Live Games Being Hosted Now:
+          </span>
+          <div id="activeGamesBarContainer" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <!-- Injected via app.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Custom Lobbies Grid -->
+      <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🔥</span> Active Custom Lobbies (Prioritized by Favorites & Live Activity)
+      </h2>
+      
+      <div class="lobby-grid" id="lobbiesGrid">
+        <!-- Injected via app.js -->
+      </div>
+    </section>
+
+    <!-- 🌐 CENTRAL HUB FOR GAMERS (Gamers Wall, LFG Squad Finder & Gamer Passport) -->
+    <section class="view-section" id="gamers-hub-view">
+      <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem;">
+        
+        <!-- Main Column: Gamers Wall & LFG Finder -->
+        <div>
+          <!-- LFG Squad Finder Box -->
+          <div class="card" style="margin-bottom: 1.5rem; border-color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div>
+                <h2 style="font-size: 1.3rem; font-weight: 900; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
+                  <span>⚡</span> LFG Squad Finder (Looking For Group)
+                </h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Find competitive teammates, scrim partners, or casual squad mates instantly</p>
+              </div>
+              <button class="btn btn-primary" onclick="alert('⚡ POST LFG CALLOUT!\n\nYour LFG squad request was posted to the Global Gamers Wall and dispatched to Discord!')">
+                ➕ Post LFG Callout
+              </button>
+            </div>
+
+            <!-- LFG Filter Form -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.8rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+              <div>
+                <label class="input-label">Select Game</label>
+                <select class="input-field" id="lfgGameFilter">
+                  <option value="all">All Games</option>
+                  <option value="cs2">Counter-Strike 2</option>
+                  <option value="valorant">Valorant</option>
+                  <option value="dota2">Dota 2</option>
+                  <option value="rocketleague">Rocket League</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="input-label">Region</label>
+                <select class="input-field" id="lfgRegionFilter">
+                  <option value="na">NA East / West</option>
+                  <option value="eu">Europe</option>
+                  <option value="asia">Asia / SA</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="input-label">Required Role</label>
+                <select class="input-field" id="lfgRoleFilter">
+                  <option value="any">Any Role</option>
+                  <option value="entry">Entry Fragger</option>
+                  <option value="awp">AWPer / Sniper</option>
+                  <option value="igl">IGL / Shotcaller</option>
+                  <option value="support">Support / Smoke</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="input-label">Mic Required</label>
+                <select class="input-field" id="lfgMicFilter">
+                  <option value="yes">🎙️ Mic Required</option>
+                  <option value="no">Casual / Optional</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gamer Social Media Post Composer Box -->
+          <div class="card" style="margin-bottom: 1.5rem; border-color: var(--accent-purple); box-shadow: 0 0 20px rgba(157, 78, 221, 0.2);">
+            <div style="display: flex; gap: 0.8rem; margin-bottom: 0.8rem;">
+              <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 2px solid var(--accent-gold);">👑</div>
+              <div style="flex: 1;">
+                <textarea class="input-field" id="socialComposerInput" rows="3" placeholder="What's happening in your game? Share a clip, clutch moment, match result, or LFG squad post..." style="resize: vertical; font-size: 0.95rem;"></textarea>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem;">
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="alert('🎥 CLIP ATTACHED!\n\nAttached latest 30s Stream Studio highlight clip to post.')">🎥 Attach Clip</button>
+                <button class="btn btn-secondary btn-sm" onclick="alert('📷 SCREENSHOT ATTACHED!\n\nAttached match victory screenshot.')">📷 Screenshot</button>
+                <button class="btn btn-secondary btn-sm" onclick="alert('🏆 SCORECARD LINKED!\n\nLinked 22/11/7 Mirage Match Scorecard.')">🏆 Scorecard</button>
+                <button class="btn btn-purple btn-sm" onclick="alert('🏷️ HASHTAG ADDED!\n\nAdded #CS2Ace #CustomLobbies')"># Hashtags</button>
+              </div>
+
+              <button class="btn btn-primary" onclick="window.app.postToGamersWall()">
+                🚀 Post to Gamers Wall
+              </button>
+            </div>
+          </div>
+
+          <!-- The Gamers Wall (Activity Feed) -->
+          <div class="card">
+            <h2 style="font-size: 1.3rem; font-weight: 900; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🌐</span> The Gamers Wall (Global Gamer Social Feed)
+            </h2>
+
+            <div style="display: flex; flex-direction: column; gap: 1.2rem;" id="gamersWallFeedContainer">
+              
+              <!-- Feed Post 1 -->
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                  <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #9d4edd); display: flex; align-items: center; justify-content: center; font-weight: 900;">👑</div>
+                    <div>
+                      <h4 style="font-weight: 800; margin: 0;">RadiantReaper <span class="mmr-badge">2540 MMR</span></h4>
+                      <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Posted 15m ago • Counter-Strike 2</p>
+                    </div>
+                  </div>
+                  <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">⚡ NEED +2 PREMIER</span>
+                </div>
+
+                <p style="font-size: 0.95rem; margin-bottom: 1rem;">Need 2 solid players for 20k+ CS2 Premier 5v5 Scrims! Have IGL and AWP locked down, need 2 entry fraggers with mic. 🎙️ Join lobby below!</p>
+
+                <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem;">
+                  <button class="btn btn-secondary btn-sm" onclick="alert('🔥 UPVOTED! Post Hype +1')">🔥 Hype Upvote (24)</button>
+                  <button class="btn btn-purple btn-sm" onclick="window.app.connectLobbyVoice('CS2 Premier Scrims')">🎙️ Join Voice Channel</button>
+                  <button class="btn btn-primary btn-sm" onclick="alert('💬 Reply sent to RadiantReaper!')">💬 Reply (6)</button>
+                </div>
+              </div>
+
+              <!-- Feed Post 2 -->
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                  <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #ff007f, #ffd700); display: flex; align-items: center; justify-content: center; font-weight: 900;">🎯</div>
+                    <div>
+                      <h4 style="font-weight: 800; margin: 0;">Valkyrie_CS <span class="mmr-badge" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">1790 MMR</span></h4>
+                      <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Posted 1h ago • Stream Highlight Clip</p>
+                    </div>
+                  </div>
+                  <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold);">🎥 30s CLIP</span>
+                </div>
+
+                <p style="font-size: 0.95rem; margin-bottom: 0.8rem;">Insane 1v4 Retake clutch on Mirage A site with deagle only! Recorded using CustomLobbies Stream Studio! 🎬</p>
+
+                <div style="background: #000; border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; border: 1px solid var(--border-color);">
+                  <div style="font-size: 2.5rem; margin-bottom: 0.4rem;">🎬</div>
+                  <div style="font-weight: 700; color: var(--accent-cyan);">[Stream Highlight Replay Stream - 1080p 60FPS]</div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem;">
+                  <button class="btn btn-secondary btn-sm" onclick="alert('🔥 UPVOTED! Post Hype +1')">🔥 Hype Upvote (42)</button>
+                  <button class="btn btn-primary btn-sm" onclick="alert('💬 Reply sent to Valkyrie_CS!')">💬 Reply (12)</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Column: Gamer Passport & Multi-Platform Identity -->
+        <div>
+          <!-- Gamer Passport Card -->
+          <div class="card" style="border-color: var(--accent-gold);">
+            <h3 style="font-size: 1.2rem; font-weight: 900; color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🪪</span> My Gamer Passport
+            </h3>
+
+            <div style="text-align: center; margin-bottom: 1.2rem;">
+              <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); margin: 0 auto 0.6rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--accent-gold);">👑</div>
+              <h4 style="font-size: 1.1rem; font-weight: 800; margin: 0;">You (Host)</h4>
+              <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.2rem;">💎 Diamond Veteran (1840 MMR)</p>
+            </div>
+
+            <!-- Linked Gaming Accounts List -->
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; font-size: 0.85rem;">
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">🎮 Steam ID:</span>
+                <strong style="color: var(--accent-cyan);">76561198012345678</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">🎯 Riot ID:</span>
+                <strong style="color: var(--accent-gold);">ProGamer#1337</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">💬 Discord Tag:</span>
+                <strong style="color: #5865F2;">GamerHost#0001</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">🎥 Stream:</span>
+                <strong style="color: #9146FF;">twitch.tv/CustomLobbiesHost</strong>
+              </div>
+            </div>
+
+            <button class="btn btn-purple btn-sm" style="width: 100%;" onclick="alert('🎮 LINK GAME ACCOUNTS:\n\nConnecting Steam OpenID, Discord OAuth2, and Riot API for instant rank synchronization...')">
+              🔗 Connect Game Accounts
+            </button>
+          </div>
+
+          <!-- Trending Gaming Hashtags Card -->
+          <div class="card" style="margin-top: 1.5rem; border-color: var(--accent-purple);">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--accent-purple); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🔥</span> Trending Gaming Hashtags
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.5rem 0.8rem; border-radius: 6px;">
+                <span style="font-weight: 800; color: var(--accent-cyan);">#CS2PremierMajor</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">18.4k Posts</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.5rem 0.8rem; border-radius: 6px;">
+                <span style="font-weight: 800; color: var(--accent-gold);">#HNSFloppytown</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">9.2k Posts</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.5rem 0.8rem; border-radius: 6px;">
+                <span style="font-weight: 800; color: var(--accent-green);">#ValorantRadiant</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">6.7k Posts</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Suggested Gamers to Follow Card -->
+          <div class="card" style="margin-top: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>👥</span> Suggested Gamers to Follow
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.6rem 0.8rem; border-radius: 6px;">
+                <div>
+                  <div style="font-weight: 800;">ApexGod99 <span style="color: var(--accent-gold); font-size: 0.75rem;">(2150 MMR)</span></div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">CS2 IGL • 14.2k Followers</div>
+                </div>
+                <button class="btn btn-purple btn-sm" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;" onclick="alert('➕ FOLLOWED ApexGod99!')">➕ Follow</button>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.6rem 0.8rem; border-radius: 6px;">
+                <div>
+                  <div style="font-weight: 800;">ShadowNinja <span style="color: var(--accent-cyan); font-size: 0.75rem;">(1920 MMR)</span></div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Valorant Duelist • 8.9k Followers</div>
+                </div>
+                <button class="btn btn-purple btn-sm" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;" onclick="alert('➕ FOLLOWED ShadowNinja!')">➕ Follow</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 1.5 SPONSORED GAME SERVERS HUB (FiveM & Dedicated Servers) -->
+    <section id="servers-view" class="view-section">
+      <div class="lobby-header-banner">
+        <div>
+          <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;">Sponsored Dedicated Server Hosting Hub</h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Promote your custom FiveM GTA RP, CS2 128-tick, Rainbow Six Siege, Arkheron, or Empulse servers with 1-click connect buttons.</p>
+        </div>
+        <button class="btn btn-primary" onclick="alert('💼 SERVER SPONSORSHIP PORTAL:\n\nSponsor your custom server for $10/week to be featured on CustomLobbies.com and Discord!\n\nEmail: sponsor@customlobbies.com')">
+          <span>💼</span> Sponsor Your Server ($10/wk)
+        </button>
+      </div>
+
+      <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🖥️</span> Featured Sponsored Servers & FiveM GTA RP Nodes
+      </h2>
+
+      <div class="grid-3" id="sponsoredServersGrid">
+        <!-- Injected via app.js -->
+      </div>
+    </section>
+
+    <!-- 2. COMMUNITY CHAT & VOICE HUB -->
+    <section id="community-view" class="view-section">
+      <div class="grid-chat">
+        <!-- Channels List Sidebar -->
+        <div class="chat-channels-panel">
+          <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem;">Community Channels</h3>
+          
+          <div class="channel-section-title">
+            <span>Text Channels</span>
+            <button class="add-channel-btn" id="btnAddTextChannel" title="Create Text Channel">+</button>
+          </div>
+          <div id="textChannelsList">
+            <div class="channel-item active" data-channel="general"># general</div>
+            <div class="channel-item" data-channel="lfg-cs2"># lfg-cs2</div>
+            <div class="channel-item" data-channel="lfg-valorant"># lfg-valorant</div>
+            <div class="channel-item" data-channel="tournaments"># tournaments</div>
+            <div class="channel-item" data-channel="stream-showcase"># stream-showcase</div>
+          </div>
+
+          <div class="channel-section-title">
+            <span>Voice Channels</span>
+            <button class="add-channel-btn" id="btnAddVoiceChannel" title="Create Voice Room">+</button>
+          </div>
+          <div id="voiceChannelsList">
+            <div class="channel-item" data-voice="general-voice">
+              <span>🔊</span> General Voice
+            </div>
+            <div class="voice-channel-users" id="vusers-general-voice">
+              <div class="voice-user-row">
+                <div class="speaking-indicator"></div>
+                <span>ApexGod99</span>
+              </div>
+              <div class="voice-user-row">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #444;"></span>
+                <span>ProSniper_2026</span>
+              </div>
+            </div>
+
+            <div class="channel-item" data-voice="team1-alpha" style="margin-top: 0.5rem;">
+              <span>🔊</span> Team 1 - Alpha (5v5)
+            </div>
+            <div class="channel-item" data-voice="team2-bravo">
+              <span>🔊</span> Team 2 - Bravo (5v5)
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Messages Panel -->
+        <div class="chat-main-panel">
+          <div class="chat-header">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span style="font-size: 1.2rem; font-weight: 800; color: var(--accent-cyan);" id="currentChannelHeader"># general</span>
+              <span style="font-size: 0.85rem; color: var(--text-muted);" id="currentChannelTopic">General community chat & CustomLobbies discussion</span>
+            </div>
+          </div>
+
+          <div class="chat-messages-container" id="chatMessagesBox">
+            <!-- Messages injected dynamically -->
+          </div>
+
+          <form class="chat-input-bar" id="chatForm">
+            <input type="text" class="input-field" style="flex: 1;" placeholder="Send a message to #general..." id="chatInputText" required autocomplete="off">
+            <button type="submit" class="btn btn-primary">Send</button>
+          </form>
+        </div>
+
+        <!-- Active Voice Room Status & Controls Sidebar -->
+        <div class="chat-channels-panel">
+          <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem;">Voice Control</h3>
+
+          <div id="voiceControlBox" class="card" style="padding: 1rem; background: rgba(0, 0, 0, 0.4); text-align: center;">
+            <div style="margin-bottom: 0.8rem;">
+              <span id="voiceStatusBadge" class="lobby-game-tag" style="background: rgba(255, 82, 82, 0.2); color: var(--accent-red);">Disconnected</span>
+              <h4 id="voiceRoomName" style="margin-top: 0.4rem; font-size: 1rem;">No Active Room</h4>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
+              <button class="btn btn-secondary btn-sm" id="btnToggleMic" disabled>
+                <span id="micIcon">🎙️</span> Mic
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnToggleDeafen" disabled>
+                <span id="deafenIcon">🎧</span> Deafen
+              </button>
+            </div>
+
+            <button class="btn btn-primary btn-sm" id="btnConnectVoice" style="width: 100%;">
+              Join Voice Channel
+            </button>
+          </div>
+
+          <div style="margin-top: 1.5rem;">
+            <h4 style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.8rem;">Online Players (18)</h4>
+            <div id="onlineUsersList" style="display: flex; flex-direction: column; gap: 0.6rem;">
+              <!-- User rows injected -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. STREAMER STUDIO & SOURCE CAPTURE VIEW -->
+    <section id="studio-view" class="view-section">
+      <div class="grid-sidebar">
+        <!-- Source Controls Sidebar -->
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div class="card">
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem;">Capture Sources</h3>
+
+            <div class="input-group">
+              <label class="input-label">Video Source</label>
+              <button class="btn btn-purple" id="btnCaptureScreen" style="width: 100%;">
+                <span>🖥️</span> Capture Screen / Window
+              </button>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Audio Input (Mic)</label>
+              <select class="input-field" id="micSelect">
+                <option value="default">Default Microphone Input</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Stream Quality</label>
+              <select class="input-field" id="qualitySelect">
+                <option value="1080p60">1080p 60 FPS (6000 Kbps)</option>
+                <option value="720p60">720p 60 FPS (4500 Kbps)</option>
+                <option value="720p30">720p 30 FPS (3000 Kbps)</option>
+              </select>
+            </div>
+
+            <button class="btn btn-primary" id="btnStartBroadcast" style="width: 100%; margin-top: 0.5rem;">
+              <span>🔴</span> Go Live to CustomLobbies
+            </button>
+          </div>
+
+          <div class="card">
+            <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.8rem;">Audio Output Meter</h4>
+            <div class="audio-meter-bar">
+              <div class="audio-meter-fill" id="audioMeterFill"></div>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem;" id="audioStatusText">Mic Level: Idle</p>
+          </div>
+        </div>
+
+        <!-- Live Canvas Broadcast Player -->
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="studio-canvas-wrapper">
+            <div class="live-badge" id="liveBadge" style="display: none;">
+              <div class="live-dot"></div> LIVE BROADCAST
+            </div>
+            <canvas id="streamCanvas" width="1920" height="1080"></canvas>
+          </div>
+
+          <div class="card" style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h4 style="font-size: 1.1rem; font-weight: 800;" id="streamTitleDisplay">CustomLobbies Stream - Valorant Diamond Ranked</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);" id="streamStatsDisplay">Bitrate: 0 kbps | FPS: 0 | Viewers: 0</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-purple btn-sm" id="btnRecordStreamClip">
+                🎬 Record 30s Highlight Clip
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnCopyStreamURL">
+                📋 Copy RTMP / Stream Key
+              </button>
+            </div>
+          </div>
+
+          <!-- Stream Highlights Clips Reel Card -->
+          <div class="card">
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🎬</span> Stream Highlights & Gameplay Clips Reel
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem;" id="streamClipsGrid">
+              <!-- Injected via widget-builder.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. WIDGET STUDIO & ALERT GENERATOR VIEW -->
+    <section id="widgets-view" class="view-section">
+      <div class="grid-sidebar">
+        <!-- Widget Settings -->
+        <div class="card">
+          <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1.25rem;">Alert & Widget Settings</h3>
+
+          <div class="input-group">
+            <label class="input-label">Alert Template Text</label>
+            <input type="text" class="input-field" id="alertTextTemplate" value="{username} just followed the stream!">
+          </div>
+
+          <div class="input-group">
+            <label class="input-label">Theme Color</label>
+            <input type="color" class="input-field" id="alertColorPicker" value="#00f2fe" style="height: 45px; padding: 4px;">
+          </div>
+
+          <div class="input-group">
+            <label class="input-label">Animation Style</label>
+            <select class="input-field" id="alertAnimSelect">
+              <option value="bounce">Bounce & Glow</option>
+              <option value="slide">Slide In Left</option>
+              <option value="zoom">Zoom Pop</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label">Alert Sound</label>
+            <select class="input-field" id="alertSoundSelect">
+              <option value="synth">Esports Chime (Synthesizer)</option>
+              <option value="fanfare">Victory Fanfare</option>
+              <option value="coin">Retro Arcade Level Up</option>
+            </select>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem;">
+            <button class="btn btn-purple" id="btnTestFollowAlert">
+              <span>🔔</span> Test Follower Alert
+            </button>
+            <button class="btn btn-secondary" id="btnTestSubAlert">
+              <span>⭐</span> Test Subscriber Alert
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Streamer Soundboard Studio Card -->
+        <div class="card" style="margin-top: 1.5rem; border-color: var(--accent-cyan);">
+          <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🔊</span> Hype Soundboard Studio
+          </h3>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Instant Web Audio sound effects triggered on stream and local speakers.</p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+            <button class="btn btn-secondary btn-sm" data-sound="airhorn">📯 Airhorn</button>
+            <button class="btn btn-secondary btn-sm" data-sound="hitmarker">🎯 Hitmarker</button>
+            <button class="btn btn-secondary btn-sm" data-sound="ggwp">🗣️ GG WP</button>
+            <button class="btn btn-secondary btn-sm" data-sound="cheer">👏 Crowd Cheer</button>
+            <button class="btn btn-secondary btn-sm" data-sound="fanfare">🏆 Fanfare</button>
+            <button class="btn btn-secondary btn-sm" data-sound="coin">🪙 Arcade Coin</button>
+          </div>
+        </div>
+
+        <!-- Preview Canvas & OBS Overlay Link -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <div class="card">
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem;">Live Overlay Canvas Preview</h3>
+            <div class="widget-preview-box">
+              <div class="follower-alert-container" id="alertBoxPreview">
+                <div class="alert-title" id="previewAlertTitle">NEW FOLLOWER!</div>
+                <div class="alert-subtext" id="previewAlertText">NightHawk99 just followed the stream!</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="border-color: var(--accent-purple);">
+            <h4 style="font-size: 1rem; font-weight: 800; color: var(--accent-purple); margin-bottom: 0.5rem;">OBS Studio / Streamlabs Browser Source Link</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Copy this transparent URL into OBS Studio as a Browser Source (Width: 1920, Height: 1080).</p>
+
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="text" class="input-field" style="flex: 1; font-family: monospace; font-size: 0.85rem;" readonly value="https://customlobbies.com/overlay?key=cl_live_892317923" id="obsOverlayURL">
+              <button class="btn btn-primary btn-sm" id="btnCopyOBSLink">Copy Link</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOURNAMENTS HUB VIEW -->
+    <section id="tournaments-view" class="view-section">
+      <div class="lobby-header-banner">
+        <div>
+          <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;">Esports Tournament & League Hub</h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Host, participate, and stream 8-Team or 16-Team brackets with live prize pools.</p>
+        </div>
+        <button class="btn btn-primary" id="btnCreateTournament">
+          <span>🏆</span> Create Paid Tournament
+        </button>
+      </div>
+
+      <!-- League Calendar Schedule Card -->
+      <div class="card" style="margin-bottom: 2rem; border-color: var(--accent-cyan);">
+        <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>📅</span> Esports League & Tournament Schedule Calendar
+        </h3>
+        <div id="leagueCalendarContainer">
+          <!-- Injected via tournaments-store.js -->
+        </div>
+      </div>
+
+      <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">Active Tournament Brackets</h2>
+      <div id="tournamentsListContainer">
+        <!-- Injected via tournaments-store.js -->
+      </div>
+    </section>
+
+    <!-- BANNER MARKETPLACE STORE VIEW -->
+    <section id="store-view" class="view-section">
+      <div style="margin-bottom: 1.5rem;">
+        <h1 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 0.4rem;">Custom Lobby Banner Marketplace</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Purchase animated custom headers to make your custom lobby stand out on the platform!</p>
+      </div>
+
+      <div class="grid-4" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem;" id="bannerStoreGrid">
+        <!-- Injected via tournaments-store.js -->
+      </div>
+    </section>
+
+    <!-- 5. CROSS-PLATFORM INTEGRATIONS VIEW (Twitch, Streamlabs, Discord) -->
+    <section id="integrations-view" class="view-section">
+      <div style="margin-bottom: 1.5rem;">
+        <h1 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 0.4rem;">4-Way Integration Suite</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Combine Discord, CustomLobbies, Twitch, and Streamlabs into one unified live stream and lobby ecosystem.</p>
+      </div>
+
+      <div class="grid-3" style="margin-bottom: 2rem;">
+        <!-- Card 1: Twitch Integration -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #9146ff; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📺</span> Twitch Live
+              </h3>
+              <span class="lobby-game-tag" id="twitchStatusBadge" style="background: rgba(255, 82, 82, 0.2); color: var(--accent-red);">NOT CONNECTED</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Sync Twitch live stream status, embed live player and chat box, and stream follower alert triggers.
+            </p>
+            <div class="input-group">
+              <label class="input-label">Twitch Channel Name</label>
+              <input type="text" class="input-field" id="twitchUsernameInput" value="ProStreamer_2026">
+            </div>
+          </div>
+          <button class="btn btn-purple" id="btnConnectTwitch" style="width: 100%; margin-top: 1rem;">
+            Connect Twitch Account
+          </button>
+        </div>
+
+        <!-- Card 2: Streamlabs OBS Integration -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #31c3a6; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🧪</span> Streamlabs OBS
+              </h3>
+              <span class="lobby-game-tag" id="streamlabsStatusBadge" style="background: rgba(255, 82, 82, 0.2); color: var(--accent-red);">NOT CONNECTED</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Connect your Streamlabs Socket API Token to sync follower alerts, donations, sub alerts, and custom lobby ELO badges.
+            </p>
+            <div class="input-group">
+              <label class="input-label">Streamlabs Socket API Token</label>
+              <input type="password" class="input-field" id="streamlabsTokenInput" placeholder="eyJ0eXAiOiJKV1QiLCJhbGci...">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnConnectStreamlabs" style="width: 100%; margin-top: 1rem;">
+            Connect Streamlabs API
+          </button>
+        </div>
+
+        <!-- Card 3: Discord Integration -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #5865f2; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🤖</span> Discord Webhooks
+              </h3>
+              <span class="lobby-game-tag" id="discordStatusBadge" style="background: rgba(255, 82, 82, 0.2); color: var(--accent-red);">NOT CONNECTED</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Auto-broadcast "Going Live" announcements, match popped alerts, and MMR win notifications to your Discord channels.
+            </p>
+            <div class="input-group">
+              <label class="input-label">Discord Channel Webhook URL</label>
+              <input type="text" class="input-field" id="discordWebhookInput" placeholder="https://discord.com/api/webhooks/...">
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+            <button class="btn btn-secondary btn-sm" id="btnSaveDiscordWebhook">Save Webhook</button>
+            <button class="btn btn-purple btn-sm" id="btnTestDiscordAnnouncement">📢 Test Going Live Announcement</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Twitch Embedded Stream & Chat Player Container -->
+      <div class="card">
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem;">Live Stream & Chat Embed Preview</h3>
+        <div id="twitchEmbedContainer">
+          <p style="color: var(--text-muted);">Connect your Twitch account above to embed your live stream and chat directly inside CustomLobbies.com!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. ELO LEADERBOARD & STATS VIEW -->
+    <section id="leaderboard-view" class="view-section">
+      <!-- Player Account Trophy Showcase -->
+      <div class="card" style="margin-bottom: 2rem; border-color: var(--accent-gold);">
+        <h2 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-gold); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>🏆</span> Player Account Trophy Showcase
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">Trophies & Badges awarded to your profile for winning CustomLobbies tournaments and leagues.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem;" id="trophyCabinetGrid">
+          <!-- Injected via tournaments-store.js -->
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.5rem; font-weight: 900;">Global ELO / MMR Leaderboard</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Calculated using standard dynamic K-factor rating system</p>
+          </div>
+          <select class="input-field" style="width: 200px;" id="leaderboardGameFilter">
+            <option value="all">All Games</option>
+            <option value="cs2">Counter-Strike 2</option>
+            <option value="valorant">Valorant</option>
+            <option value="rocketleague">Rocket League</option>
+          </select>
+        </div>
+
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>MMR Rating</th>
+              <th>Tier Rank</th>
+              <th>Win / Loss</th>
+              <th>Win %</th>
+              <th>Streak</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardTableBody">
+            <!-- Injected via app.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Recent Match History & Scorecard Replay Logs -->
+      <div class="card" style="margin-top: 2rem;">
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>📜</span> Recent Custom Lobby Match Scorecards & Replay Logs
+        </h2>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 1.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-size: 0.85rem; font-weight: 900;">VICTORY (13 - 9)</span>
+              <div>
+                <h4 style="font-size: 1rem; font-weight: 800;">Counter-Strike 2 • de_mirage</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Mode: 5v5 Captain Draft • MVP: <strong style="color: var(--accent-gold);">👑 You (Host)</strong></p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+              <div style="text-align: right;">
+                <div style="font-size: 0.9rem; font-weight: 800; color: var(--accent-gold);">K/D: 22 / 11 / 7 (64% HS)</div>
+                <div style="font-size: 0.78rem; color: var(--accent-green); font-weight: 700;">+24 MMR | +150 XP</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="alert('📊 SCORECARD DETAILS:\n\nMatch ID: match_901\nMap: de_mirage\nDuration: 34m 12s\nRating: 1.48 Performance\n\nReplay File: demo_cl_901.dem ready!')">
+                📊 Scorecard & Replay
+              </button>
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 1.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span class="lobby-game-tag" style="background: rgba(255, 82, 82, 0.2); color: #ff5252; font-size: 0.85rem; font-weight: 900;">DEFEAT (11 - 13)</span>
+              <div>
+                <h4 style="font-size: 1rem; font-weight: 800;">Valorant • Ascent</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Mode: 5v5 Highest MMR • MVP: <strong style="color: var(--accent-cyan);">Valkyrie_CS</strong></p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+              <div style="text-align: right;">
+                <div style="font-size: 0.9rem; font-weight: 800; color: var(--text-muted);">K/D: 17 / 15 / 4 (58% HS)</div>
+                <div style="font-size: 0.78rem; color: #ff5252; font-weight: 700;">-16 MMR | +75 XP</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="alert('📊 SCORECARD DETAILS:\n\nMatch ID: match_902\nMap: Ascent\nDuration: 38m 45s\nRating: 1.12 Performance\n\nReplay File: demo_cl_902.dem ready!')">
+                📊 Scorecard & Replay
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Create Lobby Modal -->
+  <div class="modal-overlay" id="createLobbyModal">
+    <div class="modal-card">
+      <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">Host Custom Lobby</h3>
+      
+      <div class="input-group">
+        <label class="input-label">Lobby Title</label>
+        <input type="text" class="input-field" id="newLobbyTitle" placeholder="e.g. 5v5 High MMR Scrims">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Game Title</label>
+        <select class="input-field" id="newLobbyGame">
+          <option value="Counter-Strike 2">Counter-Strike 2</option>
+          <option value="CS2 Bhop (Auto & Scroll)">CS2 Bhop (Auto & Scroll)</option>
+          <option value="CS2 Danger Zone (BR)">CS2 Danger Zone (BR)</option>
+          <option value="CS2 Retake (Bomb Defusal)">CS2 Retake (Bomb Defusal)</option>
+          <option value="CS2 Execute (Tactical Scrims)">CS2 Execute (Tactical Scrims)</option>
+          <option value="CS2 1v1 Arena (Aim Map)">CS2 1v1 Arena (Aim Map)</option>
+          <option value="CS2 Gun Game (Arms Race)">CS2 Gun Game (Arms Race)</option>
+          <option value="CS2 Deathmatch (FFA DM)">CS2 Deathmatch (FFA DM)</option>
+          <option value="CS2 HNS (Hide & Seek)">CS2 HNS (Hide & Seek)</option>
+          <option value="CS2 Surf (Tier 1-6)">CS2 Surf (Tier 1-6)</option>
+          <option value="CS2 KZ / Climb (Bhop)">CS2 KZ / Climb (Bhop)</option>
+          <option value="CS2 Zombie Escape">CS2 Zombie Escape</option>
+          <option value="Valorant">Valorant</option>
+          <option value="Dota 2">Dota 2</option>
+          <option value="StarCraft II">StarCraft II</option>
+          <option value="PUBG">PUBG: Battlegrounds</option>
+          <option value="Arkheron">Arkheron</option>
+          <option value="Empulse">Empulse</option>
+          <option value="Rainbow Six Siege">Rainbow Six Siege</option>
+          <option value="FiveM GTA RP">FiveM GTA RP</option>
+          <option value="Rocket League">Rocket League</option>
+          <option value="Apex Legends">Apex Legends</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Max Players</label>
+        <select class="input-field" id="newLobbyMax">
+          <option value="10">10 Players (5v5)</option>
+          <option value="6">6 Players (3v3)</option>
+          <option value="4">4 Players (2v2)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" id="btnCloseLobbyModal">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitNewLobby">Create Lobby</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Channel Modal -->
+  <div class="modal-overlay" id="createChannelModal">
+    <div class="modal-card">
+      <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;" id="channelModalTitle">Create Text Channel</h3>
+
+      <div class="input-group">
+        <label class="input-label">Channel Name</label>
+        <input type="text" class="input-field" id="newChannelNameInput" placeholder="e.g. strategy-talk">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" id="btnCloseChannelModal">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitNewChannel">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Tournament Modal -->
+  <div class="modal-overlay" id="createTourneyModal">
+    <div class="modal-card">
+      <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">Create & Host Tournament</h3>
+
+      <div class="input-group">
+        <label class="input-label">Tournament Title</label>
+        <input type="text" class="input-field" id="newTourneyTitle" value="$500 Valorant Diamond Clash">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Game Title</label>
+        <select class="input-field" id="newTourneyGame">
+          <option value="Valorant">Valorant</option>
+          <option value="Counter-Strike 2">Counter-Strike 2</option>
+          <option value="Rocket League">Rocket League</option>
+          <option value="Apex Legends">Apex Legends</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Prize Pool ($ USD)</label>
+        <input type="number" class="input-field" id="newTourneyPrize" value="500">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Tournament Hosting Plan Tier</label>
+        <select class="input-field" id="newTourneyPlan">
+          <option value="15">🥉 Standard Tier ($15 Hosting Fee) - 8 Teams Bracket</option>
+          <option value="35" selected>🥈 Pro Esports Tier ($35 Hosting Fee) - 16 Teams + Frontpage Feature</option>
+          <option value="75">🥇 Grand Championship Tier ($75 Hosting Fee) - 32 Teams + Twitch Stream Auto-Feature</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" id="btnCloseTourneyModal">Cancel</button>
+        <button class="btn btn-primary" id="btnProceedCheckout">Proceed to Checkout 💳</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto-Draft Teams Modal -->
+  <div class="modal-overlay" id="autoDraftModal">
+    <div class="modal-card" style="max-width: 650px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan);" id="draftGameTitle">Captain Auto-Draft Engine</h3>
+        <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">Auto-Balanced</span>
+      </div>
+
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">The top 2 ELO players in the pool are assigned as Captains, followed by a balanced Snake Draft algorithm.</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+        <!-- Team Alpha -->
+        <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--accent-cyan);">
+          <div style="font-size: 0.8rem; color: var(--accent-cyan); text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔵 Team Alpha</div>
+          <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainAName">Captain Alpha</div>
+          <div id="teamAList"></div>
+        </div>
+
+        <!-- Team Bravo -->
+        <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--accent-purple);">
+          <div style="font-size: 0.8rem; color: var(--accent-purple); text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔴 Team Bravo</div>
+          <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainBName">Captain Bravo</div>
+          <div id="teamBList"></div>
+        </div>
+      </div>
+
+      <!-- Interactive Map Veto & Ban Control Board -->
+      <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+          <span>🗺️</span> Competitive Map Veto & Ban Phase
+        </h4>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem;">Captains alternate banning maps. Click "Ban Map" or "Pick Map" to establish the official match map!</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.6rem;" id="mapVetoGridContainer">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+
+      <div style="background: rgba(255, 255, 255, 0.05); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; text-align: center; color: var(--text-main); margin-bottom: 1.5rem;" id="draftMMRSummary">
+        Team Alpha Avg: 1890 MMR | Team Bravo Avg: 1885 MMR | Rating Delta: 5 MMR (Fair Match)
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" id="btnPassTurnCap" onclick="window.app.passTurnToCaptain1()">⏩ Pass First Pick (Cap #2 -> Cap #1)</button>
+          <button class="btn btn-secondary btn-sm" id="btnReDraftTeams">🔄 Re-Shuffle Draft</button>
+        </div>
+        <div style="display: flex; gap: 0.6rem;">
+          <button class="btn btn-secondary" id="btnCloseAutoDraftModal">Cancel</button>
+          <button class="btn btn-primary" id="btnConfirmDraftTeams">Lock Teams & Start Scrim 🎮</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tournament Payment Checkout Modal -->
+  <div class="modal-overlay" id="tourneyCheckoutModal">
+    <div class="modal-card" style="max-width: 550px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.4rem; font-weight: 900;">💳 Tournament Checkout</h3>
+        <span class="mmr-badge">Balance: $150.00 USD</span>
+      </div>
+
+      <div style="background: rgba(0, 0, 0, 0.4); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+        <h4 style="font-size: 1.1rem; color: var(--accent-cyan); margin-bottom: 0.8rem;" id="summaryTourneyTitle">Valorant Diamond Clash</h4>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+          <span style="color: var(--text-muted);">Hosting Plan Fee:</span>
+          <span id="summaryPlanFee" style="font-weight: 700;">$35.00 USD</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+          <span style="color: var(--text-muted);">Prize Pool Escrow:</span>
+          <span id="summaryPrizeEscrow" style="font-weight: 700;">$500.00 USD</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--border-color); padding-top: 0.8rem; margin-top: 0.8rem; font-size: 1.1rem;">
+          <span style="font-weight: 800;">Total Amount Due:</span>
+          <span id="summaryTotalAmount" style="font-weight: 900; color: var(--accent-gold);">$535.00 USD</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Select Payment Method</label>
+        <select class="input-field" id="payMethodSelect">
+          <option value="Credit Card (Stripe)">💳 Credit / Debit Card (Stripe)</option>
+          <option value="CustomLobbies Wallet">👛 CustomLobbies Wallet Balance ($150.00)</option>
+          <option value="PayPal">🅿️ PayPal Express</option>
+          <option value="Crypto SOL/USDT">🪙 Crypto (Solana / USDT)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" id="btnCloseCheckoutModal">Cancel</button>
+        <button class="btn btn-primary" id="btnConfirmPayTournament">Pay & Launch Tournament 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase & Google Cloud SDK Imports -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="js/firebase-google.js"></script>
+
+  <!-- Application Script Imports -->
+  <script src="js/elo-engine.js"></script>
+  <script src="js/chat-voice.js"></script>
+  <script src="js/stream-studio.js"></script>
+  <script src="js/widget-builder.js"></script>
+  <script src="js/integrations.js"></script>
+  <script src="js/tournaments-store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

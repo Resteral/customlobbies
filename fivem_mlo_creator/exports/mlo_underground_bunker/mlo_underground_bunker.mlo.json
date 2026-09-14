@@ -1,0 +1,340 @@
+{
+  "name": "mlo_underground_bunker",
+  "displayName": "Tactical Underground Bunker & Armory",
+  "archetype": "hei_dlc_mlo_custom",
+  "position": {
+    "x": 970.2,
+    "y": -100.5,
+    "z": 74
+  },
+  "rotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "w": 1
+  },
+  "rooms": [
+    {
+      "name": "limbo",
+      "bbMin": [
+        -30,
+        -30,
+        -10
+      ],
+      "bbMax": [
+        30,
+        30,
+        10
+      ],
+      "timecycle": "default",
+      "blend": 0,
+      "flags": 0
+    },
+    {
+      "name": "airlock_entrance",
+      "bbMin": [
+        -3,
+        -4,
+        -1
+      ],
+      "bbMax": [
+        3,
+        4,
+        4
+      ],
+      "timecycle": "v_tunnel",
+      "blend": 1,
+      "flags": 0
+    },
+    {
+      "name": "tactical_war_room",
+      "bbMin": [
+        -10,
+        -10,
+        -1
+      ],
+      "bbMax": [
+        10,
+        10,
+        5
+      ],
+      "timecycle": "int_hospital",
+      "blend": 1,
+      "flags": 0
+    },
+    {
+      "name": "high_sec_armory",
+      "bbMin": [
+        10,
+        -8,
+        -1
+      ],
+      "bbMax": [
+        22,
+        8,
+        4
+      ],
+      "timecycle": "int_motel",
+      "blend": 1,
+      "flags": 0
+    }
+  ],
+  "portals": [
+    {
+      "fromRoom": 0,
+      "toRoom": 1,
+      "flags": 0,
+      "vertices": [
+        {
+          "x": 0,
+          "y": -4,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": -4,
+          "z": 3
+        },
+        {
+          "x": 2,
+          "y": -4,
+          "z": 3
+        },
+        {
+          "x": 2,
+          "y": -4,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "fromRoom": 1,
+      "toRoom": 2,
+      "flags": 0,
+      "vertices": [
+        {
+          "x": 0,
+          "y": 4,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "z": 3
+        },
+        {
+          "x": 2,
+          "y": 4,
+          "z": 3
+        },
+        {
+          "x": 2,
+          "y": 4,
+          "z": 0
+        }
+      ]
+    },
+    {
+      "fromRoom": 2,
+      "toRoom": 3,
+      "flags": 0,
+      "vertices": [
+        {
+          "x": 10,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "z": 3
+        },
+        {
+          "x": 10,
+          "y": 2,
+          "z": 3
+        },
+        {
+          "x": 10,
+          "y": 2,
+          "z": 0
+        }
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "model": "v_ilev_arm_secdoor",
+      "room": 1,
+      "pos": {
+        "x": 0,
+        "y": -4,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "model": "hei_prop_heist_monitor",
+      "room": 2,
+      "pos": {
+        "x": 0,
+        "y": 2,
+        "z": 1.2
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "model": "hei_prop_hei_table_console",
+      "room": 2,
+      "pos": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "model": "v_corp_offchair",
+      "room": 2,
+      "pos": {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0.707,
+        "w": 0.707
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "model": "v_corp_offchair",
+      "room": 2,
+      "pos": {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": -0.707,
+        "w": 0.707
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "model": "gr_prop_gr_gun_cabinet_01a",
+      "room": 3,
+      "pos": {
+        "x": 18,
+        "y": 4,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 1,
+        "w": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "model": "gr_prop_gr_gun_cabinet_02a",
+      "room": 3,
+      "pos": {
+        "x": 18,
+        "y": -4,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 1,
+        "w": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "model": "hei_prop_heist_wooden_box",
+      "room": 3,
+      "pos": {
+        "x": 14,
+        "y": 0,
+        "z": 0
+      },
+      "rot": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      }
+    }
+  ],
+  "entitySets": [
+    {
+      "name": "heavy_defenses",
+      "entities": [
+        5,
+        6
+      ]
+    },
+    {
+      "name": "raid_breached",
+      "entities": []
+    }
+  ]
+}

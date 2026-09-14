@@ -1,0 +1,108 @@
+{
+  "HELIX Server Block": {
+    "prefix": "hx:server",
+    "body": [
+      "/**",
+      " * HELIX Platform - ${1:System Name} Server Module",
+      " * docs.helixgame.com",
+      " */",
+      "",
+      "Helix.server(async () => {",
+      "\tconsole.log('[HELIX SERVER] Initializing ${1:System Name}...');",
+      "\t",
+      "\tconst ${2:stateMap} = new Map();",
+      "\t",
+      "\t// Server Endpoint",
+      "\tHelix.endpoint('${3:actionName}', async (playerId, data) => {",
+      "\t\tconsole.log(`[${1:System Name}] Action triggered by player ${playerId}:`, data);",
+      "\t\t$0",
+      "\t\treturn { success: true };",
+      "\tend);",
+      "});"
+    ],
+    "description": "Scaffold a HELIX (helixgame.com) server module"
+  },
+  "HELIX Client Block": {
+    "prefix": "hx:client",
+    "body": [
+      "/**",
+      " * HELIX Platform - ${1:System Name} Client Module",
+      " */",
+      "",
+      "Helix.client(() => {",
+      "\tconsole.log('[HELIX CLIENT] Initializing ${1:System Name} Client...');",
+      "\t",
+      "\tconst ${2:uiInstance} = new Helix.WebUI('${1:System Name}UI', 'file://ui/${3:index.html}');",
+      "\t",
+      "\t// Keybind toggle",
+      "\tif (typeof Helix.Input !== 'undefined' && Helix.Input.OnKeyDown) {",
+      "\t\tHelix.Input.OnKeyDown('${4:E}', () => {",
+      "\t\t\t${2:uiInstance}.CallEvent('open${1:System Name}');",
+      "\t\t\tif (Helix.Input.SetMouseEnabled) Helix.Input.SetMouseEnabled(true);",
+      "\t\t});",
+      "\t}",
+      "\t",
+      "\tHelix.on('${5:ServerEventName}', (data) => {",
+      "\t\t$0",
+      "\tend);",
+      "});"
+    ],
+    "description": "Scaffold a HELIX (helixgame.com) client module"
+  },
+  "HELIX Server Endpoint": {
+    "prefix": "hx:endpoint",
+    "body": [
+      "Helix.endpoint('${1:endpointName}', async (playerId, ${2:payload}) => {",
+      "\tconst player = Helix.getPlayer(playerId);",
+      "\tif (!player) return { success: false, error: 'Player not found' };",
+      "\t",
+      "\t$0",
+      "\treturn { success: true, data: ${2:payload} };",
+      "});"
+    ],
+    "description": "Scaffold a HELIX server endpoint RPC"
+  },
+  "HELIX WebUI Controller": {
+    "prefix": "hx:webui",
+    "body": [
+      "const ${1:myUI} = new Helix.WebUI('${2:UIName}', 'file://${3:ui/index.html}');",
+      "",
+      "function setUIFocus(enabled) {",
+      "\tif (typeof Helix.Input !== 'undefined') {",
+      "\t\tif (Helix.Input.SetMouseEnabled) Helix.Input.SetMouseEnabled(enabled);",
+      "\t\tif (Helix.Input.SetInputEnabled) Helix.Input.SetInputEnabled(!enabled);",
+      "\t}",
+      "}"
+    ],
+    "description": "Scaffold a HELIX WebUI overlay instance with mouse focus management"
+  },
+  "HELIX Event Listener & Emitter": {
+    "prefix": "hx:event",
+    "body": [
+      "Helix.on('${1:EventName}', (${2:data}) => {",
+      "\t$0",
+      "});",
+      "",
+      "// To emit: Helix.emit('${1:EventName}', { ... });"
+    ],
+    "description": "Scaffold HELIX event listener"
+  },
+  "HELIX Interactive Station / System Definition": {
+    "prefix": "hx:station",
+    "body": [
+      "HelixSystems.registerStation('${1:station_id}', {",
+      "\tname: '${2:Station Name}',",
+      "\tcategory: '${3:Processing}',",
+      "\tmodel: '${4:assets/models/workbench.glb}',",
+      "\tprocessTime: ${5:5},",
+      "\tinputs: { '${6:raw_material}': ${7:2} },",
+      "\toutputs: { '${8:processed_item}': ${9:1} },",
+      "\trewardCash: ${10:150},",
+      "\tonComplete: (playerId, station) => {",
+      "\t\t$0",
+      "\t}",
+      "});"
+    ],
+    "description": "Register a data-driven interactive gameplay station in HELIX"
+  }
+}

@@ -1,0 +1,521 @@
+/* ==========================================================================
+   RESIDENT EVIL OUTBREAK - PS2 Survival Horror UI Stylesheet (Expanded)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Orbitron:wght@600;800;900&display=swap');
+
+:root {
+  --bg-dark: #07090c;
+  --panel-bg: rgba(12, 16, 22, 0.90);
+  --panel-border: rgba(90, 120, 150, 0.4);
+  --green-fine: #39ff14;
+  --yellow-caution: #ffd700;
+  --red-danger: #ff2a2a;
+  --purple-poison: #bf00ff;
+  --accent-blue: #00d4ff;
+  --text-main: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-main);
+}
+
+#game-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.crt-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+              radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.8) 100%);
+  background-size: 100% 4px, 100% 100%;
+  box-shadow: inset 0 0 100px rgba(0,0,0,0.85);
+}
+
+/* --- TITLE & SCENARIO SELECTION --- */
+#title-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #1b202c 0%, #050608 100%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.8rem 2.5rem;
+  overflow-y: auto;
+}
+
+.title-header {
+  text-align: center;
+}
+
+.title-header h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.8rem;
+  letter-spacing: 0.35rem;
+  color: #ff3333;
+  text-shadow: 0 0 20px rgba(255, 50, 50, 0.6), 0 0 40px rgba(255, 0, 0, 0.3);
+}
+
+.scenario-tabs {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.6rem;
+}
+
+.scenario-tab-btn {
+  background: rgba(20, 25, 35, 0.8);
+  border: 1px solid var(--panel-border);
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  padding: 0.5rem 1.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.scenario-tab-btn.active {
+  background: #991111;
+  border-color: #ff4444;
+  box-shadow: 0 0 15px rgba(255, 50, 50, 0.5);
+}
+
+/* 8-Character Grid */
+.survivor-select-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  max-width: 1250px;
+  width: 100%;
+  margin: 0.8rem 0;
+}
+
+.char-card {
+  background: var(--panel-bg);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.char-card:hover, .char-card.selected {
+  border-color: #ff3333;
+  box-shadow: 0 0 20px rgba(255, 50, 50, 0.4);
+  transform: translateY(-3px);
+  background: rgba(30, 20, 24, 0.95);
+}
+
+.char-card .avatar-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.char-card h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.05rem;
+  color: #fff;
+}
+
+.char-card .char-role {
+  font-size: 0.78rem;
+  color: #88a0c0;
+  margin-bottom: 0.4rem;
+}
+
+.char-card .char-desc {
+  font-size: 0.74rem;
+  line-height: 1.3;
+  color: #cbd5e1;
+  margin-bottom: 0.5rem;
+  flex-grow: 1;
+}
+
+.char-card .char-stats {
+  width: 100%;
+  font-size: 0.72rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.4rem;
+  text-align: left;
+  color: #94a3b8;
+}
+
+.start-action-bar {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-top: 0.4rem;
+}
+
+.btn-biohazard {
+  background: linear-gradient(180deg, #bb1111 0%, #660505 100%);
+  border: 2px solid #ff4444;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  padding: 0.7rem 2.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.15rem;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-biohazard:hover {
+  background: linear-gradient(180deg, #ee1515 0%, #990808 100%);
+  box-shadow: 0 0 35px rgba(255, 0, 0, 0.8);
+  transform: scale(1.04);
+}
+
+/* --- RETRO SURVIVAL HORROR HUD --- */
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Boss Health Bar (Top Center) */
+#boss-hud-bar {
+  position: absolute;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #ff3333;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+  display: none;
+}
+
+.boss-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  color: #ff4a4a;
+  letter-spacing: 0.15rem;
+  margin-bottom: 0.3rem;
+}
+
+.boss-bar-track {
+  width: 100%;
+  height: 12px;
+  background: #222;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#boss-hp-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff2222, #ff8800);
+  transition: width 0.2s ease;
+}
+
+/* Top Left: EKG Health Monitor */
+.hud-ekg-panel {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 0.8rem 1.2rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.ekg-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.ekg-label {
+  font-size: 0.7rem;
+  color: #718096;
+}
+
+#ekg-status-text {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.condition-fine { color: var(--green-fine); text-shadow: 0 0 10px var(--green-fine); }
+.condition-caution { color: var(--yellow-caution); text-shadow: 0 0 10px var(--yellow-caution); }
+.condition-danger { color: var(--red-danger); text-shadow: 0 0 10px var(--red-danger); }
+.condition-bleed { color: #ff0055; animation: pulseRed 0.6s infinite alternate; }
+.condition-poison { color: var(--purple-poison); }
+
+@keyframes pulseRed {
+  0% { opacity: 0.3; }
+  100% { opacity: 1.0; }
+}
+
+/* Top Right: T-Virus Gauge */
+.hud-virus-panel {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 0.8rem 1.2rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.virus-gauge-circle {
+  width: 54px;
+  height: 54px;
+}
+
+.virus-gauge-circle svg {
+  transform: rotate(-90deg);
+}
+
+#virus-gauge-fill {
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 0.3s linear;
+}
+
+.virus-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.virus-label {
+  font-size: 0.7rem;
+  color: #e53e3e;
+}
+
+#virus-percent-text {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ff4a4a;
+}
+
+/* Bottom Left: Partner Status & Ad-Lib Wheel */
+.hud-partner-panel {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 0.8rem 1.2rem;
+  border-radius: 4px;
+}
+
+.adlib-hints {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #a0aec0;
+}
+
+.adlib-badge {
+  background: rgba(255,255,255,0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+}
+
+/* Bottom Right: Weapon & Ammo */
+.hud-weapon-panel {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 0.8rem 1.4rem;
+  border-radius: 4px;
+  text-align: right;
+}
+
+#hud-weapon-name {
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: bold;
+}
+
+#hud-weapon-ammo {
+  font-size: 1.6rem;
+  color: var(--accent-blue);
+  font-weight: bold;
+}
+
+#dialog-box {
+  position: absolute;
+  bottom: 6.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid #4a5568;
+  padding: 0.6rem 2rem;
+  border-radius: 4px;
+  font-size: 1.05rem;
+  color: #fff;
+  max-width: 80%;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* --- INVENTORY MODAL --- */
+#inventory-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 7, 10, 0.92);
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 2rem;
+}
+
+.inv-container {
+  background: var(--panel-bg);
+  border: 2px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 1.5rem;
+  width: 480px;
+}
+
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.inv-slot {
+  background: rgba(20, 26, 36, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 1rem;
+  min-height: 85px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.inv-slot.filled:hover {
+  border-color: var(--accent-blue);
+  background: rgba(30, 42, 60, 0.9);
+}
+
+.inv-details-panel {
+  background: var(--panel-bg);
+  border: 2px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 1.5rem;
+  width: 340px;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.action-buttons button {
+  background: #2d3748;
+  border: 1px solid #4a5568;
+  color: #fff;
+  padding: 0.6rem;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* --- RESULTS & VICTORY MODAL --- */
+.screen-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.screen-modal.victory h1 {
+  color: #48bb78;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 0.2rem;
+}
+
+.results-box {
+  background: rgba(20, 30, 25, 0.9);
+  border: 2px solid #48bb78;
+  border-radius: 6px;
+  padding: 1.5rem 3rem;
+  margin: 1.5rem 0;
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+}
+
+.rank-badge {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 4rem;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+}

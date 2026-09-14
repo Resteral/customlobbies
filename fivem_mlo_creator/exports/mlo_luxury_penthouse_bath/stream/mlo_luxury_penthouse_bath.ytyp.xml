@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+  <extensions />
+  <archetypes>
+    <Item type="CMloArchetypeDef">
+      <lodDist value="150.00000000" />
+      <flags value="0" />
+      <specialAttribute value="0" />
+      <bbMin x="-30" y="-30" z="-5" />
+      <bbMax x="30" y="30" z="10" />
+      <bsCentre x="0.0000" y="0.0000" z="2.5000" />
+      <bsRadius value="43.0842" />
+      <name>hei_dlc_mlo_penthouse</name>
+      <textureDictionary>hei_dlc_mlo_penthouse</textureDictionary>
+      <clipDictionary />
+      <drawableDictionary />
+      <physicsDictionary>hei_dlc_mlo_penthouse</physicsDictionary>
+      <hdTextureDist value="60.00000000" />
+      <assetType>ASSET_TYPE_DRAWABLE</assetType>
+      <assetName>hei_dlc_mlo_penthouse</assetName>
+      <rooms>
+        <Item type="CMloRoomDef">
+          <name>limbo</name>
+          <bbMin x="-30" y="-30" z="-5" />
+          <bbMax x="30" y="30" z="10" />
+          <blend value="0.00000000" />
+          <timecycleName>default</timecycleName>
+          <secondaryTimecycleName />
+          <flags value="0" />
+          <portalCount value="0" />
+          <floorId value="0" />
+        </Item>
+        <Item type="CMloRoomDef">
+          <name>living_lounge</name>
+          <bbMin x="-8" y="-8" z="0" />
+          <bbMax x="8" y="8" z="4" />
+          <blend value="1.00000000" />
+          <timecycleName>int_clothes_high</timecycleName>
+          <secondaryTimecycleName />
+          <flags value="0" />
+          <portalCount value="0" />
+          <floorId value="0" />
+        </Item>
+        <Item type="CMloRoomDef">
+          <name>bathroom_suite</name>
+          <bbMin x="10" y="-1.75" z="0" />
+          <bbMax x="14" y="1.75" z="3" />
+          <blend value="1.00000000" />
+          <timecycleName>int_hospital</timecycleName>
+          <secondaryTimecycleName />
+          <flags value="0" />
+          <portalCount value="0" />
+          <floorId value="0" />
+        </Item>
+      </rooms>
+      <portals>
+        <Item type="CMloPortalDef">
+          <roomFrom value="1" />
+          <roomTo value="2" />
+          <flags value="0" />
+          <mirrorPriority value="0" />
+          <opacity value="0" />
+          <vertices>
+            <Item x="11.5000" y="-1.7500" z="0.0000" />
+            <Item x="11.5000" y="-1.7500" z="2.2000" />
+            <Item x="12.5000" y="-1.7500" z="2.2000" />
+            <Item x="12.5000" y="-1.7500" z="0.0000" />
+          </vertices>
+          <attachedObjects />
+        </Item>
+      </portals>
+      <entities>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_cd_wall01</archetypeName>
+          <flags value="0" />
+          <guid value="1" />
+          <position x="0.0000" y="8.0000" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="0.3000" />
+          <parentIndex value="1" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_cd_wall01</archetypeName>
+          <flags value="0" />
+          <guid value="2" />
+          <position x="0.0000" y="8.0000" z="2.5000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="0.1670" />
+          <parentIndex value="1" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_cd_wall01</archetypeName>
+          <flags value="0" />
+          <guid value="3" />
+          <position x="-1.4500" y="8.0000" z="0.9000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="0.2750" />
+          <scaleZ value="0.5330" />
+          <parentIndex value="1" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_cd_wall01</archetypeName>
+          <flags value="0" />
+          <guid value="4" />
+          <position x="1.4500" y="8.0000" z="0.9000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="0.2750" />
+          <scaleZ value="0.5330" />
+          <parentIndex value="1" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_bank_glass01</archetypeName>
+          <flags value="0" />
+          <guid value="5" />
+          <position x="0.0000" y="8.0000" z="0.9000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="0.9000" />
+          <scaleZ value="1.0670" />
+          <parentIndex value="1" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>prop_curtain_open_01</archetypeName>
+          <flags value="0" />
+          <guid value="6" />
+          <position x="0.0000" y="8.0800" z="0.7000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="0.9000" />
+          <scaleZ value="0.7270" />
+          <parentIndex value="1" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_floor_tile01</archetypeName>
+          <flags value="0" />
+          <guid value="7" />
+          <position x="12.0000" y="0.0000" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_floor_tile01</archetypeName>
+          <flags value="0" />
+          <guid value="8" />
+          <position x="12.0000" y="0.0000" z="3.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_cd_wall01</archetypeName>
+          <flags value="0" />
+          <guid value="9" />
+          <position x="12.0000" y="1.7500" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_cd_wall01</archetypeName>
+          <flags value="0" />
+          <guid value="10" />
+          <position x="12.0000" y="-1.7500" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_cd_wall01</archetypeName>
+          <flags value="0" />
+          <guid value="11" />
+          <position x="14.0000" y="0.0000" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.707100" w="0.707100" />
+          <scaleXY value="0.8800" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_cd_wall01</archetypeName>
+          <flags value="0" />
+          <guid value="12" />
+          <position x="10.0000" y="0.0000" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.707100" w="0.707100" />
+          <scaleXY value="0.8800" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_res_mp_soakertub</archetypeName>
+          <flags value="0" />
+          <guid value="13" />
+          <position x="13.0000" y="0.0000" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.707100" w="0.707100" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_res_mp_shower</archetypeName>
+          <flags value="0" />
+          <guid value="14" />
+          <position x="10.9000" y="0.8500" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_res_mp_vanity</archetypeName>
+          <flags value="0" />
+          <guid value="15" />
+          <position x="12.2000" y="1.3500" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="1.000000" w="0.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_res_mp_mirror</archetypeName>
+          <flags value="0" />
+          <guid value="16" />
+          <position x="12.2000" y="1.7000" z="1.2000" />
+          <rotation x="0.000000" y="0.000000" z="1.000000" w="0.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>prop_toilet_01</archetypeName>
+          <flags value="0" />
+          <guid value="17" />
+          <position x="10.6000" y="-1.1500" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>prop_towel_rail_01</archetypeName>
+          <flags value="0" />
+          <guid value="18" />
+          <position x="10.0500" y="0.0000" z="0.9000" />
+          <rotation x="0.000000" y="0.000000" z="0.707100" w="0.707100" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>prop_toilet_roll_01</archetypeName>
+          <flags value="0" />
+          <guid value="19" />
+          <position x="10.0500" y="-1.1500" z="0.6000" />
+          <rotation x="0.000000" y="0.000000" z="0.707100" w="0.707100" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+        <Item type="CMloEntityDef">
+          <archetypeName>v_ilev_bath_door</archetypeName>
+          <flags value="0" />
+          <guid value="20" />
+          <position x="12.0000" y="-1.7500" z="0.0000" />
+          <rotation x="0.000000" y="0.000000" z="0.000000" w="1.000000" />
+          <scaleXY value="1.0000" />
+          <scaleZ value="1.0000" />
+          <parentIndex value="2" />
+          <lodDist value="100.00000000" />
+          <childLodDist value="0.00000000" />
+          <lodLevel>LODTYPES_DEPTH_HD</lodLevel>
+          <numChildren value="0" />
+          <priorityLevel>PRI_REQUIRED</priorityLevel>
+          <extensions />
+          <ambientOcclusionMultiplier value="255" />
+          <artificialAmbientOcclusion value="255" />
+          <tintValue value="0" />
+        </Item>
+      </entities>
+      <entitySets>
+        <Item type="CMloEntitySet">
+          <name>curtains_open</name>
+          <locations />
+          <entities>
+            <Item value="4" />
+          </entities>
+        </Item>
+        <Item type="CMloEntitySet">
+          <name>curtains_closed</name>
+          <locations />
+          <entities>
+          </entities>
+        </Item>
+      </entitySets>
+      <timeCycleModifiers />
+    </Item>
+  </archetypes>
+  <name>hei_dlc_mlo_penthouse</name>
+</CMapTypes>

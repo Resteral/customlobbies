@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logitech Trackball Direction Tracker & 3D Device HUD (OBS Stream Overlay)</title>
+  <!-- Three.js for 3D WebGL rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- OrbitControls for interactive 3D viewing -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- Feather Icons for modern iconography -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="theme-cyberpunk">
+
+  <!-- Streamer Dashboard Header -->
+  <header class="dashboard-header">
+    <div class="brand-title">
+      <i data-feather="crosshair"></i>
+      <span>LOGITECH 3D TRACKBALL AIM & BUTTON TRACKER</span>
+    </div>
+    <div class="server-status-pill">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">CONNECTING TO TRACKER SERVER...</span>
+    </div>
+  </header>
+
+  <main class="app-container">
+    
+    <!-- Main Tracker Viewports & Visualizers -->
+    <section class="tracker-stage">
+
+      <!-- Mouse Fallback / Test Notice -->
+      <div class="fallback-banner" id="fallbackBanner">
+        <span>💡 <strong>Browser Test Mode:</strong> Click inside this window to test 3D trackball roll and 3D button clicks directly in your browser.</span>
+        <button class="btn-primary" id="testModeBtn" style="padding: 6px 12px; font-size: 0.8rem;">
+          <i data-feather="mouse-pointer"></i> Lock Pointer Test
+        </button>
+      </div>
+
+      <!-- Main Stage Grid -->
+      <div class="stage-card-wrapper">
+
+        <!-- Card 1: 3D Lookalike Logitech Trackball Device Model -->
+        <div class="hud-card main-3d-card" style="grid-column: span 2;">
+          <div class="card-label">
+            <span>3D Logitech Trackball Device Model</span>
+            <div class="view-preset-group">
+              <button class="view-btn active" onclick="setCameraAngle('iso')">Isometric 45°</button>
+              <button class="view-btn" onclick="setCameraAngle('top')">Top View</button>
+              <button class="view-btn" onclick="setCameraAngle('side')">Thumb View</button>
+              <button class="view-btn" onclick="setCameraAngle('front')">Front Angle</button>
+            </div>
+            <span class="badge" id="ballTextureBadge">MX ERGO RED</span>
+          </div>
+          <div class="trackball-3d-box-large">
+            <canvas id="canvas3d"></canvas>
+            <div class="interactive-hint"><i data-feather="move"></i> Drag to rotate 3D trackball model</div>
+          </div>
+        </div>
+
+        <!-- Card 2: 2D Aim Vector Radar & Compass Reticle -->
+        <div class="hud-card">
+          <div class="card-label">
+            <span>Aim Vector & Velocity Radar</span>
+            <span class="badge" id="cardinalBadge">NORTH</span>
+          </div>
+          <div class="radar-box">
+            <canvas id="radarCanvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Card 3: Interactive Ergonomic Button Telemetry HUD -->
+        <div class="hud-card" id="buttonHudCard">
+          <div class="card-label">
+            <span>Logitech Button HUD</span>
+            <span class="badge" id="lastButtonBadge">READY</span>
+          </div>
+          <div class="button-hud-container" id="hudContainer">
+
+            <!-- Click Ripple Container -->
+            <div id="rippleContainer"></div>
+
+            <!-- Scroll Wheel Spin Pulse Arrows -->
+            <div class="scroll-pulse-arrow" id="scrollUpArrow" style="top: 25px;"><i data-feather="chevron-up"></i></div>
+            <div class="scroll-pulse-arrow" id="scrollDownArrow" style="bottom: 25px;"><i data-feather="chevron-down"></i></div>
+
+            <!-- SVG Vector Layout of Logitech MX Ergo Trackball Chassis & Buttons -->
+            <svg class="trackball-svg-hud" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Main Ergonomic Chassis Outline -->
+              <path d="M70 210 C40 180 30 130 40 80 C50 35 90 20 140 25 C185 30 205 65 200 120 C195 170 170 215 125 220 Z" 
+                    fill="#101624" stroke="rgba(255,255,255,0.2)" stroke-width="3" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.5))"/>
+
+              <!-- Trackball Well Socket -->
+              <circle cx="85" cy="115" r="42" fill="#090d16" stroke="var(--accent-color)" stroke-width="2" opacity="0.8"/>
+              <circle cx="85" cy="115" r="36" fill="url(#ballGlowGrad)" opacity="0.4"/>
+
+              <!-- Button: Left Click (LMB) -->
+              <path id="btn-left" class="btn-part" d="M122 30 C135 28 152 32 158 75 L130 80 L122 30 Z"/>
+              <text x="135" y="55" class="btn-label-text">LMB</text>
+
+              <!-- Button: Right Click (RMB) -->
+              <path id="btn-right" class="btn-part" d="M164 34 C185 45 198 65 192 110 L166 100 L164 34 Z"/>
+              <text x="172" y="70" class="btn-label-text">RMB</text>
+
+              <!-- Button: Scroll Wheel & Middle Click (MMB) -->
+              <rect id="btn-wheel" class="btn-part" x="156" y="52" width="10" height="26" rx="5"/>
+
+              <!-- Button: Extra Mouse 4 (Back) -->
+              <path id="btn-back" class="btn-part" d="M115 88 L126 86 L124 106 L113 108 Z"/>
+              <text x="96" y="100" class="btn-label-text">M4</text>
+
+              <!-- Button: Extra Mouse 5 (Forward) -->
+              <path id="btn-forward" class="btn-part" d="M113 114 L124 112 L122 132 L111 134 Z"/>
+              <text x="94" y="128" class="btn-label-text">M5</text>
+
+              <!-- Button: Precision DPI Toggle Button -->
+              <circle id="btn-dpi" class="btn-part" cx="72" cy="62" r="8"/>
+              <text x="52" y="50" class="btn-label-text">DPI</text>
+
+              <!-- Gradient Definitions -->
+              <defs>
+                <radialGradient id="ballGlowGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="var(--accent-color)" stop-opacity="0.8"/>
+                  <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+            </svg>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Real-Time Telemetry Data Bar -->
+      <div class="telemetry-bar">
+        <div class="telemetry-item">
+          <span class="telemetry-title">Aim Angle</span>
+          <span class="telemetry-value highlight" id="telAngle">0.0° N</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-title">Motion Velocity</span>
+          <span class="telemetry-value" id="telSpeed">0 px/s</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-title">Vector (DX, DY)</span>
+          <span class="telemetry-value" id="telVector">0, 0</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-title">Total Clicks</span>
+          <span class="telemetry-value" id="telClicks">0</span>
+        </div>
+      </div>
+
+      <!-- Live Action Log Feed -->
+      <div class="action-feed-bar">
+        <span class="feed-label">RECENT ACTIONS:</span>
+        <div class="feed-tags" id="actionFeedTags">
+          <span class="feed-tag">SYSTEM READY</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Customization & Settings Sidebar -->
+    <aside class="control-sidebar">
+      <div class="sidebar-panel">
+        <div class="panel-title">
+          <i data-feather="sliders"></i> Streamer Controls
+        </div>
+
+        <!-- Color Theme Selector -->
+        <div class="form-group">
+          <label>Accent Theme</label>
+          <select class="form-control" id="themeSelect">
+            <option value="theme-cyberpunk">Cyberpunk Cyan</option>
+            <option value="theme-logitech" selected>Logitech Blue</option>
+            <option value="theme-crimson">Crimson Ruby</option>
+            <option value="theme-razer">Razer Green</option>
+            <option value="theme-purple">Deep Purple</option>
+          </select>
+        </div>
+
+        <!-- 3D Ball Finish Preset -->
+        <div class="form-group">
+          <label>3D Trackball Finish</label>
+          <select class="form-control" id="ballTextureSelect">
+            <option value="ergo-red">Logitech MX Ergo Red</option>
+            <option value="ergo-blue">Ergo M575 Sapphire Blue</option>
+            <option value="trackman-ruby">Trackman Marble Ruby</option>
+            <option value="stealth-black">Matte Stealth Black</option>
+            <option value="cyber-mesh">Cyberpunk RGB Energy Mesh</option>
+          </select>
+        </div>
+
+        <!-- Damping / Friction Inertia -->
+        <div class="form-group">
+          <label>Ball Inertia Damping <span id="dampingVal">0.92</span></label>
+          <input type="range" class="form-range" id="dampingRange" min="0.5" max="0.99" step="0.01" value="0.92">
+        </div>
+
+        <!-- Sensitivity Multiplier -->
+        <div class="form-group">
+          <label>Sensitivity Scale <span id="sensVal">1.0x</span></label>
+          <input type="range" class="form-range" id="sensRange" min="0.2" max="3.0" step="0.1" value="1.0">
+        </div>
+
+        <!-- Background Mode (Transparent / Chroma Key) -->
+        <div class="form-group">
+          <label>Background Mode</label>
+          <div class="toggle-btn-group">
+            <div class="toggle-btn active" id="bgModeNormal" onclick="setBgMode('normal')">Dark Glass</div>
+            <div class="toggle-btn" id="bgModeTransparent" onclick="setBgMode('transparent')">Transparent</div>
+            <div class="toggle-btn" id="bgModeGreen" onclick="setBgMode('green')">Green Screen</div>
+            <div class="toggle-btn" id="bgModeBlue" onclick="setBgMode('blue')">Blue Screen</div>
+          </div>
+        </div>
+
+        <!-- OBS Browser Source URL Helper -->
+        <div class="obs-link-box">
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">OBS Browser Source Link</label>
+          <input type="text" class="obs-link-input" id="obsUrlInput" readonly value="http://localhost:8765/?mode=overlay&bg=transparent">
+          <button class="btn-primary" id="copyObsUrlBtn">
+            <i data-feather="copy"></i> Copy OBS URL
+          </button>
+        </div>
+
+      </div>
+    </aside>
+
+  </main>
+
+  <script src="js/app.js"></script>
+  <script>
+    feather.replace();
+  </script>
+</body>
+</html>

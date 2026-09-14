@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIOHAZARD OUTBREAK: Raccoon Escape (3 Full Scenarios & 8 Survivors)</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+  <!-- Three.js r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- Retro CRT Scanline & Vignette Effect -->
+  <div class="crt-overlay"></div>
+
+  <!-- 3D WebGL Canvas Container -->
+  <div id="game-container"></div>
+
+  <!-- Title & Character Selection Screen -->
+  <div id="title-screen">
+    <div class="title-header">
+      <h1>OUTBREAK</h1>
+      <!-- 3 Scenario Selector Tabs -->
+      <div class="scenario-tabs">
+        <button id="tab-scen-1" class="scenario-tab-btn active" onclick="switchScenarioTab('outbreak')">SCENARIO 1: J's BAR</button>
+        <button id="tab-scen-2" class="scenario-tab-btn" onclick="switchScenarioTab('underbelly')">SCENARIO 2: UNDERBELLY (SUBWAY)</button>
+        <button id="tab-scen-3" class="scenario-tab-btn" onclick="switchScenarioTab('hospital')">SCENARIO 3: THE HIVE (HOSPITAL)</button>
+      </div>
+    </div>
+
+    <!-- 8 Original Outbreak Survivors Grid -->
+    <div class="survivor-select-grid">
+      <!-- Kevin -->
+      <div class="char-card selected" onclick="selectSurvivor('kevin', this)">
+        <div class="avatar-icon">👮‍♂️</div>
+        <h3>KEVIN RYMAN</h3>
+        <div class="char-role">R.P.D. OFFICER</div>
+        <div class="char-desc">Fast movement speed, custom .45 Auto Pistol. High critical headshot potential.</div>
+        <div class="char-stats">
+          <div>HP: 120 | SPEED: High</div>
+          <div>ABILITY: Lethal Aiming Snipe</div>
+        </div>
+      </div>
+
+      <!-- Cindy -->
+      <div class="char-card" onclick="selectSurvivor('cindy', this)">
+        <div class="avatar-icon">👩‍💼</div>
+        <h3>CINDY LENNOX</h3>
+        <div class="char-role">J's BAR WAITRESS</div>
+        <div class="char-desc">Herb Case holds 3 extra herbs without inventory slots. High healing boost.</div>
+        <div class="char-stats">
+          <div>HP: 100 | SPEED: Med</div>
+          <div>ABILITY: Herb Case & Team Medic</div>
+        </div>
+      </div>
+
+      <!-- Alyssa -->
+      <div class="char-card" onclick="selectSurvivor('alyssa', this)">
+        <div class="avatar-icon">🕵️‍♀️</div>
+        <h3>ALYSSA ASHCROFT</h3>
+        <div class="char-role">REPORTER</div>
+        <div class="char-desc">Lockpick Set opens locked doors/safes without keys. Quick backstep dodge.</div>
+        <div class="char-stats">
+          <div>HP: 95 | SPEED: Med</div>
+          <div>ABILITY: Lockpicking & Dodge</div>
+        </div>
+      </div>
+
+      <!-- David -->
+      <div class="char-card" onclick="selectSurvivor('david', this)">
+        <div class="avatar-icon">🔧</div>
+        <h3>DAVID KING</h3>
+        <div class="char-role">PLUMBER</div>
+        <div class="char-desc">Tough brawler. Can craft Spears (Plank+Knife) and Stun Rods. High melee stun.</div>
+        <div class="char-stats">
+          <div>HP: 130 | SPEED: Heavy</div>
+          <div>ABILITY: Weapon Crafting & Knockdown</div>
+        </div>
+      </div>
+
+      <!-- Yoko -->
+      <div class="char-card" onclick="selectSurvivor('yoko', this)">
+        <div class="avatar-icon">🎒</div>
+        <h3>YOKO SUZUKI</h3>
+        <div class="char-role">STUDENT</div>
+        <div class="char-desc">Large Knapsack carrying 8 full inventory slots. Can crawl to escape grabs.</div>
+        <div class="char-stats">
+          <div>HP: 90 | SPEED: Normal</div>
+          <div>ABILITY: 8 Inventory Slots</div>
+        </div>
+      </div>
+
+      <!-- Mark -->
+      <div class="char-card" onclick="selectSurvivor('mark', this)">
+        <div class="avatar-icon">🛡️</div>
+        <h3>MARK WILKINS</h3>
+        <div class="char-role">SECURITY GUARD</div>
+        <div class="char-desc">Military veteran with high stamina. Physical Guard stance reduces damage by 75%.</div>
+        <div class="char-stats">
+          <div>HP: 140 | SPEED: Heavy</div>
+          <div>ABILITY: Guard Stance (Key G)</div>
+        </div>
+      </div>
+
+      <!-- George -->
+      <div class="char-card" onclick="selectSurvivor('george', this)">
+        <div class="avatar-icon">👨‍⚕️</div>
+        <h3>DR. GEORGE</h3>
+        <div class="char-role">PHYSICIAN</div>
+        <div class="char-desc">Medical Capsule Shooter shoots Antiviral darts that heal and lower virus infection %.</div>
+        <div class="char-stats">
+          <div>HP: 100 | SPEED: Med</div>
+          <div>ABILITY: Medical Synthesis Shooter</div>
+        </div>
+      </div>
+
+      <!-- Jim -->
+      <div class="char-card" onclick="selectSurvivor('jim', this)">
+        <div class="avatar-icon">🪙</div>
+        <h3>JIM CHAPMAN</h3>
+        <div class="char-role">SUBWAY STAFF</div>
+        <div class="char-desc">Flips Lucky Coin for +35% crits. Play Dead (Key P) drops zombie aggro completely.</div>
+        <div class="char-stats">
+          <div>HP: 95 | SPEED: Normal</div>
+          <div>ABILITY: Play Dead & Lucky Coin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Partner & Control Selection -->
+    <div style="display: flex; gap: 2rem; align-items: center; background: rgba(0,0,0,0.6); padding: 0.6rem 2rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.15);">
+      <div>
+        <label style="font-size: 0.85rem; color: #88a0c0;">AI PARTNER:</label>
+        <select id="select-partner" style="background: #111; color: #fff; border: 1px solid #4a5568; padding: 0.4rem 0.8rem; font-family: inherit; margin-left: 0.5rem;">
+          <option value="cindy">Cindy Lennox (Medic)</option>
+          <option value="kevin">Kevin Ryman (Firearms)</option>
+          <option value="mark">Mark Wilkins (Tank Guard)</option>
+          <option value="george">Dr. George (Antiviral)</option>
+          <option value="david">David King (Brawler)</option>
+          <option value="alyssa">Alyssa Ashcroft (Lockpick)</option>
+          <option value="yoko">Yoko Suzuki (Carrier)</option>
+          <option value="jim">Jim Chapman (Subway Staff)</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="font-size: 0.85rem; color: #88a0c0;">CONTROLS:</label>
+        <select id="select-controls" style="background: #111; color: #fff; border: 1px solid #4a5568; padding: 0.4rem 0.8rem; font-family: inherit; margin-left: 0.5rem;" onchange="window.outbreakEngine.controlMode = this.value">
+          <option value="modern">Modern 3D (WASD Move)</option>
+          <option value="tank">Classic Tank Controls (W=Forward, A/D=Turn)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Start Button -->
+    <div class="start-action-bar">
+      <button class="btn-biohazard" onclick="startOutbreakGame()">ENTER THE OUTBREAK</button>
+    </div>
+  </div>
+
+  <!-- In-Game HUD -->
+  <div id="hud" style="display: none;">
+    <!-- Boss Health Bar -->
+    <div id="boss-hud-bar">
+      <div id="boss-title-text" class="boss-title">MUTANT FLEA QUEEN</div>
+      <div class="boss-bar-track">
+        <div id="boss-hp-fill"></div>
+      </div>
+    </div>
+
+    <!-- EKG Heartbeat Health Monitor -->
+    <div class="hud-ekg-panel">
+      <div class="ekg-box">
+        <span class="ekg-label">CONDITION</span>
+        <span id="ekg-status-text" class="condition-fine">FINE</span>
+      </div>
+    </div>
+
+    <!-- T-Virus Infection Gauge -->
+    <div class="hud-virus-panel">
+      <div class="virus-gauge-circle">
+        <svg viewBox="0 0 100 100" width="54" height="54">
+          <circle cx="50" cy="50" r="45" stroke="rgba(255,255,255,0.15)" stroke-width="8" fill="none" />
+          <circle id="virus-gauge-fill" cx="50" cy="50" r="45" stroke="#ff2222" stroke-width="8" fill="none" />
+        </svg>
+      </div>
+      <div class="virus-info">
+        <span class="virus-label">T-VIRUS INFECTION</span>
+        <span id="virus-percent-text">0.0%</span>
+      </div>
+    </div>
+
+    <!-- Partner Status & Ad-Lib Hotkeys -->
+    <div class="hud-partner-panel">
+      <div id="partner-status-text" style="font-size: 0.95rem; color: #fff; font-weight: bold;">Cindy: FINE (0% INF)</div>
+      <div class="adlib-hints">
+        <span class="adlib-badge">[1] HELP!</span>
+        <span class="adlib-badge">[2] COME ON!</span>
+        <span class="adlib-badge">[3] ATTACK!</span>
+        <span class="adlib-badge">[4] THANKS</span>
+      </div>
+    </div>
+
+    <!-- Weapon & Ammo Status -->
+    <div class="hud-weapon-panel">
+      <div id="hud-weapon-name">HANDGUN 9MM</div>
+      <div id="hud-weapon-ammo">15 / 15</div>
+      <div style="font-size: 0.72rem; color: #718096; margin-top: 0.2rem;">[SPACE/RMB] Aim | [F/LMB] Shoot | [G] Guard | [P] Play Dead | [I] Inventory</div>
+    </div>
+
+    <!-- Subtitle Dialogue Box -->
+    <div id="dialog-box"></div>
+  </div>
+
+  <!-- Inventory Screen Modal -->
+  <div id="inventory-modal" style="display: none;">
+    <div class="inv-container">
+      <h2 style="font-family: 'Orbitron', sans-serif; color: #ff3333; margin-bottom: 0.5rem; letter-spacing: 0.1rem;">SURVIVOR INVENTORY</h2>
+      <div style="font-size: 0.8rem; color: #88a0c0;">Click item to examine, equip, craft, or give to partner.</div>
+      <div id="inventory-slots" class="inv-grid"></div>
+      <button style="margin-top: 1.5rem; width: 100%; padding: 0.7rem; background: #333; color: #fff; border: 1px solid #555; cursor: pointer; font-family: inherit;" onclick="outbreakGame.toggleInventory()">CLOSE INVENTORY [I]</button>
+    </div>
+
+    <div class="inv-details-panel">
+      <div id="item-actions">
+        <h4 style="color: #cbd5e1; margin-bottom: 0.5rem;">ITEM DETAILS</h4>
+        <p style="font-size: 0.85rem; color: #718096;">Select an item from the left inventory slots.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="game-over-screen" class="screen-modal gameover" style="display: none;">
+    <h1 style="color: #e53e3e; font-family: 'Orbitron', sans-serif;">YOU DIED</h1>
+    <p id="game-over-reason" style="font-size: 1.2rem; color: #cbd5e1; max-width: 600px; margin-bottom: 2rem;">YOU WERE OVERWHELMED BY THE HORDE</p>
+    <button class="btn-biohazard" onclick="restartGame()">RETRY SCENARIO</button>
+  </div>
+
+  <!-- Victory / Evacuation Screen -->
+  <div id="victory-screen" class="screen-modal victory" style="display: none;">
+    <h1>SCENARIO COMPLETE</h1>
+    <div class="results-box">
+      <div>
+        <div style="font-size: 0.85rem; color: #88a0c0;">OUTBREAK GRADE</div>
+        <div id="results-rank" class="rank-badge">S</div>
+      </div>
+      <div style="text-align: left; font-size: 1.1rem; line-height: 1.6;">
+        <div>CLEAR TIME: <span id="results-time" style="color: #fff; font-weight: bold;">1m 45s</span></div>
+        <div>MUTANTS DEFEATED: <span id="results-kills" style="color: #ff4a4a; font-weight: bold;">8 MUTANTS</span></div>
+        <div>STATUS: <span style="color: #48bb78; font-weight: bold;">SURVIVED & EVACUATED</span></div>
+      </div>
+    </div>
+    <button class="btn-biohazard" onclick="restartGame()">PLAY AGAIN</button>
+  </div>
+
+  <!-- Game Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/models.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/game.js"></script>
+
+  <script>
+    let chosenChar = 'kevin';
+    let chosenScenario = 'outbreak';
+
+    function switchScenarioTab(scenario) {
+      chosenScenario = scenario;
+      document.getElementById('tab-scen-1').classList.toggle('active', scenario === 'outbreak');
+      document.getElementById('tab-scen-2').classList.toggle('active', scenario === 'underbelly');
+      document.getElementById('tab-scen-3').classList.toggle('active', scenario === 'hospital');
+      window.outbreakAudio.playMenuSelect();
+    }
+
+    function selectSurvivor(charId, el) {
+      chosenChar = charId;
+      document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      window.outbreakAudio.playMenuSelect();
+
+      const partnerSelect = document.getElementById('select-partner');
+      if (partnerSelect.value === charId) {
+        partnerSelect.value = charId === 'kevin' ? 'cindy' : 'kevin';
+      }
+    }
+
+    function startOutbreakGame() {
+      const partnerId = document.getElementById('select-partner').value;
+      const controlMode = document.getElementById('select-controls').value;
+      window.outbreakEngine.controlMode = controlMode;
+
+      window.outbreakEngine.init(document.getElementById('game-container'));
+      window.outbreakGame.startGame(chosenChar, partnerId, chosenScenario);
+
+      if (!window.isLooping) {
+        window.isLooping = true;
+        lastTime = performance.now();
+        requestAnimationFrame(mainGameLoop);
+      }
+    }
+
+    function restartGame() {
+      document.getElementById('game-over-screen').style.display = 'none';
+      document.getElementById('victory-screen').style.display = 'none';
+      document.getElementById('title-screen').style.display = 'flex';
+      window.outbreakAudio.startAmbientMusic();
+    }
+
+    let lastTime = performance.now();
+    function mainGameLoop(now) {
+      const delta = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      if (window.outbreakGame && window.outbreakGame.state === 'PLAYING') {
+        window.outbreakGame.update(delta);
+      }
+      if (window.outbreakEngine) {
+        window.outbreakEngine.update(delta);
+      }
+
+      requestAnimationFrame(mainGameLoop);
+    }
+  </script>
+</body>
+</html>

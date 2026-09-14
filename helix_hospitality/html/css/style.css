@@ -1,0 +1,1600 @@
+:root {
+  --bg-primary: #0a0c10;
+  --bg-surface: rgba(18, 22, 32, 0.85);
+  --bg-surface-elevated: rgba(28, 34, 48, 0.9);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(255, 42, 127, 0.4);
+  --accent-pink: #ff2a7f;
+  --accent-pink-glow: rgba(255, 42, 127, 0.35);
+  --accent-cyan: #00f0ff;
+  --accent-cyan-glow: rgba(0, 240, 255, 0.35);
+  --accent-gold: #ffb800;
+  --accent-purple: #9d4edd;
+  --accent-green: #00e676;
+  --text-main: #f0f3f8;
+  --text-muted: #8a94a6;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  font-family: var(--font-sans);
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   APP WINDOW SHELL & GLASSMORPHISM
+   ========================================================================== */
+.app-window {
+  position: relative;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.85), 0 0 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(25px);
+  color: var(--text-main);
+  animation: modalFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ==========================================================================
+   MIXOLOGY SUITE STAGE
+   ========================================================================== */
+#mixologyStation {
+  width: 1180px;
+  height: 740px;
+  display: flex;
+  flex-direction: column;
+}
+
+.station-header {
+  height: 75px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(14, 17, 24, 0.9);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-badge-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  box-shadow: 0 0 20px var(--accent-pink-glow);
+}
+
+.header-left h2 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.header-left p {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.live-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-green);
+  letter-spacing: 1px;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-green);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.btn-close {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  background: rgba(255, 50, 80, 0.2);
+  color: #ff3366;
+  border-color: #ff3366;
+}
+
+/* ==========================================================================
+   RECIPE SIDEBAR
+   ========================================================================== */
+.station-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.recipe-sidebar {
+  width: 320px;
+  background: rgba(12, 15, 22, 0.95);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  gap: 14px;
+}
+
+.sidebar-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-search i {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.sidebar-search input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 14px 10px 38px;
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sidebar-search input:focus {
+  border-color: var(--accent-pink);
+}
+
+.recipe-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  padding: 3px;
+  border: 1px solid var(--border-color);
+}
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: var(--accent-pink);
+  color: #fff;
+  box-shadow: 0 0 15px var(--accent-pink-glow);
+}
+
+.recipe-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.recipe-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.recipe-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.recipe-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.recipe-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(3px);
+}
+
+.recipe-card.active {
+  background: rgba(255, 42, 127, 0.08);
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 20px rgba(255, 42, 127, 0.15);
+}
+
+.recipe-card-info h4 {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.recipe-card-info span {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.recipe-card-price {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent-green);
+}
+
+/* ==========================================================================
+   WORKSPACE & TELEMETRY
+   ========================================================================== */
+.mixology-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 60% 30%, rgba(26, 32, 48, 0.5), #07090d 80%);
+  position: relative;
+}
+
+.workspace-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  gap: 16px;
+}
+
+.empty-icon-ring {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  color: var(--text-muted);
+}
+
+.workspace-active {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.craft-header {
+  padding: 16px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(10, 12, 18, 0.4);
+}
+
+.craft-header h3 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.badge-row {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+}
+
+.badge-buff {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.3);
+  color: var(--accent-cyan);
+}
+
+.badge-glass {
+  background: rgba(255, 184, 0, 0.1);
+  border-color: rgba(255, 184, 0, 0.3);
+  color: var(--accent-gold);
+}
+
+.live-cocktail-telemetry {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-color);
+  padding: 8px 18px;
+  border-radius: 12px;
+}
+
+.telemetry-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetry-item .lbl, .rating-preview .lbl {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+.telemetry-item .val {
+  font-size: 15px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #fff;
+}
+
+.rating-preview .stars {
+  color: var(--accent-gold);
+  font-size: 12px;
+  display: flex;
+  gap: 2px;
+}
+
+/* ==========================================================================
+   ULTRA-REALISTIC 3D GLASSWARE STAGE
+   ========================================================================== */
+.craft-center-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 20px;
+}
+
+.bar-counter-ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 42, 127, 0.06), transparent 70%);
+}
+
+.glass-stage-pedestal {
+  position: relative;
+  width: 360px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 10;
+}
+
+/* BAR DRIP MAT & COUNTER SURFACE */
+.bar-drip-mat {
+  position: absolute;
+  bottom: 0;
+  width: 340px;
+  height: 28px;
+  background: linear-gradient(180deg, #181a20, #0c0d12);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mat-ribs {
+  width: 94%;
+  height: 14px;
+  background: repeating-linear-gradient(90deg, #111318, #111318 6px, #1e222d 6px, #1e222d 12px);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================================
+   GLASSWARE GEOMETRIES (COUPE, ROCKS, HIGHBALL, MUG)
+   ========================================================================== */
+.glass-unit {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+  transition: all 0.35s ease;
+}
+
+/* 1. COUPE / MARTINI GLASS */
+.glass-unit.coupe .glass-bowl-wrapper {
+  width: 220px;
+  height: 110px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 0 0 110px 110px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01) 40%, rgba(255, 255, 255, 0.06));
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 0 18px rgba(255, 255, 255, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-unit.coupe .crystal-stem {
+  width: 6px;
+  height: 100px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.2));
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+.glass-unit.coupe .crystal-foot {
+  width: 100px;
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+}
+
+/* 2. ROCKS / OLD FASHIONED TUMBLER */
+.glass-unit.rocks .glass-bowl-wrapper {
+  width: 160px;
+  height: 175px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-bottom: 18px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0 0 16px 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.08));
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-unit.rocks .glass-stem-structure {
+  display: none;
+}
+
+/* 3. HIGHBALL / COLLINS GLASS */
+.glass-unit.highball .glass-bowl-wrapper {
+  width: 125px;
+  height: 220px;
+  border: 3px solid rgba(255, 255, 255, 0.38);
+  border-bottom: 14px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0 0 12px 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.08));
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-unit.highball .glass-stem-structure {
+  display: none;
+}
+
+/* 4. COPPER MOSCOW MULE MUG */
+.glass-unit.mug .glass-bowl-wrapper {
+  width: 160px;
+  height: 170px;
+  border-radius: 0 0 20px 20px;
+  background: radial-gradient(circle at 30% 30%, #e07a4a, #8f3718 80%);
+  border: 3px solid #b85226;
+  border-bottom: 10px solid #70260b;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-unit.mug .glass-stem-structure {
+  display: none;
+}
+
+/* Specular Sheen & Highlights */
+.glass-specular-sheen {
+  position: absolute;
+  top: 0;
+  left: 12%;
+  width: 14%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
+  z-index: 8;
+}
+
+.glass-rim-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 0 10px #fff;
+  z-index: 8;
+}
+
+/* Inner Liquid Chamber */
+.glass-bowl-interior {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* ==========================================================================
+   REALISTIC LIQUID DYNAMICS & GRADIENTS
+   ========================================================================== */
+.glass-liquid {
+  position: relative;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(180deg, rgba(255, 42, 127, 0.8), rgba(157, 78, 221, 0.95));
+  transition: height 0.08s ease-out;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+  z-index: 3;
+}
+
+.liquid-meniscus-curve {
+  position: absolute;
+  top: -6px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: inherit;
+  border-radius: 50%;
+  filter: brightness(1.25);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.liquid-surface-wave {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+}
+
+.liquid-effervescence {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+  background-size: 12px 12px;
+  opacity: 0.4;
+  animation: bubblesUp 2s linear infinite;
+}
+
+@keyframes bubblesUp {
+  from { transform: translateY(0); }
+  to { transform: translateY(-20px); }
+}
+
+/* Target Line */
+.pour-target-line {
+  position: absolute;
+  top: 20%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-top: 2px dashed rgba(255, 184, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.target-badge {
+  background: rgba(255, 184, 0, 0.95);
+  color: #000;
+  font-size: 9px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  padding: 2px 6px;
+  border-radius: 4px;
+  transform: translateY(-8px);
+  box-shadow: 0 0 10px rgba(255, 184, 0, 0.5);
+}
+
+/* ==========================================================================
+   FROSTED 3D ICE CUBES
+   ========================================================================== */
+.ice-container {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  height: 70%;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 0 14px;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.ice-cube {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.15) 60%, rgba(255, 255, 255, 0.45));
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.4);
+  position: relative;
+  transform: rotate(-8deg);
+  animation: iceBob 3s ease-in-out infinite alternate;
+}
+
+.cube-2 {
+  transform: rotate(14deg) translateY(-8px);
+  animation-delay: -1s;
+}
+
+.cube-3 {
+  transform: rotate(-18deg) translateY(-4px);
+  animation-delay: -2s;
+}
+
+@keyframes iceBob {
+  0% { transform: translateY(0) rotate(-8deg); }
+  100% { transform: translateY(-8px) rotate(-4deg); }
+}
+
+.ice-bubble {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 4px #fff;
+}
+
+/* ==========================================================================
+   CRYSTALLINE RIM DRESSINGS & PHYSICAL GARNISHES
+   ========================================================================== */
+.glass-rim-dressing {
+  position: absolute;
+  top: -3px;
+  left: -2px;
+  right: -2px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 9;
+}
+
+.glass-rim-dressing.salt {
+  background: repeating-linear-gradient(90deg, #fff, #fff 3px, transparent 3px, transparent 6px);
+  box-shadow: 0 0 8px #fff, 0 0 14px rgba(255, 255, 255, 0.8);
+}
+
+.glass-rim-dressing.sugar {
+  background: repeating-linear-gradient(90deg, #ffe082, #ffe082 3px, transparent 3px, transparent 6px);
+  box-shadow: 0 0 8px #ffe082;
+}
+
+.glass-rim-dressing.peppermint {
+  background: repeating-linear-gradient(90deg, #ff1744, #ff1744 4px, #fff 4px, #fff 8px);
+  box-shadow: 0 0 8px rgba(255, 23, 68, 0.8);
+}
+
+.glass-garnish-display {
+  position: absolute;
+  top: -16px;
+  right: -8px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.garnish-olive-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotate(26deg);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7));
+}
+
+.olive-node {
+  width: 18px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #7cb342, #33691e);
+  border: 1px solid #2e5617;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: -4px;
+}
+
+.olive-pimento {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d50000;
+  box-shadow: 0 0 3px #ff1744;
+}
+
+.metal-pick-stem {
+  width: 2.5px;
+  height: 85px;
+  background: linear-gradient(180deg, #cfd8dc, #eceff1, #78909c);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+  margin-top: -65px;
+}
+
+.garnish-mint-sprig {
+  font-size: 34px;
+  color: #43a047;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+  transform: rotate(-15deg);
+}
+
+.garnish-umbrella {
+  font-size: 38px;
+  color: #ff4081;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7));
+  transform: rotate(18deg);
+}
+
+/* ==========================================================================
+   REALISTIC TILTING POUR BOTTLE
+   ========================================================================== */
+.pour-bottle-visual {
+  position: absolute;
+  top: 15px;
+  right: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotate(-48deg);
+  z-index: 12;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.bottle-glass-body {
+  width: 54px;
+  height: 150px;
+  border-radius: 12px 12px 6px 6px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(40, 50, 70, 0.95));
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.bottle-real-label {
+  background: #0f1420;
+  color: #fff;
+  border: 1px solid var(--accent-cyan);
+  font-size: 9px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  padding: 4px 6px;
+  border-radius: 4px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+}
+
+.bottle-pour-spout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.metal-speed-pourer {
+  width: 8px;
+  height: 32px;
+  background: linear-gradient(90deg, #90a4ae, #eceff1, #607d8b);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+.liquid-stream {
+  width: 4.5px;
+  height: 170px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 42, 127, 0.85));
+  box-shadow: 0 0 14px var(--accent-pink-glow);
+  border-radius: 2px;
+  animation: streamFlow 0.15s linear infinite;
+}
+
+@keyframes streamFlow {
+  0% { transform: scaleX(0.9); }
+  50% { transform: scaleX(1.1); }
+  100% { transform: scaleX(0.9); }
+}
+
+/* ==========================================================================
+   BRUSHED METAL COBBLER SHAKER (WITH FROST CONDENSATION)
+   ========================================================================== */
+.cobbler-shaker-visual {
+  position: relative;
+  width: 150px;
+  height: 270px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.shaker-top-cap {
+  width: 50px;
+  height: 35px;
+  background: linear-gradient(90deg, #78909c, #cfd8dc 50%, #455a64);
+  border-radius: 12px 12px 0 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+.shaker-strainer-collar {
+  width: 90px;
+  height: 50px;
+  background: linear-gradient(90deg, #607d8b, #b0bec5 50%, #37474f);
+  border-radius: 0 0 8px 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+}
+
+.shaker-tin-body {
+  width: 125px;
+  height: 180px;
+  background: linear-gradient(90deg, #546e7a, #cfd8dc 35%, #90a4ae 70%, #37474f);
+  border-radius: 0 0 20px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shaker-frost {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2) 80%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.shaker-emboss {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   CRAFT CONTROLS & RHYTHM BAR
+   ========================================================================== */
+.craft-controls {
+  width: 520px;
+  background: rgba(14, 18, 28, 0.95);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 15;
+}
+
+.ingredient-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.ratio-counter {
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+}
+
+.meter-bar {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.meter-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-pink), var(--accent-cyan));
+  box-shadow: 0 0 15px var(--accent-cyan-glow);
+  transition: width 0.05s linear;
+}
+
+.meter-sweetspot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 72%;
+  width: 16%;
+  background: rgba(0, 230, 118, 0.25);
+  border-left: 2px solid var(--accent-green);
+  border-right: 2px solid var(--accent-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sweetspot-pin {
+  font-size: 8px;
+  font-weight: 900;
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+}
+
+.control-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-pour {
+  flex: 1;
+  background: linear-gradient(135deg, #ff2a7f, #d81b60);
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 13px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 25px var(--accent-pink-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.1s, filter 0.2s;
+}
+
+.btn-pour:active {
+  transform: scale(0.98);
+  filter: brightness(1.2);
+}
+
+.btn-shake {
+  flex: 1;
+  background: linear-gradient(135deg, #00f0ff, #0091ea);
+  border: none;
+  color: #000;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 13px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 25px var(--accent-cyan-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* SHAKER RHYTHM TRACK */
+.shaker-rhythm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rhythm-track {
+  position: relative;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rhythm-target-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 45%;
+  width: 18%;
+  background: rgba(0, 240, 255, 0.3);
+  border: 2px solid var(--accent-cyan);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px var(--accent-cyan-glow);
+}
+
+.hit-label {
+  font-size: 10px;
+  font-weight: 900;
+  color: #fff;
+  font-family: var(--font-mono);
+}
+
+.rhythm-beat {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0%;
+  width: 14px;
+  background: #ff2a7f;
+  border-radius: 4px;
+  box-shadow: 0 0 12px var(--accent-pink);
+}
+
+.rhythm-meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   FOOTER BAR
+   ========================================================================== */
+.craft-footer {
+  padding: 14px 28px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(10, 12, 18, 0.85);
+}
+
+.ingredients-needed-list {
+  display: flex;
+  gap: 10px;
+}
+
+.ing-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.btn-action {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-action.primary {
+  background: linear-gradient(135deg, var(--accent-pink), #e91e63);
+  border: none;
+  box-shadow: 0 0 20px var(--accent-pink-glow);
+}
+
+.btn-action.primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-action.full-width {
+  width: 100%;
+  justify-content: center;
+  padding: 14px 0;
+}
+
+/* ==========================================================================
+   MODAL WINDOWS & TABLET
+   ========================================================================== */
+.modal-box {
+  width: 480px;
+  padding: 24px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.form-group input, .form-group select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+}
+
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--accent-pink);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.modal-btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.modal-btn-row button {
+  flex: 1;
+}
+
+/* SAFE QUICK BUTTONS */
+.safe-balance-display {
+  text-align: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 18px;
+}
+
+.safe-balance-display span {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+.safe-balance-display h2 {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+  margin-top: 4px;
+}
+
+.safe-quick-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.safe-quick-buttons button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 8px 0;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.safe-quick-buttons button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+}
+
+/* ==========================================================================
+   TABLET SHELL
+   ========================================================================== */
+.tablet-shell {
+  width: 1100px;
+  height: 680px;
+  display: flex;
+}
+
+.tablet-sidebar {
+  width: 240px;
+  background: rgba(12, 14, 20, 0.95);
+  border-right: 1px solid var(--border-color);
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.tablet-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--accent-cyan);
+  letter-spacing: 1px;
+}
+
+.tablet-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 30px;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+}
+
+.nav-item.active {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.btn-tablet-close {
+  background: rgba(255, 50, 80, 0.1);
+  border: 1px solid rgba(255, 50, 80, 0.3);
+  color: #ff3366;
+  padding: 10px 0;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tablet-content {
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto;
+}
+
+.tablet-tab-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pane-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.pane-header p {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.hype-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 42, 127, 0.1);
+  border: 1px solid rgba(255, 42, 127, 0.3);
+  padding: 8px 16px;
+  border-radius: 12px;
+  color: var(--accent-pink);
+}
+
+.hype-badge i {
+  font-size: 22px;
+}
+
+.hype-val {
+  font-size: 18px;
+  font-weight: 900;
+  display: block;
+}
+
+.hype-lbl {
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.stat-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-card .card-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+.stat-card h3 {
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.card-trend {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.text-green { color: var(--accent-green); }
+.text-blue { color: var(--accent-cyan); }
+.text-purple { color: var(--accent-purple); }
+
+.table-container {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.data-table th {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.wholesale-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.wholesale-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wholesale-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.wholesale-price-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   DIGITAL BREATHALYZER HUD
+   ========================================================================== */
+.breathalyzer-shell {
+  width: 380px;
+  padding: 20px;
+  background: #11141c;
+  border: 2px solid #2a3142;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+}
+
+.device-screen {
+  background: #000;
+  border: 2px solid #1a2332;
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.screen-header {
+  font-size: 11px;
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  letter-spacing: 2px;
+}
+
+.patron-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.bac-big-display {
+  font-size: 46px;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  color: var(--accent-green);
+  text-shadow: 0 0 20px rgba(0, 230, 118, 0.4);
+}
+
+.status-indicator {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent-green);
+  letter-spacing: 1px;
+}
+
+.bac-scale-bar {
+  height: 8px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  display: flex;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.scale-zone.safe { flex: 2; background: var(--accent-green); }
+.scale-zone.warn { flex: 2; background: var(--accent-gold); }
+.scale-zone.danger { flex: 3; background: #ff1744; }
+
+.btn-breathalyzer-dismiss {
+  width: 100%;
+  margin-top: 14px;
+  background: #1e2638;
+  border: 1px solid #333f5c;
+  color: #fff;
+  padding: 12px 0;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+}

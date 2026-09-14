@@ -1,0 +1,20 @@
+{
+  "name": "fivem-mlo-creator",
+  "version": "1.0.0",
+  "description": "Professional Visual 3D FiveM MLO (Map Location Object) Creator & Exporter Suite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "fivem",
+    "gta5",
+    "mlo",
+    "codewalker",
+    "ytyp",
+    "ymap",
+    "interior-editor"
+  ],
+  "author": "Helix MLO Studio",
+  "license": "MIT"
+}

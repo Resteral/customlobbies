@@ -1,0 +1,142 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+}
+
+body {
+  background: transparent;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.hidden { display: none !important; }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 12, 20, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.map-container {
+  width: 900px;
+  height: 600px;
+  background: rgba(14, 20, 32, 0.95);
+  border: 1px solid rgba(0, 255, 200, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(0, 255, 200, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.map-header {
+  padding: 16px 24px;
+  background: rgba(20, 28, 45, 0.9);
+  border-bottom: 1px solid rgba(0, 255, 200, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.world-tag { font-size: 11px; letter-spacing: 2px; color: #00ffc8; font-weight: bold; }
+.map-header h2 { font-size: 18px; color: #fff; letter-spacing: 1px; }
+
+.btn-close {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 24px;
+  cursor: pointer;
+}
+.btn-close:hover { color: #fff; }
+
+.map-body {
+  flex: 1;
+  display: flex;
+}
+
+.radar-view {
+  flex: 2;
+  position: relative;
+  background: #060a12;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(0, 255, 200, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.radar-sweep {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: conic-gradient(from 0deg, rgba(0, 255, 200, 0.15) 0deg, transparent 60deg);
+  border-radius: 50%;
+  animation: sweep 6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.player-ping {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ping-circle {
+  width: 14px;
+  height: 14px;
+  background: #00ffc8;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #00ffc8;
+}
+
+.ping-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #00ffc8;
+  margin-top: 4px;
+}
+
+.map-sidebar {
+  flex: 1;
+  padding: 16px;
+  background: rgba(12, 16, 26, 0.9);
+  overflow-y: auto;
+}
+
+.map-sidebar h3 { font-size: 13px; color: #888; margin-bottom: 12px; letter-spacing: 1px; }
+
+.district-card {
+  background: rgba(22, 30, 45, 0.8);
+  border-left: 4px solid #00ffc8;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.dist-name { font-size: 14px; font-weight: bold; color: #fff; display: block; margin-bottom: 6px; }
+.poi-item { font-size: 12px; color: #ccc; margin-top: 4px; }

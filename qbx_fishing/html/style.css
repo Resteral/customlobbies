@@ -1,0 +1,366 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+:root {
+    --accent: #4dd0c4;
+    --danger: #ff5d5d;
+    --success: #7CFC8A;
+    --ink: #eaf6ff;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-family: "Segoe UI", "Rajdhani", system-ui, sans-serif;
+}
+
+.hidden { display: none !important; }
+
+#game {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* critical line tension -> shake the whole scene as a danger cue */
+#game.shake {
+    animation: screenShake 0.08s infinite;
+}
+
+@keyframes screenShake {
+    0%   { transform: translate(-3px, 2px); }
+    25%  { transform: translate(3px, -2px); }
+    50%  { transform: translate(-2px, -3px); }
+    75%  { transform: translate(2px, 3px); }
+    100% { transform: translate(-3px, 2px); }
+}
+
+/* The scene canvas sits centered as a "window" into the water */
+#scene {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 760px;
+    height: 460px;
+    border-radius: 18px;
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.65),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.06);
+    background: #06202b;
+}
+
+/* ---------- HUD ---------- */
+#hud {
+    position: absolute;
+    top: calc(50% - 262px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 760px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    color: var(--ink);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+#rod-label {
+    font-size: 15px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+#phase-text {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+/* ---------- Bite prompt ---------- */
+#bite-prompt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 5;
+    animation: pop 0.18s ease-out;
+}
+
+.bite-flash {
+    font-size: 96px;
+    font-weight: 900;
+    color: #ffe14d;
+    text-shadow: 0 0 26px rgba(255, 220, 60, 0.9), 0 4px 10px rgba(0,0,0,0.8);
+    line-height: 1;
+    animation: shake 0.35s infinite;
+}
+
+.bite-key {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #0b1622;
+    background: #ffe14d;
+    padding: 4px 18px;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
+
+.bite-sub {
+    font-size: 16px;
+    letter-spacing: 0.3em;
+    color: #ffe14d;
+    text-transform: uppercase;
+}
+
+.bite-timer {
+    margin-top: 8px;
+    width: 220px;
+    height: 8px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+}
+
+#bite-timer-fill {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #ffe14d, var(--danger));
+    transform-origin: left center;
+}
+
+/* ---------- Reel / catch bar ---------- */
+#reel-ui {
+    position: absolute;
+    top: 50%;
+    right: calc(50% - 452px);
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    z-index: 5;
+}
+
+.reel-hint {
+    color: var(--ink);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-align: center;
+    max-width: 130px;
+    opacity: 0.85;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+}
+
+#catch-bar {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    height: 340px;
+}
+
+/* ---------- Line tension meter ---------- */
+#tension-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+#tension-track {
+    width: 16px;
+    flex: 1;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column-reverse;
+    overflow: hidden;
+    position: relative;
+}
+
+/* danger stripe near the top = snap zone */
+#tension-track::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 22%;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(255, 93, 93, 0.35),
+        rgba(255, 93, 93, 0.35) 6px,
+        rgba(255, 93, 93, 0.12) 6px,
+        rgba(255, 93, 93, 0.12) 12px
+    );
+}
+
+#tension-fill {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(180deg, #ffd24d, #ff8a3d);
+    transition: height 0.05s linear, background 0.1s linear;
+}
+
+#tension-fill.high {
+    background: linear-gradient(180deg, #ff5d5d, #c81e1e);
+    box-shadow: 0 0 16px rgba(255, 93, 93, 0.7);
+}
+
+#tension-label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    opacity: 0.6;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+#progress-track {
+    width: 14px;
+    height: 100%;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column-reverse;
+    overflow: hidden;
+}
+
+#progress-fill {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(180deg, var(--success), #34c759);
+    box-shadow: 0 0 14px rgba(124, 252, 138, 0.6);
+    transition: height 0.05s linear;
+}
+
+#bar-track {
+    position: relative;
+    width: 52px;
+    height: 100%;
+    border-radius: 26px;
+    background:
+        linear-gradient(180deg, rgba(9, 38, 51, 0.95), rgba(4, 20, 28, 0.95));
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08),
+        inset 0 12px 30px rgba(0,0,0,0.6);
+    overflow: hidden;
+    transition: box-shadow 0.12s ease;
+}
+
+/* the whole bar shakes and glows red while the fish thrashes */
+#bar-track.struggling {
+    box-shadow: inset 0 0 0 2px rgba(255, 93, 93, 0.9),
+        inset 0 12px 30px rgba(0,0,0,0.6),
+        0 0 22px rgba(255, 93, 93, 0.5);
+    animation: barShake 0.09s infinite;
+}
+
+/* ---------- Struggle warning banner ---------- */
+#struggle-warn {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #0b1622;
+    background: var(--danger);
+    padding: 5px 12px;
+    border-radius: 7px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(255, 93, 93, 0.5);
+    animation: warnPulse 0.5s infinite;
+}
+
+#control-zone {
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    height: 90px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(77, 208, 196, 0.5), rgba(77, 208, 196, 0.28));
+    box-shadow: inset 0 0 0 2px rgba(124, 252, 205, 0.55);
+    will-change: top;
+}
+
+#control-zone.on-fish {
+    background: linear-gradient(180deg, rgba(124, 252, 138, 0.6), rgba(52, 199, 89, 0.35));
+    box-shadow: inset 0 0 0 2px rgba(124, 252, 138, 0.85), 0 0 16px rgba(124,252,138,0.4);
+}
+
+#fish-marker {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 34px;
+    height: 34px;
+    top: 50%;
+    will-change: top;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path fill='%230b1622' d='M8 32c8-14 26-18 38-14 4 1.4 8 4 12 6-4 2-8 4.6-12 6-12 4-30 0-38-4z'/><path fill='%230b1622' d='M46 24l14-8-4 16 4 16-14-8z'/><circle cx='20' cy='30' r='3' fill='%23eaf6ff'/></svg>");
+    background-size: contain;
+    background-repeat: no-repeat;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+
+/* ---------- Result banner ---------- */
+#result {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 6;
+    animation: pop 0.25s ease-out;
+}
+
+#result-title {
+    font-size: 46px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-shadow: 0 6px 22px rgba(0,0,0,0.85);
+}
+
+#result-title.win { color: var(--success); }
+#result-title.lose { color: var(--danger); }
+
+#result-sub {
+    margin-top: 6px;
+    font-size: 18px;
+    color: var(--ink);
+    opacity: 0.85;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+/* ---------- animations ---------- */
+@keyframes pop {
+    0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(-6deg); }
+    50% { transform: rotate(6deg); }
+}
+
+@keyframes barShake {
+    0%   { transform: translateX(-2px); }
+    50%  { transform: translateX(2px); }
+    100% { transform: translateX(-2px); }
+}
+
+@keyframes warnPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.65; transform: scale(1.04); }
+}

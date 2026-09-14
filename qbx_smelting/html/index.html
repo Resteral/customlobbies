@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QBox Industrial Smelting</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="smelter-app" class="hidden">
+        <!-- Floating Magma Embers Canvas -->
+        <canvas id="ember-canvas"></canvas>
+
+        <div class="smelter-container">
+            <!-- Header -->
+            <header class="foundry-header">
+                <div class="header-left">
+                    <div class="forge-icon"><i class="fa-solid fa-fire-burner"></i></div>
+                    <div>
+                        <h1 id="furnace-name">INDUSTRIAL SMELTER</h1>
+                        <span class="sub-status" id="furnace-type-tag">FOUNDRY GRADE • HEAVY REFINING</span>
+                    </div>
+                </div>
+                <button class="close-btn" id="close-btn" title="Close"><i class="fa-solid fa-xmark"></i></button>
+            </header>
+
+            <!-- Main Workspace Grid -->
+            <main class="foundry-grid">
+                <!-- Left: Furnace Status & Fuel Control -->
+                <section class="panel furnace-telemetry">
+                    <h2><i class="fa-solid fa-gauge-high"></i> CORE TELEMETRY</h2>
+
+                    <!-- Heat Meter -->
+                    <div class="gauge-card">
+                        <div class="gauge-label">
+                            <span>CHAMBER TEMPERATURE</span>
+                            <span id="temp-val" class="highlight-temp">25°C</span>
+                        </div>
+                        <div class="temp-bar-bg">
+                            <div class="temp-bar-fill" id="temp-fill" style="width: 2%;"></div>
+                        </div>
+                        <div class="temp-markers">
+                            <span>0°C</span>
+                            <span>800°C (Min)</span>
+                            <span id="max-temp-marker">1800°C</span>
+                        </div>
+                    </div>
+
+                    <!-- Fuel Meter -->
+                    <div class="gauge-card">
+                        <div class="gauge-label">
+                            <span>FUEL INJECTION</span>
+                            <span id="fuel-seconds-val">0s REMAINING</span>
+                        </div>
+                        <div class="fuel-bar-bg">
+                            <div class="fuel-bar-fill" id="fuel-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="active-fuel-text" id="active-fuel-text">STATUS: IDLE (NO COMBUSTION)</div>
+                    </div>
+
+                    <!-- Fuel Injector Controls -->
+                    <div class="fuel-controls">
+                        <h3><i class="fa-solid fa-gas-pump"></i> FEED COMBUSTIBLES</h3>
+                        <div class="fuel-buttons-grid" id="fuel-buttons-grid">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Middle & Right: Recipes & Refining Crucible -->
+                <section class="panel recipe-foundry">
+                    <!-- Category Tabs -->
+                    <div class="category-tabs" id="category-tabs">
+                        <button class="cat-btn active" data-cat="all"><i class="fa-solid fa-layer-group"></i> ALL</button>
+                        <button class="cat-btn" data-cat="ores"><i class="fa-solid fa-gem"></i> ORES</button>
+                        <button class="cat-btn" data-cat="alloys"><i class="fa-solid fa-cubes-stacked"></i> ALLOYS</button>
+                        <button class="cat-btn" data-cat="scrap"><i class="fa-solid fa-recycle"></i> SCRAP</button>
+                        <button class="cat-btn" data-cat="jewelry"><i class="fa-solid fa-ring"></i> BLACK MARKET</button>
+                    </div>
+
+                    <!-- Split: List vs Details -->
+                    <div class="recipe-layout">
+                        <!-- Recipe List -->
+                        <div class="recipe-list" id="recipe-list">
+                            <!-- Injected dynamically -->
+                        </div>
+
+                        <!-- Selected Recipe Crucible View -->
+                        <div class="crucible-view" id="crucible-view">
+                            <div class="no-selection" id="no-selection">
+                                <div class="ore-vein-art">
+                                    <i class="fa-solid fa-gem"></i>
+                                    <i class="fa-solid fa-mountain"></i>
+                                </div>
+                                <p>Select an ore deposit or metallurgical blueprint to prepare the crucible.</p>
+                            </div>
+
+                            <div class="recipe-details hidden" id="recipe-details">
+                                <div class="details-header">
+                                    <h3 id="selected-title">Refined Iron Ingot</h3>
+                                    <span class="temp-req-badge" id="selected-temp-req"><i class="fa-solid fa-temperature-arrow-up"></i> Req: 800°C</span>
+                                </div>
+                                <p class="recipe-desc" id="selected-desc">Description text</p>
+
+                                <div class="crucible-io">
+                                    <!-- Inputs -->
+                                    <div class="io-column">
+                                        <h4><i class="fa-solid fa-arrow-down-to-bracket"></i> REQUIRED INPUTS</h4>
+                                        <div class="io-slots" id="selected-inputs"></div>
+                                    </div>
+
+                                    <div class="io-arrow"><i class="fa-solid fa-angles-right"></i></div>
+
+                                    <!-- Outputs -->
+                                    <div class="io-column">
+                                        <h4><i class="fa-solid fa-arrow-up-from-bracket"></i> YIELD</h4>
+                                        <div class="io-slots" id="selected-outputs"></div>
+                                    </div>
+                                </div>
+
+                                <button class="smelt-action-btn" id="start-smelt-btn" disabled>
+                                    <i class="fa-solid fa-fire"></i> START SMELTING PROCESS
+                                </button>
+                                <div class="status-tip" id="smelt-status-tip">Furnace heat or materials insufficient.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- ACTIVE WORKING SMELTER OVERLAY / ANIMATION SCREEN -->
+        <div id="active-smelt-modal" class="active-smelt-modal hidden">
+            <div class="smelt-chamber-box">
+                <div class="chamber-glow-bg"></div>
+
+                <!-- Chamber Header -->
+                <div class="chamber-header">
+                    <div class="chamber-status-badge">
+                        <span class="pulse-dot"></span> CHAMBER ACTIVE • REFINING IN PROGRESS
+                    </div>
+                    <h2 id="active-smelt-name">SMELTING REFINED IRON INGOT</h2>
+                </div>
+
+                <!-- 3D Molten Animation Station -->
+                <div class="forge-animation-stage">
+                    <!-- Top: Crucible Pot with Dissolving Ores -->
+                    <div class="crucible-pot-container">
+                        <div class="crucible-pot" id="crucible-pot">
+                            <div class="molten-lava-surface">
+                                <div class="lava-bubble b1"></div>
+                                <div class="lava-bubble b2"></div>
+                                <div class="lava-bubble b3"></div>
+                            </div>
+                            <div class="ore-chunks-layer" id="ore-chunks-layer">
+                                <span class="ore-chunk oc1">🪨</span>
+                                <span class="ore-chunk oc2">🪨</span>
+                                <span class="ore-chunk oc3">🪨</span>
+                            </div>
+                        </div>
+                        <div class="crucible-burner-fire">
+                            <i class="fa-solid fa-fire fire-flame f1"></i>
+                            <i class="fa-solid fa-fire fire-flame f2"></i>
+                            <i class="fa-solid fa-fire fire-flame f3"></i>
+                        </div>
+                    </div>
+
+                    <!-- Middle: Glowing Molten Pouring Stream -->
+                    <div class="molten-stream-track">
+                        <div class="molten-stream" id="molten-stream"></div>
+                        <div class="stream-sparks-container">
+                            <div class="spark s1"></div>
+                            <div class="spark s2"></div>
+                            <div class="spark s3"></div>
+                            <div class="spark s4"></div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom: Ingot Mold Casting Tray -->
+                    <div class="ingot-mold-container">
+                        <div class="ingot-mold">
+                            <div class="mold-metal-fill" id="mold-metal-fill"></div>
+                            <div class="mold-solid-ingot hidden" id="mold-solid-ingot">
+                                <i class="fa-solid fa-bars"></i>
+                            </div>
+                        </div>
+                        <div class="mold-base-label">HIGH-HEAT CASTING MOLD</div>
+                    </div>
+                </div>
+
+                <!-- Progress & Telemetry -->
+                <div class="smelt-progress-section">
+                    <div class="progress-info-row">
+                        <span id="active-stage-label"><i class="fa-solid fa-gear fa-spin"></i> Liquefying Ore...</span>
+                        <span id="active-countdown">8.0s REMAINING</span>
+                    </div>
+                    <div class="smelt-bar-bg">
+                        <div class="smelt-bar-fill" id="smelt-bar-fill"></div>
+                    </div>
+                    <div class="smelt-percent" id="smelt-percent">0%</div>
+                </div>
+
+                <!-- Completion Reward View -->
+                <div class="smelt-complete-card hidden" id="smelt-complete-card">
+                    <div class="complete-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <h3>BATCH COMPLETED SUCCESSFULLY!</h3>
+                    <div class="reward-yield-chips" id="reward-yield-chips">
+                        <!-- Yield items added here -->
+                    </div>
+                    <button class="return-foundry-btn" id="return-foundry-btn">
+                        <i class="fa-solid fa-arrow-left"></i> RETURN TO FOUNDRY
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

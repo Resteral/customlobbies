@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FiveM MLO Creator - Ground-Up Architectural Studio</title>
+    <link rel="stylesheet" href="css/mlo_studio.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js & Controls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Top Sims Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">💎</div>
+                <div class="brand-title">FiveM MLO Studio <span>GROUND-UP BUILDER</span></div>
+            </div>
+
+            <!-- Sims Build Mode vs Buy Mode Switcher -->
+            <div class="sims-mode-switcher">
+                <button class="mode-tab-btn active" data-mode="build">
+                    <span>🔨</span> Build Mode
+                </button>
+                <button class="mode-tab-btn" data-mode="buy">
+                    <span>🛋️</span> Buy Mode
+                </button>
+            </div>
+
+            <div class="header-menu">
+                <!-- Simoleons / FiveM Budget Display -->
+                <div class="sims-budget-badge" id="sims-budget-display">
+                    § 12,450 | 0 Props | 2 Rooms
+                </div>
+
+                <button class="btn btn-purple" id="btn-open-ai-architect">
+                    <span>✨</span> AI Architect
+                </button>
+                <button class="btn btn-default" id="btn-open-codewalker-xml">
+                    <span>📄</span> CodeWalker XML
+                </button>
+                <button class="btn btn-default" onclick="app.saveProject()">
+                    <span>💾</span> Save
+                </button>
+                <button class="btn btn-success" id="btn-open-export">
+                    <span>🚀</span> Export FiveM
+                </button>
+            </div>
+        </header>
+
+        <!-- Sub-Toolbar (Sims Tools, Floor Levels, Lighting Environments, Snapping, Camera Modes) -->
+        <div class="sub-toolbar">
+            <!-- Sims Quick Tools -->
+            <div class="tool-group">
+                <button class="sims-tool-btn active" data-sims-tool="select" title="Select / Move Tool (V)">
+                    <span>👆</span> Select
+                </button>
+                <button class="sims-tool-btn" data-sims-tool="drag_wall" title="Drag-to-Build Wall (W)">
+                    <span>🧱</span> Drag Wall
+                </button>
+                <button class="sims-tool-btn" data-sims-tool="drag_room" title="Drag-to-Build Room (B)">
+                    <span>📦</span> Drag Room
+                </button>
+                <button class="sims-tool-btn" data-sims-tool="eyedropper" title="Eyedropper / Clone (E)">
+                    <span>💧</span> Clone
+                </button>
+                <button class="sims-tool-btn" data-sims-tool="sledgehammer" title="Sledgehammer / Demolish (K)">
+                    <span>🔨</span> Demolish
+                </button>
+            </div>
+
+            <!-- Ground-Up Multi-Story Floor Level Switcher -->
+            <div class="tool-group">
+                <span style="font-size:11px;color:var(--text-muted);padding-left:4px;">🏢 Floor:</span>
+                <button class="sims-tool-btn floor-pill-btn" data-floor="0" title="Basement Level B1 (-3.2m)">B1</button>
+                <button class="sims-tool-btn floor-pill-btn active" data-floor="1" title="Ground Floor F1 (0.0m)">F1</button>
+                <button class="sims-tool-btn floor-pill-btn" data-floor="2" title="Second Floor F2 (+3.2m)">F2</button>
+                <button class="sims-tool-btn floor-pill-btn" data-floor="3" title="Roof Deck F3 (+6.4m)">F3</button>
+
+                <div class="tool-separator"></div>
+
+                <button class="tool-btn" onclick="app.spawnFoundationSlab()" title="Lay 16x16m Concrete Foundation Slab">
+                    <span>🏗️</span> Foundation
+                </button>
+            </div>
+
+            <!-- Photorealistic Lighting Environment Presets -->
+            <div class="tool-group">
+                <span style="font-size:11px;color:var(--text-muted);padding-left:4px;">☀️ Light:</span>
+                <select class="snap-select" id="env-lighting-select" onchange="app.viewport.envLighting.setPreset(this.value)">
+                    <option value="daylight" selected>☀️ Noon Daylight (6000K)</option>
+                    <option value="sunset">🌅 Golden Sunset (2800K)</option>
+                    <option value="night">🌙 Midnight Moonlight</option>
+                    <option value="studio">💡 Architectural Studio</option>
+                </select>
+
+                <div class="tool-separator"></div>
+
+                <button class="tool-btn active" id="btn-toggle-trims" title="Toggle Baseboards & Crown Molding" onclick="app.toggleTrims()">
+                    <span>🏛️</span> Trims
+                </button>
+            </div>
+
+            <!-- Snapping Controls -->
+            <div class="tool-group">
+                <span style="font-size:11px;color:var(--text-muted);padding-left:4px;">Grid:</span>
+                <select class="snap-select" id="snap-grid-select">
+                    <option value="0.1">0.1m</option>
+                    <option value="0.25">0.25m</option>
+                    <option value="0.5" selected>0.5m</option>
+                    <option value="1.0">1.0m</option>
+                    <option value="2.0">2.0m</option>
+                    <option value="0">Off</option>
+                </select>
+
+                <div class="tool-separator"></div>
+
+                <span style="font-size:11px;color:var(--text-muted);">Angle:</span>
+                <select class="snap-select" id="snap-rotate-select">
+                    <option value="15">15°</option>
+                    <option value="45" selected>45°</option>
+                    <option value="90">90°</option>
+                    <option value="0">Off</option>
+                </select>
+            </div>
+
+            <!-- Camera View Controls -->
+            <div class="tool-group">
+                <button class="tool-btn active" data-camera-view="perspective" title="3D Orbit View">
+                    <span>🎥</span> 3D Orbit
+                </button>
+                <button class="tool-btn" data-camera-view="top" title="Top 2D Floorplan">
+                    <span>⬇️</span> Top View
+                </button>
+                <button class="tool-btn" data-camera-view="front" title="Front Elevation">
+                    <span>➡️</span> Front
+                </button>
+                <button class="tool-btn" data-camera-view="walk" title="First-Person Walk Mode (WASD)">
+                    <span>🚶</span> Walk Mode
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="workspace">
+            <!-- Left Sidebar -->
+            <div class="left-sidebar">
+                <div class="sidebar-tabs">
+                    <button class="tab-btn active" data-tab="props">Catalog</button>
+                    <button class="tab-btn" data-tab="walls">Walls & Windows</button>
+                    <button class="tab-btn" data-tab="bathrooms">Bathrooms</button>
+                    <button class="tab-btn" data-tab="rooms">Rooms</button>
+                    <button class="tab-btn" data-tab="portals">Portals</button>
+                    <button class="tab-btn" data-tab="hierarchy">Tree</button>
+                </div>
+
+                <!-- TAB: GTA Prop Catalog -->
+                <div class="tab-content active" id="tab-content-props">
+                    <div class="prop-search-box">
+                        <span class="icon">🔍</span>
+                        <input type="text" id="prop-search-input" class="form-input" placeholder="Search GTA Props (e.g. toilet, sofa, bed, desk)...">
+                    </div>
+                    <div class="prop-grid" id="prop-catalog-grid">
+                        <!-- Populated by prop_library.js -->
+                    </div>
+                </div>
+
+                <!-- TAB: Wall Editor & Window/Curtain Puncher -->
+                <div class="tab-content" id="tab-content-walls">
+                    <div class="section-title">🧱 Custom Wall Materials & Dimensions</div>
+                    <div class="form-group">
+                        <label class="form-label">PBR Wall Pattern & Finish</label>
+                        <select id="wall-material-select" class="form-select"></select>
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Length</label>
+                            <input type="number" id="wall-dim-length" class="form-input form-input-mono" value="4.0" step="0.5">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Height</label>
+                            <input type="number" id="wall-dim-height" class="form-input form-input-mono" value="3.0" step="0.2">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Thick</label>
+                            <input type="number" id="wall-dim-thickness" class="form-input form-input-mono" value="0.2" step="0.05">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-default" id="btn-spawn-custom-wall" style="width:100%;margin-top:4px;">
+                        <span>🧱</span> Spawn Finished Wall
+                    </button>
+
+                    <div class="section-title" style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border-color);">
+                        🪟 Punch Window Opening & Curtains
+                    </div>
+                    <div class="form-group-row">
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Width</label>
+                            <input type="number" id="window-cutout-width" class="form-input form-input-mono" value="2.0" step="0.2">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Height</label>
+                            <input type="number" id="window-cutout-height" class="form-input form-input-mono" value="1.6" step="0.2">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Sill</label>
+                            <input type="number" id="window-cutout-sill" class="form-input form-input-mono" value="0.9" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Curtains / Blinds Style</label>
+                        <select id="window-curtain-style" class="form-select">
+                            <option value="fabric_curtains" selected>Luxury Velvet Curtains (Interactive)</option>
+                            <option value="venetian_blinds">Venetian Horizontal Blinds</option>
+                            <option value="roller_blinds">Motorized Roller Shade</option>
+                            <option value="none">Glass Only (No Curtains)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" id="btn-punch-window" style="width:100%;margin-top:4px;">
+                        <span>🪟</span> Punch Window with Curtains & Glass
+                    </button>
+                </div>
+
+                <!-- TAB: Bathroom Builder -->
+                <div class="tab-content" id="tab-content-bathrooms">
+                    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
+                        1-Click Complete Bathrooms with Tiled Walls, Plumbing, Portals & Lighting:
+                    </div>
+                    <div id="bathroom-presets-grid" style="display:flex;flex-direction:column;gap:10px;">
+                        <!-- Populated by bathroom_builder.js -->
+                    </div>
+                </div>
+
+                <!-- TAB: Rooms Manager -->
+                <div class="tab-content" id="tab-content-rooms">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:12px;font-weight:600;">Interior Rooms</span>
+                        <button class="btn btn-primary btn-sm" id="btn-add-room">+ Add Room</button>
+                    </div>
+                    <div class="tree-list" id="rooms-list-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- TAB: Portals Manager -->
+                <div class="tab-content" id="tab-content-portals">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:12px;font-weight:600;">4-Vertex Portals</span>
+                        <button class="btn btn-primary btn-sm" id="btn-add-portal">+ Add Portal</button>
+                    </div>
+                    <div class="tree-list" id="portals-list-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- TAB: Scene Hierarchy Tree -->
+                <div class="tab-content" id="tab-content-hierarchy">
+                    <div class="tree-list" id="hierarchy-tree-list">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center 3D Viewport -->
+            <div class="viewport-container" id="viewport-canvas-container">
+                <div class="viewport-overlay">
+                    <div class="hud-badge">
+                        <span>Studio:</span> <span class="accent">Ground-Up Architectural Mode</span>
+                    </div>
+                </div>
+
+                <div class="hud-controls-hint">
+                    <kbd>W</kbd> Wall Tool &nbsp;|&nbsp; <kbd>B</kbd> Room Box &nbsp;|&nbsp; <kbd>K</kbd> Sledgehammer &nbsp;|&nbsp; <kbd>0</kbd>/<kbd>1</kbd>/<kbd>2</kbd> Floors &nbsp;|&nbsp; <kbd>V</kbd> Select &nbsp;|&nbsp; Double-Click Door to Swing
+                </div>
+
+                <!-- Sims Bottom Floating Catalog Strip -->
+                <div class="sims-bottom-bar">
+                    <div class="sims-category-pills" id="sims-category-pills">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div class="sims-catalog-strip" id="sims-catalog-strip">
+                        <!-- Item Cards -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Inspector Panel -->
+            <div class="right-panel">
+                <div class="panel-header">
+                    <span>Inspector & Properties</span>
+                </div>
+
+                <!-- MLO Project Metadata Section -->
+                <div class="panel-section">
+                    <div class="section-title">MLO Archetype Metadata</div>
+                    <div class="form-group">
+                        <label class="form-label">Project Name</label>
+                        <input type="text" id="prop-project-name" class="form-input form-input-mono" value="mlo_custom_interior">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Archetype Name</label>
+                        <input type="text" id="prop-project-arch" class="form-input form-input-mono" value="hei_dlc_mlo_custom">
+                    </div>
+                </div>
+
+                <!-- Dynamic Item Properties Section -->
+                <div id="inspector-empty" class="panel-section" style="color:var(--text-muted);font-size:12px;text-align:center;padding:30px 10px;">
+                    Select an Entity, Door, Portal, or Room to edit properties.
+                </div>
+
+                <!-- Entity / Prop Inspector -->
+                <div id="inspector-entity" class="panel-section" style="display:none;">
+                    <div class="section-title">Prop Properties</div>
+                    <div class="form-group">
+                        <label class="form-label">Model Archetype / Label</label>
+                        <input type="text" id="inspect-entity-model" class="form-input form-input-mono" readonly>
+                    </div>
+
+                    <!-- Interactive Curtain State Switcher -->
+                    <div id="inspector-curtain-controls" class="form-group" style="display:none;background:rgba(34,197,94,0.1);padding:8px;border-radius:6px;border:1px solid rgba(34,197,94,0.3);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span id="inspect-curtain-state-label" style="font-size:12px;font-weight:600;color:var(--accent-green);">State: Open</span>
+                            <button class="btn btn-success btn-sm" id="btn-inspect-toggle-curtain">
+                                <span>🪟</span> Toggle Open/Close
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Door Controls -->
+                    <div id="inspector-door-controls" class="form-group" style="display:none;background:rgba(59,130,246,0.1);padding:8px;border-radius:6px;border:1px solid rgba(59,130,246,0.3);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:12px;font-weight:600;color:var(--accent-blue);">Door Swing:</span>
+                            <button class="btn btn-primary btn-sm" id="btn-inspect-toggle-door" onclick="app.toggleSelectedDoor()">
+                                <span>🚪</span> Swing Open / Close
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Parent Room Index</label>
+                        <select id="inspect-entity-room" class="form-select"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Position (X, Y, Z)</label>
+                        <div class="vector3-input">
+                            <div class="vec-field"><span class="vec-label x">X</span><input type="number" step="0.1" id="inspect-pos-x"></div>
+                            <div class="vec-field"><span class="vec-label y">Y</span><input type="number" step="0.1" id="inspect-pos-y"></div>
+                            <div class="vec-field"><span class="vec-label z">Z</span><input type="number" step="0.1" id="inspect-pos-z"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Rotation Euler (Pitch, Roll, Yaw)</label>
+                        <div class="vector3-input">
+                            <div class="vec-field"><span class="vec-label x">P</span><input type="number" step="5" id="inspect-rot-x" readonly></div>
+                            <div class="vec-field"><span class="vec-label y">R</span><input type="number" step="5" id="inspect-rot-y" readonly></div>
+                            <div class="vec-field"><span class="vec-label z">Y</span><input type="number" step="5" id="inspect-rot-z" readonly></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Inspector -->
+                <div id="inspector-room" class="panel-section" style="display:none;">
+                    <div class="section-title">Room Definition</div>
+                    <div class="form-group">
+                        <label class="form-label">Room Name</label>
+                        <input type="text" id="inspect-room-name" class="form-input form-input-mono">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Timecycle Modifier (Lighting / Atmosphere)</label>
+                        <select id="inspect-room-timecycle" class="form-select"></select>
+                    </div>
+                </div>
+
+                <!-- Portal Inspector -->
+                <div id="inspector-portal" class="panel-section" style="display:none;">
+                    <div class="section-title">4-Vertex Portal Link</div>
+                    <div class="form-group">
+                        <label class="form-label">Room From</label>
+                        <select id="inspect-portal-from" class="form-select"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Room To</label>
+                        <select id="inspect-portal-to" class="form-select"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AI Interior Architect -->
+    <div class="modal-backdrop" id="modal-ai-architect">
+        <div class="modal-dialog modal-dialog-large">
+            <div class="modal-header">
+                <div class="modal-title"><span>✨</span> AI MLO Interior Architect</div>
+                <button class="btn btn-default btn-sm modal-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Describe the interior you want to create:</label>
+                    <input type="text" id="ai-prompt-input" class="form-input" placeholder="e.g. create a 2-story luxury mansion with master spa bath, floor-to-ceiling glass, and wine cellar basement" style="padding:10px;">
+                </div>
+
+                <div class="section-title">Or Choose a Pre-Engineered Blueprint Preset:</div>
+                <div id="ai-presets-container" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;">
+                    <!-- Populated by ai_architect.js -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default modal-close">Cancel</button>
+                <button class="btn btn-purple" id="btn-ai-generate-submit">Generate Full MLO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CodeWalker XML Live Preview -->
+    <div class="modal-backdrop" id="modal-codewalker-xml">
+        <div class="modal-dialog modal-dialog-large">
+            <div class="modal-header">
+                <div class="modal-title"><span>📄</span> CodeWalker XML Preview (.ytyp.xml & .ymap.xml)</div>
+                <button class="btn btn-default btn-sm modal-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="section-title">CMapTypes Archetype Definition (.ytyp.xml)</div>
+                <div class="code-preview" id="preview-ytyp-xml"></div>
+
+                <div class="section-title" style="margin-top:10px;">CMapData Instance Placement (.ymap.xml)</div>
+                <div class="code-preview" id="preview-ymap-xml"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default modal-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Export FiveM Resource Package -->
+    <div class="modal-backdrop" id="modal-export">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div class="modal-title"><span>🚀</span> Export FiveM Resource</div>
+                <button class="btn btn-default btn-sm modal-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Resource Folder Name</label>
+                    <input type="text" id="export-resource-name" class="form-input form-input-mono" value="mlo_custom_interior">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Direct Server Deploy Path (Optional)</label>
+                    <input type="text" id="export-deploy-path" class="form-input form-input-mono" placeholder="e.g. C:\Users\Sean\Desktop\txData\Qbox_861B84.base\resources\[standalone]">
+                </div>
+                <div style="font-size:12px;color:var(--text-muted);background:var(--bg-input);padding:10px;border-radius:6px;border:1px solid var(--border-color);line-height:1.6;">
+                    <strong>📦 Package includes:</strong><br>
+                    • <code>fxmanifest.lua</code> (configured with DLC_ITYP_REQUEST)<br>
+                    • <code>stream/name.ytyp.xml</code> & <code>stream/name.ymap.xml</code><br>
+                    • <code>client.lua</code> (interactive curtains, doors & acoustic audio reverbs)<br>
+                    • <code>config.lua</code> & <code>doorlocks.lua</code> (OX & QB doorlocks)
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default modal-close">Cancel</button>
+                <button class="btn btn-success" id="btn-perform-export">Export Resource</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="js/sims_audio.js"></script>
+    <script src="js/prop_library.js"></script>
+    <script src="js/pbr_materials.js"></script>
+    <script src="js/environment_lighting.js"></script>
+    <script src="js/realistic_fixtures.js"></script>
+    <script src="js/floor_manager.js"></script>
+    <script src="js/wall_framing_engine.js"></script>
+    <script src="js/codewalker_xml.js"></script>
+    <script src="js/room_manager.js"></script>
+    <script src="js/portal_manager.js"></script>
+    <script src="js/entity_sets.js"></script>
+    <script src="js/wall_editor.js"></script>
+    <script src="js/bathroom_builder.js"></script>
+    <script src="js/curtain_manager.js"></script>
+    <script src="js/modular_builder.js"></script>
+    <script src="js/sims_buy_catalog.js"></script>
+    <script src="js/sims_build_tools.js"></script>
+    <script src="js/ai_architect.js"></script>
+    <script src="js/viewport3d.js"></script>
+    <script src="js/resource_exporter.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

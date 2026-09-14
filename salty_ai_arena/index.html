@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SALTY-GEN: AI Fight Club - Automated AI Battler & Spectator Arena</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Header Navigation & Wallet Bar -->
+        <header class="main-header">
+            <div class="logo-section">
+                <h1>⚡ SALTY-GEN</h1>
+                <span class="badge-live">● 24/7 AI STREAM</span>
+            </div>
+
+            <div class="header-stats">
+                <div class="wallet-badge">
+                    <span>🧂 SaltyBucks:</span>
+                    <span id="walletBalance" class="wallet-amount">$1,000</span>
+                </div>
+                <button id="btnBailout" class="btn-bailout" title="Claim $500 if under $100">Claim Bailout</button>
+            </div>
+
+            <div class="header-actions">
+                <button id="btnToggleSound" class="btn-secondary">🔊 Sound: ON</button>
+                <button id="btnToggleVoice" class="btn-secondary">🎙️ Voice: ON</button>
+                <button id="btnOpenRoster" class="btn-secondary">🏆 Tier Roster</button>
+                <button id="btnOpenCreateModal" class="btn-primary">✨ + Prompt AI Fighter</button>
+            </div>
+        </header>
+
+        <!-- Main Workspace: Fight Arena + Betting + Live Chat -->
+        <main class="main-layout">
+            <!-- Left Stage & Wagering Column -->
+            <section class="stage-column">
+                <!-- 2D Canvas Battle Arena -->
+                <div class="arena-wrapper">
+                    <canvas id="fightCanvas" width="960" height="540"></canvas>
+                    <div class="controls-overlay">
+                        <span style="font-size:0.75rem; color:#aaa; margin-right:4px;">Speed:</span>
+                        <button class="speed-btn active" data-speed="1.0">1x</button>
+                        <button class="speed-btn" data-speed="1.5">1.5x</button>
+                        <button class="speed-btn" data-speed="2.0">2x</button>
+                    </div>
+                </div>
+
+                <!-- Betting Console -->
+                <div class="betting-console">
+                    <!-- Matchup Cards & Countdown -->
+                    <div class="matchup-cards-row">
+                        <!-- Red Fighter Card -->
+                        <div id="redFighterCard" class="fighter-card-box red">
+                            <div class="corner-badge red">RED CORNER</div>
+                            <div class="fighter-name">Loading...</div>
+                        </div>
+
+                        <!-- Center VS & Countdown Timer -->
+                        <div class="versus-center">
+                            <div class="vs-tag">VS</div>
+                            <div class="countdown-box">
+                                <div style="font-size: 0.65rem; color: #888;">FIGHT IN</div>
+                                <div id="betCountdown" class="countdown-number">12</div>
+                            </div>
+                            <button id="btnSkipBetting" class="btn-skip">Skip Timer ⏩</button>
+                        </div>
+
+                        <!-- Blue Fighter Card -->
+                        <div id="blueFighterCard" class="fighter-card-box blue">
+                            <div class="corner-badge blue">BLUE CORNER</div>
+                            <div class="fighter-name">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Wagering Panel -->
+                    <div class="wagering-panel">
+                        <!-- Quick Bet Chips -->
+                        <div class="bet-buttons-group">
+                            <span style="font-size:0.8rem; font-weight:bold;">Bet Red:</span>
+                            <button class="bet-chip chip-red" data-corner="red" data-amount="100">$100</button>
+                            <button class="bet-chip chip-red" data-corner="red" data-amount="500">$500</button>
+                            <button class="bet-chip chip-red" data-corner="red" data-amount="2500">$2.5k</button>
+                            <button class="bet-chip chip-all" data-corner="red" data-amount="all">ALL IN</button>
+                        </div>
+
+                        <div class="bet-buttons-group">
+                            <span style="font-size:0.8rem; font-weight:bold;">Bet Blue:</span>
+                            <button class="bet-chip chip-blue" data-corner="blue" data-amount="100">$100</button>
+                            <button class="bet-chip chip-blue" data-corner="blue" data-amount="500">$500</button>
+                            <button class="bet-chip chip-blue" data-corner="blue" data-amount="2500">$2.5k</button>
+                            <button class="bet-chip chip-all" data-corner="blue" data-amount="all">ALL IN</button>
+                        </div>
+
+                        <!-- Custom Bet Input -->
+                        <div class="custom-bet-group">
+                            <label class="corner-radio-label red">
+                                <input type="radio" name="cornerSelect" value="red" checked> Red
+                            </label>
+                            <label class="corner-radio-label blue">
+                                <input type="radio" name="cornerSelect" value="blue"> Blue
+                            </label>
+                            <input type="number" id="customBetAmount" placeholder="$ Amount" min="10" step="50" value="200">
+                            <button id="btnCustomBet" class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem;">Bet</button>
+                        </div>
+                    </div>
+
+                    <!-- Active Bet Info Bar -->
+                    <div class="bet-status-row">
+                        <span id="bettingStatus" class="betting-status-banner">BETTING IS OPEN!</span>
+                        <span id="activeBetInfo">No active bet placed for this match.</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Simulated Live Stream Chat -->
+            <aside class="chat-column">
+                <div class="chat-header">
+                    <span>💬 SALTY STREAM CHAT</span>
+                    <span style="font-size: 0.75rem; color: #00e676;">● 4,892 Spectators</span>
+                </div>
+                <div id="chatMessages" class="chat-messages">
+                    <!-- Chat rows dynamically generated -->
+                </div>
+                <div class="chat-input-row">
+                    <input type="text" id="userChatInput" placeholder="Send a message to the arena chat...">
+                    <button id="btnSendChat" class="btn-primary" style="padding: 8px 12px;">Send</button>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Modal 1: Prompt AI Fighter Creator -->
+        <div id="createModal" class="modal-backdrop hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>🧬 Prompt-to-Fighter AI Synthesizer</h2>
+                    <button id="btnCloseCreateModal" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">
+                        Type <strong>any character, food, creature, or meme concept</strong> (e.g. <em>"Pop-Tart Wombat"</em>, <em>"Cyberpunk Capybara"</em>, <em>"Goku made of Spaghetti"</em>) and the AI engine will generate their stats, visuals, archetype, and screen-shaking ultimate super move!
+                    </p>
+
+                    <div class="prompt-input-group">
+                        <input type="text" id="promptInput" placeholder="e.g. Pop-Tart Wombat, Laser Chainsaw Duck..." value="Pop-Tart Wombat">
+                        <button id="btnRandomPrompt" class="btn-secondary" title="Roll random idea">🎲 Surprise Me</button>
+                        <button id="btnPreviewFighter" class="btn-primary">Generate</button>
+                    </div>
+
+                    <!-- Fighter Preview -->
+                    <div id="fighterPreviewCard" class="preview-card">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnSaveFighter" class="btn-primary" style="width: 100%;">⚔️ Register to Arena Roster</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 2: Roster & Tier Leaderboard -->
+        <div id="rosterModal" class="modal-backdrop hidden">
+            <div class="modal-content" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h2>🏆 Fighter Hall of Fame & Tier Rankings</h2>
+                    <button id="btnCloseRoster" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <table class="roster-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Tier</th>
+                                <th>Fighter</th>
+                                <th>Archetype</th>
+                                <th>MMR</th>
+                                <th>Record</th>
+                                <th>Streak</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rosterTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/sound_synth.js"></script>
+    <script src="js/fighter_gen.js"></script>
+    <script src="js/preset_fighters.js"></script>
+    <script src="js/sprite_renderer.js"></script>
+    <script src="js/combat_engine.js"></script>
+    <script src="js/betting_system.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

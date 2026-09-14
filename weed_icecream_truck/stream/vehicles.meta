@@ -1,0 +1,41 @@
+﻿<?xml version=1.0 encoding=UTF-8?>
+<CVehicleModelInfo__InitDataList>
+  <residentTxdHashName>mrtasty</residentTxdHashName>
+  <residentAnims></residentAnims>
+  <InitDatas>
+    <Item>
+      <modelName>weedtruck</modelName>
+      <txdName>weedtruck</txdName>
+      <handlingId>BOXVILLE</handlingId>
+      <gameName>WEEDTRUCK</gameName>
+      <vehicleMakeName>BRUTE</vehicleMakeName>
+      <expressionDictName>null</expressionDictName>
+      <expressionName>null</expressionName>
+      <animConvRoofDictName>null</animConvRoofDictName>
+      <animConvRoofName>null</animConvRoofName>
+      <animConvRoofWindowsAffected></animConvRoofWindowsAffected>
+      <ptfxAssetName>null</ptfxAssetName>
+      <audioHash>BOXVILLE</audioHash>
+      <layout>LAYOUT_VAN</layout>
+      <coverBoundOffsets>BOXVILLE_COVER_OFFSETS</coverBoundOffsets>
+      <structurePitchMultiplier value=1.000000/>
+      <structureRollMultiplier value=1.000000/>
+      <flags>FLAG_DELIVERY FLAG_IS_VAN FLAG_CAN_BE_DRIVEN FLAG_DONT_SPAWN_IN_CARGEN FLAG_EXTRAS_REQUIRE FLAG_HAS_LIVERY</flags>
+      <type>VEHICLE_TYPE_AUTOMOBILE</type>
+      <plateType>VPT_FRONT_AND_BACK_16_8</plateType>
+      <dashboardType>VDT_TRUCK</dashboardType>
+      <vehicleClass>VC_COMMERCIAL</vehicleClass>
+      <wheelType>VWT_SPORT</wheelType>
+      <trailers>
+        <Item>trailers</Item>
+      </trailers>
+      <additionalTrailers></additionalTrailers>
+      <drivers></drivers>
+      <extraCount value=6/>
+      <frequency value=1/>
+      <swankness>SWANKNESS_1</swankness>
+      <maxSpeed value=130.000000/>
+      <monetaryValue value=45000/>
+    </Item>
+  </InitDatas>
+</CVehicleModelInfo__InitDataList>
