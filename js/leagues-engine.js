@@ -112,6 +112,34 @@ class LeaguesEngine {
         fixtures: [
           { week: 'Week 5 Matchup', teamA: 'Radiant Vipers', teamB: 'Ascendant Phoenix', date: 'Sept 21 21:00 EST', format: 'Best of 3 Map Veto', status: 'UPCOMING' }
         ]
+      },
+      'Slapshot: Rebound': {
+        season: 'Season 4: Cyberpunk Showdown',
+        prizePool: '$2,500 USD',
+        divisions: [
+          {
+            id: 'premier',
+            name: '🏆 Slapshot Pro Puck Division',
+            minElo: 2000,
+            prize: '$1,800 USD',
+            teams: [
+              { rank: 1, name: 'Slapshot Overlords', tag: '[PUCK]', wins: 12, losses: 1, points: 36, roundDelta: '+124', winRate: '92.3%', elo: 2650, captain: 'PuckMaster99' },
+              { rank: 2, name: 'Cyber Skaters', tag: '[ICE]', wins: 9, losses: 4, points: 27, roundDelta: '+58', winRate: '69.2%', elo: 2310, captain: 'IceKing' }
+            ]
+          },
+          {
+            id: 'challenger',
+            name: '🥉 Slapshot Open Rink Cup',
+            minElo: 0,
+            prize: '$700 USD',
+            teams: [
+              { rank: 1, name: 'Puck Strikers 3v3', tag: '[STK]', wins: 7, losses: 2, points: 21, roundDelta: '+42', winRate: '77.8%', elo: 1780, captain: 'Deeker' }
+            ]
+          }
+        ],
+        fixtures: [
+          { week: 'Week 5 Matchup', teamA: 'Slapshot Overlords', teamB: 'Cyber Skaters', date: 'This Friday 20:00 EST', format: 'Best of 3 Puck Veto', status: 'UPCOMING' }
+        ]
       }
     };
   }

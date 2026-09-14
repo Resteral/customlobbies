@@ -55,13 +55,15 @@ class CustomLobbiesApp {
       'Rainbow Six Siege',
       'FiveM GTA RP',
       'Rocket League',
-      'Apex Legends'
+      'Apex Legends',
+      'Slapshot: Rebound'
     ];
 
-    this.favoriteGames = new Set(['Counter-Strike 2', 'REMATCH', 'Arkheron', 'Valorant', 'Marvel Rivals', 'Dota 2', 'FiveM GTA RP']);
+    this.favoriteGames = new Set(['Counter-Strike 2', 'REMATCH', 'Arkheron', 'Valorant', 'Marvel Rivals', 'Dota 2', 'FiveM GTA RP', 'Slapshot: Rebound']);
     this.loadFavorites();
 
     this.sponsoredServers = [
+      { id: 319, name: 'Slapshot: Rebound 3v3 Cyber Puck Arena', game: 'Slapshot: Rebound', host: 'PuckMaster99', players: 5, max: 6, connectURL: 'steam://connect/192.168.1.130:27015', sponsoredBadge: '🏒 SLAPSHOT SPONSOR' },
       { id: 318, name: 'Empulse 5v5 Cyber Arena Server Node #1', game: 'Empulse', host: 'Empulse_Overlord', players: 9, max: 10, connectURL: 'steam://connect/192.168.1.120:27015', sponsoredBadge: '⚡ EMPULSE SPONSOR' },
       { id: 316, name: 'REMATCH 5v5 Competitive Arena Node #1', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, connectURL: 'steam://connect/192.168.1.110:27015', sponsoredBadge: '🔥 REMATCH SPONSOR' },
       { id: 317, name: 'Arkheron 12-Player Cyber Scrim Spire', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, connectURL: 'steam://connect/192.168.1.115:27015', sponsoredBadge: '⚔️ ARKHERON SPONSOR' },
@@ -71,11 +73,11 @@ class CustomLobbiesApp {
     ];
 
     this.lobbies = [
+      { id: 14, title: 'Slapshot 3v3 High ELO Arcade Puck Scrims', game: 'Slapshot: Rebound', host: 'PuckMaster99', players: 5, max: 6, region: 'NA East', draftType: '3v3 Captain Pick' },
       { id: 13, title: 'Empulse 5v5 Apex Striker Cyber Arena Scrims', game: 'Empulse', host: 'Empulse_Overlord', players: 9, max: 10, region: 'NA East', draftType: 'Captain Snake Draft' },
       { id: 12, title: 'REMATCH 5v5 High ELO Champion Scrims', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, region: 'NA East', draftType: 'Captain Draft' },
       { id: 11, title: 'Arkheron Cyber Spire Battle Scrims', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, region: 'NA East', draftType: 'Battle Draft' },
-      { id: 9, title: 'CS2 FACEIT Level 8-10 Premier Scrims', game: 'Counter-Strike 2', host: 'ApexGod99', players: 9, max: 10, region: 'NA East', draftType: 'FACEIT Pro League' },
-      { id: 8, title: 'CS2 3v4 Retake Mirage A/B Site Scrims', game: 'CS2 Retake (Bomb Defusal)', host: 'Retake_Leader', players: 7, max: 9, region: 'NA East', draftType: 'Retakers vs Defenders' }
+      { id: 9, title: 'CS2 FACEIT Level 8-10 Premier Scrims', game: 'Counter-Strike 2', host: 'ApexGod99', players: 9, max: 10, region: 'NA East', draftType: 'FACEIT Pro League' }
     ];
 
     this.selectedLeaderboardGame = 'Counter-Strike 2';

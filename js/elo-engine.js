@@ -136,6 +136,13 @@ class EloEngine {
         { min: 2201, max: 2600, name: 'Emerald I - V', badge: '🟢 Emerald', color: '#00e676' },
         { min: 2601, max: 3000, name: 'Diamond I - V', badge: '💎 Diamond', color: '#b388ff' },
         { min: 3001, max: 9999, name: 'Champions Leaderboard', badge: '🛡️ Champions', color: '#ff1744' }
+      ],
+      'Slapshot: Rebound': [
+        { min: 0, max: 800, name: 'Rookie Puck', badge: '🏒 Rookie', color: '#8d6e63' },
+        { min: 801, max: 1500, name: 'Amateur Skater', badge: '⛸️ Amateur', color: '#c0c0c0' },
+        { min: 1501, max: 2200, name: 'Pro Playmaker', badge: '⚡ Playmaker', color: '#ffd700' },
+        { min: 2201, max: 2800, name: 'Master Captain', badge: '👑 Master', color: '#00e5ff' },
+        { min: 2801, max: 9999, name: 'Slapshot Legend League', badge: '🔥 Slapshot Legend', color: '#ff1744' }
       ]
     };
 
@@ -161,7 +168,8 @@ class EloEngine {
       'Deadlock': ['Cursed City Canyons', 'Midtown Lanes'],
       'The Finals': ['Monaco', 'Seoul', 'Las Vegas', 'Skyway Stadium'],
       'Rainbow Six Siege': ['Clubhouse', 'Oregon', 'Bank', 'Kafe', 'Chalet', 'Consulate'],
-      'Dota 2': ['Radiant Side', 'Dire Side', 'Captains Mode Draft']
+      'Dota 2': ['Radiant Side', 'Dire Side', 'Captains Mode Draft'],
+      'Slapshot: Rebound': ['Puck Arena Stadium', 'Cyber Ice Rink', 'Frozen Coliseum', 'Neon Rink', 'Metro Ice Center']
     };
   }
 
