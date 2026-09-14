@@ -1983,28 +1983,43 @@ class CustomLobbiesApp {
 
     const favList = this.allGames.filter(game => this.favoriteGames.has(game));
 
-    let html = favList.map(game => {
+    // Cap direct pill count to 4 max to maintain clean single-row UI across screens
+    const MAX_VISIBLE_FAVS = 4;
+    const visibleFavs = favList.slice(0, MAX_VISIBLE_FAVS);
+    const hiddenCount = favList.length - visibleFavs.length;
+
+    let html = visibleFavs.map(game => {
       const isSelected = this.activeFilter === game;
       return `
-        <button class="btn btn-sm ${isSelected ? 'btn-primary' : 'btn-purple'}" onclick="window.app.setGameFilter('${game}')" title="Filter lobbies by ${game}">
+        <button class="btn btn-sm ${isSelected ? 'btn-primary' : 'btn-purple'}" onclick="window.app.setGameFilter('${game}')" title="Filter lobbies by ${game}" style="padding: 0.25rem 0.6rem; font-size: 0.78rem;">
           <span>⭐</span> ${game}
         </button>
       `;
     }).join('');
 
-    // Add Manage Favorites Dropdown Menu
+    // Add Manage Favorites Dropdown Menu with filter and toggle controls
     html += `
       <div class="dropdown-wrapper dropdown-left">
-        <button class="btn btn-secondary btn-sm" style="gap: 0.3rem;">
-          <span>⚙️</span> Manage Favorites (${this.favoriteGames.size}) <span style="font-size: 0.7rem;">▼</span>
+        <button class="btn btn-secondary btn-sm" style="gap: 0.35rem; padding: 0.25rem 0.6rem; font-size: 0.78rem;">
+          <span>⚙️</span> Manage Favorites (${this.favoriteGames.size}) ${hiddenCount > 0 ? `<span style="background: rgba(255, 215, 0, 0.25); color: var(--accent-gold); padding: 0.1rem 0.4rem; border-radius: 6px; font-size: 0.7rem; font-weight: 800;">+${hiddenCount} more</span>` : ''} <span style="font-size: 0.7rem;">▼</span>
         </button>
-        <div class="dropdown-menu" style="max-height: 280px; overflow-y: auto;">
+        <div class="dropdown-menu" style="max-height: 290px; overflow-y: auto; min-width: 260px;">
+          <div style="padding: 0.4rem 0.8rem; font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; font-weight: 800; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+            <span>Game Title</span>
+            <span>Status</span>
+          </div>
           ${this.allGames.map(game => {
             const isFav = this.favoriteGames.has(game);
+            const isSelected = this.activeFilter === game;
             return `
-              <button class="dropdown-item" onclick="window.app.toggleFavorite('${game}')">
-                <span>${isFav ? '⭐' : '☆'}</span> ${game} ${isFav ? '<span style="margin-left: auto; color: var(--accent-gold); font-size: 0.72rem; font-weight: 800;">FAVORITED</span>' : ''}
-              </button>
+              <div class="dropdown-item" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.4rem 0.8rem;">
+                <span onclick="window.app.setGameFilter('${game}')" style="cursor: pointer; flex: 1; ${isSelected ? 'color: var(--accent-cyan); font-weight: 800;' : ''}" title="Filter by ${game}">
+                  ${game} ${isSelected ? '✓' : ''}
+                </span>
+                <button class="btn btn-sm ${isFav ? 'btn-gold' : 'btn-secondary'}" style="padding: 0.15rem 0.45rem; font-size: 0.7rem; flex-shrink: 0;" onclick="window.app.toggleFavorite('${game}')" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
+                  ${isFav ? '⭐ Fav' : '☆ Add'}
+                </button>
+              </div>
             `;
           }).join('')}
         </div>

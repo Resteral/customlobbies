@@ -221,22 +221,22 @@
       </div>
 
       <!-- Favorite Games Priority Bar (Decluttered & Streamlined) -->
-      <div class="card" style="margin-bottom: 1.5rem; padding: 1rem; border-color: var(--accent-gold);">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-          <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
-            <span style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); display: flex; align-items: center; gap: 0.4rem;">
-              <span>⭐</span> Favorited Games:
+      <div class="card" style="margin-bottom: 1.5rem; padding: 0.85rem 1.25rem; border-color: var(--accent-gold);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; flex: 1; min-width: 0;">
+            <span style="font-size: 0.88rem; font-weight: 800; color: var(--accent-gold); display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+              <span>⭐</span> Favorited:
             </span>
-            <div id="favoriteGamesTagsContainer" style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+            <div id="favoriteGamesTagsContainer" style="display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center;">
               <!-- Injected via app.js -->
             </div>
           </div>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-            <button class="btn btn-secondary btn-sm" id="filterAllGames">🎮 All Games</button>
-            <button class="btn btn-purple btn-sm" id="filterFavsOnly">⭐ Favorites Only</button>
+          <div style="display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" id="filterAllGames" style="padding: 0.3rem 0.7rem; font-size: 0.8rem;">🎮 All Games</button>
+            <button class="btn btn-purple btn-sm" id="filterFavsOnly" style="padding: 0.3rem 0.7rem; font-size: 0.8rem;">⭐ Favorites Only</button>
             
-            <div class="dropdown-wrapper">
-              <button class="btn btn-purple btn-sm" style="gap: 0.3rem;" id="btnQueueActionsDropdown">
+            <div class="dropdown-wrapper dropdown-right">
+              <button class="btn btn-purple btn-sm" style="gap: 0.3rem; padding: 0.3rem 0.7rem; font-size: 0.8rem;" id="btnQueueActionsDropdown">
                 <span>⚡</span> Queue Options <span style="font-size: 0.7rem;">▼</span>
               </button>
               <div class="dropdown-menu">
