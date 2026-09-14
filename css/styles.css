@@ -1039,3 +1039,45 @@ body.obs-transparent-mode {
 .event-tag-rematch { background: rgba(255, 82, 82, 0.2); color: var(--accent-red); border: 1px solid rgba(255, 82, 82, 0.4); }
 .event-tag-valorant { background: rgba(157, 78, 221, 0.2); color: var(--accent-purple); border: 1px solid rgba(157, 78, 221, 0.4); }
 .event-tag-arkheron { background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); border: 1px solid rgba(255, 215, 0, 0.4); }
+
+/* Live Status Dot Pulsing */
+.live-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 10px var(--accent-green);
+  animation: pulseDot 1.5s infinite alternate;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.8); opacity: 0.6; box-shadow: 0 0 4px var(--accent-green); }
+  100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px var(--accent-green); }
+}
+
+@keyframes borderGlow {
+  0% { border-color: rgba(0, 242, 254, 0.4); box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
+  50% { border-color: rgba(157, 78, 221, 0.6); box-shadow: 0 0 20px rgba(157, 78, 221, 0.4); }
+  100% { border-color: rgba(0, 242, 254, 0.4); box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
+}
+
+.glow-card {
+  animation: borderGlow 3s infinite alternate;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(10, 12, 16, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 242, 254, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-cyan);
+}
