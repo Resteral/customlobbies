@@ -930,7 +930,9 @@ class CustomLobbiesApp {
 
       container.innerHTML = `
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
-          ${solos.map(m => `
+          ${solos.map(m => {
+            const rolePreset = window.wardogsEngine.rolePresets[m.role] || window.wardogsEngine.rolePresets['⚡ Breacher / Assault'];
+            return `
             <div class="card" style="border-color: rgba(255, 111, 0, 0.4); position: relative;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
                 <div>
@@ -941,12 +943,15 @@ class CustomLobbiesApp {
               </div>
 
               <h3 style="font-size: 1.15rem; font-weight: 900; margin-bottom: 0.3rem; color: #fff;">${m.name}</h3>
-              <div style="font-size: 0.82rem; color: var(--accent-gold); font-weight: 800; margin-bottom: 0.8rem;">Role: ${m.role}</div>
+              <div style="font-size: 0.82rem; color: var(--accent-gold); font-weight: 800; margin-bottom: 0.4rem;">Role: ${m.role}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+                Equipped Loadout: <strong style="color: #fff;">${rolePreset.primary}</strong> | Gadget: <strong style="color: var(--accent-cyan);">${rolePreset.gadget}</strong>
+              </div>
 
               <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; background: rgba(0,0,0,0.4); padding: 0.6rem; border-radius: 6px; font-size: 0.78rem; margin-bottom: 1rem; text-align: center;">
                 <div><div style="color: var(--text-muted);">Rating</div><strong style="color: var(--accent-purple);">${m.elo} MMR</strong></div>
                 <div><div style="color: var(--text-muted);">K/D Ratio</div><strong style="color: var(--accent-green);">${m.kd}</strong></div>
-                <div><div style="color: var(--text-muted);">Contracts</div><strong style="color: #ffab00;">${m.contracts}</strong></div>
+                <div><div style="color: var(--text-muted);">Bounty Earned</div><strong style="color: #ffab00;">${m.bountyEarned || '$500'}</strong></div>
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -958,7 +963,8 @@ class CustomLobbiesApp {
                 </button>
               </div>
             </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       `;
     } else if (this.activeWardogsMode === 'squads') {
@@ -977,7 +983,8 @@ class CustomLobbiesApp {
               </div>
 
               <h3 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 0.3rem; color: #fff;">${s.name}</h3>
-              <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">Captain: <strong style="color: var(--accent-cyan);">${s.captain}</strong> | Game: <strong style="color: #fff;">${s.game}</strong></div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem;">Captain: <strong style="color: var(--accent-cyan);">${s.captain}</strong> | Game: <strong style="color: #fff;">${s.game}</strong></div>
+              <div style="font-size: 0.78rem; color: #ffab00; margin-bottom: 0.8rem; font-weight: 700;">Allegiance: ${s.faction || '🔵 Vanguard Command'}</div>
 
               <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.82rem; margin-bottom: 1rem;">
                 <span>Battle Record: <strong style="color: var(--accent-green);">${s.record}</strong></span>
@@ -991,39 +998,137 @@ class CustomLobbiesApp {
           `).join('')}
         </div>
       `;
-    } else if (this.activeWardogsMode === 'ranked') {
+    } else if (this.activeWardogsMode === 'warroom') {
+      const sectors = window.wardogsEngine.sectors;
       const history = window.wardogsEngine.rankedSelectionHistory;
 
       container.innerHTML = `
-        <div class="card" style="border-color: rgba(255, 111, 0, 0.4);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h3 style="font-size: 1.15rem; font-weight: 900; color: #ffab00;">⚡ WARDOGS Ranked Selection Match History</h3>
-            <button class="btn btn-primary btn-sm" onclick="window.app.runWardogsRankedDraft()" style="width: auto;">🎯 Run New Ranked Selection</button>
-          </div>
-
-          ${history.length === 0 ? `
-            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
-              <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎯</div>
-              <p>No Ranked Selections generated yet. Click "Run New Ranked Selection" to match combatants!</p>
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <!-- Live Sector Capture Control Header -->
+          <div class="card" style="border-color: #ff6f00; background: radial-gradient(circle at top right, rgba(255,111,0,0.15), rgba(0,0,0,0.6));">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div>
+                <span class="lobby-game-tag" style="background: rgba(255, 111, 0, 0.3); color: #ffab00; font-weight: 900;">33 v 33 v 33 TRI-FACTION WAR ZONE</span>
+                <h3 style="font-size: 1.35rem; font-weight: 900; color: #fff; margin: 0.3rem 0 0 0;">Sector 33 Tactical Operations Command</h3>
+              </div>
+              <button class="btn btn-purple" style="width: auto;" onclick="window.app.runWardogsRankedDraft()">⚡ LAUNCH 99-PLAYER TRI-FACTION DRAFT</button>
             </div>
-          ` : `
-            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
-              ${history.map(m => `
-                <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem;">
-                  <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.4rem;">
-                    <span style="color: #ffab00; font-weight: 900;">${m.id} • ${m.game} (${m.capacity} Players)</span>
-                    <span style="color: var(--accent-green); font-weight: 800;">${m.status}</span>
+
+            <!-- Sector Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+              ${sectors.map(sec => `
+                <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem;">
+                  <div style="font-size: 0.8rem; font-weight: 800; color: #ffab00; margin-bottom: 0.3rem;">${sec.name}</div>
+                  <div style="font-size: 0.85rem; color: #fff; font-weight: 700; margin-bottom: 0.4rem;">Held by: ${sec.controllingFaction}</div>
+                  <div style="width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 0.4rem;">
+                    <div style="width: ${sec.controlPct}%; background: var(--accent-gold); height: 100%;"></div>
                   </div>
-                  <div style="font-size: 0.85rem; margin-bottom: 0.4rem; color: #fff;">
-                    🔵 Alpha (${m.avgEloAlpha} ELO) <strong style="color: var(--accent-purple);">VS</strong> 🔴 Bravo (${m.avgEloBravo} ELO) | Arena: <strong style="color: var(--accent-gold);">${m.map}</strong>
-                  </div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">Timestamp: ${m.timestamp}</div>
+                  <div style="font-size: 0.75rem; color: var(--accent-cyan); text-align: right;">${sec.controlPct}% Control • ${sec.activeBuffer}</div>
                 </div>
               `).join('')}
             </div>
-          `}
+
+            <!-- Tactical Strike Actions -->
+            <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 800; color: var(--accent-cyan); font-size: 0.9rem;">🛰️ Tri-Faction Tactical Air & Satellite Support</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Trigger real-time tactical strike support across all active 33v33v33 server nodes.</div>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-secondary btn-sm" onclick="window.app.triggerTacticalStrike('recon')">🛰️ Recon Scan</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.app.triggerTacticalStrike('emp')">⚡ EMP Burst</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.app.triggerTacticalStrike('drop')">📦 Air Drop</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- History Feed -->
+          <div class="card" style="border-color: rgba(255, 111, 0, 0.4);">
+            <h3 style="font-size: 1.15rem; font-weight: 900; color: #ffab00; margin-bottom: 1rem;">⚡ Active 99-Player Match History & Server Telemetry</h3>
+            ${history.length === 0 ? `
+              <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎯</div>
+                <p>No 99-Player Ranked Selections generated yet. Click "LAUNCH 99-PLAYER TRI-FACTION DRAFT" above!</p>
+              </div>
+            ` : `
+              <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                ${history.map(m => `
+                  <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.4rem;">
+                      <span style="color: #ffab00; font-weight: 900;">${m.id} • ${m.game} (${m.capacity} Players)</span>
+                      <span style="color: var(--accent-green); font-weight: 800;">${m.status}</span>
+                    </div>
+                    <div style="font-size: 0.85rem; margin-bottom: 0.4rem; color: #fff;">
+                      🔵 Alpha (${m.avgEloAlpha} ELO) <strong style="color: var(--accent-purple);">VS</strong> 🔴 Bravo (${m.avgEloBravo} ELO) <strong style="color: var(--accent-purple);">VS</strong> 🟡 Charlie (${m.avgEloCharlie} ELO)
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">
+                      Arena: <strong style="color: var(--accent-gold);">${m.map}</strong> | Server Node: <strong style="color: var(--accent-cyan);">${m.serverNode || 'US-EAST-128TICK'}</strong>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+          </div>
         </div>
       `;
+    } else if (this.activeWardogsMode === 'bounties') {
+      const bounties = window.wardogsEngine.tacticalBounties;
+
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="background: rgba(255, 111, 0, 0.1); border: 1px solid #ff6f00; border-radius: 8px; padding: 1rem; margin-bottom: 0.5rem;">
+            <div style="font-weight: 900; color: #ffab00; font-size: 1.1rem; margin-bottom: 0.3rem;">🎯 WARDOGS Mercenary Tactical Bounties</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Complete tactical objectives in 33v33v33 Tri-Faction matches to earn CL-Points and Cash Bounties into your balance!</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+            ${bounties.map(b => `
+              <div class="card" style="border-color: ${b.completed ? 'var(--accent-green)' : 'rgba(255, 111, 0, 0.5)'};">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+                  <span class="lobby-game-tag" style="background: rgba(255, 111, 0, 0.2); color: #ffab00;">${b.id}</span>
+                  <div style="text-align: right;">
+                    <div style="font-size: 0.85rem; color: var(--accent-green); font-weight: 900;">${b.reward}</div>
+                    <div style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">${b.cash}</div>
+                  </div>
+                </div>
+
+                <h3 style="font-size: 1.1rem; font-weight: 900; color: #fff; margin-bottom: 0.4rem;">${b.title}</h3>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4;">${b.desc}</p>
+
+                <button class="btn ${b.completed ? 'btn-secondary' : 'btn-primary'}" style="width: 100%;" ${b.completed ? 'disabled' : ''} onclick="window.app.claimWardogsBounty('${b.id}')">
+                  ${b.completed ? '✅ Bounty Claimed' : '🎯 Claim Bounty Reward'}
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  triggerTacticalStrike(strikeType) {
+    if (!window.wardogsEngine) return;
+    const msg = window.wardogsEngine.triggerTacticalStrike(strikeType);
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+    alert(msg);
+  }
+
+  claimWardogsBounty(bountyId) {
+    if (!window.wardogsEngine) return;
+    const b = window.wardogsEngine.claimBounty(bountyId);
+    if (b) {
+      this.clPoints += 250;
+      const clDisplay = document.getElementById('userCLPointsValue');
+      if (clDisplay) clDisplay.textContent = `${this.clPoints.toLocaleString()} Points`;
+
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('fanfare');
+      }
+
+      this.renderWardogsView();
+      alert(`🎉 BOUNTY CLAIMED!\n\nCompleted objective: "${b.title}"!\n\nEarned +250 🪙 CL-Points!`);
     }
   }
 
