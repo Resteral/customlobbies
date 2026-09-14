@@ -333,25 +333,27 @@ class WardogsEngine {
       remainingDraft.push(player);
     }
 
-    // Attach Rank Info to all players
+    // Attach Rank Info & Effective Performance-Adjusted MMR to all players
     [...factionAlpha, ...factionBravo, ...factionCharlie, ...remainingDraft].forEach(p => {
       const rank = this.computePlayerRankTier(p);
       p.rankInfo = rank;
+      p.effectiveElo = rank.effectiveMMR;
+      p.mmrAdjustment = rank.mmrAdjustment;
       p.kd = rank.kd;
       p.bountyEarned = p.bountyEarned || rank.cashFormatted;
       p.rankTitle = rank.rankTitle;
       p.rankBadge = rank.rankBadge;
     });
 
-    // Sort remaining draft operatives descending by ELO
-    remainingDraft.sort((a, b) => b.elo - a.elo);
+    // Sort remaining draft operatives descending by Effective MMR
+    remainingDraft.sort((a, b) => b.effectiveElo - a.effectiveElo);
 
-    // Greedy Least-Sum Equalization Balancing across Factions (Alpha, Bravo, Charlie)
+    // Greedy Least-Sum Equalization Balancing across Factions using Effective MMR
     remainingDraft.forEach(player => {
       const totals = [
-        { faction: factionAlpha, sum: factionAlpha.reduce((acc, p) => acc + p.elo, 0) },
-        { faction: factionBravo, sum: factionBravo.reduce((acc, p) => acc + p.elo, 0) },
-        { faction: factionCharlie, sum: factionCharlie.reduce((acc, p) => acc + p.elo, 0) }
+        { faction: factionAlpha, sum: factionAlpha.reduce((acc, p) => acc + (p.effectiveElo || p.elo), 0) },
+        { faction: factionBravo, sum: factionBravo.reduce((acc, p) => acc + (p.effectiveElo || p.elo), 0) },
+        { faction: factionCharlie, sum: factionCharlie.reduce((acc, p) => acc + (p.effectiveElo || p.elo), 0) }
       ];
 
       // Pick lowest sum faction that has less than 33 players
@@ -361,9 +363,9 @@ class WardogsEngine {
       available[0].faction.push(player);
     });
 
-    const avgAlpha = Math.round(factionAlpha.reduce((acc, p) => acc + p.elo, 0) / factionAlpha.length);
-    const avgBravo = Math.round(factionBravo.reduce((acc, p) => acc + p.elo, 0) / factionBravo.length);
-    const avgCharlie = Math.round(factionCharlie.reduce((acc, p) => acc + p.elo, 0) / factionCharlie.length);
+    const avgAlpha = Math.round(factionAlpha.reduce((acc, p) => acc + (p.effectiveElo || p.elo), 0) / factionAlpha.length);
+    const avgBravo = Math.round(factionBravo.reduce((acc, p) => acc + (p.effectiveElo || p.elo), 0) / factionBravo.length);
+    const avgCharlie = Math.round(factionCharlie.reduce((acc, p) => acc + (p.effectiveElo || p.elo), 0) / factionCharlie.length);
 
     const kdAlpha = (factionAlpha.reduce((acc, p) => acc + parseFloat(p.kd), 0) / factionAlpha.length).toFixed(2);
     const kdBravo = (factionBravo.reduce((acc, p) => acc + parseFloat(p.kd), 0) / factionBravo.length).toFixed(2);
@@ -410,32 +412,43 @@ class WardogsEngine {
     return matchRoom;
   }
 
-  // Compute Player Rank & Balance Rating from ELO, K/D Ratio, and Cash Economy Balance
+  // Compute Player Rank & Effective MMR from Base ELO, K/D Ratio, and Cash Economy Balance
   computePlayerRankTier(player) {
-    const elo = player.elo || 1800;
+    const baseElo = player.elo || 1800;
     const kd = parseFloat(player.kd) || 1.85;
     const cashVal = parseInt((player.bountyEarned || '$1200').replace(/[^0-9]/g, '')) || 1200;
 
-    const compositeScore = (elo * 0.5) + (kd * 450) + (cashVal / 8);
+    // Performance MMR Adjustment based on K/D & Economy
+    const kdMMRBonus = Math.round((kd - 1.0) * 120);
+    const cashMMRBonus = Math.round(cashVal / 250);
+    const mmrAdjustment = kdMMRBonus + cashMMRBonus;
+
+    // Effective MMR
+    const effectiveMMR = Math.max(800, baseElo + mmrAdjustment);
+
+    const compositeScore = (effectiveMMR * 0.5) + (kd * 450) + (cashVal / 8);
 
     let rankTitle = '🥉 Vanguard Recruit';
     let rankBadge = '🥉';
 
-    if (compositeScore >= 2400) {
+    if (effectiveMMR >= 2500 || compositeScore >= 2400) {
       rankTitle = '👑 Apex Commander';
       rankBadge = '👑';
-    } else if (compositeScore >= 2100) {
+    } else if (effectiveMMR >= 2200 || compositeScore >= 2100) {
       rankTitle = '💎 Diamond Veteran';
       rankBadge = '💎';
-    } else if (compositeScore >= 1800) {
+    } else if (effectiveMMR >= 1800 || compositeScore >= 1800) {
       rankTitle = '🥇 Gold Operative';
       rankBadge = '🥇';
-    } else if (compositeScore >= 1500) {
+    } else if (effectiveMMR >= 1400 || compositeScore >= 1500) {
       rankTitle = '🥈 Silver Combatant';
       rankBadge = '🥈';
     }
 
     return {
+      baseElo,
+      effectiveMMR,
+      mmrAdjustment,
       compositeScore: Math.round(compositeScore),
       rankTitle,
       rankBadge,

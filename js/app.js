@@ -1551,8 +1551,9 @@ class CustomLobbiesApp {
           <div style="font-size: 0.68rem; color: var(--text-muted);">${p.rankTitle || 'Operative'}</div>
         </div>
         <div style="text-align: right;">
-          <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
-          <div style="font-size: 0.68rem; color: var(--accent-green); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
+          <span style="color: var(--accent-gold); font-weight: 800;">${p.effectiveElo || p.elo} MMR</span>
+          <span style="font-size: 0.68rem; color: var(--accent-green); font-weight: 800;"> (${p.mmrAdjustment >= 0 ? '+' + p.mmrAdjustment : p.mmrAdjustment})</span>
+          <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
         </div>
       </div>
     `).join('');
@@ -1564,8 +1565,9 @@ class CustomLobbiesApp {
           <div style="font-size: 0.68rem; color: var(--text-muted);">${p.rankTitle || 'Operative'}</div>
         </div>
         <div style="text-align: right;">
-          <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
-          <div style="font-size: 0.68rem; color: var(--accent-green); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
+          <span style="color: var(--accent-gold); font-weight: 800;">${p.effectiveElo || p.elo} MMR</span>
+          <span style="font-size: 0.68rem; color: var(--accent-green); font-weight: 800;"> (${p.mmrAdjustment >= 0 ? '+' + p.mmrAdjustment : p.mmrAdjustment})</span>
+          <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
         </div>
       </div>
     `).join('');
@@ -1579,8 +1581,9 @@ class CustomLobbiesApp {
             <div style="font-size: 0.68rem; color: var(--text-muted);">${p.rankTitle || 'Operative'}</div>
           </div>
           <div style="text-align: right;">
-            <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
-            <div style="font-size: 0.68rem; color: var(--accent-green); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
+            <span style="color: var(--accent-gold); font-weight: 800;">${p.effectiveElo || p.elo} MMR</span>
+            <span style="font-size: 0.68rem; color: var(--accent-green); font-weight: 800;"> (${p.mmrAdjustment >= 0 ? '+' + p.mmrAdjustment : p.mmrAdjustment})</span>
+            <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
           </div>
         </div>
       `).join('');
