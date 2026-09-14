@@ -83,6 +83,8 @@ class CustomLobbiesApp {
         riotId: 'Reaper#NA1',
         discord: 'RadiantReaper#0001',
         twitch: 'twitch.tv/RadiantReaper',
+        commendations: { leadership: 24, friendly: 35, clutch: 42, teacher: 18 },
+        badRemarks: { toxic: 1, afk: 0, griefing: 0, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 2540, wins: 142, losses: 28, winRate: 83.5, kd: '2.14', mvp: 48 },
           'Valorant': { elo: 2350, wins: 110, losses: 22, winRate: 83.3, kd: '1.98', mvp: 35 },
@@ -102,6 +104,8 @@ class CustomLobbiesApp {
         riotId: 'ApexGod#EUW',
         discord: 'ApexGod#1337',
         twitch: 'twitch.tv/ApexGod99',
+        commendations: { leadership: 18, friendly: 20, clutch: 31, teacher: 9 },
+        badRemarks: { toxic: 2, afk: 1, griefing: 0, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 2150, wins: 98, losses: 31, winRate: 76.0, kd: '1.75', mvp: 32 },
           'Valorant': { elo: 2100, wins: 82, losses: 24, winRate: 77.3, kd: '1.68', mvp: 24 },
@@ -121,6 +125,8 @@ class CustomLobbiesApp {
         riotId: 'Valkyrie#EU1',
         discord: 'Valkyrie#2026',
         twitch: 'twitch.tv/Valkyrie_CS',
+        commendations: { leadership: 15, friendly: 40, clutch: 28, teacher: 22 },
+        badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 1920, wins: 85, losses: 42, winRate: 66.9, kd: '1.45', mvp: 28 },
           'Valorant': { elo: 1950, wins: 90, losses: 38, winRate: 70.3, kd: '1.52', mvp: 26 },
@@ -140,6 +146,8 @@ class CustomLobbiesApp {
         riotId: 'ProGamer#1337',
         discord: 'GamerHost#0001',
         twitch: 'twitch.tv/CustomLobbiesHost',
+        commendations: { leadership: 19, friendly: 28, clutch: 34, teacher: 15 },
+        badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 1840, wins: 76, losses: 34, winRate: 69.1, kd: '1.40', mvp: 22 },
           'Valorant': { elo: 1350, wins: 62, losses: 30, winRate: 67.4, kd: '1.38', mvp: 19 },
@@ -159,6 +167,8 @@ class CustomLobbiesApp {
         riotId: 'ShadowNinja#BR1',
         discord: 'ShadowNinja#9999',
         twitch: 'twitch.tv/ShadowNinja',
+        commendations: { leadership: 12, friendly: 18, clutch: 22, teacher: 8 },
+        badRemarks: { toxic: 1, afk: 0, griefing: 1, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 1790, wins: 64, losses: 40, winRate: 61.5, kd: '1.32', mvp: 18 },
           'Valorant': { elo: 1750, wins: 72, losses: 45, winRate: 61.5, kd: '1.35', mvp: 17 },
@@ -178,6 +188,8 @@ class CustomLobbiesApp {
         riotId: 'GhostOp#JP1',
         discord: 'GhostOperator#7777',
         twitch: 'twitch.tv/GhostOperator',
+        commendations: { leadership: 10, friendly: 15, clutch: 19, teacher: 6 },
+        badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
         games: {
           'Counter-Strike 2': { elo: 1680, wins: 52, losses: 38, winRate: 57.8, kd: '1.22', mvp: 14 },
           'Valorant': { elo: 1820, wins: 80, losses: 39, winRate: 67.2, kd: '1.48', mvp: 21 },
@@ -1003,7 +1015,10 @@ class CustomLobbiesApp {
                   <span>${p.name}</span>
                   <span style="font-size: 0.75rem; opacity: 0.7;">[${p.region}]</span>
                 </div>
-                <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-size: 0.68rem;">🛡️ Guardian Verified</span>
+                <div style="display: flex; gap: 0.3rem; margin-top: 0.15rem;">
+                  <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-size: 0.68rem;">🛡️ Guardian Verified</span>
+                  <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.12); color: var(--accent-gold); font-size: 0.68rem;" title="Player Reputation Karma">👍 +${(p.commendations ? p.commendations.leadership + p.commendations.friendly + p.commendations.clutch + p.commendations.teacher : 40)} / 👎 -${(p.badRemarks ? p.badRemarks.toxic + p.badRemarks.afk + p.badRemarks.griefing + p.badRemarks.suspected : 0)}</span>
+                </div>
               </div>
             </div>
           </td>
@@ -1042,12 +1057,14 @@ class CustomLobbiesApp {
     const modal = document.getElementById('playerPassportModal');
     if (!modal) return;
 
+    this.activePassportPlayer = playerName;
     const p = this.leaderboardData.find(user => user.name === playerName) || this.leaderboardData[0];
 
     document.getElementById('passportAvatar').textContent = p.avatar || '👑';
     document.getElementById('passportName').textContent = p.name;
     document.getElementById('passportPrimaryRank').textContent = `${p.region} Region • ${p.targetElo || 1840} Rating`;
 
+    // Per-game ranks grid
     const gamesContainer = document.getElementById('passportGamesGrid');
     if (gamesContainer && p.games) {
       gamesContainer.innerHTML = Object.entries(p.games).map(([gName, gStat]) => {
@@ -1062,6 +1079,53 @@ class CustomLobbiesApp {
       }).join('');
     }
 
+    // Commendations & Bad Remarks calculations
+    const commends = p.commendations || { leadership: 15, friendly: 22, clutch: 28, teacher: 10 };
+    const remarks = p.badRemarks || { toxic: 1, afk: 0, griefing: 0, suspected: 0 };
+
+    const totalCommends = (commends.leadership || 0) + (commends.friendly || 0) + (commends.clutch || 0) + (commends.teacher || 0);
+    const totalRemarks = (remarks.toxic || 0) + (remarks.afk || 0) + (remarks.griefing || 0) + (remarks.suspected || 0);
+    const karmaPct = Math.round((totalCommends / (totalCommends + totalRemarks || 1)) * 100);
+
+    const karmaBadge = document.getElementById('passportKarmaBadge');
+    if (karmaBadge) {
+      if (totalRemarks > 5) {
+        karmaBadge.style.background = 'rgba(255, 82, 82, 0.2)';
+        karmaBadge.style.color = 'var(--accent-red)';
+        karmaBadge.textContent = `⚠️ Warning Karma (${karmaPct}% Positivity)`;
+      } else {
+        karmaBadge.style.background = 'rgba(0, 230, 118, 0.2)';
+        karmaBadge.style.color = 'var(--accent-green)';
+        karmaBadge.textContent = `👍 ${karmaPct}% Positive Karma`;
+      }
+    }
+
+    const totalCommendsEl = document.getElementById('passportTotalCommends');
+    if (totalCommendsEl) totalCommendsEl.textContent = `+${totalCommends}`;
+
+    const totalRemarksEl = document.getElementById('passportTotalRemarks');
+    if (totalRemarksEl) totalRemarksEl.textContent = `-${totalRemarks}`;
+
+    const commendsGrid = document.getElementById('passportCommendsGrid');
+    if (commendsGrid) {
+      commendsGrid.innerHTML = `
+        <div>🧠 Leadership: <strong style="color: var(--accent-green);">${commends.leadership || 0}</strong></div>
+        <div>🎯 Friendly: <strong style="color: var(--accent-green);">${commends.friendly || 0}</strong></div>
+        <div>⚡ Clutch: <strong style="color: var(--accent-green);">${commends.clutch || 0}</strong></div>
+        <div>🎓 Helpful: <strong style="color: var(--accent-green);">${commends.teacher || 0}</strong></div>
+      `;
+    }
+
+    const remarksGrid = document.getElementById('passportRemarksGrid');
+    if (remarksGrid) {
+      remarksGrid.innerHTML = `
+        <div>☣️ Toxic: <strong style="color: var(--accent-red);">${remarks.toxic || 0}</strong></div>
+        <div>🏃 AFK/Leaver: <strong style="color: var(--accent-red);">${remarks.afk || 0}</strong></div>
+        <div>🛑 Griefing: <strong style="color: var(--accent-red);">${remarks.griefing || 0}</strong></div>
+        <div>⚠️ Suspected: <strong style="color: var(--accent-red);">${remarks.suspected || 0}</strong></div>
+      `;
+    }
+
     const linkedContainer = document.getElementById('passportLinkedAccounts');
     if (linkedContainer) {
       linkedContainer.innerHTML = `
@@ -1073,6 +1137,67 @@ class CustomLobbiesApp {
     }
 
     modal.classList.add('active');
+  }
+
+  triggerCommendPlayer(type) {
+    const targetName = this.activePassportPlayer || 'RadiantReaper';
+    const p = this.leaderboardData.find(user => user.name === targetName);
+
+    if (p) {
+      if (!p.commendations) {
+        p.commendations = { leadership: 10, friendly: 10, clutch: 10, teacher: 5 };
+      }
+      p.commendations[type] = (p.commendations[type] || 0) + 1;
+
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('fanfare');
+      }
+
+      this.openPlayerPassportModal(targetName);
+      this.renderLeaderboard();
+
+      const titles = {
+        leadership: '🧠 Leadership & Shotcalling',
+        friendly: '🎯 Sportsmanship & Friendly Teammate',
+        clutch: '⚡ Clutch Player & Aim Skill',
+        teacher: '🎓 Helpful Teacher & Guide'
+      };
+
+      alert(`⭐ PLAYER COMMENDED!\n\nYou awarded +1 Commendation for "${titles[type]}" to ${p.name}!`);
+    }
+  }
+
+  triggerBadRemarkPlayer() {
+    const targetName = this.activePassportPlayer || 'RadiantReaper';
+    const p = this.leaderboardData.find(user => user.name === targetName);
+
+    if (p) {
+      const reason = prompt(`⚠️ REPORT MISCONDUCT FOR ${p.name}:\n\nChoose category code:\n1 - ☣️ Toxic / Verbal Abuse\n2 - 🏃 AFK / Match Leaver\n3 - 🛑 Griefing / Team Flash\n4 - ⚠️ Suspected Cheating\n\nEnter number (1-4):`, '1');
+
+      if (!reason) return;
+
+      if (!p.badRemarks) {
+        p.badRemarks = { toxic: 0, afk: 0, griefing: 0, suspected: 0 };
+      }
+
+      let category = 'toxic';
+      let label = 'Toxic Behavior';
+
+      if (reason === '2') { category = 'afk'; label = 'AFK / Leaver'; }
+      else if (reason === '3') { category = 'griefing'; label = 'Griefing'; }
+      else if (reason === '4') { category = 'suspected'; label = 'Suspected Cheater'; }
+
+      p.badRemarks[category] = (p.badRemarks[category] || 0) + 1;
+
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('hitmarker');
+      }
+
+      this.openPlayerPassportModal(targetName);
+      this.renderLeaderboard();
+
+      alert(`🛑 REPORT SUBMITTED!\n\nBad remark logged for ${p.name} (${label}). Sent to Guardian Anti-Cheat Moderators for review.`);
+    }
   }
 
   setupModalHandlers() {
