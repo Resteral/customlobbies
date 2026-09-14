@@ -365,6 +365,36 @@
               <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.2rem;">💎 Diamond Veteran (1840 MMR)</p>
             </div>
 
+            <!-- Multi-Game Rank Breakdown -->
+            <div style="background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; border: 1px solid var(--border-color);">
+              <div style="font-size: 0.78rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 0.6rem; display: flex; justify-content: space-between;">
+                <span>🎮 Per-Game Ranks & ELO</span>
+                <span>Global Ratings</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.82rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>🎯 CS2 Premier:</span>
+                  <span style="font-weight: 800; color: #706fd3;">🟣 Level 8 (1840 ELO)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>🔴 Valorant:</span>
+                  <span style="font-weight: 800; color: #b388ff;">💎 Diamond 3 (450 RR)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>🏆 Apex Legends:</span>
+                  <span style="font-weight: 800; color: #ff1744;">🏆 Apex Predator #180</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>⚽ Rocket League:</span>
+                  <span style="font-weight: 800; color: #ff1744;">⚽ Grand Champ II</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>🛡️ R6 Siege:</span>
+                  <span style="font-weight: 800; color: #00e676;">🟢 Emerald I (3850)</span>
+                </div>
+              </div>
+            </div>
+
             <!-- Linked Gaming Accounts List -->
             <div style="display: flex; flex-direction: column; gap: 0.6rem; background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; font-size: 0.85rem;">
               <div style="display: flex; justify-content: space-between;">
@@ -918,35 +948,64 @@
       </div>
 
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
           <div>
-            <h2 style="font-size: 1.5rem; font-weight: 900;">Global ELO / MMR Leaderboard</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Calculated using standard dynamic K-factor rating system</p>
+            <h2 style="font-size: 1.5rem; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+              <span>👑</span> Per-Game Global Leaderboards & Ranks
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.2rem;">Live player rankings across Counter-Strike 2, Valorant, Apex Legends, Rocket League, Dota 2, and R6 Siege.</p>
           </div>
-          <select class="input-field" style="width: 200px;" id="leaderboardGameFilter">
-            <option value="all">All Games</option>
-            <option value="cs2">Counter-Strike 2</option>
-            <option value="valorant">Valorant</option>
-            <option value="rocketleague">Rocket League</option>
-          </select>
+
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <!-- Username Search Input -->
+            <input type="text" class="input-field" id="leaderboardSearchInput" placeholder="🔍 Search Gamer Handle..." style="width: 190px; font-size: 0.85rem;">
+
+            <!-- Region Filter -->
+            <select class="input-field" style="width: 170px; font-size: 0.85rem;" id="leaderboardRegionFilter">
+              <option value="all">🌍 All Regions</option>
+              <option value="na">🇺🇸 North America (NA)</option>
+              <option value="eu">🇪🇺 Europe (EU)</option>
+              <option value="sa">🇧🇷 South America (SA)</option>
+              <option value="apac">🌏 Asia-Pacific (APAC)</option>
+            </select>
+
+            <!-- Game Select Filter -->
+            <select class="input-field" style="width: 190px; font-size: 0.85rem;" id="leaderboardGameFilter">
+              <option value="Counter-Strike 2">Counter-Strike 2</option>
+              <option value="Valorant">Valorant</option>
+              <option value="Apex Legends">Apex Legends</option>
+              <option value="Rocket League">Rocket League</option>
+              <option value="Dota 2">Dota 2</option>
+              <option value="Rainbow Six Siege">Rainbow Six Siege</option>
+              <option value="all">🎮 All Games Combined</option>
+            </select>
+          </div>
         </div>
 
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Player</th>
-              <th>MMR Rating</th>
-              <th>Tier Rank</th>
-              <th>Win / Loss</th>
-              <th>Win %</th>
-              <th>Streak</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboardTableBody">
-            <!-- Injected via app.js -->
-          </tbody>
-        </table>
+        <!-- Quick Game Filter Button Bar -->
+        <div style="display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.8rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color);" id="leaderboardGameTabsBar">
+          <!-- Injected via app.js -->
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="leaderboard-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="text-align: left; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem;">
+                <th style="padding: 0.8rem;">Rank #</th>
+                <th style="padding: 0.8rem;">Gamer Profile</th>
+                <th style="padding: 0.8rem;">Game Specific Rank & Tier</th>
+                <th style="padding: 0.8rem;">MMR / Rating</th>
+                <th style="padding: 0.8rem;">W / L Record</th>
+                <th style="padding: 0.8rem;">Win Rate %</th>
+                <th style="padding: 0.8rem;">K/D & MVP</th>
+                <th style="padding: 0.8rem; text-align: right;">Passport & Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTableBody">
+              <!-- Injected via app.js -->
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Recent Match History & Scorecard Replay Logs -->
@@ -1202,6 +1261,46 @@
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
         <button class="btn btn-secondary" id="btnCloseCheckoutModal">Cancel</button>
         <button class="btn btn-primary" id="btnConfirmPayTournament">Pay & Launch Tournament 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player Passport Detail Modal -->
+  <div class="modal-overlay" id="playerPassportModal">
+    <div class="modal-card" style="max-width: 620px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 2px solid var(--accent-gold);" id="passportAvatar">👑</div>
+          <div>
+            <h3 style="font-size: 1.4rem; font-weight: 900; margin: 0;" id="passportName">RadiantReaper</h3>
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.3rem;">
+              <span class="mmr-badge" id="passportPrimaryRank">🔴 Radiant #14 (2540 MMR)</span>
+              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);" id="passportACStatus">🛡️ Guardian AC Verified</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btnClosePassportModal">✕ Close</button>
+      </div>
+
+      <div style="background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
+          <span>🎮</span> Per-Game Ranks & Competitive Ratings
+        </h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; font-size: 0.88rem;" id="passportGamesGrid">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+
+      <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.6rem;">Linked Gaming Identities</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; font-size: 0.85rem;" id="passportLinkedAccounts">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
+        <button class="btn btn-purple" onclick="alert('💬 MESSAGE SENT!\n\nDirect message opened on CustomLobbies Chat & Voice Hub!')">💬 Direct Message</button>
+        <button class="btn btn-primary" onclick="alert('⚔️ CHALLENGE DISPATCHED!\n\n1v1 Duel challenge invite sent!')">⚔️ Challenge 1v1</button>
       </div>
     </div>
   </div>

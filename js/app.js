@@ -68,13 +68,125 @@ class CustomLobbiesApp {
       { id: 6, title: 'CS2 Surf Utopia v3 Tier 2 Speedrun Scrims', game: 'CS2 Surf (Tier 1-6)', host: 'SurfGod', players: 16, max: 32, region: 'NA East', draftType: 'Surf Timer Race' }
     ];
 
+    this.selectedLeaderboardGame = 'Counter-Strike 2';
+    this.selectedLeaderboardRegion = 'all';
+    this.leaderboardSearchQuery = '';
+
     this.leaderboardData = [
-      { rank: 1, name: 'RadiantReaper', elo: 2540, wins: 142, losses: 28, streak: '🔥 W8' },
-      { rank: 2, name: 'ApexGod99', elo: 2150, wins: 98, losses: 31, streak: '🔥 W4' },
-      { rank: 3, name: 'ShadowNinja', elo: 1920, wins: 85, losses: 42, streak: '❌ L1' },
-      { rank: 4, name: 'You (Host)', elo: 1840, wins: 76, losses: 34, streak: '🔥 W2' },
-      { rank: 5, name: 'Valkyrie_CS', elo: 1790, wins: 64, losses: 40, streak: '❌ L2' },
-      { rank: 6, name: 'ProSniper_2026', elo: 1450, wins: 41, losses: 45, streak: '🔥 W1' }
+      {
+        rank: 1,
+        name: 'RadiantReaper',
+        region: 'NA',
+        avatar: '👑',
+        acVerified: true,
+        steamId: '76561198099887766',
+        riotId: 'Reaper#NA1',
+        discord: 'RadiantReaper#0001',
+        twitch: 'twitch.tv/RadiantReaper',
+        games: {
+          'Counter-Strike 2': { elo: 2540, wins: 142, losses: 28, winRate: 83.5, kd: '2.14', mvp: 48 },
+          'Valorant': { elo: 2350, wins: 110, losses: 22, winRate: 83.3, kd: '1.98', mvp: 35 },
+          'Apex Legends': { elo: 2650, wins: 95, losses: 18, winRate: 84.0, kd: '3.45', mvp: 42 },
+          'Rocket League': { elo: 2450, wins: 88, losses: 20, winRate: 81.4, kd: 'N/A', mvp: 30 },
+          'Dota 2': { elo: 4200, wins: 130, losses: 40, winRate: 76.4, kd: '3.10', mvp: 29 },
+          'Rainbow Six Siege': { elo: 3100, wins: 75, losses: 15, winRate: 83.3, kd: '2.05', mvp: 22 }
+        }
+      },
+      {
+        rank: 2,
+        name: 'ApexGod99',
+        region: 'EU',
+        avatar: '⚡',
+        acVerified: true,
+        steamId: '76561198011223344',
+        riotId: 'ApexGod#EUW',
+        discord: 'ApexGod#1337',
+        twitch: 'twitch.tv/ApexGod99',
+        games: {
+          'Counter-Strike 2': { elo: 2150, wins: 98, losses: 31, winRate: 76.0, kd: '1.75', mvp: 32 },
+          'Valorant': { elo: 2100, wins: 82, losses: 24, winRate: 77.3, kd: '1.68', mvp: 24 },
+          'Apex Legends': { elo: 2580, wins: 112, losses: 20, winRate: 84.8, kd: '3.20', mvp: 50 },
+          'Rocket League': { elo: 1850, wins: 64, losses: 30, winRate: 68.1, kd: 'N/A', mvp: 18 },
+          'Dota 2': { elo: 2800, wins: 55, losses: 35, winRate: 61.1, kd: '2.40', mvp: 12 },
+          'Rainbow Six Siege': { elo: 2400, wins: 60, losses: 25, winRate: 70.5, kd: '1.55', mvp: 15 }
+        }
+      },
+      {
+        rank: 3,
+        name: 'Valkyrie_CS',
+        region: 'EU',
+        avatar: '🎯',
+        acVerified: true,
+        steamId: '76561198055443322',
+        riotId: 'Valkyrie#EU1',
+        discord: 'Valkyrie#2026',
+        twitch: 'twitch.tv/Valkyrie_CS',
+        games: {
+          'Counter-Strike 2': { elo: 1920, wins: 85, losses: 42, winRate: 66.9, kd: '1.45', mvp: 28 },
+          'Valorant': { elo: 1950, wins: 90, losses: 38, winRate: 70.3, kd: '1.52', mvp: 26 },
+          'Apex Legends': { elo: 1900, wins: 70, losses: 35, winRate: 66.7, kd: '2.10', mvp: 20 },
+          'Rocket League': { elo: 1600, wins: 50, losses: 32, winRate: 60.9, kd: 'N/A', mvp: 12 },
+          'Dota 2': { elo: 3300, wins: 78, losses: 45, winRate: 63.4, kd: '2.70', mvp: 18 },
+          'Rainbow Six Siege': { elo: 2850, wins: 88, losses: 30, winRate: 74.5, kd: '1.85', mvp: 25 }
+        }
+      },
+      {
+        rank: 4,
+        name: 'You (Host)',
+        region: 'NA',
+        avatar: '👑',
+        acVerified: true,
+        steamId: '76561198012345678',
+        riotId: 'ProGamer#1337',
+        discord: 'GamerHost#0001',
+        twitch: 'twitch.tv/CustomLobbiesHost',
+        games: {
+          'Counter-Strike 2': { elo: 1840, wins: 76, losses: 34, winRate: 69.1, kd: '1.40', mvp: 22 },
+          'Valorant': { elo: 1350, wins: 62, losses: 30, winRate: 67.4, kd: '1.38', mvp: 19 },
+          'Apex Legends': { elo: 2510, wins: 104, losses: 26, winRate: 80.0, kd: '3.10', mvp: 38 },
+          'Rocket League': { elo: 2100, wins: 80, losses: 32, winRate: 71.4, kd: 'N/A', mvp: 21 },
+          'Dota 2': { elo: 2500, wins: 60, losses: 35, winRate: 63.1, kd: '2.25', mvp: 14 },
+          'Rainbow Six Siege': { elo: 2250, wins: 54, losses: 28, winRate: 65.8, kd: '1.42', mvp: 16 }
+        }
+      },
+      {
+        rank: 5,
+        name: 'ShadowNinja',
+        region: 'SA',
+        avatar: '🥷',
+        acVerified: true,
+        steamId: '76561198088776655',
+        riotId: 'ShadowNinja#BR1',
+        discord: 'ShadowNinja#9999',
+        twitch: 'twitch.tv/ShadowNinja',
+        games: {
+          'Counter-Strike 2': { elo: 1790, wins: 64, losses: 40, winRate: 61.5, kd: '1.32', mvp: 18 },
+          'Valorant': { elo: 1750, wins: 72, losses: 45, winRate: 61.5, kd: '1.35', mvp: 17 },
+          'Apex Legends': { elo: 1800, wins: 65, losses: 42, winRate: 60.7, kd: '1.95', mvp: 15 },
+          'Rocket League': { elo: 1500, wins: 45, losses: 35, winRate: 56.2, kd: 'N/A', mvp: 10 },
+          'Dota 2': { elo: 3100, wins: 70, losses: 50, winRate: 58.3, kd: '2.50', mvp: 16 },
+          'Rainbow Six Siege': { elo: 1950, wins: 48, losses: 38, winRate: 55.8, kd: '1.25', mvp: 11 }
+        }
+      },
+      {
+        rank: 6,
+        name: 'GhostOperator',
+        region: 'APAC',
+        avatar: '👻',
+        acVerified: true,
+        steamId: '76561198033445566',
+        riotId: 'GhostOp#JP1',
+        discord: 'GhostOperator#7777',
+        twitch: 'twitch.tv/GhostOperator',
+        games: {
+          'Counter-Strike 2': { elo: 1680, wins: 52, losses: 38, winRate: 57.8, kd: '1.22', mvp: 14 },
+          'Valorant': { elo: 1820, wins: 80, losses: 39, winRate: 67.2, kd: '1.48', mvp: 21 },
+          'Apex Legends': { elo: 1650, wins: 50, losses: 38, winRate: 56.8, kd: '1.75', mvp: 12 },
+          'Rocket League': { elo: 1420, wins: 38, losses: 30, winRate: 55.9, kd: 'N/A', mvp: 8 },
+          'Dota 2': { elo: 1900, wins: 42, losses: 38, winRate: 52.5, kd: '2.05', mvp: 9 },
+          'Rainbow Six Siege': { elo: 3050, wins: 95, losses: 22, winRate: 81.2, kd: '2.10', mvp: 28 }
+        }
+      }
     ];
   }
 
@@ -93,6 +205,7 @@ class CustomLobbiesApp {
     this.setupRandomPickerHandler();
     this.setupCaptainModeToggle();
     this.setupGameDraftPoolButton();
+    this.setupLeaderboardHandlers();
   }
 
   loadFavorites() {
@@ -763,37 +876,203 @@ class CustomLobbiesApp {
     }
   }
 
+  setupLeaderboardHandlers() {
+    const gameSelect = document.getElementById('leaderboardGameFilter');
+    const regionSelect = document.getElementById('leaderboardRegionFilter');
+    const searchInput = document.getElementById('leaderboardSearchInput');
+    const modalPassport = document.getElementById('playerPassportModal');
+    const btnClosePassport = document.getElementById('btnClosePassportModal');
+
+    if (gameSelect) {
+      gameSelect.addEventListener('change', (e) => {
+        this.selectedLeaderboardGame = e.target.value;
+        this.renderLeaderboardGameTabs();
+        this.renderLeaderboard();
+      });
+    }
+
+    if (regionSelect) {
+      regionSelect.addEventListener('change', (e) => {
+        this.selectedLeaderboardRegion = e.target.value;
+        this.renderLeaderboard();
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.leaderboardSearchQuery = e.target.value.toLowerCase().trim();
+        this.renderLeaderboard();
+      });
+    }
+
+    if (btnClosePassport && modalPassport) {
+      btnClosePassport.addEventListener('click', () => {
+        modalPassport.classList.remove('active');
+      });
+    }
+
+    this.renderLeaderboardGameTabs();
+  }
+
+  renderLeaderboardGameTabs() {
+    const container = document.getElementById('leaderboardGameTabsBar');
+    if (!container) return;
+
+    const gamesList = [
+      'Counter-Strike 2',
+      'Valorant',
+      'Apex Legends',
+      'Rocket League',
+      'Dota 2',
+      'Rainbow Six Siege'
+    ];
+
+    container.innerHTML = gamesList.map(g => {
+      const active = this.selectedLeaderboardGame === g;
+      return `
+        <button class="btn btn-sm ${active ? 'btn-primary' : 'btn-secondary'}" onclick="window.app.setLeaderboardGame('${g}')" style="white-space: nowrap;">
+          <span>${active ? '👑' : '🎮'}</span> ${g}
+        </button>
+      `;
+    }).join('');
+  }
+
+  setLeaderboardGame(gameName) {
+    this.selectedLeaderboardGame = gameName;
+    const gameSelect = document.getElementById('leaderboardGameFilter');
+    if (gameSelect) gameSelect.value = gameName;
+    this.renderLeaderboardGameTabs();
+    this.renderLeaderboard();
+  }
+
   renderLeaderboard() {
     const tbody = document.getElementById('leaderboardTableBody');
     if (!tbody) return;
 
-    tbody.innerHTML = this.leaderboardData.map((p, idx) => {
-      const tier = window.eloEngine.getRankTier(p.elo);
-      const total = p.wins + p.losses;
-      const winPct = Math.round((p.wins / total) * 100);
-      const rankClass = idx < 3 ? `rank-${idx + 1}` : '';
+    const targetGame = this.selectedLeaderboardGame === 'all' ? 'Counter-Strike 2' : this.selectedLeaderboardGame;
+
+    let players = this.leaderboardData.map(p => {
+      const gStats = (p.games && p.games[targetGame]) || { elo: 1500, wins: 20, losses: 15, winRate: 57.1, kd: '1.20', mvp: 5 };
+      return {
+        ...p,
+        targetElo: gStats.elo,
+        gStats
+      };
+    });
+
+    // Sort descending by ELO/MMR rating for the active game
+    players.sort((a, b) => b.targetElo - a.targetElo);
+
+    // Apply Region Filter
+    if (this.selectedLeaderboardRegion !== 'all') {
+      players = players.filter(p => p.region.toLowerCase() === this.selectedLeaderboardRegion.toLowerCase());
+    }
+
+    // Apply Search Query Filter
+    if (this.leaderboardSearchQuery) {
+      players = players.filter(p => p.name.toLowerCase().includes(this.leaderboardSearchQuery));
+    }
+
+    if (players.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            No players found matching current search/filter for ${targetGame}.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = players.map((p, idx) => {
+      const tier = window.eloEngine.getGameSpecificRank(targetGame, p.targetElo);
+      const winPct = p.gStats.winRate;
+      const rankBadge = idx === 0 ? '🥇 1st' : idx === 1 ? '🥈 2nd' : idx === 2 ? '🥉 3rd' : `#${idx + 1}`;
+      const rankBg = idx === 0 ? 'background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); border: 1px solid var(--accent-gold);' : idx === 1 ? 'background: rgba(192, 192, 192, 0.2); color: #c0c0c0; border: 1px solid #c0c0c0;' : idx === 2 ? 'background: rgba(205, 127, 50, 0.2); color: #cd7f32; border: 1px solid #cd7f32;' : 'background: rgba(255,255,255,0.05); color: var(--text-muted);';
 
       return `
-        <tr>
-          <td><div class="rank-pill ${rankClass}">${idx + 1}</div></td>
-          <td>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="font-weight: 700;">${p.name}</span>
-              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-size: 0.72rem;">🛡️ AC Active</span>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 0.8rem;">
+            <span class="lobby-game-tag" style="${rankBg} font-weight: 900;">${rankBadge}</span>
+          </td>
+          <td style="padding: 0.8rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.9rem;">${p.avatar || '👑'}</div>
+              <div>
+                <div style="font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>${p.name}</span>
+                  <span style="font-size: 0.75rem; opacity: 0.7;">[${p.region}]</span>
+                </div>
+                <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-size: 0.68rem;">🛡️ Guardian Verified</span>
+              </div>
             </div>
           </td>
-          <td><span style="color: var(--accent-gold); font-weight: 800;">${p.elo} ELO</span></td>
-          <td>
-            <span style="display: flex; align-items: center; gap: 0.3rem; color: ${tier.color}; font-weight: 700;">
-              ${tier.badge}
+          <td style="padding: 0.8rem;">
+            <span style="color: ${tier.color}; font-weight: 800; display: flex; align-items: center; gap: 0.3rem;">
+              ${tier.badge || tier.name}
             </span>
           </td>
-          <td>${p.wins}W / ${p.losses}L</td>
-          <td><strong style="color: var(--accent-green);">${winPct}%</strong></td>
-          <td><span style="font-weight: 700;">${p.streak}</span></td>
+          <td style="padding: 0.8rem;">
+            <strong style="color: var(--accent-gold); font-size: 0.95rem;">${p.targetElo} ELO</strong>
+          </td>
+          <td style="padding: 0.8rem; font-size: 0.88rem;">${p.gStats.wins}W / ${p.gStats.losses}L</td>
+          <td style="padding: 0.8rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <strong style="color: var(--accent-green);">${winPct}%</strong>
+              <div style="width: 45px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                <div style="width: ${winPct}%; height: 100%; background: var(--accent-green);"></div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 0.8rem; font-size: 0.85rem;">
+            <div style="font-weight: 700; color: var(--accent-cyan);">K/D: ${p.gStats.kd}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">${p.gStats.mvp} MVPs</div>
+          </td>
+          <td style="padding: 0.8rem; text-align: right;">
+            <button class="btn btn-purple btn-sm" onclick="window.app.openPlayerPassportModal('${p.name}')">
+              🪪 View Passport
+            </button>
+          </td>
         </tr>
       `;
     }).join('');
+  }
+
+  openPlayerPassportModal(playerName) {
+    const modal = document.getElementById('playerPassportModal');
+    if (!modal) return;
+
+    const p = this.leaderboardData.find(user => user.name === playerName) || this.leaderboardData[0];
+
+    document.getElementById('passportAvatar').textContent = p.avatar || '👑';
+    document.getElementById('passportName').textContent = p.name;
+    document.getElementById('passportPrimaryRank').textContent = `${p.region} Region • ${p.targetElo || 1840} Rating`;
+
+    const gamesContainer = document.getElementById('passportGamesGrid');
+    if (gamesContainer && p.games) {
+      gamesContainer.innerHTML = Object.entries(p.games).map(([gName, gStat]) => {
+        const rInfo = window.eloEngine.getGameSpecificRank(gName, gStat.elo);
+        return `
+          <div style="background: rgba(255,255,255,0.03); padding: 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="font-weight: 800; color: var(--accent-cyan); font-size: 0.8rem;">${gName}</div>
+            <div style="font-weight: 800; color: ${rInfo.color}; margin: 0.2rem 0;">${rInfo.badge} (${gStat.elo} ELO)</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">${gStat.wins}W / ${gStat.losses}L • Win Rate: ${gStat.winRate}%</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    const linkedContainer = document.getElementById('passportLinkedAccounts');
+    if (linkedContainer) {
+      linkedContainer.innerHTML = `
+        <div><span style="color: var(--text-muted);">Steam:</span> <strong>${p.steamId || 'Not Linked'}</strong></div>
+        <div><span style="color: var(--text-muted);">Riot ID:</span> <strong>${p.riotId || 'Not Linked'}</strong></div>
+        <div><span style="color: var(--text-muted);">Discord:</span> <strong>${p.discord || 'Not Linked'}</strong></div>
+        <div><span style="color: var(--text-muted);">Twitch:</span> <strong>${p.twitch || 'Not Linked'}</strong></div>
+      `;
+    }
+
+    modal.classList.add('active');
   }
 
   setupModalHandlers() {

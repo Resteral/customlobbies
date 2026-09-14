@@ -43,6 +43,60 @@ class EloEngine {
       'Apex Legends': 6
     };
 
+    // Native Rank Systems per Game Title
+    this.gameRankSystems = {
+      'Valorant': [
+        { min: 0, max: 200, name: 'Iron 1 - 3', badge: '⚪ Iron', color: '#a0a0a0' },
+        { min: 201, max: 400, name: 'Bronze 1 - 3', badge: '🤎 Bronze', color: '#cd7f32' },
+        { min: 401, max: 600, name: 'Silver 1 - 3', badge: '🥈 Silver', color: '#c0c0c0' },
+        { min: 601, max: 800, name: 'Gold 1 - 3', badge: '🥇 Gold', color: '#ffd700' },
+        { min: 801, max: 1000, name: 'Platinum 1 - 3', badge: '🩵 Platinum', color: '#00e5ff' },
+        { min: 1001, max: 1400, name: 'Diamond 1 - 3', badge: '💎 Diamond', color: '#b388ff' },
+        { min: 1401, max: 1800, name: 'Ascendant 1 - 3', badge: '🟢 Ascendant', color: '#00e676' },
+        { min: 1801, max: 2200, name: 'Immortal 1 - 3', badge: '🟣 Immortal', color: '#d500f9' },
+        { min: 2201, max: 9999, name: 'Radiant Leaderboard', badge: '🔴 Radiant', color: '#ff1744' }
+      ],
+      'Apex Legends': [
+        { min: 0, max: 500, name: 'Bronze League', badge: '🤎 Bronze', color: '#cd7f32' },
+        { min: 501, max: 900, name: 'Silver League', badge: '🥈 Silver', color: '#c0c0c0' },
+        { min: 901, max: 1300, name: 'Gold League', badge: '🥇 Gold', color: '#ffd700' },
+        { min: 1301, max: 1700, name: 'Platinum League', badge: '🩵 Platinum', color: '#00e5ff' },
+        { min: 1701, max: 2100, name: 'Diamond League', badge: '💎 Diamond', color: '#b388ff' },
+        { min: 2101, max: 2500, name: 'Master League', badge: '🔮 Master', color: '#aa00ff' },
+        { min: 2501, max: 9999, name: 'Apex Predator Top 750', badge: '🏆 Apex Predator', color: '#ff1744' }
+      ],
+      'Rocket League': [
+        { min: 0, max: 500, name: 'Bronze I - III', badge: '🤎 Bronze', color: '#cd7f32' },
+        { min: 501, max: 800, name: 'Silver I - III', badge: '🥈 Silver', color: '#c0c0c0' },
+        { min: 801, max: 1100, name: 'Gold I - III', badge: '🥇 Gold', color: '#ffd700' },
+        { min: 1101, max: 1400, name: 'Platinum I - III', badge: '🩵 Platinum', color: '#00e5ff' },
+        { min: 1401, max: 1700, name: 'Diamond I - III', badge: '💎 Diamond', color: '#b388ff' },
+        { min: 1701, max: 2000, name: 'Champion I - III', badge: '🟣 Champion', color: '#aa00ff' },
+        { min: 2001, max: 2400, name: 'Grand Champion I - III', badge: '⚽ Grand Champion', color: '#ff1744' },
+        { min: 2401, max: 9999, name: 'Supersonic Legend', badge: '⚡ Supersonic Legend', color: '#00f2fe' }
+      ],
+      'Dota 2': [
+        { min: 0, max: 700, name: 'Herald Tier', badge: '🛡️ Herald', color: '#8d6e63' },
+        { min: 701, max: 1200, name: 'Guardian Tier', badge: '⚔️ Guardian', color: '#78909c' },
+        { min: 1201, max: 1700, name: 'Crusader Tier', badge: '🛡️ Crusader', color: '#26a69a' },
+        { min: 1701, max: 2200, name: 'Archon Tier', badge: '📜 Archon', color: '#ffa726' },
+        { min: 2201, max: 2700, name: 'Legend Tier', badge: '👑 Legend', color: '#ab47bc' },
+        { min: 2701, max: 3200, name: 'Ancient Tier', badge: '🏛️ Ancient', color: '#42a5f5' },
+        { min: 3201, max: 4000, name: 'Divine Tier', badge: '✨ Divine', color: '#ffca28' },
+        { min: 4001, max: 9999, name: 'Immortal Leaderboard', badge: '🔥 Immortal', color: '#ef5350' }
+      ],
+      'Rainbow Six Siege': [
+        { min: 0, max: 600, name: 'Copper I - V', badge: '🤎 Copper', color: '#8d6e63' },
+        { min: 601, max: 1000, name: 'Bronze I - V', badge: '🥉 Bronze', color: '#cd7f32' },
+        { min: 1001, max: 1400, name: 'Silver I - V', badge: '🥈 Silver', color: '#c0c0c0' },
+        { min: 1401, max: 1800, name: 'Gold I - V', badge: '🥇 Gold', color: '#ffd700' },
+        { min: 1801, max: 2200, name: 'Platinum I - V', badge: '🩵 Platinum', color: '#00e5ff' },
+        { min: 2201, max: 2600, name: 'Emerald I - V', badge: '🟢 Emerald', color: '#00e676' },
+        { min: 2601, max: 3000, name: 'Diamond I - V', badge: '💎 Diamond', color: '#b388ff' },
+        { min: 3001, max: 9999, name: 'Champions Leaderboard', badge: '🛡️ Champions', color: '#ff1744' }
+      ]
+    };
+
     // Competitive Map Pools
     this.mapPools = {
       'Counter-Strike 2': ['Mirage', 'Inferno', 'Nuke', 'Anubis', 'Ancient', 'Dust II', 'Vertigo'],
@@ -91,6 +145,17 @@ class EloEngine {
   getRankTier(mmr) {
     const tier = this.rankTiers.find(t => mmr >= t.min && mmr <= t.max);
     return tier || this.rankTiers[0];
+  }
+
+  // Get Native Game Rank Tier per Game Title
+  getGameSpecificRank(gameName, mmr) {
+    const sys = this.gameRankSystems[gameName];
+    if (sys) {
+      const match = sys.find(t => mmr >= t.min && mmr <= t.max);
+      if (match) return match;
+    }
+    // Fallback to FACEIT Level 1-10 Engine
+    return this.getRankTier(mmr);
   }
 
   // Player Level & XP System
