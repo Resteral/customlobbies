@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CustomLobbies.com - Esports Hub, Stream Studio & Captain Drafts</title>
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="apple-touch-icon" href="assets/logo.jpg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00f2fe">
   <link rel="stylesheet" href="css/styles.css">
@@ -24,8 +26,8 @@
 
   <!-- Top Navigation Bar -->
   <header class="navbar">
-    <div class="brand">
-      <div class="brand-icon">🎮</div>
+    <div class="brand" onclick="window.app.switchView('lobbies-view')">
+      <img src="assets/logo.jpg" alt="CustomLobbies Logo" class="brand-logo-img">
       <span>CustomLobbies.com</span>
     </div>
 
@@ -127,15 +129,18 @@
 
     <!-- 1. LOBBIES & MATCHMAKING QUEUE VIEW -->
     <section id="lobbies-view" class="view-section active">
-      <div class="lobby-header-banner">
-        <div>
-          <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;">Competitive Matchmaking & Custom Lobbies</h1>
-          <p style="color: var(--text-muted); font-size: 0.95rem;">Join queues, auto-balance 5v5 / 2v2 teams with ELO MMR rating, or host your own streamable lobby.</p>
-          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-            <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Counter-Strike 2')">⚡ Auto-Draft CS2</button>
-            <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Valorant')">⚡ Auto-Draft Valorant</button>
-            <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Rocket League')">⚡ Auto-Draft Rocket League</button>
-            <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Slapshot: Rebound')">⚡ Auto-Draft Slapshot</button>
+      <div class="lobby-header-banner" style="background: linear-gradient(135deg, rgba(14, 18, 28, 0.9), rgba(6, 8, 14, 0.95)), url('assets/logo.jpg') center/cover no-repeat; border: 1px solid var(--border-color); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15);">
+        <div style="display: flex; align-items: center; gap: 1.2rem;">
+          <img src="assets/logo.jpg" alt="CustomLobbies Shield" style="width: 72px; height: 72px; border-radius: 16px; border: 2px solid var(--accent-cyan); box-shadow: 0 0 25px rgba(0,242,254,0.5), 0 0 40px rgba(168,85,247,0.4); flex-shrink: 0;">
+          <div>
+            <h1 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 0.3rem; background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 60%, var(--accent-purple) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Competitive Matchmaking & Custom Lobbies</h1>
+            <p style="color: var(--text-muted); font-size: 0.98rem;">Join queues, auto-balance 5v5 / 2v2 teams with ELO MMR rating, or host your own streamable lobby.</p>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.8rem;">
+              <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Counter-Strike 2')">⚡ Auto-Draft CS2</button>
+              <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Valorant')">⚡ Auto-Draft Valorant</button>
+              <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Rocket League')">⚡ Auto-Draft Rocket League</button>
+              <button class="btn btn-purple btn-sm" onclick="window.app.triggerAutoDraftModal('Slapshot: Rebound')">⚡ Auto-Draft Slapshot</button>
+            </div>
           </div>
         </div>
         <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
@@ -2539,8 +2544,9 @@
   <footer style="background: rgba(10, 10, 18, 0.95); border-top: 1px solid var(--border-color); padding: 2.5rem 1.5rem; margin-top: 3rem; font-size: 0.88rem;">
     <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem;">
       <div>
-        <h4 style="color: var(--accent-gold); font-size: 1.1rem; font-weight: 900; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.4rem;">
-          <span>🎮</span> CustomLobbies.com
+        <h4 style="color: var(--accent-gold); font-size: 1.15rem; font-weight: 900; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.6rem;">
+          <img src="assets/logo.jpg" alt="CustomLobbies Logo" style="width: 34px; height: 34px; border-radius: 9px; border: 1.5px solid var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
+          <span style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">CustomLobbies.com</span>
         </h4>
         <p style="color: var(--text-muted); font-size: 0.82rem; line-height: 1.5;">
           The ultimate 128-tick competitive match platform. Host custom lobbies, captain snake drafts, Ring 0 Guardian anti-cheat verification, and live esports tournaments.
