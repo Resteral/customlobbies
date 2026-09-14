@@ -75,6 +75,45 @@ class StreamStudioEngine {
         videoURL: '#'
       }
     ];
+
+    this.streamerAnnouncements = [
+      {
+        id: 901,
+        author: 'RadiantReaper',
+        game: 'Counter-Strike 2',
+        title: '🔴 CS2 $1,000 Major Scrim Finals Watch Party!',
+        description: 'Watch party active on CustomLobbies WebRTC Ingest Node! Drop in chat for live viewer 500 CL-Points giveaway!',
+        giveaway: 500,
+        claimed: false,
+        hypes: 84,
+        date: '15m ago',
+        isLive: true
+      },
+      {
+        id: 902,
+        author: 'Empulse_Overlord',
+        game: 'Empulse',
+        title: '⚡ Empulse 5v5 Cyber Arena League Week 1 Grand Finals!',
+        description: 'Live broadcast & custom lobby subscriber matches! Join our voice room to play with the pros!',
+        giveaway: 250,
+        claimed: false,
+        hypes: 62,
+        date: '45m ago',
+        isLive: true
+      },
+      {
+        id: 903,
+        author: 'Valkyrie_CS',
+        game: 'Valorant',
+        title: '🎯 Valorant Radiant Rank Up Stream & 1v1 Arena Duels',
+        description: 'Streaming 1080p 60FPS on CustomLobbies RTMP Ingest! Challenging viewers to 1v1 aim map duels!',
+        giveaway: 100,
+        claimed: true,
+        hypes: 48,
+        date: '2h ago',
+        isLive: false
+      }
+    ];
   }
 
   init() {
@@ -86,6 +125,7 @@ class StreamStudioEngine {
     this.setupEventListeners();
     this.enumerateAudioDevices();
     this.renderFarmedClipsFeed();
+    this.renderStreamerAnnouncements();
   }
 
   toggleAutoClipFarmer() {
@@ -201,41 +241,116 @@ class StreamStudioEngine {
     alert(`📱 VERTICAL 9:16 EXPORT COMPLETE!\n\nClip "${clip.title}" exported in portrait format (1080x1920 60FPS) with #CustomLobbies branding! Ready for TikTok / Shorts / Reels!`);
   }
 
-  renderFarmedClipsFeed() {
-    const container = document.getElementById('farmedClipsGrid');
+  openAnnouncementModal() {
+    const modal = document.getElementById('streamerAnnouncementModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  publishAnnouncement() {
+    const channel = document.getElementById('announcementChannelName')?.value.trim() || 'You (Verified Streamer)';
+    const title = document.getElementById('announcementTitle')?.value.trim() || '🔴 Live Stream Broadcast & Watch Party!';
+    const game = document.getElementById('announcementGame')?.value || 'Counter-Strike 2';
+    const giveaway = parseInt(document.getElementById('announcementGiveaway')?.value || 100);
+    const desc = document.getElementById('announcementDescription')?.value.trim() || 'Tune into our live broadcast on CustomLobbies WebRTC Stream Node!';
+
+    const newAnn = {
+      id: Date.now(),
+      author: channel,
+      game: game,
+      title: title,
+      description: desc,
+      giveaway: giveaway,
+      claimed: false,
+      hypes: 12,
+      date: 'Just Now',
+      isLive: true
+    };
+
+    this.streamerAnnouncements.unshift(newAnn);
+    this.renderStreamerAnnouncements();
+
+    const modal = document.getElementById('streamerAnnouncementModal');
+    if (modal) modal.classList.remove('active');
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    alert(`📢 STREAM ANNOUNCEMENT PUBLISHED!\n\nHeadline: "${title}"\nGame: ${game}\nGiveaway: 🪙 ${giveaway} CL-Points!\n\nBroadcast alert posted live to CustomLobbies Streamer Hub!`);
+  }
+
+  claimStreamerGiveaway(annId) {
+    const ann = this.streamerAnnouncements.find(a => a.id === annId);
+    if (!ann || ann.claimed) return;
+
+    ann.claimed = true;
+    if (window.app) {
+      window.app.clPoints += ann.giveaway;
+      window.app.updatePointsWidget();
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('ggwp');
+    }
+
+    this.renderStreamerAnnouncements();
+    alert(`🎁 STREAM GIVEAWAY CLAIMED!\n\nYou claimed +${ann.giveaway} 🪙 CL-Points from ${ann.author}'s live stream announcement!`);
+  }
+
+  hypeStreamAnnouncement(annId) {
+    const ann = this.streamerAnnouncements.find(a => a.id === annId);
+    if (!ann) return;
+
+    ann.hypes = (ann.hypes || 0) + 1;
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('cheer');
+    }
+
+    if (window.app) {
+      window.app.clPoints += 10;
+      window.app.updatePointsWidget();
+    }
+
+    this.renderStreamerAnnouncements();
+    alert(`🔥 STREAM ANNOUNCEMENT HYPED!\n\nYou hyped ${ann.author}'s stream announcement! Earned +10 🪙 CL-Points bonus!`);
+  }
+
+  renderStreamerAnnouncements() {
+    const container = document.getElementById('streamerAnnouncementsGrid');
     if (!container) return;
 
-    if (this.farmedClips.length === 0) {
-      container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 1.5rem;">No auto-farmed clips harvested yet. Click "Start Auto-Clip Farmer" above!</div>`;
+    if (this.streamerAnnouncements.length === 0) {
+      container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 1.5rem;">No active streamer announcements. Be the first to post!</div>`;
       return;
     }
 
-    container.innerHTML = this.farmedClips.map(c => `
-      <div style="background: rgba(0,0,0,0.4); border: 1px solid ${c.claimed ? 'var(--border-color)' : 'var(--accent-gold)'}; border-radius: 8px; padding: 0.8rem; display: flex; flex-direction: column; justify-content: space-between;">
+    container.innerHTML = this.streamerAnnouncements.map(a => `
+      <div style="background: rgba(0,0,0,0.4); border: 1px solid ${a.isLive ? 'var(--accent-gold)' : 'var(--border-color)'}; border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: ${a.isLive ? '0 0 15px rgba(255, 215, 0, 0.15)' : 'none'};">
         <div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-            <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-size: 0.72rem;">${c.trigger}</span>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">${c.duration}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span class="lobby-game-tag" style="background: ${a.isLive ? 'rgba(255, 82, 82, 0.2)' : 'rgba(255,255,255,0.08)'}; color: ${a.isLive ? 'var(--accent-red)' : 'var(--text-muted)'}; font-weight: 800; font-size: 0.72rem;">
+              ${a.isLive ? '🔴 STREAMER LIVE' : '📢 BROADCAST ALERT'}
+            </span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">${a.date}</span>
           </div>
 
-          <h4 style="font-size: 0.92rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text-main);">${c.title}</h4>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.8rem;">Game: <strong style="color: var(--accent-cyan);">${c.game}</strong> • ${c.date}</p>
+          <h4 style="font-size: 0.98rem; font-weight: 900; margin-bottom: 0.3rem; color: var(--text-main);">${a.title}</h4>
+          <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 800; margin-bottom: 0.5rem;">Streamer: ${a.author} • Game: ${a.game}</div>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.8rem;">${a.description}</p>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-          <div style="display: flex; justify-content: space-between; gap: 0.4rem;">
-            <button class="btn btn-purple btn-sm" style="flex: 1; font-size: 0.75rem;" onclick="window.streamStudioEngine.autoPostClipToWall(${c.id})">
-              🚀 Post Wall
+        <div style="display: flex; flex-direction: column; gap: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.6rem;">
+          <div style="display: flex; gap: 0.4rem;">
+            <button class="btn btn-purple btn-sm" style="flex: 1; font-size: 0.75rem;" onclick="alert('📺 WATCH LIVE STREAM:\\n\\nConnecting to ${a.author}\\'s Native WebRTC Stream Server Node...\\nBitrate: 6000 Kbps | 1080p 60FPS')">
+              📺 Watch Live
             </button>
-            <button class="btn btn-secondary btn-sm" style="flex: 1; font-size: 0.75rem;" onclick="window.streamStudioEngine.exportClip916Vertical(${c.id})">
-              📱 TikTok 9:16
+            <button class="btn btn-secondary btn-sm" style="flex: 1; font-size: 0.75rem; border-color: var(--accent-gold); color: var(--accent-gold);" onclick="window.streamStudioEngine.hypeStreamAnnouncement(${a.id})">
+              🔥 Hype (${a.hypes})
             </button>
           </div>
-          <button class="btn btn-secondary btn-sm" style="width: 100%; font-size: 0.75rem; border-color: var(--accent-gold); color: var(--accent-gold);" onclick="window.streamStudioEngine.upvoteFarmedClip(${c.id})">
-            🔥 Hype Upvote (${c.upvotes || 42})
-          </button>
-          <button class="btn ${c.claimed ? 'btn-secondary' : 'btn-primary'} btn-sm" style="width: 100%; font-size: 0.75rem;" onclick="window.streamStudioEngine.claimFarmClipPoints(${c.id})" ${c.claimed ? 'disabled' : ''}>
-            ${c.claimed ? '✅ +25 Points Claimed' : '🪙 Claim +25 CL-Points'}
+          <button class="btn ${a.claimed ? 'btn-secondary' : 'btn-primary'} btn-sm" style="width: 100%; font-size: 0.75rem;" onclick="window.streamStudioEngine.claimStreamerGiveaway(${a.id})" ${a.claimed ? 'disabled' : ''}>
+            ${a.claimed ? '✅ Giveaway Claimed' : `🎁 Claim 🪙 ${a.giveaway} Points Giveaway`}
           </button>
         </div>
       </div>
@@ -272,6 +387,15 @@ class StreamStudioEngine {
         setTimeout(() => btnCopyURL.textContent = '📋 Copy RTMP / Stream Key', 2000);
       });
     }
+
+    const btnCloseAnn = document.getElementById('btnCloseAnnouncementModal');
+    const btnCancelAnn = document.getElementById('btnCancelAnnouncementModal');
+    const btnSubmitAnn = document.getElementById('btnSubmitStreamerAnnouncement');
+    const modalAnn = document.getElementById('streamerAnnouncementModal');
+
+    if (btnCloseAnn) btnCloseAnn.addEventListener('click', () => modalAnn?.classList.remove('active'));
+    if (btnCancelAnn) btnCancelAnn.addEventListener('click', () => modalAnn?.classList.remove('active'));
+    if (btnSubmitAnn) btnSubmitAnn.addEventListener('click', () => this.publishAnnouncement());
   }
 
   async enumerateAudioDevices() {
