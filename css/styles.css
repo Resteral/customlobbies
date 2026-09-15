@@ -186,6 +186,15 @@ body {
   position: relative;
 }
 
+/* Ensure parent card stacking context elevates above subsequent sibling cards when a dropdown inside it is open */
+.card:has(.dropdown-wrapper:hover),
+.card:has(.dropdown-wrapper:focus-within),
+div:has(.dropdown-wrapper:hover),
+div:has(.dropdown-wrapper:focus-within) {
+  position: relative;
+  z-index: 10000 !important;
+}
+
 .nav-dropdown-wrapper:hover .nav-dropdown-menu,
 .nav-dropdown-wrapper:focus-within .nav-dropdown-menu,
 .dropdown-wrapper:hover .dropdown-menu,

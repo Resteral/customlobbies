@@ -2587,16 +2587,32 @@
 
   <!-- UNIVERSAL TEAM CREATION MODAL -->
   <div class="modal-overlay" id="createUniversalTeamModal">
-    <div class="modal-card" style="max-width: 580px; border-color: var(--accent-purple);">
+    <div class="modal-card" style="max-width: 650px; border-color: var(--accent-purple);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
         <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <span style="font-size: 1.8rem;">🛡️</span>
+          <span style="font-size: 1.8rem;" id="selectedTeamEmblemPreview">🛡️</span>
           <div>
             <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--accent-purple); margin: 0;">Create Custom Team & Clan Roster</h3>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Register your competitive fireteam or battalion into tournaments, leagues, and scrims</p>
           </div>
         </div>
         <button class="btn btn-secondary btn-sm" onclick="window.app.closeCreateTeamModal()">✕ Close</button>
+      </div>
+
+      <!-- Clan Emblem & Crest Selector -->
+      <div class="input-group">
+        <label class="input-label">Select Clan Crest Emblem</label>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="emblemPickerContainer">
+          <button type="button" class="btn btn-sm btn-purple emblem-option active" data-emblem="🛡️" onclick="window.app.selectClanEmblem('🛡️', this)">🛡️ Shield</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="⚔️" onclick="window.app.selectClanEmblem('⚔️', this)">⚔️ Blades</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🦅" onclick="window.app.selectClanEmblem('🦅', this)">🦅 Falcon</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🐺" onclick="window.app.selectClanEmblem('🐺', this)">🐺 Apex</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🐉" onclick="window.app.selectClanEmblem('🐉', this)">🐉 Dragon</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="💀" onclick="window.app.selectClanEmblem('💀', this)">💀 Reaper</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="⚡" onclick="window.app.selectClanEmblem('⚡', this)">⚡ Thunder</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="👑" onclick="window.app.selectClanEmblem('👑', this)">👑 Royalty</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🎯" onclick="window.app.selectClanEmblem('🎯', this)">🎯 Snipers</button>
+        </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.8rem;">
@@ -2610,9 +2626,20 @@
         </div>
       </div>
 
-      <div class="input-group">
-        <label class="input-label">Team Captain Handle</label>
-        <input type="text" class="input-field" id="modalTeamCaptain" value="Sean">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Team Captain / Commander</label>
+          <input type="text" class="input-field" id="modalTeamCaptain" value="Sean">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Team Playstyle Focus</label>
+          <select class="input-field" id="modalTeamFocus">
+            <option value="Competitive Scrims" selected>🏆 Competitive 5v5 Scrims</option>
+            <option value="33-Man Battalion">🛡️ WARDOG 33-Man Battalion</option>
+            <option value="Pro Esports League">🥇 Pro League Ladder</option>
+            <option value="Casual Clan">🎮 Casual Clan Matches</option>
+          </select>
+        </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
@@ -2640,18 +2667,44 @@
         </div>
       </div>
 
+      <!-- Teammates / Roster Handles with Free Agent Auto-Recruiter -->
       <div class="input-group">
-        <label class="input-label">Teammates / Roster Handles (Comma-separated)</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <label class="input-label" style="margin: 0;">Teammates / Roster Handles (Comma-separated)</label>
+          <button type="button" class="btn btn-cyan btn-sm" style="padding: 0.15rem 0.5rem; font-size: 0.72rem; gap: 0.3rem;" onclick="window.app.autoRecruitFreeAgents()">
+            <span>➕</span> Auto-Recruit Free Agents
+          </button>
+        </div>
         <input type="text" class="input-field" id="modalTeamMembers" value="Ghost_Dog_99, Sargeant_Iron, Valkyrie_Merc, Shadow_K9">
       </div>
 
       <div style="background: rgba(168, 85, 247, 0.12); border: 1px solid var(--accent-purple); border-radius: 8px; padding: 0.8rem; font-size: 0.85rem; color: #d8b4fe; margin-bottom: 1.25rem;">
-        🎁 Team Bonus: Earn +150 🪙 CL-Points & unlock official Team Scrims & Tournament Eligibility!
+        🎁 Team Bonus: Earn +150 🪙 CL-Points & unlock <strong>100% Team Chemistry Synergy (+5% MMR)</strong> in official Scrims & Leagues!
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
         <button class="btn btn-secondary" onclick="window.app.closeCreateTeamModal()">Cancel</button>
         <button class="btn btn-purple" onclick="window.app.submitCreateTeam()">Create Team 🛡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGE TEAM ROSTER & SCRIM HUB MODAL -->
+  <div class="modal-overlay" id="manageTeamRosterModal">
+    <div class="modal-card" style="max-width: 680px; border-color: var(--accent-cyan);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.8rem;" id="manageTeamEmblem">🛡️</span>
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--accent-cyan); margin: 0;" id="manageTeamTitle">Team Roster Hub</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;" id="manageTeamSub">Manage assigned roles, recruit free agents, and challenge rival teams</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeManageTeamModal()">✕ Close</button>
+      </div>
+
+      <div id="manageTeamBody">
+        <!-- Injected via app.js -->
       </div>
     </div>
   </div>

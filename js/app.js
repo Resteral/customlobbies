@@ -1448,6 +1448,47 @@ class CustomLobbiesApp {
     if (modal) modal.classList.remove('active');
   }
 
+  selectClanEmblem(emblem, btnEl) {
+    this.selectedClanEmblem = emblem;
+    const preview = document.getElementById('selectedTeamEmblemPreview');
+    if (preview) preview.textContent = emblem;
+
+    const container = document.getElementById('emblemPickerContainer');
+    if (container) {
+      container.querySelectorAll('.emblem-option').forEach(b => {
+        b.classList.remove('btn-purple', 'active');
+        b.classList.add('btn-secondary');
+      });
+    }
+    if (btnEl) {
+      btnEl.classList.remove('btn-secondary');
+      btnEl.classList.add('btn-purple', 'active');
+    }
+  }
+
+  autoRecruitFreeAgents() {
+    const input = document.getElementById('modalTeamMembers');
+    if (!input) return;
+
+    const freeAgentPool = [
+      'Ghost_Dog_99 (🎯 Entry)',
+      'Sargeant_Iron (🛡️ Anchor)',
+      'Valkyrie_Merc (🔭 AWPer)',
+      'Shadow_K9 (⚡ Flex)',
+      'Cyber_Ninja (🎯 Entry)',
+      'Vortex_IGL (👑 Commander)',
+      'Apex_Hunter (🔭 AWPer)',
+      'Echo_Pulse (🛡️ Support)'
+    ];
+
+    const shuffled = freeAgentPool.sort(() => 0.5 - Math.random()).slice(0, 4);
+    input.value = shuffled.join(', ');
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
+  }
+
   loadMyCreatedTeams() {
     try {
       const saved = localStorage.getItem('cl_user_custom_teams_v1');
@@ -1459,10 +1500,13 @@ class CustomLobbiesApp {
             id: 'TEAM-101',
             name: 'Vanguard Cyber Squad',
             tag: '[VANGUARD]',
+            emblem: '🛡️',
+            focus: 'Competitive Scrims',
+            synergy: '100% (Role-Balanced)',
             captain: 'Sean',
             game: 'Counter-Strike 2',
             size: 5,
-            members: ['Sean (Captain)', 'Ghost_Dog_99', 'Sargeant_Iron', 'Valkyrie_Merc', 'Shadow_K9'],
+            members: ['Sean (👑 IGL)', 'Ghost_Dog_99 (🎯 Entry)', 'Sargeant_Iron (🛡️ Anchor)', 'Valkyrie_Merc (🔭 AWPer)', 'Shadow_K9 (⚡ Flex)'],
             record: '12W - 2L',
             elo: 2380,
             kd: '2.35',
@@ -1491,62 +1535,82 @@ class CustomLobbiesApp {
       return;
     }
 
-    grid.innerHTML = this.myCreatedTeams.map(t => `
-      <div class="card" style="border-color: var(--accent-purple); position: relative;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+    grid.innerHTML = this.myCreatedTeams.map(t => {
+      const emblem = t.emblem || '🛡️';
+      const synergy = t.synergy || '100% Synergy';
+
+      return `
+        <div class="card" style="border-color: var(--accent-purple); position: relative; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe; font-weight: 900; border: 1px solid var(--accent-purple);">🛡️ ${t.tag}</span>
-            <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); margin-left: 0.3rem;">🎮 ${t.game}</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem;">
+              <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                <span style="font-size: 1.3rem;">${emblem}</span>
+                <span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe; font-weight: 900; border: 1px solid var(--accent-purple);">${t.tag}</span>
+                <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">${t.game}</span>
+              </div>
+              <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">${t.record || '0W - 0L'}</span>
+            </div>
+
+            <h3 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 0.25rem; color: #fff;">${t.name}</h3>
+            <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 800; margin-bottom: 0.6rem;">
+              👑 Captain: ${t.captain} • <span style="color: var(--accent-green);">⚡ ${synergy}</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; background: rgba(0,0,0,0.4); padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; margin-bottom: 0.8rem; text-align: center;">
+              <div><div style="color: var(--text-muted);">Team MMR</div><strong style="color: var(--accent-gold);">${t.elo || 2200} ELO</strong></div>
+              <div><div style="color: var(--text-muted);">Team K/D</div><strong style="color: var(--accent-green);">${t.kd || '2.10'}</strong></div>
+              <div><div style="color: var(--text-muted);">Earnings</div><strong style="color: #ffab00;">${t.bountyEarned || '$1k'}</strong></div>
+            </div>
+
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem; max-height: 55px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;">
+              <strong style="color: var(--text-main);">Roster (${t.members ? t.members.length : t.size}):</strong> ${t.members ? t.members.join(', ') : 'Active Roster'}
+            </div>
           </div>
-          <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">${t.record || '0W - 0L'}</span>
-        </div>
 
-        <h3 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 0.2rem; color: #fff;">${t.name}</h3>
-        <div style="font-size: 0.82rem; color: var(--accent-cyan); font-weight: 800; margin-bottom: 0.6rem;">👑 Captain: ${t.captain} • Roster: ${t.members ? t.members.length : t.size} Members</div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; background: rgba(0,0,0,0.4); padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; margin-bottom: 0.8rem; text-align: center;">
-          <div><div style="color: var(--text-muted);">Team MMR</div><strong style="color: var(--accent-gold);">${t.elo || 2200} ELO</strong></div>
-          <div><div style="color: var(--text-muted);">Team K/D</div><strong style="color: var(--accent-green);">${t.kd || '2.10'}</strong></div>
-          <div><div style="color: var(--text-muted);">Earnings</div><strong style="color: #ffab00;">${t.bountyEarned || '$1k'}</strong></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem;">
+            <button class="btn btn-purple btn-sm" style="flex: 1; padding: 0.3rem 0.5rem; font-size: 0.78rem;" onclick="window.app.openManageTeamModal('${t.id}')">
+              📋 Roster Hub
+            </button>
+            <button class="btn btn-cyan btn-sm" style="padding: 0.3rem 0.5rem; font-size: 0.78rem;" onclick="alert('⚔️ SCRIM CHALLENGE DISPATCHED!\\n\\nOfficial 5v5 Scrim challenge sent for team \"${t.name}\"!')">
+              ⚔️ Scrim
+            </button>
+            <button class="btn btn-danger btn-sm" style="padding: 0.3rem 0.45rem; font-size: 0.75rem;" onclick="window.app.disbandTeam('${t.id}')" title="Disband Team">
+              ❌
+            </button>
+          </div>
         </div>
-
-        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem; max-height: 50px; overflow-y: auto;">
-          Roster: ${t.members ? t.members.join(', ') : 'Active Roster'}
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
-          <button class="btn btn-purple btn-sm" style="flex: 1; padding: 0.3rem 0.6rem; font-size: 0.78rem;" onclick="alert('⚔️ SCRIM CHALLENGE DISPATCHED!\\n\\nOfficial 5v5 Scrim challenge sent for team \"${t.name}\"!')">
-            ⚔️ Scrim Challenge
-          </button>
-          <button class="btn btn-danger btn-sm" style="padding: 0.3rem 0.5rem; font-size: 0.75rem;" onclick="window.app.disbandTeam('${t.id}')">
-            ❌ Disband
-          </button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   submitCreateTeam() {
     const name = document.getElementById('modalTeamName').value.trim() || 'Vanguard Esports';
-    const tag = document.getElementById('modalTeamTag').value.trim() || 'VANGUARD';
+    const tagRaw = document.getElementById('modalTeamTag').value.trim() || 'VANGUARD';
+    const tag = tagRaw.startsWith('[') ? tagRaw.toUpperCase() : `[${tagRaw.toUpperCase()}]`;
     const captain = document.getElementById('modalTeamCaptain').value.trim() || (this.user ? this.user.displayName : 'Sean');
+    const focus = document.getElementById('modalTeamFocus') ? document.getElementById('modalTeamFocus').value : 'Competitive Scrims';
     const game = document.getElementById('modalTeamGame').value;
     const size = parseInt(document.getElementById('modalTeamSize').value) || 5;
+    const emblem = this.selectedClanEmblem || '🛡️';
     const membersRaw = document.getElementById('modalTeamMembers').value.trim();
 
-    const members = membersRaw ? membersRaw.split(',').map(m => m.trim()).filter(Boolean) : [captain, 'Operative_Alpha', 'Operative_Bravo', 'Operative_Charlie', 'Operative_Delta'];
+    const rawList = membersRaw ? membersRaw.split(',').map(m => m.trim()).filter(Boolean) : ['Ghost_Dog_99', 'Sargeant_Iron', 'Valkyrie_Merc', 'Shadow_K9'];
+    const members = [`${captain} (👑 Captain/IGL)`, ...rawList];
 
     const newTeam = {
       id: `TEAM-${Date.now().toString().slice(-4)}`,
       name,
-      tag: tag.startsWith('[') ? tag.toUpperCase() : `[${tag.toUpperCase()}]`,
+      tag,
+      emblem,
+      focus,
+      synergy: '100% (Role-Balanced)',
       captain,
       game,
       size,
       members,
       record: '0W - 0L',
-      elo: Math.floor(2100 + Math.random() * 300),
-      kd: '2.25',
+      elo: Math.floor(2150 + Math.random() * 350),
+      kd: '2.30',
       bountyEarned: '$2,500',
       createdDate: new Date().toLocaleDateString()
     };
@@ -1572,7 +1636,84 @@ class CustomLobbiesApp {
     this.closeCreateTeamModal();
     this.renderMyCreatedTeams();
 
-    alert(`🎉 TEAM CREATED SUCCESSFULLY!\n\nTeam "${name} ${newTeam.tag}" created for ${game}!\nAdded to your Team Management Cabinet (+150 🪙 CL-Points)!`);
+    alert(`🎉 TEAM CREATED SUCCESSFULLY!\n\n${emblem} ${name} ${tag} created for ${game}!\nCalculated 100% Team Chemistry Synergy (+150 🪙 CL-Points)!`);
+  }
+
+  openManageTeamModal(teamId) {
+    if (!this.myCreatedTeams) this.loadMyCreatedTeams();
+    const team = this.myCreatedTeams.find(t => t.id === teamId);
+    if (!team) return;
+
+    const modal = document.getElementById('manageTeamRosterModal');
+    const emblem = document.getElementById('manageTeamEmblem');
+    const title = document.getElementById('manageTeamTitle');
+    const sub = document.getElementById('manageTeamSub');
+    const body = document.getElementById('manageTeamBody');
+
+    if (emblem) emblem.textContent = team.emblem || '🛡️';
+    if (title) title.textContent = `${team.name} ${team.tag}`;
+    if (sub) sub.textContent = `${team.game} • ${team.focus || 'Competitive Scrims'} • ${team.members ? team.members.length : team.size} Members`;
+
+    if (body) {
+      const roles = ['👑 IGL / Commander', '🎯 Entry Fragger', '🔭 Marksman / AWPer', '🛡️ Support / Anchor', '⚡ Flex Specialist'];
+      const memberList = team.members || [team.captain || 'Sean', 'Ghost_Dog_99', 'Sargeant_Iron', 'Valkyrie_Merc', 'Shadow_K9'];
+
+      body.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; background: rgba(0,0,0,0.4); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.25rem; text-align: center;">
+          <div><div style="font-size: 0.75rem; color: var(--text-muted);">Team Rating</div><strong style="color: var(--accent-gold); font-size: 1.1rem;">${team.elo || 2350} ELO</strong></div>
+          <div><div style="font-size: 0.75rem; color: var(--text-muted);">Chemistry Synergy</div><strong style="color: var(--accent-green); font-size: 1.1rem;">${team.synergy || '100%'}</strong></div>
+          <div><div style="font-size: 0.75rem; color: var(--text-muted);">Bounty Earned</div><strong style="color: #ffab00; font-size: 1.1rem;">${team.bountyEarned || '$4,500'}</strong></div>
+        </div>
+
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 0.6rem;">📋 Active Tactical Roster & Roles</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+          ${memberList.map((m, idx) => `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.04); padding: 0.55rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-color);">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span style="font-size: 0.85rem; font-weight: 800; color: #fff;">${m}</span>
+                ${idx === 0 ? '<span style="background: rgba(255,215,0,0.2); color: var(--accent-gold); border: 1px solid var(--accent-gold); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 800;">CAPTAIN</span>' : ''}
+              </div>
+              <span class="lobby-game-tag" style="background: rgba(0,242,254,0.15); color: var(--accent-cyan); font-size: 0.75rem;">
+                ${roles[idx % roles.length]}
+              </span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+          <button class="btn btn-purple btn-sm" style="flex: 1;" onclick="alert('⚔️ SCRIM DISPATCHED!\\n\\nDispatching 5v5 Scrim challenge to top available ladder teams for ${team.name}!')">
+            ⚔️ Queue Team Scrim
+          </button>
+          <button class="btn btn-cyan btn-sm" style="flex: 1;" onclick="alert('🏆 LEAGUE ENTRY CONFIRMED!\\n\\n${team.name} registered into the Active Esports Championship League!')">
+            🏆 Register for League
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.autoRecruitForTeam('${team.id}')">
+            ➕ Recruit Free Agent
+          </button>
+        </div>
+      `;
+    }
+
+    if (modal) modal.classList.add('active');
+  }
+
+  closeManageTeamModal() {
+    const modal = document.getElementById('manageTeamRosterModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  autoRecruitForTeam(teamId) {
+    const team = this.myCreatedTeams.find(t => t.id === teamId);
+    if (!team) return;
+
+    const newRecruit = `Recruit_${Math.floor(100 + Math.random() * 900)} (Flex)`;
+    if (!team.members) team.members = [team.captain || 'Sean'];
+    team.members.push(newRecruit);
+
+    localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
+    this.openManageTeamModal(teamId);
+    this.renderMyCreatedTeams();
+    alert(`🎉 RECRUIT ADDED!\n\n${newRecruit} has joined ${team.name}!`);
   }
 
   disbandTeam(teamId) {
