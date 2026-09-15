@@ -1571,7 +1571,7 @@ class CustomLobbiesApp {
             <button class="btn btn-purple btn-sm" style="flex: 1; padding: 0.3rem 0.5rem; font-size: 0.78rem;" onclick="window.app.openManageTeamModal('${t.id}')">
               📋 Roster Hub
             </button>
-            <button class="btn btn-cyan btn-sm" style="padding: 0.3rem 0.5rem; font-size: 0.78rem;" onclick="alert('⚔️ SCRIM CHALLENGE DISPATCHED!\\n\\nOfficial 5v5 Scrim challenge sent for team \"${t.name}\"!')">
+            <button class="btn btn-cyan btn-sm" style="padding: 0.3rem 0.5rem; font-size: 0.78rem;" onclick="window.app.openTeamScrimModal('${t.id}')">
               ⚔️ Scrim
             </button>
             <button class="btn btn-danger btn-sm" style="padding: 0.3rem 0.45rem; font-size: 0.75rem;" onclick="window.app.disbandTeam('${t.id}')" title="Disband Team">
@@ -1681,7 +1681,7 @@ class CustomLobbiesApp {
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-          <button class="btn btn-purple btn-sm" style="flex: 1;" onclick="alert('⚔️ SCRIM DISPATCHED!\\n\\nDispatching 5v5 Scrim challenge to top available ladder teams for ${team.name}!')">
+          <button class="btn btn-purple btn-sm" style="flex: 1;" onclick="window.app.closeManageTeamModal(); window.app.openTeamScrimModal('${team.id}');">
             ⚔️ Queue Team Scrim
           </button>
           <button class="btn btn-cyan btn-sm" style="flex: 1;" onclick="alert('🏆 LEAGUE ENTRY CONFIRMED!\\n\\n${team.name} registered into the Active Esports Championship League!')">
@@ -1714,6 +1714,65 @@ class CustomLobbiesApp {
     this.openManageTeamModal(teamId);
     this.renderMyCreatedTeams();
     alert(`🎉 RECRUIT ADDED!\n\n${newRecruit} has joined ${team.name}!`);
+  }
+
+  openTeamScrimModal(teamId) {
+    if (!this.myCreatedTeams) this.loadMyCreatedTeams();
+    const team = this.myCreatedTeams.find(t => t.id === teamId);
+    if (!team) return;
+
+    this.activeScrimTeam = team;
+    const modal = document.getElementById('teamScrimDispatchModal');
+    const title = document.getElementById('scrimModalTeamTitle');
+    const gameTag = document.getElementById('scrimModalGameTag');
+    const mmrTag = document.getElementById('scrimModalMMRTag');
+    const output = document.getElementById('scrimDispatchStatus');
+
+    if (title) title.textContent = `${team.emblem || '🛡️'} ${team.name} ${team.tag}`;
+    if (gameTag) gameTag.textContent = team.game;
+    if (mmrTag) mmrTag.textContent = `${team.elo || 2350} Team ELO`;
+    if (output) output.style.display = 'none';
+
+    if (modal) modal.classList.add('active');
+  }
+
+  closeTeamScrimModal() {
+    const modal = document.getElementById('teamScrimDispatchModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  startTeamScrimSearch() {
+    const team = this.activeScrimTeam || (this.myCreatedTeams ? this.myCreatedTeams[0] : null);
+    const serverRegion = document.getElementById('scrimServerRegion') ? document.getElementById('scrimServerRegion').value : 'US East (N. Virginia)';
+    const selectedMap = document.getElementById('scrimMapSelect') ? document.getElementById('scrimMapSelect').value : 'Mirage / Anubis';
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
+
+    const output = document.getElementById('scrimDispatchStatus');
+    if (output) {
+      output.style.display = 'block';
+      output.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem;">
+          <div class="live-dot" style="width: 12px; height: 12px; background: var(--accent-cyan);"></div>
+          <strong style="color: var(--accent-cyan); font-size: 0.95rem;">Searching for Equal ELO Rival Team...</strong>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.5rem;">Target Server: <strong style="color: #fff;">${serverRegion}</strong> • Map Pool: <strong style="color: var(--accent-gold);">${selectedMap}</strong></p>
+        <div style="background: rgba(0,0,0,0.5); border-radius: 6px; padding: 0.6rem; font-size: 0.78rem; font-family: monospace; color: var(--accent-green);">
+          [00:02] Matching ${team ? team.name : 'Team'} (Rating: ${team ? team.elo : 2350} ELO) against 128-tick Scrim Queue...<br>
+          [00:05] Rival Found: ⚡ Apex Predators [APEX] (Rating: 2,360 ELO)!<br>
+          [00:07] Server Provisioned: Dallas 128-tick Node #482.<br>
+          [00:09] Match Connect Command: <code style="color: var(--accent-cyan);">connect 192.168.1.100:27015; password scrim33</code>
+        </div>
+      `;
+    }
+
+    if (window.widgetBuilderEngine) {
+      setTimeout(() => {
+        window.widgetBuilderEngine.playSoundEffect('fanfare');
+      }, 2500);
+    }
   }
 
   disbandTeam(teamId) {

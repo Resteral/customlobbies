@@ -2707,6 +2707,56 @@
         <!-- Injected via app.js -->
       </div>
     </div>
+  <!-- INTERACTIVE TEAM SCRIM DISPATCH MODAL -->
+  <div class="modal-overlay" id="teamScrimDispatchModal">
+    <div class="modal-card" style="max-width: 620px; border-color: var(--accent-purple);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.8rem;">⚔️</span>
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--accent-purple); margin: 0;" id="scrimModalTeamTitle">Team Scrim Matchmaking</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Queue team into 128-tick private scrim nodes with server region & map vetoes</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeTeamScrimModal()">✕ Close</button>
+      </div>
+
+      <div style="display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap;">
+        <span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe; font-weight: 900; border: 1px solid var(--accent-purple);" id="scrimModalGameTag">Counter-Strike 2</span>
+        <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold);" id="scrimModalMMRTag">2,380 Team ELO</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+        <div class="input-group">
+          <label class="input-label">Server Region Node</label>
+          <select class="input-field" id="scrimServerRegion">
+            <option value="US East (N. Virginia)" selected>🇺🇸 US East (N. Virginia)</option>
+            <option value="US Central (Dallas)">🇺🇸 US Central (Dallas)</option>
+            <option value="US West (Oregon)">🇺🇸 US West (Oregon)</option>
+            <option value="EU Central (Frankfurt)">🇪🇺 EU Central (Frankfurt)</option>
+            <option value="APAC (Tokyo)">🇯🇵 APAC (Tokyo)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Map Veto Preference</label>
+          <select class="input-field" id="scrimMapSelect">
+            <option value="Mirage / Anubis" selected>🗺️ Mirage & Anubis</option>
+            <option value="Inferno / Nuke">🗺️ Inferno & Nuke</option>
+            <option value="Dust II / Ancient">🗺️ Dust II & Ancient</option>
+            <option value="Captain Veto Pick">🎲 Captain Pick Ban Veto</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="scrimDispatchStatus" style="display: none; background: rgba(0,0,0,0.4); border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem;">
+        <!-- Status output -->
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
+        <button class="btn btn-secondary" onclick="window.app.closeTeamScrimModal()">Cancel</button>
+        <button class="btn btn-purple" onclick="window.app.startTeamScrimSearch()">Dispatch Scrim Search ⚔️</button>
+      </div>
+    </div>
   </div>
 
   <!-- WARDOGS 99-PLAYER SERVER LOBBY POOL QUEUE MODAL -->
