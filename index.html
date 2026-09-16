@@ -47,6 +47,9 @@
       <button class="nav-btn" data-tab="leaderboard-view">
         <span>👑</span> Leaderboards
       </button>
+      <button class="nav-btn" data-tab="debate-view">
+        <span>🗣️</span> Debate Arena
+      </button>
       
       <!-- Sleek Dropdown for Secondary Nav Items -->
       <div class="nav-dropdown-wrapper">
@@ -54,6 +57,9 @@
           <span>✨</span> More <span style="font-size: 0.7rem;">▼</span>
         </button>
         <div class="nav-dropdown-menu" id="navMoreDropdownMenu">
+          <button class="nav-btn dropdown-item" data-tab="debate-view">
+            <span>🗣️</span> Debate Arena & Siding Hub
+          </button>
           <button class="nav-btn dropdown-item" data-tab="servers-view">
             <span>🖥️</span> Sponsored Servers (FiveM)
           </button>
@@ -501,9 +507,12 @@
             </h3>
 
             <div style="text-align: center; margin-bottom: 1.2rem;">
-              <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); margin: 0 auto 0.6rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--accent-gold);">👑</div>
-              <h4 style="font-size: 1.1rem; font-weight: 800; margin: 0;">You (Host)</h4>
-              <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.2rem;">💎 Diamond Veteran (1840 MMR)</p>
+              <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); margin: 0 auto 0.6rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--accent-gold); cursor: pointer; transition: transform 0.2s;" id="userProfileEmblemAvatar" onclick="window.app.promptCustomizePassportEmblem()" title="Click to Change Custom Gamer Crest / Emblem">👑</div>
+              <h4 style="font-size: 1.1rem; font-weight: 800; margin: 0;" id="userPassportDisplayName">You (Host)</h4>
+              <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.2rem;" id="userPassportSubTitle">💎 Diamond Veteran (1840 MMR)</p>
+              <button class="btn btn-purple btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; margin-top: 0.4rem; gap: 0.3rem;" onclick="window.app.promptCustomizePassportEmblem()">
+                <span>🎨</span> Custom Emblem
+              </button>
             </div>
 
             <!-- Profile Reputation & Commendations Badge -->
@@ -1571,6 +1580,142 @@
       </div>
     </section>
 
+    <!-- 6. DEBATE ARENA & SIDING MATCHMAKER VIEW -->
+    <section id="debate-view" class="view-section">
+      <!-- Debate Hero Banner & Telemetry -->
+      <div class="lobby-header-banner" style="background: linear-gradient(135deg, rgba(30, 20, 50, 0.95), rgba(10, 12, 22, 0.98)), url('assets/logo.jpg') center/cover no-repeat; border: 1px solid var(--accent-purple); box-shadow: 0 0 30px rgba(168, 85, 247, 0.2); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+        <div style="max-width: 650px;">
+          <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem;">
+            <span style="font-size: 2.2rem;">🗣️</span>
+            <h1 style="font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 50%, var(--accent-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">Competitive Debate Arena & Siding Matchmaker</h1>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; margin: 0;">
+            Queue into structured 1v1 or 2v2 debates on gaming, tech, and competitive meta topics. Choose your stance (<strong>PRO / FOR</strong> vs <strong>CON / AGAINST</strong>) or select Auto-Assign Siding for faster matchmaking!
+          </p>
+        </div>
+
+        <!-- Quick Stats Widget -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); padding: 0.75rem 1.2rem; border-radius: 10px; text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Active Duels</div>
+            <strong style="color: var(--accent-cyan); font-size: 1.25rem;">16 Duels Live</strong>
+          </div>
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); padding: 0.75rem 1.2rem; border-radius: 10px; text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Orator Rating</div>
+            <strong style="color: var(--accent-gold); font-size: 1.25rem;" id="userOratorElo">1,890 ELO</strong>
+          </div>
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); padding: 0.75rem 1.2rem; border-radius: 10px; text-align: center;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Audience Jury</div>
+            <strong style="color: var(--accent-green); font-size: 1.25rem;">412 Voting</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Siding & Topic Matchmaking Queue Creator Card -->
+      <div class="card" style="margin-bottom: 1.5rem; border-color: var(--accent-purple); box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
+          <h3 style="font-size: 1.25rem; font-weight: 900; color: #d8b4fe; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+            <span>🎯</span> Debate Topic & Siding Matchmaker
+          </h3>
+          <button class="btn btn-purple btn-sm" onclick="window.app.openCreateDebateModal()">
+            <span>➕</span> Host Custom Debate Topic
+          </button>
+        </div>
+
+        <!-- Matchmaking Siding Selection Inputs -->
+        <div style="display: grid; grid-template-columns: 2fr 1.5fr 1fr; gap: 1rem; margin-bottom: 1.25rem;" class="responsive-grid-3">
+          <!-- Topic Picker -->
+          <div class="input-group" style="margin: 0;">
+            <label class="input-label">Select Debate Topic / Category</label>
+            <select class="input-field" id="debateQueueTopic">
+              <option value="Is Controller Aim Assist Overpowered in Competitive Shooters?" selected>🎮 Is Controller Aim Assist Overpowered in Competitive Shooters?</option>
+              <option value="Will AI Companions Replace Human Teammates in Esports by 2030?">🤖 Will AI Companions Replace Human Teammates in Esports by 2030?</option>
+              <option value="Should In-Game Skins Have Real-Money Cash Tradeability?">💰 Should In-Game Skins Have Real-Money Cash Tradeability?</option>
+              <option value="Is PC Superior to Next-Gen Consoles for Professional Esports?">🏆 Is PC Superior to Next-Gen Consoles for Professional Esports?</option>
+              <option value="Are 33v33 WARDOG Battles Superior to 5v5 Arena Shooters?">⚔️ Are 33v33 WARDOG Battles Superior to 5v5 Arena Shooters?</option>
+            </select>
+          </div>
+
+          <!-- Siding Selection (PRO / CON / AUTO) -->
+          <div class="input-group" style="margin: 0;">
+            <label class="input-label">Choose Your Debate Siding Stance</label>
+            <div style="display: flex; gap: 0.4rem;">
+              <button type="button" class="btn btn-sm btn-cyan siding-btn active" id="btnSidingPro" onclick="window.app.selectDebateSiding('PRO', this)" style="flex: 1; padding: 0.5rem; font-size: 0.82rem;">
+                🔵 PRO (Affirmative)
+              </button>
+              <button type="button" class="btn btn-sm btn-secondary siding-btn" id="btnSidingCon" onclick="window.app.selectDebateSiding('CON', this)" style="flex: 1; padding: 0.5rem; font-size: 0.82rem;">
+                🔴 CON (Negative)
+              </button>
+              <button type="button" class="btn btn-sm btn-secondary siding-btn" id="btnSidingAuto" onclick="window.app.selectDebateSiding('AUTO', this)" style="padding: 0.5rem 0.7rem; font-size: 0.82rem;" title="Auto-Assign Siding for fastest queue time">
+                🎲 Auto
+              </button>
+            </div>
+          </div>
+
+          <!-- Format Selection -->
+          <div class="input-group" style="margin: 0;">
+            <label class="input-label">Debate Format</label>
+            <select class="input-field" id="debateQueueFormat">
+              <option value="1v1 Rapid Duel (5-Min)">1v1 Rapid Duel (5-Min)</option>
+              <option value="2v2 Partner Debate (10-Min)">2v2 Partner Debate (10-Min)</option>
+              <option value="Town Hall (Jury Vote)" selected>Town Hall (Jury Vote)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Matchmaking Action Button -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 0.8rem 1.2rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 0.8rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.88rem;">
+            <span style="color: var(--accent-cyan); font-weight: 800;">Selected Siding:</span>
+            <span id="selectedSidingBadge" class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); font-weight: 900;">
+              🔵 AFFIRMATIVE (PRO / FOR)
+            </span>
+            <span style="color: var(--text-muted); font-size: 0.8rem;">• Equal ELO Orator Matching (+25 🪙 CL-Points)</span>
+          </div>
+
+          <button class="btn btn-purple" onclick="window.app.joinDebateQueue()" style="padding: 0.75rem 1.6rem; font-size: 1.05rem; box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);">
+            ⚡ Join Debate Queue with Selected Siding
+          </button>
+        </div>
+      </div>
+
+      <!-- Debate Queue Searching Status Bar -->
+      <div id="debateQueueStatusCard" class="card" style="display: none; margin-bottom: 1.5rem; border-color: var(--accent-cyan); background: rgba(0, 242, 254, 0.08);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="live-dot" style="width: 14px; height: 14px; background: var(--accent-cyan);"></div>
+            <div>
+              <h4 style="font-size: 1.1rem; color: var(--accent-cyan); margin: 0;">🗣️ Searching Opposing Debate Speaker...</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.2rem 0 0 0;" id="debateQueueStatusText">
+                Looking for 🔴 CON (Negative) speaker to match your 🔵 PRO (Affirmative) stance...
+              </p>
+            </div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="window.app.leaveDebateQueue()">
+            ❌ Cancel Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Active Debate Rooms Grid Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
+        <div>
+          <h3 style="font-size: 1.3rem; font-weight: 900; color: #fff; margin: 0;">🗣️ Active Debate Duels & Jury Voting Arenas</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Spectate live debates, vote on the winning orator, or challenge an open side (PRO or CON)!</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.filterDebates('all')">All Debates</button>
+          <button class="btn btn-purple btn-sm" onclick="window.app.filterDebates('open')">Open Siding</button>
+          <button class="btn btn-cyan btn-sm" onclick="window.app.filterDebates('live')">🔴 Live Voting</button>
+        </div>
+      </div>
+
+      <!-- Debate Grid Container -->
+      <div class="lobbies-grid" id="activeDebateLobbiesGrid">
+        <!-- Injected dynamically via app.js -->
+      </div>
+    </section>
+
     <!-- 7. FLOATING QUICK SOUNDBOARD & MATCHMAKER WIDGET -->
     <div id="floatingQuickWidget" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; background: linear-gradient(135deg, rgba(16, 20, 30, 0.95), rgba(26, 32, 48, 0.95)); border: 1px solid var(--accent-cyan); border-radius: 16px; padding: 1rem 1.2rem; box-shadow: 0 8px 32px rgba(0, 242, 254, 0.25); backdrop-filter: blur(10px); max-width: 320px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
@@ -2599,10 +2744,15 @@
         <button class="btn btn-secondary btn-sm" onclick="window.app.closeCreateTeamModal()">✕ Close</button>
       </div>
 
-      <!-- Clan Emblem & Crest Selector -->
-      <div class="input-group">
-        <label class="input-label">Select Clan Crest Emblem</label>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="emblemPickerContainer">
+      <!-- Clan Emblem & Crest Selector with Full Custom Upload & Symbol Creator -->
+      <div class="input-group" style="background: rgba(0,0,0,0.3); padding: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+          <label class="input-label" style="margin: 0; font-weight: 800; color: var(--accent-gold);">🎨 Clan Emblem & Crest (Custom or Preset)</label>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Supports Emojis, Symbols & Custom PNG / SVG Images</span>
+        </div>
+        
+        <!-- Preset Emblems Grid -->
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem;" id="emblemPickerContainer">
           <button type="button" class="btn btn-sm btn-purple emblem-option active" data-emblem="🛡️" onclick="window.app.selectClanEmblem('🛡️', this)">🛡️ Shield</button>
           <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="⚔️" onclick="window.app.selectClanEmblem('⚔️', this)">⚔️ Blades</button>
           <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🦅" onclick="window.app.selectClanEmblem('🦅', this)">🦅 Falcon</button>
@@ -2611,7 +2761,41 @@
           <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="💀" onclick="window.app.selectClanEmblem('💀', this)">💀 Reaper</button>
           <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="⚡" onclick="window.app.selectClanEmblem('⚡', this)">⚡ Thunder</button>
           <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="👑" onclick="window.app.selectClanEmblem('👑', this)">👑 Royalty</button>
-          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🎯" onclick="window.app.selectClanEmblem('🎯', this)">🎯 Snipers</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🎯" onclick="window.app.selectClanEmblem('🎯', this)">🎯 Sniper</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🔥" onclick="window.app.selectClanEmblem('🔥', this)">🔥 Flame</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🦁" onclick="window.app.selectClanEmblem('🦁', this)">🦁 Lion</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="💎" onclick="window.app.selectClanEmblem('💎', this)">💎 Diamond</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="☣️" onclick="window.app.selectClanEmblem('☣️', this)">☣️ Biohazard</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="👾" onclick="window.app.selectClanEmblem('👾', this)">👾 Cyber</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🏆" onclick="window.app.selectClanEmblem('🏆', this)">🏆 Trophy</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🩸" onclick="window.app.selectClanEmblem('🩸', this)">🩸 Phantom</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🚀" onclick="window.app.selectClanEmblem('🚀', this)">🚀 Rocket</button>
+          <button type="button" class="btn btn-sm btn-secondary emblem-option" data-emblem="🐍" onclick="window.app.selectClanEmblem('🐍', this)">🐍 Viper</button>
+        </div>
+
+        <!-- Custom Emblem Creator Tools -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; padding-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.08);">
+          <div>
+            <label class="input-label" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Type Custom Emoji / Symbol</label>
+            <div style="display: flex; gap: 0.4rem;">
+              <input type="text" class="input-field" id="customEmojiEmblemInput" placeholder="e.g. 🦁, 🦾, 🔱, 🌌" style="font-size: 0.85rem; padding: 0.35rem 0.6rem;" oninput="window.app.setCustomEmojiEmblem(this.value)">
+              <button type="button" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.75rem;" onclick="window.app.setRandomEmojiEmblem()">🎲</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="input-label" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Upload Custom Image / Icon</label>
+            <div style="display: flex; gap: 0.4rem;">
+              <input type="file" id="customEmblemFileInput" accept="image/*" style="display: none;" onchange="window.app.handleCustomEmblemUpload(this)">
+              <button type="button" class="btn btn-cyan btn-sm" style="width: 100%; font-size: 0.75rem; padding: 0.35rem 0.6rem; gap: 0.3rem;" onclick="document.getElementById('customEmblemFileInput').click()">
+                <span>📁</span> Upload PNG / SVG
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 0.5rem;">
+          <input type="text" class="input-field" id="customEmblemUrlInput" placeholder="Or paste custom image URL (https://.../crest.png)" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;" oninput="window.app.setCustomEmblemUrl(this.value)">
         </div>
       </div>
 
@@ -2707,6 +2891,8 @@
         <!-- Injected via app.js -->
       </div>
     </div>
+  </div>
+
   <!-- INTERACTIVE TEAM SCRIM DISPATCH MODAL -->
   <div class="modal-overlay" id="teamScrimDispatchModal">
     <div class="modal-card" style="max-width: 620px; border-color: var(--accent-purple);">
@@ -2755,6 +2941,82 @@
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
         <button class="btn btn-secondary" onclick="window.app.closeTeamScrimModal()">Cancel</button>
         <button class="btn btn-purple" onclick="window.app.startTeamScrimSearch()">Dispatch Scrim Search ⚔️</button>
+      </div>
+    </div>
+  <!-- HOST CUSTOM DEBATE TOPIC MODAL -->
+  <div class="modal-overlay" id="createDebateTopicModal">
+    <div class="modal-card" style="max-width: 620px; border-color: var(--accent-purple);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.8rem;">🗣️</span>
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--accent-purple); margin: 0;">Host Custom Debate Topic</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Publish a debate topic, select your initial stance, and invite opponent orators</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeCreateDebateModal()">✕ Close</button>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Debate Motion / Topic Title</label>
+        <input type="text" class="input-field" id="modalDebateTopic" value="Is Controller Aim Assist Overpowered in Competitive Shooters?">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Category</label>
+          <select class="input-field" id="modalDebateCategory">
+            <option value="Gaming Meta" selected>🎮 Gaming Meta & Balance</option>
+            <option value="Tech & AI">🤖 Tech & AI Innovations</option>
+            <option value="Esports Formats">🏆 Esports Rules & Formats</option>
+            <option value="Gaming Economy">💰 Skins & Economy</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Your Siding Stance</label>
+          <select class="input-field" id="modalDebateSiding">
+            <option value="PRO" selected>🔵 PRO (Affirmative)</option>
+            <option value="CON">🔴 CON (Negative)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Debate Format</label>
+        <select class="input-field" id="modalDebateFormat">
+          <option value="Town Hall (Jury Vote)" selected>Town Hall (Jury Vote)</option>
+          <option value="1v1 Rapid Duel (5-Min)">1v1 Rapid Duel (5-Min)</option>
+          <option value="2v2 Partner Debate (10-Min)">2v2 Partner Debate (10-Min)</option>
+        </select>
+      </div>
+
+      <div style="background: rgba(168, 85, 247, 0.12); border: 1px solid var(--accent-purple); border-radius: 8px; padding: 0.8rem; font-size: 0.85rem; color: #d8b4fe; margin-bottom: 1.25rem;">
+        🎁 Host Reward: Earn +50 🪙 CL-Points & featured placement in the Live Debate Arena!
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
+        <button class="btn btn-secondary" onclick="window.app.closeCreateDebateModal()">Cancel</button>
+        <button class="btn btn-purple" onclick="window.app.submitCreateDebateTopic()">Publish Debate Topic 🗣️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEBATE STAGE & AUDIENCE JURY VOTING MODAL -->
+  <div class="modal-overlay" id="debateStageModal">
+    <div class="modal-card" style="max-width: 780px; width: 95%; border-color: var(--accent-purple);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.8rem;">🗣️</span>
+          <div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; color: #d8b4fe; margin: 0;" id="debateStageTopic">Debate Arena Stage</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Live Competitive Debate & Audience Jury Voting Stage</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeDebateStageModal()">✕ Close Stage</button>
+      </div>
+
+      <div id="debateStageBody">
+        <!-- Injected dynamically via app.js -->
       </div>
     </div>
   </div>

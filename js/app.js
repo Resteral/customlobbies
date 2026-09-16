@@ -74,11 +74,26 @@ class CustomLobbiesApp {
     ];
 
     this.lobbies = [
-      { id: 14, title: 'Slapshot 3v3 High ELO Arcade Puck Scrims', game: 'Slapshot: Rebound', host: 'PuckMaster99', players: 5, max: 6, region: 'NA East', draftType: '3v3 Captain Pick' },
-      { id: 13, title: 'Empulse 5v5 Apex Striker Cyber Arena Scrims', game: 'Empulse', host: 'Empulse_Overlord', players: 9, max: 10, region: 'NA East', draftType: 'Captain Snake Draft' },
-      { id: 12, title: 'REMATCH 5v5 High ELO Champion Scrims', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, region: 'NA East', draftType: 'Captain Draft' },
-      { id: 11, title: 'Arkheron Cyber Spire Battle Scrims', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, region: 'NA East', draftType: 'Battle Draft' },
-      { id: 9, title: 'CS2 FACEIT Level 8-10 Premier Scrims', game: 'Counter-Strike 2', host: 'ApexGod99', players: 9, max: 10, region: 'NA East', draftType: 'FACEIT Pro League' }
+      { id: 24, title: 'CS2 128-Tick Mirage / Inferno Premier Scrims', game: 'Counter-Strike 2', host: 'ApexGod99', players: 9, max: 10, region: 'NA East', draftType: 'FACEIT Pro League', matchStatus: '🟢 IN-GAME (Round 11/13)', map: 'de_mirage', serverIp: '192.168.1.85:27015' },
+      { id: 23, title: 'CS2 Dust II High ELO 5v5 PUG [Need +1 AWPer]', game: 'Counter-Strike 2', host: 'Retake_Leader', players: 4, max: 5, region: 'NA East', draftType: 'Captain Pick', matchStatus: '⚡ DRAFTING', map: 'de_dust2', serverIp: '192.168.1.86:27015' },
+      { id: 22, title: 'Valorant Radiant 5v5 Scrims [Ascent / Bind]', game: 'Valorant', host: 'ViperMain_01', players: 9, max: 10, region: 'NA East', draftType: 'Captain Snake Draft', matchStatus: '🟢 IN-GAME (Round 8/13)', map: 'Ascent', serverIp: 'riotgames://valorant/party/join' },
+      { id: 21, title: 'PUBG Squad Battlegrounds Competitive Scrims', game: 'PUBG', host: 'Pochinki_Lord', players: 15, max: 16, region: 'NA East', draftType: 'Squad Battle', matchStatus: '🟢 IN-GAME (Phase 4 Circle)', map: 'Erangel', serverIp: 'pubg://connect/10.0.1.44:7777' },
+      { id: 20, title: 'StarCraft II 1v1 High Grandmaster Ladder', game: 'StarCraft II', host: 'SerralHype', players: 1, max: 2, region: 'NA East', draftType: '1v1 Pro Ladder', matchStatus: '⚡ DRAFTING', map: 'Alcyone LE', serverIp: 'battlenet://sc2/match/8821' },
+      { id: 19, title: 'League of Legends 5v5 Challenger Draft Scrims', game: 'League of Legends', host: 'FakerFanatic', players: 9, max: 10, region: 'NA East', draftType: 'Tournament Draft', matchStatus: '🟢 IN-GAME (22 Mins in)', map: "Summoner's Rift", serverIp: 'riotclient://league-of-legends/custom' },
+      { id: 18, title: 'Overwatch 2 5v5 Grandmaster Scrims', game: 'Overwatch 2', host: 'TracerGod', players: 9, max: 10, region: 'NA East', draftType: '5v5 Role Queue', matchStatus: '🟢 IN-GAME (Overtime Point B)', map: "King's Row", serverIp: 'battlenet://Pro' },
+      { id: 17, title: 'The Finals 3v3 Tournament Scrims', game: 'The Finals', host: 'CashOutKing', players: 5, max: 6, region: 'NA East', draftType: '3v3 Quick Cash', matchStatus: '🔥 WARMUP', map: 'Monaco', serverIp: 'thefinals://connect/na1' },
+      { id: 16, title: 'Valorant Haven 5v5 Tactical Scrims', game: 'Valorant', host: 'JettDash_99', players: 8, max: 10, region: 'NA East', draftType: 'Captain Pick', matchStatus: '🔥 WARMUP', map: 'Haven', serverIp: 'riotgames://valorant/party/join' },
+      { id: 15, title: 'Marvel Rivals 6v6 Celestial Scrimmage Board', game: 'Marvel Rivals', host: 'Galacta_Queen', players: 11, max: 12, region: 'NA East', draftType: '6v6 Role Lock', matchStatus: '🟢 IN-GAME (Payload Escort)', map: 'Yggsgard', serverIp: 'steam://run/2767030' },
+      { id: 14, title: 'Slapshot 3v3 High ELO Arcade Puck Scrims', game: 'Slapshot: Rebound', host: 'PuckMaster99', players: 5, max: 6, region: 'NA East', draftType: '3v3 Captain Pick', matchStatus: '🟢 IN-GAME (Period 2 - 3:1)', map: 'Cyber Rink Alpha', serverIp: 'steam://connect/192.168.1.130:27015' },
+      { id: 13, title: 'Empulse 5v5 Apex Striker Cyber Arena Scrims', game: 'Empulse', host: 'Empulse_Overlord', players: 9, max: 10, region: 'NA East', draftType: 'Captain Snake Draft', matchStatus: '🟢 IN-GAME (Round 5/9)', map: 'Neon Core 01', serverIp: 'steam://connect/192.168.1.120:27015' },
+      { id: 12, title: 'REMATCH 5v5 High ELO Champion Scrims', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, region: 'NA East', draftType: 'Captain Draft', matchStatus: '🔥 WARMUP', map: 'Hyper Coliseum', serverIp: 'steam://connect/192.168.1.110:27015' },
+      { id: 11, title: 'Arkheron Cyber Spire Battle Scrims', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, region: 'NA East', draftType: 'Battle Draft', matchStatus: '🟢 IN-GAME (Spire Stage 3)', map: 'Spire Nexus', serverIp: 'steam://connect/192.168.1.115:27015' },
+      { id: 10, title: 'Rocket League 3v3 Supersonic Legend Scrims', game: 'Rocket League', host: 'AerialGod', players: 5, max: 6, region: 'NA East', draftType: '3v3 Captain Pick', matchStatus: '🟢 IN-GAME (+1:24 Overtime)', map: 'DFH Stadium', serverIp: 'com.epicgames.launcher://apps/RocketLeague' },
+      { id: 9, title: 'CS2 Anubis / Ancient Competitive Practice', game: 'Counter-Strike 2', host: 'Valkyrie_CS', players: 7, max: 10, region: 'EU Central', draftType: '5v5 Ranked Draft', matchStatus: '🔥 WARMUP', map: 'de_anubis', serverIp: '192.168.1.88:27015' },
+      { id: 8, title: 'FiveM Los Santos Underground RP 32-Slot Lobby', game: 'FiveM GTA RP', host: 'Chief_Miller', players: 28, max: 32, region: 'NA East', draftType: 'RP Faction Queue', matchStatus: '🟢 LIVE SERVER (28 Active)', map: 'Los Santos', serverIp: 'fivem://connect/198.51.100.24:30120' },
+      { id: 7, title: 'Dota 2 5v5 High Immortal Captains Mode Scrims', game: 'Dota 2', host: 'InvokerPro', players: 8, max: 10, region: 'NA East', draftType: 'Captains Mode', matchStatus: '🟢 IN-GAME (Roshan Fight)', map: 'Standard Dota', serverIp: 'steam://run/570' },
+      { id: 6, title: 'Rainbow Six Siege 5v5 Tactical Bomb Scrims', game: 'Rainbow Six Siege', host: 'Smoke_Anchor', players: 8, max: 10, region: 'NA East', draftType: '5v5 Ranked Draft', matchStatus: '🟢 IN-GAME (Match Point 3-3)', map: 'Clubhouse', serverIp: 'uplay://launch/3599/0' },
+      { id: 5, title: 'Deadlock 6v6 High MMR Lane Battle', game: 'Deadlock', host: 'Abrams_Main', players: 10, max: 12, region: 'NA East', draftType: '6v6 Captain Draft', matchStatus: '🟢 IN-GAME (Mid Boss Active)', map: 'The Cursed City', serverIp: 'steam://run/1422450' }
     ];
 
     this.selectedLeaderboardGame = 'Counter-Strike 2';
@@ -233,7 +248,14 @@ class CustomLobbiesApp {
       const savedPoints = localStorage.getItem('cl_points_v2');
       if (savedPoints) this.clPoints = parseInt(savedPoints);
       const savedLobbies = localStorage.getItem('cl_lobbies_v2');
-      if (savedLobbies) this.lobbies = JSON.parse(savedLobbies);
+      if (savedLobbies) {
+        const parsed = JSON.parse(savedLobbies);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const existingGames = new Set(parsed.map(l => l.game));
+          const missingLobbies = this.lobbies.filter(l => !existingGames.has(l.game));
+          this.lobbies = [...parsed, ...missingLobbies];
+        }
+      }
       const savedPool = localStorage.getItem('cl_pool_v2');
       if (savedPool) this.poolFeed = JSON.parse(savedPool);
       const savedTitle = localStorage.getItem('cl_title_v2');
@@ -266,6 +288,7 @@ class CustomLobbiesApp {
 
   init() {
     this.initAuthSession();
+    this.initDebateSystem();
     this.setupTabNavigation();
     this.renderFavoriteStarTags();
     this.renderActiveGamesBar();
@@ -273,6 +296,7 @@ class CustomLobbiesApp {
     this.renderMyCreatedTeams();
     this.renderPoolFeed();
     this.renderLobbies();
+    this.renderDebateLobbies();
     this.renderLeaderboard();
     this.renderLeaguesView();
     this.renderWardogsView();
@@ -1448,10 +1472,23 @@ class CustomLobbiesApp {
     if (modal) modal.classList.remove('active');
   }
 
+  renderEmblemHTML(emblem, size = '1.3rem', extraStyle = '') {
+    if (!emblem) emblem = '🛡️';
+    if (emblem.startsWith('http://') || emblem.startsWith('https://') || emblem.startsWith('data:image/') || emblem.startsWith('/') || emblem.includes('.png') || emblem.includes('.svg') || emblem.includes('.jpg') || emblem.includes('.webp')) {
+      return `<img src="${emblem}" alt="Emblem" style="width: ${size}; height: ${size}; border-radius: 6px; object-fit: cover; vertical-align: middle; display: inline-block; border: 1px solid var(--accent-purple); box-shadow: 0 0 10px rgba(168,85,247,0.4); ${extraStyle}">`;
+    }
+    return `<span style="font-size: ${size}; vertical-align: middle; display: inline-block; line-height: 1; ${extraStyle}">${emblem}</span>`;
+  }
+
   selectClanEmblem(emblem, btnEl) {
     this.selectedClanEmblem = emblem;
     const preview = document.getElementById('selectedTeamEmblemPreview');
-    if (preview) preview.textContent = emblem;
+    if (preview) preview.innerHTML = this.renderEmblemHTML(emblem, '2.2rem');
+
+    const emojiInput = document.getElementById('customEmojiEmblemInput');
+    if (emojiInput) emojiInput.value = '';
+    const urlInput = document.getElementById('customEmblemUrlInput');
+    if (urlInput) urlInput.value = '';
 
     const container = document.getElementById('emblemPickerContainer');
     if (container) {
@@ -1463,6 +1500,71 @@ class CustomLobbiesApp {
     if (btnEl) {
       btnEl.classList.remove('btn-secondary');
       btnEl.classList.add('btn-purple', 'active');
+    }
+  }
+
+  setCustomEmojiEmblem(emoji) {
+    if (!emoji || !emoji.trim()) return;
+    this.selectedClanEmblem = emoji.trim();
+    const preview = document.getElementById('selectedTeamEmblemPreview');
+    if (preview) preview.innerHTML = this.renderEmblemHTML(this.selectedClanEmblem, '2.2rem');
+
+    const container = document.getElementById('emblemPickerContainer');
+    if (container) {
+      container.querySelectorAll('.emblem-option').forEach(b => {
+        b.classList.remove('btn-purple', 'active');
+        b.classList.add('btn-secondary');
+      });
+    }
+  }
+
+  setRandomEmojiEmblem() {
+    const list = ['🔥', '🦁', '⭐', '💎', '🦾', '☣️', '🩸', '👾', '🚀', '🏆', '🥇', '⚡', '💀', '🦅', '🛡️', '⚔️', '🐺', '🐉', '👑', '🎯', '🐍', '🦈', '🦊', '👹', '🌌', '⚓', '🏎️', '🌪️', '🗡️', '🛸'];
+    const chosen = list[Math.floor(Math.random() * list.length)];
+    const input = document.getElementById('customEmojiEmblemInput');
+    if (input) input.value = chosen;
+    this.setCustomEmojiEmblem(chosen);
+  }
+
+  handleCustomEmblemUpload(fileInput) {
+    if (!fileInput || !fileInput.files || !fileInput.files[0]) return;
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      this.selectedClanEmblem = dataUrl;
+      const preview = document.getElementById('selectedTeamEmblemPreview');
+      if (preview) preview.innerHTML = this.renderEmblemHTML(dataUrl, '2.2rem');
+      const urlInput = document.getElementById('customEmblemUrlInput');
+      if (urlInput) urlInput.value = `[Uploaded Image: ${file.name}]`;
+      const emojiInput = document.getElementById('customEmojiEmblemInput');
+      if (emojiInput) emojiInput.value = '';
+
+      const container = document.getElementById('emblemPickerContainer');
+      if (container) {
+        container.querySelectorAll('.emblem-option').forEach(b => {
+          b.classList.remove('btn-purple', 'active');
+          b.classList.add('btn-secondary');
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  setCustomEmblemUrl(url) {
+    if (!url || !url.trim()) return;
+    this.selectedClanEmblem = url.trim();
+    const preview = document.getElementById('selectedTeamEmblemPreview');
+    if (preview) preview.innerHTML = this.renderEmblemHTML(this.selectedClanEmblem, '2.2rem');
+    const emojiInput = document.getElementById('customEmojiEmblemInput');
+    if (emojiInput) emojiInput.value = '';
+
+    const container = document.getElementById('emblemPickerContainer');
+    if (container) {
+      container.querySelectorAll('.emblem-option').forEach(b => {
+        b.classList.remove('btn-purple', 'active');
+        b.classList.add('btn-secondary');
+      });
     }
   }
 
@@ -1536,15 +1638,15 @@ class CustomLobbiesApp {
     }
 
     grid.innerHTML = this.myCreatedTeams.map(t => {
-      const emblem = t.emblem || '🛡️';
+      const emblemHTML = this.renderEmblemHTML(t.emblem || '🛡️', '1.4rem');
       const synergy = t.synergy || '100% Synergy';
 
       return `
         <div class="card" style="border-color: var(--accent-purple); position: relative; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem;">
-              <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
-                <span style="font-size: 1.3rem;">${emblem}</span>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                ${emblemHTML}
                 <span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe; font-weight: 900; border: 1px solid var(--accent-purple);">${t.tag}</span>
                 <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">${t.game}</span>
               </div>
@@ -1636,7 +1738,7 @@ class CustomLobbiesApp {
     this.closeCreateTeamModal();
     this.renderMyCreatedTeams();
 
-    alert(`🎉 TEAM CREATED SUCCESSFULLY!\n\n${emblem} ${name} ${tag} created for ${game}!\nCalculated 100% Team Chemistry Synergy (+150 🪙 CL-Points)!`);
+    alert(`🎉 TEAM CREATED SUCCESSFULLY!\n\n${name} ${tag} created for ${game}!\nCustom Emblem Saved & Team Chemistry Synergy Active (+150 🪙 CL-Points)!`);
   }
 
   openManageTeamModal(teamId) {
@@ -1645,12 +1747,12 @@ class CustomLobbiesApp {
     if (!team) return;
 
     const modal = document.getElementById('manageTeamRosterModal');
-    const emblem = document.getElementById('manageTeamEmblem');
+    const emblemEl = document.getElementById('manageTeamEmblem');
     const title = document.getElementById('manageTeamTitle');
     const sub = document.getElementById('manageTeamSub');
     const body = document.getElementById('manageTeamBody');
 
-    if (emblem) emblem.textContent = team.emblem || '🛡️';
+    if (emblemEl) emblemEl.innerHTML = this.renderEmblemHTML(team.emblem || '🛡️', '2rem');
     if (title) title.textContent = `${team.name} ${team.tag}`;
     if (sub) sub.textContent = `${team.game} • ${team.focus || 'Competitive Scrims'} • ${team.members ? team.members.length : team.size} Members`;
 
@@ -1663,6 +1765,23 @@ class CustomLobbiesApp {
           <div><div style="font-size: 0.75rem; color: var(--text-muted);">Team Rating</div><strong style="color: var(--accent-gold); font-size: 1.1rem;">${team.elo || 2350} ELO</strong></div>
           <div><div style="font-size: 0.75rem; color: var(--text-muted);">Chemistry Synergy</div><strong style="color: var(--accent-green); font-size: 1.1rem;">${team.synergy || '100%'}</strong></div>
           <div><div style="font-size: 0.75rem; color: var(--text-muted);">Bounty Earned</div><strong style="color: #ffab00; font-size: 1.1rem;">${team.bountyEarned || '$4,500'}</strong></div>
+        </div>
+
+        <!-- Interactive Emblem Customizer for this Team -->
+        <div style="background: rgba(168,85,247,0.1); border: 1px solid var(--accent-purple); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.82rem; font-weight: 800; color: var(--accent-purple);">🎨 Customize Team Emblem</span>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Instant Update</span>
+          </div>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+            ${['🛡️', '⚔️', '🦅', '🐺', '🐉', '💀', '⚡', '👑', '🎯', '🔥', '🦁', '💎', '☣️', '👾', '🏆', '🩸', '🚀', '🐍'].map(e => `
+              <button class="btn btn-secondary btn-sm" style="padding: 0.2rem 0.45rem; font-size: 0.85rem;" onclick="window.app.updateTeamEmblemDirect('${team.id}', '${e}')">${e}</button>
+            `).join('')}
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" class="input-field" placeholder="Or type custom emoji / paste image URL..." style="font-size: 0.8rem; padding: 0.3rem 0.6rem;" id="manageCustomEmblemInput_${team.id}">
+            <button class="btn btn-purple btn-sm" style="font-size: 0.78rem; padding: 0.3rem 0.7rem;" onclick="const val = document.getElementById('manageCustomEmblemInput_${team.id}').value; if(val) window.app.updateTeamEmblemDirect('${team.id}', val);">Apply Emblem</button>
+          </div>
         </div>
 
         <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 0.6rem;">📋 Active Tactical Roster & Roles</h4>
@@ -1695,6 +1814,21 @@ class CustomLobbiesApp {
     }
 
     if (modal) modal.classList.add('active');
+  }
+
+  updateTeamEmblemDirect(teamId, newEmblem) {
+    if (!this.myCreatedTeams) this.loadMyCreatedTeams();
+    const team = this.myCreatedTeams.find(t => t.id === teamId);
+    if (!team || !newEmblem) return;
+
+    team.emblem = newEmblem;
+    localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
+    this.openManageTeamModal(teamId);
+    this.renderMyCreatedTeams();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
   }
 
   closeManageTeamModal() {
@@ -2152,27 +2286,13 @@ class CustomLobbiesApp {
 
     if (filterAll) {
       filterAll.addEventListener('click', () => {
-        this.activeFilter = 'all';
-        filterAll.classList.add('btn-primary');
-        filterAll.classList.remove('btn-secondary');
-        if (filterFavs) {
-          filterFavs.classList.remove('btn-primary');
-          filterFavs.classList.add('btn-secondary');
-        }
-        this.renderLobbies();
+        this.setGameFilter('all');
       });
     }
 
     if (filterFavs) {
       filterFavs.addEventListener('click', () => {
-        this.activeFilter = 'favorites';
-        filterFavs.classList.add('btn-primary');
-        filterFavs.classList.remove('btn-secondary');
-        if (filterAll) {
-          filterAll.classList.remove('btn-primary');
-          filterAll.classList.add('btn-secondary');
-        }
-        this.renderLobbies();
+        this.setGameFilter('favorites');
       });
     }
   }
@@ -2191,7 +2311,7 @@ class CustomLobbiesApp {
     let html = visibleFavs.map(game => {
       const isSelected = this.activeFilter === game;
       return `
-        <button class="btn btn-sm ${isSelected ? 'btn-primary' : 'btn-purple'}" onclick="window.app.setGameFilter('${game}')" title="Filter lobbies by ${game}" style="padding: 0.25rem 0.6rem; font-size: 0.78rem;">
+        <button class="btn btn-sm ${isSelected ? 'btn-primary' : 'btn-purple'}" onclick="window.app.setGameFilter('${game}')" title="Go to ${game} Lobbies" style="padding: 0.25rem 0.6rem; font-size: 0.78rem; ${isSelected ? 'box-shadow: 0 0 15px rgba(0, 242, 254, 0.5); border-color: var(--accent-cyan); font-weight: 800;' : ''}">
           <span>⭐</span> ${game}
         </button>
       `;
@@ -2213,7 +2333,7 @@ class CustomLobbiesApp {
             const isSelected = this.activeFilter === game;
             return `
               <div class="dropdown-item" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.4rem 0.8rem;">
-                <span onclick="window.app.setGameFilter('${game}')" style="cursor: pointer; flex: 1; ${isSelected ? 'color: var(--accent-cyan); font-weight: 800;' : ''}" title="Filter by ${game}">
+                <span onclick="window.app.setGameFilter('${game}')" style="cursor: pointer; flex: 1; ${isSelected ? 'color: var(--accent-cyan); font-weight: 800;' : ''}" title="View ${game} Lobbies">
                   ${game} ${isSelected ? '✓' : ''}
                 </span>
                 <button class="btn btn-sm ${isFav ? 'btn-gold' : 'btn-secondary'}" style="padding: 0.15rem 0.45rem; font-size: 0.7rem; flex-shrink: 0;" onclick="window.app.toggleFavorite('${game}')" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
@@ -2241,7 +2361,7 @@ class CustomLobbiesApp {
       const isSelected = this.activeFilter === game;
 
       return `
-        <button class="btn btn-sm ${isSelected ? 'btn-primary' : 'btn-secondary'}" onclick="window.app.setGameFilter('${game}')" style="display: flex; align-items: center; gap: 0.4rem;">
+        <button class="btn btn-sm ${isSelected ? 'btn-primary' : 'btn-secondary'}" onclick="window.app.setGameFilter('${game}')" style="display: flex; align-items: center; gap: 0.4rem; ${isSelected ? 'box-shadow: 0 0 15px rgba(0, 242, 254, 0.5); border-color: var(--accent-cyan); font-weight: 800;' : ''}">
           <span>${isFav ? '⭐' : '🎮'}</span>
           <span>${game}</span>
           <span class="lobby-game-tag" style="${cnt > 0 ? 'background: rgba(0, 230, 118, 0.2); color: var(--accent-green);' : 'background: rgba(255,255,255,0.05); color: var(--text-dim);'}">
@@ -2253,13 +2373,62 @@ class CustomLobbiesApp {
   }
 
   setGameFilter(gameName) {
-    if (this.activeFilter === gameName) {
+    if (this.activeFilter === gameName && gameName !== 'all') {
       this.activeFilter = 'all';
     } else {
       this.activeFilter = gameName;
     }
+
+    // 1. Ensure Lobbies & Queue view is the active tab
+    const lobbiesTabBtn = document.querySelector('.nav-btn[data-tab="lobbies-view"]');
+    if (lobbiesTabBtn && !lobbiesTabBtn.classList.contains('active')) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      lobbiesTabBtn.classList.add('active');
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      const targetSec = document.getElementById('lobbies-view');
+      if (targetSec) targetSec.classList.add('active');
+    }
+
+    // 2. Update filter button styles (All Games vs Favorites Only)
+    const filterAll = document.getElementById('filterAllGames');
+    const filterFavs = document.getElementById('filterFavsOnly');
+    if (filterAll && filterFavs) {
+      if (this.activeFilter === 'all') {
+        filterAll.classList.add('btn-primary');
+        filterAll.classList.remove('btn-secondary');
+        filterFavs.classList.remove('btn-primary');
+        filterFavs.classList.add('btn-purple');
+      } else if (this.activeFilter === 'favorites') {
+        filterFavs.classList.add('btn-primary');
+        filterFavs.classList.remove('btn-purple');
+        filterAll.classList.remove('btn-primary');
+        filterAll.classList.add('btn-secondary');
+      } else {
+        filterAll.classList.remove('btn-primary');
+        filterAll.classList.add('btn-secondary');
+        filterFavs.classList.remove('btn-primary');
+        filterFavs.classList.add('btn-purple');
+      }
+    }
+
+    // 3. Re-render all bars & lobbies list
+    this.renderFavoriteStarTags();
     this.renderActiveGamesBar();
     this.renderLobbies();
+
+    // 4. Smoothly scroll down to that game's lobbies
+    setTimeout(() => {
+      const lobbiesGrid = document.getElementById('lobbiesGrid');
+      if (lobbiesGrid) {
+        const headerOffset = 180;
+        const elementPosition = lobbiesGrid.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 40);
   }
 
   renderSponsoredServers() {
@@ -2344,29 +2513,6 @@ class CustomLobbiesApp {
         }
       }, 100);
     });
-  }
-
-  setGameFilter(filterName) {
-    this.activeFilter = filterName;
-    this.renderActiveGamesBar();
-    this.renderLobbies();
-  }
-
-  setupFilterHandlers() {
-    const filterAll = document.getElementById('filterAllGames');
-    const filterFavs = document.getElementById('filterFavsOnly');
-
-    if (filterAll) {
-      filterAll.addEventListener('click', () => {
-        this.setGameFilter('all');
-      });
-    }
-
-    if (filterFavs) {
-      filterFavs.addEventListener('click', () => {
-        this.setGameFilter('favorites');
-      });
-    }
   }
 
   initAuthSession() {
@@ -2517,11 +2663,45 @@ class CustomLobbiesApp {
     alert('Logged out from CustomLobbies Account.');
   }
 
+  promptCustomizePassportEmblem() {
+    const defaultEmblems = ['👑', '💎', '🔥', '🦁', '⚡', '🦅', '🐺', '🐉', '💀', '🎯', '🚀', '👾', '🏆', '🩸', '🛡️', '⚔️'];
+    const current = (this.user && this.user.emblem) || '👑';
+    const choice = prompt(`🎨 CUSTOMIZE YOUR GAMER EMBLEM & CREST:\n\nType any custom Emoji, Symbol, or paste an Image URL:\n(Presets: ${defaultEmblems.slice(0, 10).join(' ')})\n`, current);
+    
+    if (choice !== null && choice.trim()) {
+      const emblem = choice.trim();
+      if (!this.user) {
+        this.user = {
+          username: 'Sean',
+          displayName: 'Sean (Host)',
+          elo: 1840,
+          level: 8,
+          title: '💎 Diamond Veteran',
+          emblem: emblem
+        };
+      } else {
+        this.user.emblem = emblem;
+      }
+      localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+      this.updateUserAuthUI();
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('fanfare');
+      }
+      alert(`🎉 GAMER EMBLEM UPDATED!\n\nYour custom gamer emblem has been equipped across your Passport & profile badges!`);
+    }
+  }
+
   updateUserAuthUI() {
     const authBtnLabel = document.getElementById('authBtnLabel');
     const userPassportTitle = document.getElementById('userPassportTitle');
     const userMMRValue = document.getElementById('userMMRValue');
     const btnOpenAuthModal = document.getElementById('btnOpenAuthModal');
+    const userProfileEmblemAvatar = document.getElementById('userProfileEmblemAvatar');
+
+    const userEmblem = (this.user && this.user.emblem) || '👑';
+    if (userProfileEmblemAvatar) {
+      userProfileEmblemAvatar.innerHTML = this.renderEmblemHTML(userEmblem, '2.2rem');
+    }
 
     if (this.user) {
       if (authBtnLabel) {
@@ -2599,15 +2779,20 @@ class CustomLobbiesApp {
     grid.innerHTML = list.map(l => {
       const fillPct = Math.round((l.players / l.max) * 100);
       const isFav = this.favoriteGames.has(l.game);
+      const statusBadge = l.matchStatus || (fillPct >= 90 ? '🟢 IN-GAME (Live)' : (fillPct >= 70 ? '⚡ DRAFTING' : '🔥 WARMUP'));
+      const statusColor = statusBadge.includes('IN-GAME') || statusBadge.includes('LIVE') ? 'var(--accent-green)' : (statusBadge.includes('DRAFT') ? 'var(--accent-cyan)' : 'var(--accent-gold)');
 
       return `
         <div class="lobby-card" style="${isFav ? 'border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);' : ''}">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-              <span class="lobby-game-tag" style="${isFav ? 'background: rgba(255, 215, 0, 0.15); color: var(--accent-gold);' : ''}">
-                ${isFav ? '⭐ ' : ''}${l.game}
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
+            <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+              <span class="lobby-game-tag" style="${isFav ? 'background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); font-weight: 800;' : ''}">
+                ${isFav ? '⭐ ' : '🎮 '}${l.game}
               </span>
-              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">🛡️ Guardian AC Verified</span>
+              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: ${statusColor}; font-weight: 800; border: 1px solid ${statusColor};">
+                ${statusBadge}
+              </span>
+              ${l.map ? `<span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">🗺️ ${l.map}</span>` : ''}
             </div>
             <button style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: ${isFav ? 'var(--accent-gold)' : 'var(--text-dim)'};" onclick="window.app.toggleFavorite('${l.game}')" title="Pin / Favorite Game">
               ${isFav ? '⭐' : '☆'}
@@ -2615,16 +2800,16 @@ class CustomLobbiesApp {
           </div>
 
           <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0.5rem 0;">${l.title}</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Host: <strong style="color: var(--accent-cyan);">${l.host}</strong> | Type: <strong style="color: var(--accent-gold);">${l.draftType}</strong></p>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">Host: <strong style="color: var(--accent-cyan);">${l.host}</strong> | Type: <strong style="color: var(--accent-gold);">${l.draftType}</strong> | Region: <strong style="color: var(--text-main);">${l.region || 'NA East'}</strong></p>
 
           <div class="lobby-players-bar">
             <div class="lobby-players-fill" style="width: ${fillPct}%;"></div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">${l.players} / ${l.max} Players</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; flex-wrap: wrap; gap: 0.6rem;">
+            <span style="font-size: 0.85rem; font-weight: 700; color: ${fillPct >= 90 ? 'var(--accent-green)' : 'var(--accent-cyan)'};">${l.players} / ${l.max} Players (${l.max - l.players > 0 ? `${l.max - l.players} Spots Left` : 'Full Lobby'})</span>
             <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-              <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('192.168.1.85:27015')" title="Copy Console Connect Command">📋 Copy IP</button>
+              <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('${l.serverIp || '192.168.1.85:27015'}')" title="Copy Console Connect Command">📋 Copy IP</button>
               <button class="btn btn-secondary btn-sm" onclick="window.app.connectLobbyVoice('${l.title}')" title="Connect WebRTC Voice Room">🎙️ Voice</button>
               <button class="btn btn-secondary btn-sm" style="border-color: var(--accent-gold); color: var(--accent-gold);" onclick="window.app.openPostGameHonorModal('${l.title}')" title="After Game Honor & Misconduct Flags">🏁 Post-Game Honor</button>
               <button class="btn btn-purple btn-sm" onclick="window.app.triggerLobbySnakeDraft('${l.title}', '${l.game}')" title="Launch FACEIT 1-2-2-1 Snake Draft Board for this lobby">🐍 Snake Draft</button>
@@ -3608,6 +3793,463 @@ class CustomLobbiesApp {
     if (btnClosePool) btnClosePool.addEventListener('click', () => poolModal?.classList.remove('active'));
     if (btnCancelPool) btnCancelPool.addEventListener('click', () => poolModal?.classList.remove('active'));
     if (btnSubmitPool) btnSubmitPool.addEventListener('click', () => this.submitJoinPlayerPool());
+  }
+
+  // --- DEBATE ARENA & SIDING MATCHMAKER ENGINE ---
+  initDebateSystem() {
+    this.debateSiding = 'PRO';
+    this.activeDebateFilter = 'all';
+
+    const savedDebates = localStorage.getItem('cl_debate_lobbies_v1');
+    if (savedDebates) {
+      try {
+        this.debateLobbies = JSON.parse(savedDebates);
+      } catch (e) {
+        this.debateLobbies = this.getDefaultDebateLobbies();
+      }
+    } else {
+      this.debateLobbies = this.getDefaultDebateLobbies();
+    }
+  }
+
+  getDefaultDebateLobbies() {
+    return [
+      {
+        id: 'DEBATE-101',
+        topic: 'Is Controller Aim Assist Overpowered in Competitive Shooters?',
+        category: 'Gaming Meta',
+        format: 'Town Hall (Jury Vote)',
+        phase: 'Round 2: Cross-Examination',
+        timer: '03:15',
+        proSpeaker: { handle: 'Sean (Host)', elo: 1890, badge: '👑 Orator', votes: 142 },
+        conSpeaker: { handle: 'Apex_Sniper_99', elo: 1920, badge: '🎯 Master Debater', votes: 118 },
+        status: 'LIVE',
+        spectators: 260,
+        totalJuryVotes: 260,
+        userVoted: null,
+        createdDate: 'Live Now'
+      },
+      {
+        id: 'DEBATE-102',
+        topic: 'Will AI Companions Replace Human Teammates in Esports by 2030?',
+        category: 'Tech & AI',
+        format: '1v1 Rapid Duel',
+        phase: 'Round 1: Opening Statement',
+        timer: '01:45',
+        proSpeaker: { handle: 'Cyber_Advocate', elo: 1780, badge: '🤖 AI Specialist', votes: 85 },
+        conSpeaker: { handle: 'Valkyrie_Merc', elo: 1850, badge: '🛡️ Human Purist', votes: 94 },
+        status: 'LIVE',
+        spectators: 179,
+        totalJuryVotes: 179,
+        userVoted: null,
+        createdDate: 'Live Now'
+      },
+      {
+        id: 'DEBATE-103',
+        topic: 'Should In-Game Skins Have Real-Money Cash Tradeability?',
+        category: 'Gaming Economy',
+        format: '1v1 Rapid Duel',
+        phase: 'Awaiting CON (Negative) Speaker',
+        timer: 'Open Slot',
+        proSpeaker: { handle: 'Trader_King', elo: 1810, badge: '💰 Economist', votes: 45 },
+        conSpeaker: null,
+        status: 'OPEN_CON',
+        spectators: 45,
+        totalJuryVotes: 45,
+        userVoted: null,
+        createdDate: 'Open Challenge'
+      },
+      {
+        id: 'DEBATE-104',
+        topic: 'Are 33v33 WARDOG Battles Superior to 5v5 Arena Shooters?',
+        category: 'Esports Formats',
+        format: '2v2 Partner Debate',
+        phase: 'Awaiting PRO (Affirmative) Speaker',
+        timer: 'Open Slot',
+        proSpeaker: null,
+        conSpeaker: { handle: 'Tactical_Sargeant', elo: 1950, badge: '🐕 Battalion Commander', votes: 62 },
+        status: 'OPEN_PRO',
+        spectators: 62,
+        totalJuryVotes: 62,
+        userVoted: null,
+        createdDate: 'Open Challenge'
+      }
+    ];
+  }
+
+  selectDebateSiding(siding, btnEl) {
+    this.debateSiding = siding;
+    const badge = document.getElementById('selectedSidingBadge');
+    
+    const buttons = document.querySelectorAll('.siding-btn');
+    buttons.forEach(b => {
+      b.classList.remove('btn-cyan', 'btn-danger', 'btn-purple', 'active');
+      b.classList.add('btn-secondary');
+    });
+
+    if (btnEl) {
+      btnEl.classList.remove('btn-secondary');
+      if (siding === 'PRO') btnEl.classList.add('btn-cyan', 'active');
+      else if (siding === 'CON') btnEl.classList.add('btn-danger', 'active');
+      else btnEl.classList.add('btn-purple', 'active');
+    }
+
+    if (badge) {
+      if (siding === 'PRO') {
+        badge.className = 'lobby-game-tag';
+        badge.style.cssText = 'background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); font-weight: 900;';
+        badge.textContent = '🔵 AFFIRMATIVE (PRO / FOR)';
+      } else if (siding === 'CON') {
+        badge.className = 'lobby-game-tag';
+        badge.style.cssText = 'background: rgba(255, 82, 82, 0.2); color: #ff5252; border: 1px solid #ff5252; font-weight: 900;';
+        badge.textContent = '🔴 NEGATIVE (CON / AGAINST)';
+      } else {
+        badge.className = 'lobby-game-tag';
+        badge.style.cssText = 'background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid var(--accent-purple); font-weight: 900;';
+        badge.textContent = '🎲 AUTO-ASSIGN SIDING (PRO vs CON)';
+      }
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
+  }
+
+  joinDebateQueue() {
+    const topicSelect = document.getElementById('debateQueueTopic');
+    const topic = topicSelect ? topicSelect.value : 'Controller Aim Assist';
+    const format = document.getElementById('debateQueueFormat') ? document.getElementById('debateQueueFormat').value : 'Town Hall (Jury Vote)';
+    const siding = this.debateSiding || 'PRO';
+
+    const card = document.getElementById('debateQueueStatusCard');
+    const text = document.getElementById('debateQueueStatusText');
+
+    if (card) card.style.display = 'block';
+    if (text) {
+      const stanceText = siding === 'PRO' ? '🔵 PRO (Affirmative)' : siding === 'CON' ? '🔴 CON (Negative)' : '🎲 Balanced Auto-Siding';
+      const lookingFor = siding === 'PRO' ? '🔴 CON (Negative)' : siding === 'CON' ? '🔵 PRO (Affirmative)' : 'Opposing Speaker';
+      text.textContent = `Queued as ${stanceText} for "${topic}" (${format}). Searching for ${lookingFor} orator...`;
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
+
+    setTimeout(() => {
+      if (card && card.style.display !== 'none') {
+        this.leaveDebateQueue();
+        const opponentSiding = siding === 'PRO' ? 'CON' : 'PRO';
+        const newDebate = {
+          id: `DEBATE-${Date.now().toString().slice(-4)}`,
+          topic: topic.length > 55 ? topic.slice(0, 52) + '...' : topic,
+          category: 'Competitive Debate',
+          format,
+          phase: 'Round 1: Opening Arguments',
+          timer: '05:00',
+          proSpeaker: siding === 'CON' ? { handle: 'Vortex_Orator', elo: 1870, badge: '🗣️ Opponent', votes: 0 } : { handle: this.user ? this.user.displayName : 'Sean (You)', elo: 1890, badge: '👑 Orator', votes: 0 },
+          conSpeaker: siding === 'CON' ? { handle: this.user ? this.user.displayName : 'Sean (You)', elo: 1890, badge: '👑 Orator', votes: 0 } : { handle: 'Vortex_Orator', elo: 1870, badge: '🗣️ Opponent', votes: 0 },
+          status: 'LIVE',
+          spectators: 18,
+          totalJuryVotes: 0,
+          userVoted: null,
+          createdDate: 'Live Now'
+        };
+
+        if (!this.debateLobbies) this.debateLobbies = [];
+        this.debateLobbies.unshift(newDebate);
+        localStorage.setItem('cl_debate_lobbies_v1', JSON.stringify(this.debateLobbies));
+        this.renderDebateLobbies();
+        this.openDebateStageModal(newDebate.id);
+
+        if (window.widgetBuilderEngine) {
+          window.widgetBuilderEngine.playSoundEffect('fanfare');
+        }
+      }
+    }, 2800);
+  }
+
+  leaveDebateQueue() {
+    const card = document.getElementById('debateQueueStatusCard');
+    if (card) card.style.display = 'none';
+  }
+
+  filterDebates(type) {
+    this.activeDebateFilter = type;
+    this.renderDebateLobbies();
+  }
+
+  renderDebateLobbies() {
+    const grid = document.getElementById('activeDebateLobbiesGrid');
+    if (!grid) return;
+
+    if (!this.debateLobbies) this.initDebateSystem();
+
+    let list = [...this.debateLobbies];
+    if (this.activeDebateFilter === 'open') {
+      list = list.filter(d => d.status === 'OPEN_PRO' || d.status === 'OPEN_CON');
+    } else if (this.activeDebateFilter === 'live') {
+      list = list.filter(d => d.status === 'LIVE');
+    }
+
+    if (list.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; background: rgba(0,0,0,0.3); padding: 2rem; border-radius: 10px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border-color);">
+          🗣️ No active debate rooms match your filter. Click "Host Custom Debate Topic" or select a siding above to enter the Arena!
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = list.map(d => {
+      const proVotes = d.proSpeaker ? d.proSpeaker.votes || 0 : 0;
+      const conVotes = d.conSpeaker ? d.conSpeaker.votes || 0 : 0;
+      const total = proVotes + conVotes || 1;
+      const proPct = Math.round((proVotes / total) * 100);
+      const conPct = 100 - proPct;
+
+      return `
+        <div class="card" style="border-color: var(--accent-purple); position: relative; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.4rem;">
+              <span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe; font-weight: 800; border: 1px solid var(--accent-purple);">🗣️ ${d.category}</span>
+              <span class="lobby-game-tag" style="background: ${d.status === 'LIVE' ? 'rgba(0, 230, 118, 0.2)' : 'rgba(255, 215, 0, 0.2)'}; color: ${d.status === 'LIVE' ? 'var(--accent-green)' : 'var(--accent-gold)'}; font-weight: 800;">
+                ${d.status === 'LIVE' ? '🔴 LIVE DUEL' : d.status === 'OPEN_CON' ? '⚡ CON SIDE OPEN' : '⚡ PRO SIDE OPEN'}
+              </span>
+            </div>
+
+            <h4 style="font-size: 1.05rem; font-weight: 900; color: #fff; margin-bottom: 0.8rem; line-height: 1.35;">${d.topic}</h4>
+
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.5rem; align-items: center; background: rgba(0,0,0,0.4); padding: 0.6rem; border-radius: 8px; margin-bottom: 0.8rem;">
+              <div style="text-align: left;">
+                <div style="font-size: 0.7rem; color: var(--accent-cyan); font-weight: 900; text-transform: uppercase;">🔵 PRO (Affirmative)</div>
+                <div style="font-size: 0.82rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                  ${d.proSpeaker ? d.proSpeaker.handle : '<span style="color: var(--accent-cyan); font-style: italic;">+ Open Slot</span>'}
+                </div>
+                <div style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 700;">${d.proSpeaker ? `${d.proSpeaker.elo} ELO` : 'Select Pro Side'}</div>
+              </div>
+
+              <div style="font-size: 0.85rem; font-weight: 900; color: var(--text-muted); padding: 0 0.2rem;">VS</div>
+
+              <div style="text-align: right;">
+                <div style="font-size: 0.7rem; color: #ff5252; font-weight: 900; text-transform: uppercase;">🔴 CON (Negative)</div>
+                <div style="font-size: 0.82rem; font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                  ${d.conSpeaker ? d.conSpeaker.handle : '<span style="color: #ff5252; font-style: italic;">+ Open Slot</span>'}
+                </div>
+                <div style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 700;">${d.conSpeaker ? `${d.conSpeaker.elo} ELO` : 'Select Con Side'}</div>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.8rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; font-weight: 800; color: var(--text-muted); margin-bottom: 0.25rem;">
+                <span style="color: var(--accent-cyan);">PRO Jury: ${proPct}%</span>
+                <span>👀 ${d.spectators} Spectators</span>
+                <span style="color: #ff5252;">CON Jury: ${conPct}%</span>
+              </div>
+              <div style="height: 6px; background: rgba(255, 82, 82, 0.4); border-radius: 3px; overflow: hidden; display: flex;">
+                <div style="width: ${proPct}%; background: var(--accent-cyan); transition: width 0.3s;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-purple btn-sm" style="flex: 1; font-size: 0.78rem;" onclick="window.app.openDebateStageModal('${d.id}')">
+              👁️ Spectate & Vote
+            </button>
+            ${d.status !== 'LIVE' ? `
+              <button class="btn btn-cyan btn-sm" style="font-size: 0.78rem;" onclick="window.app.challengeDebateSide('${d.id}')">
+                ⚔️ Take Open Side
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  openDebateStageModal(debateId) {
+    if (!this.debateLobbies) this.initDebateSystem();
+    const debate = this.debateLobbies.find(d => d.id === debateId);
+    if (!debate) return;
+
+    this.activeDebateStage = debate;
+    const modal = document.getElementById('debateStageModal');
+    const topicEl = document.getElementById('debateStageTopic');
+    const bodyEl = document.getElementById('debateStageBody');
+
+    if (topicEl) topicEl.textContent = debate.topic;
+    if (bodyEl) {
+      const proName = debate.proSpeaker ? debate.proSpeaker.handle : 'Open Slot (PRO)';
+      const conName = debate.conSpeaker ? debate.conSpeaker.handle : 'Open Slot (CON)';
+      const proVotes = debate.proSpeaker ? debate.proSpeaker.votes || 0 : 0;
+      const conVotes = debate.conSpeaker ? debate.conSpeaker.votes || 0 : 0;
+      const total = proVotes + conVotes || 1;
+      const proPct = Math.round((proVotes / total) * 100);
+      const conPct = 100 - proPct;
+
+      bodyEl.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.6rem;">
+          <div>
+            <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-weight: 800;">🔴 STAGE LIVE</span>
+            <strong style="margin-left: 0.5rem; font-size: 0.88rem; color: var(--accent-cyan);">${debate.phase}</strong>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--accent-gold); font-weight: 800; font-family: monospace;">
+            ⏱️ Timer: ${debate.timer} | 👀 ${debate.spectators} Jury Spectators
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="background: rgba(0, 242, 254, 0.05); border: 1px solid var(--accent-cyan); border-radius: 10px; padding: 1rem; text-align: center;">
+            <div class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); font-weight: 900; margin-bottom: 0.5rem;">🔵 AFFIRMATIVE (PRO)</div>
+            <h4 style="font-size: 1.1rem; font-weight: 900; color: #fff; margin: 0 0 0.2rem 0;">${proName}</h4>
+            <div style="font-size: 0.78rem; color: var(--accent-gold); font-weight: 800; margin-bottom: 0.8rem;">${debate.proSpeaker ? `${debate.proSpeaker.elo} Orator ELO` : 'Awaiting Speaker'}</div>
+            
+            <div style="background: rgba(0,0,0,0.4); border-radius: 6px; padding: 0.6rem; font-size: 0.8rem; color: var(--text-muted); font-style: italic; min-height: 60px; text-align: left;">
+              "Aim assist algorithms provide automated sub-millisecond rotational tracking that human reflexes cannot match physically in high-tier competitive duels."
+            </div>
+          </div>
+
+          <div style="background: rgba(255, 82, 82, 0.05); border: 1px solid #ff5252; border-radius: 10px; padding: 1rem; text-align: center;">
+            <div class="lobby-game-tag" style="background: rgba(255, 82, 82, 0.2); color: #ff5252; font-weight: 900; margin-bottom: 0.5rem;">🔴 NEGATIVE (CON)</div>
+            <h4 style="font-size: 1.1rem; font-weight: 900; color: #fff; margin: 0 0 0.2rem 0;">${conName}</h4>
+            <div style="font-size: 0.78rem; color: var(--accent-gold); font-weight: 800; margin-bottom: 0.8rem;">${debate.conSpeaker ? `${debate.conSpeaker.elo} Orator ELO` : 'Awaiting Speaker'}</div>
+
+            <div style="background: rgba(0,0,0,0.4); border-radius: 6px; padding: 0.6rem; font-size: 0.8rem; color: var(--text-muted); font-style: italic; min-height: 60px; text-align: left;">
+              "Analogs lack arm-length precision, recoil control ranges, and keybind flexibility; friction slowdown compensates for inferior mechanical hardware input."
+            </div>
+          </div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; text-align: center;">
+          <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 0.6rem;">🗳️ Cast Your Audience Jury Vote (+10 🪙 CL-Points)</h4>
+          
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 800; margin-bottom: 0.4rem;">
+            <span style="color: var(--accent-cyan);">PRO (Affirmative): ${proVotes} Votes (${proPct}%)</span>
+            <span style="color: #ff5252;">CON (Negative): ${conVotes} Votes (${conPct}%)</span>
+          </div>
+
+          <div style="height: 10px; background: rgba(255, 82, 82, 0.4); border-radius: 5px; overflow: hidden; display: flex; margin-bottom: 1rem;">
+            <div style="width: ${proPct}%; background: var(--accent-cyan); transition: width 0.4s;"></div>
+          </div>
+
+          <div style="display: flex; gap: 0.8rem; justify-content: center;">
+            <button class="btn btn-cyan" onclick="window.app.castJuryVote('${debate.id}', 'PRO')" style="flex: 1; font-size: 0.95rem;">
+              👍 Vote PRO (Affirmative)
+            </button>
+            <button class="btn btn-danger" onclick="window.app.castJuryVote('${debate.id}', 'CON')" style="flex: 1; font-size: 0.95rem;">
+              👎 Vote CON (Negative)
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (modal) modal.classList.add('active');
+  }
+
+  closeDebateStageModal() {
+    const modal = document.getElementById('debateStageModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  castJuryVote(debateId, side) {
+    const debate = this.debateLobbies.find(d => d.id === debateId);
+    if (!debate) return;
+
+    if (debate.userVoted) {
+      alert(`⚠️ ALREADY VOTED!\n\nYou have already cast your jury vote for this debate room.`);
+      return;
+    }
+
+    debate.userVoted = side;
+    debate.spectators += 1;
+    debate.totalJuryVotes += 1;
+
+    if (side === 'PRO' && debate.proSpeaker) {
+      debate.proSpeaker.votes = (debate.proSpeaker.votes || 0) + 1;
+    } else if (side === 'CON' && debate.conSpeaker) {
+      debate.conSpeaker.votes = (debate.conSpeaker.votes || 0) + 1;
+    }
+
+    this.clPoints += 10;
+    this.updatePointsWidget();
+    localStorage.setItem('cl_debate_lobbies_v1', JSON.stringify(this.debateLobbies));
+
+    this.openDebateStageModal(debateId);
+    this.renderDebateLobbies();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    alert(`🎉 JURY VOTE CAST!\n\nYou voted ${side === 'PRO' ? '🔵 PRO (Affirmative)' : '🔴 CON (Negative)'}! Awarded +10 🪙 CL-Points!`);
+  }
+
+  challengeDebateSide(debateId) {
+    const debate = this.debateLobbies.find(d => d.id === debateId);
+    if (!debate) return;
+
+    const userHandle = this.user ? this.user.displayName : 'Sean (You)';
+
+    if (debate.status === 'OPEN_CON') {
+      debate.conSpeaker = { handle: userHandle, elo: 1890, badge: '👑 Orator', votes: 0 };
+      debate.status = 'LIVE';
+      debate.phase = 'Round 1: Opening Arguments';
+    } else if (debate.status === 'OPEN_PRO') {
+      debate.proSpeaker = { handle: userHandle, elo: 1890, badge: '👑 Orator', votes: 0 };
+      debate.status = 'LIVE';
+      debate.phase = 'Round 1: Opening Arguments';
+    }
+
+    localStorage.setItem('cl_debate_lobbies_v1', JSON.stringify(this.debateLobbies));
+    this.renderDebateLobbies();
+    this.openDebateStageModal(debateId);
+  }
+
+  openCreateDebateModal() {
+    const modal = document.getElementById('createDebateTopicModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeCreateDebateModal() {
+    const modal = document.getElementById('createDebateTopicModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  submitCreateDebateTopic() {
+    const topic = document.getElementById('modalDebateTopic').value.trim() || 'Controller vs K&M Balance';
+    const category = document.getElementById('modalDebateCategory').value;
+    const siding = document.getElementById('modalDebateSiding').value;
+    const format = document.getElementById('modalDebateFormat').value;
+
+    const userHandle = this.user ? this.user.displayName : 'Sean (Host)';
+
+    const newDebate = {
+      id: `DEBATE-${Date.now().toString().slice(-4)}`,
+      topic,
+      category,
+      format,
+      phase: siding === 'PRO' ? 'Awaiting CON Speaker' : 'Awaiting PRO Speaker',
+      timer: 'Open Slot',
+      proSpeaker: siding === 'PRO' ? { handle: userHandle, elo: 1890, badge: '👑 Orator', votes: 0 } : null,
+      conSpeaker: siding === 'CON' ? { handle: userHandle, elo: 1890, badge: '👑 Orator', votes: 0 } : null,
+      status: siding === 'PRO' ? 'OPEN_CON' : 'OPEN_PRO',
+      spectators: 1,
+      totalJuryVotes: 0,
+      userVoted: null,
+      createdDate: 'Open Challenge'
+    };
+
+    if (!this.debateLobbies) this.debateLobbies = [];
+    this.debateLobbies.unshift(newDebate);
+    localStorage.setItem('cl_debate_lobbies_v1', JSON.stringify(this.debateLobbies));
+
+    this.clPoints += 50;
+    this.updatePointsWidget();
+
+    this.closeCreateDebateModal();
+    this.renderDebateLobbies();
+
+    alert(`🎉 DEBATE TOPIC HOSTED!\n\nDebate "${topic}" created with ${siding} siding! (+50 🪙 CL-Points)`);
   }
 }
 
