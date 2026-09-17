@@ -4102,7 +4102,7 @@ class CustomLobbiesApp {
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('fanfare');
-      window.widgetBuilderEngine.showToast('📹 Omegle 1v1 Video & Mic Stage Activated!', 'info');
+      window.widgetBuilderEngine.showToast('📹 1v1 Instant Orator Video Stage Activated!', 'info');
     }
   }
 
@@ -4332,7 +4332,7 @@ class CustomLobbiesApp {
   triggerOmegleReaction(emoji, label) {
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect(label.includes('Mic Drop') ? 'fanfare' : 'click');
-      window.widgetBuilderEngine.showToast(`${emoji} ${label} broadcasted to 1v1 Omegle stage!`, 'success');
+      window.widgetBuilderEngine.showToast(`${emoji} ${label} broadcasted to 1v1 Orator stage!`, 'success');
     }
 
     const statusText = document.getElementById('omegleStatusText');
@@ -4366,7 +4366,7 @@ class CustomLobbiesApp {
     if (nameEl) nameEl.textContent = randomPartner.name;
     if (eloEl) eloEl.textContent = `${randomPartner.elo} ELO`;
     if (statusText) {
-      statusText.textContent = `⚡ Live connected to 1v1 Omegle video & mic partner ${randomPartner.name}! Record your speech clip or click NEXT to skip.`;
+      statusText.textContent = `⚡ Live connected to 1v1 orator video partner ${randomPartner.name}! Record your speech clip or click NEXT to skip.`;
     }
 
     if (oppVideo) {
@@ -4394,16 +4394,16 @@ class CustomLobbiesApp {
     const oppVideo = document.getElementById('omegleOpponentVideo');
     const oppFallback = document.getElementById('omegleOpponentVideoFallback');
 
-    if (nameEl) nameEl.textContent = '🔍 Queueing next Omegle video partner...';
+    if (nameEl) nameEl.textContent = '🔍 Queueing next 1v1 video orator...';
     if (eloEl) eloEl.textContent = 'Matching ELO rating...';
-    if (statusText) statusText.textContent = '⏳ Omegle Matchmaker searching for available 1v1 video partner...';
+    if (statusText) statusText.textContent = '⏳ 1v1 Orator Matchmaker searching for available video partner...';
     if (oppVideo) oppVideo.style.display = 'none';
     if (oppFallback) oppFallback.style.display = 'flex';
     if (clipsContainer) clipsContainer.innerHTML = '<div style="font-style: italic; color: var(--text-muted);">Searching for opponent video & mic stream...</div>';
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('click');
-      window.widgetBuilderEngine.showToast('⏭️ Skipped current partner! Finding next Omegle orator...', 'info');
+      window.widgetBuilderEngine.showToast('⏭️ Skipped current partner! Finding next 1v1 orator...', 'info');
     }
 
     setTimeout(() => {
