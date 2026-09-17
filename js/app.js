@@ -4079,7 +4079,7 @@ class CustomLobbiesApp {
     }
   }
 
-  // --- OMEGLE 1v1 MICROPHONE RECORDING & LIVE PAIRING DEBATE ENGINE ---
+  // --- OMEGLE 1v1 LIVE WEBCAM VIDEO STREAM & MIC DEBATE ENGINE ---
   openOmegleDebateModal() {
     if (!this.masterDebateTopics) this.initDebateSystem();
     const modal = document.getElementById('omegleDebateModal');
@@ -4087,6 +4087,8 @@ class CustomLobbiesApp {
 
     this.isOmegleActive = true;
     this.isRecordingMic = false;
+    this.isCameraOn = true;
+    this.isMicMuted = false;
     this.audioChunks = [];
     this.recTimerSeconds = 0;
 
@@ -4094,13 +4096,13 @@ class CustomLobbiesApp {
     const userNameEl = document.getElementById('omegleUserName');
     if (userNameEl) userNameEl.textContent = userHandle;
 
-    this.initMicMediaRecorder();
+    this.initCameraMediaStream();
     this.connectOmeglePartner();
     this.startWaveformVisualizer();
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('fanfare');
-      window.widgetBuilderEngine.showToast('🎙️ Omegle 1v1 Mic Debate Stage Activated!', 'info');
+      window.widgetBuilderEngine.showToast('📹 Omegle 1v1 Video & Mic Stage Activated!', 'info');
     }
   }
 
@@ -4118,9 +4120,9 @@ class CustomLobbiesApp {
       this.recTimerInterval = null;
     }
 
-    if (this.micStream) {
-      this.micStream.getTracks().forEach(track => track.stop());
-      this.micStream = null;
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => track.stop());
+      this.mediaStream = null;
     }
 
     if (this.waveformAnimationFrame) {
@@ -4129,12 +4131,22 @@ class CustomLobbiesApp {
     }
   }
 
-  async initMicMediaRecorder() {
-    const badge = document.getElementById('omegleMicStatusBadge');
+  async initCameraMediaStream() {
+    const badge = document.getElementById('omegleCamStatusBadge');
+    const userVideo = document.getElementById('omegleUserVideo');
+    const fallback = document.getElementById('omegleUserVideoFallback');
+
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        this.micStream = stream;
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: true });
+        this.mediaStream = stream;
+
+        if (userVideo) {
+          userVideo.srcObject = stream;
+          userVideo.style.display = 'block';
+        }
+        if (fallback) fallback.style.display = 'none';
+
         this.mediaRecorder = new MediaRecorder(stream);
 
         this.mediaRecorder.ondataavailable = (e) => {
@@ -4150,7 +4162,7 @@ class CustomLobbiesApp {
         };
 
         if (badge) {
-          badge.textContent = '🎙️ Mic Active & Verified';
+          badge.textContent = '📹 WebCam & Mic Active';
           badge.style.background = 'rgba(0, 230, 118, 0.2)';
           badge.style.color = '#00e676';
           badge.style.border = '1px solid #00e676';
@@ -4159,12 +4171,69 @@ class CustomLobbiesApp {
         throw new Error('MediaDevices unsupported');
       }
     } catch (e) {
+      if (userVideo) userVideo.style.display = 'none';
+      if (fallback) fallback.style.display = 'flex';
+
       if (badge) {
-        badge.textContent = '🎙️ Mic Standby (Audio Waveform Active)';
+        badge.textContent = '📹 WebCam Standby (Audio Visualizer Active)';
         badge.style.background = 'rgba(0, 242, 254, 0.2)';
         badge.style.color = 'var(--accent-cyan)';
         badge.style.border = '1px solid var(--accent-cyan)';
       }
+    }
+  }
+
+  toggleOmegleCamera() {
+    this.isCameraOn = !this.isCameraOn;
+    const btn = document.getElementById('btnToggleOmegleCamera');
+    const userVideo = document.getElementById('omegleUserVideo');
+    const fallback = document.getElementById('omegleUserVideoFallback');
+
+    if (this.mediaStream) {
+      const videoTracks = this.mediaStream.getVideoTracks();
+      videoTracks.forEach(track => track.enabled = this.isCameraOn);
+    }
+
+    if (btn) {
+      btn.textContent = this.isCameraOn ? '📹 Camera: ON' : '📷 Camera: OFF';
+      btn.classList.toggle('btn-cyan', this.isCameraOn);
+      btn.classList.toggle('btn-secondary', !this.isCameraOn);
+    }
+
+    if (userVideo && fallback) {
+      if (this.isCameraOn && this.mediaStream) {
+        userVideo.style.display = 'block';
+        fallback.style.display = 'none';
+      } else {
+        userVideo.style.display = 'none';
+        fallback.style.display = 'flex';
+      }
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+      window.widgetBuilderEngine.showToast(this.isCameraOn ? '📹 Camera Feed Enabled' : '📷 Camera Feed Disabled', 'info');
+    }
+  }
+
+  toggleOmegleMicMute() {
+    this.isMicMuted = !this.isMicMuted;
+    const btn = document.getElementById('btnToggleOmegleMic');
+
+    if (this.mediaStream) {
+      const audioTracks = this.mediaStream.getAudioTracks();
+      audioTracks.forEach(track => track.enabled = !this.isMicMuted);
+    }
+
+    if (btn) {
+      btn.textContent = this.isMicMuted ? '🔇 Mic: MUTED' : '🎙️ Mic: ON';
+      btn.classList.toggle('btn-cyan', !this.isMicMuted);
+      btn.classList.toggle('btn-danger', this.isMicMuted);
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+      window.widgetBuilderEngine.showToast(this.isMicMuted ? '🔇 Microphone Muted' : '🎙️ Microphone Unmuted', 'info');
     }
   }
 
@@ -4176,7 +4245,6 @@ class CustomLobbiesApp {
     const timerEl = document.getElementById('omegleTimerDisplay');
 
     if (!this.isRecordingMic) {
-      // Start Recording
       this.isRecordingMic = true;
       this.audioChunks = [];
       this.recTimerSeconds = 0;
@@ -4190,7 +4258,7 @@ class CustomLobbiesApp {
         btn.classList.add('btn-purple');
         btn.style.boxShadow = '0 0 25px rgba(168,85,247,0.7)';
       }
-      if (btnText) btnText.textContent = '⏹️ Stop & Post Audio Speech Clip';
+      if (btnText) btnText.textContent = '⏹️ Stop & Post Speech Clip';
       if (recDot) recDot.style.background = '#00e676';
       if (recStatus) {
         recStatus.textContent = '🔴 RECORDING LIVE... Speak your argument!';
@@ -4208,7 +4276,6 @@ class CustomLobbiesApp {
         window.widgetBuilderEngine.playSoundEffect('click');
       }
     } else {
-      // Stop Recording
       this.isRecordingMic = false;
       if (this.recTimerInterval) {
         clearInterval(this.recTimerInterval);
@@ -4218,7 +4285,6 @@ class CustomLobbiesApp {
       if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
         this.mediaRecorder.stop();
       } else {
-        // Fallback for environments without live mic stream
         this.postUserAudioClip('https://actions.google.com/sounds/v1/speech/person_talking.ogg');
       }
 
@@ -4227,7 +4293,7 @@ class CustomLobbiesApp {
         btn.classList.add('btn-danger');
         btn.style.boxShadow = '0 0 15px rgba(255,82,82,0.4)';
       }
-      if (btnText) btnText.textContent = '🔴 Record Mic Speech Clip';
+      if (btnText) btnText.textContent = '🔴 Record Speech Clip';
       if (recDot) recDot.style.background = '#fff';
       if (recStatus) {
         recStatus.textContent = '🎙️ Speech Clip Posted to Stage!';
@@ -4265,12 +4331,12 @@ class CustomLobbiesApp {
 
   connectOmeglePartner() {
     const partners = [
-      { name: 'Apex_Orator_99', elo: 1940, badge: '🎯 Debate Grandmaster' },
-      { name: 'Vortex_Scholar', elo: 1870, badge: '⚡ Logic Specialist' },
-      { name: 'Radiant_Debater', elo: 2050, badge: '👑 Radiant Orator' },
-      { name: 'Cypher_Tactician', elo: 1790, badge: '🛡️ Defense Analyst' },
-      { name: 'Titan_Speaker', elo: 1910, badge: '🗣️ Town Hall Champion' },
-      { name: 'Valkyrie_Arguer', elo: 1840, badge: '🔥 Firebrand' }
+      { name: 'Apex_Orator_99', elo: 1940, badge: '🎯 Debate Grandmaster', streamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-man-holding-a-video-call-on-his-laptop-40348-large.mp4' },
+      { name: 'Vortex_Scholar', elo: 1870, badge: '⚡ Logic Specialist', streamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-young-man-having-a-video-call-with-a-laptop-40346-large.mp4' },
+      { name: 'Radiant_Debater', elo: 2050, badge: '👑 Radiant Orator', streamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-young-woman-talking-on-a-video-call-on-laptop-40347-large.mp4' },
+      { name: 'Cypher_Tactician', elo: 1790, badge: '🛡️ Defense Analyst', streamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-woman-talking-on-a-video-call-with-a-laptop-40349-large.mp4' },
+      { name: 'Titan_Speaker', elo: 1910, badge: '🗣️ Town Hall Champion', streamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-man-holding-a-video-call-on-his-laptop-40348-large.mp4' },
+      { name: 'Valkyrie_Arguer', elo: 1840, badge: '🔥 Firebrand', streamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-young-woman-talking-on-a-video-call-on-laptop-40347-large.mp4' }
     ];
 
     const randomPartner = partners[Math.floor(Math.random() * partners.length)];
@@ -4278,12 +4344,21 @@ class CustomLobbiesApp {
     const eloEl = document.getElementById('omegleOpponentElo');
     const statusText = document.getElementById('omegleStatusText');
     const clipsContainer = document.getElementById('omegleOpponentAudioClips');
+    const oppVideo = document.getElementById('omegleOpponentVideo');
+    const oppFallback = document.getElementById('omegleOpponentVideoFallback');
 
     if (nameEl) nameEl.textContent = randomPartner.name;
-    if (eloEl) eloEl.textContent = `${randomPartner.elo} Orator ELO (${randomPartner.badge})`;
+    if (eloEl) eloEl.textContent = `${randomPartner.elo} ELO`;
     if (statusText) {
-      statusText.textContent = `⚡ Live connected to 1v1 Omegle partner ${randomPartner.name}! Record your mic speech or click NEXT to skip.`;
+      statusText.textContent = `⚡ Live connected to 1v1 Omegle video & mic partner ${randomPartner.name}! Record your speech clip or click NEXT to skip.`;
     }
+
+    if (oppVideo) {
+      oppVideo.src = randomPartner.streamUrl;
+      oppVideo.style.display = 'block';
+      oppVideo.play().catch(() => {});
+    }
+    if (oppFallback) oppFallback.style.display = 'none';
 
     if (clipsContainer) {
       clipsContainer.innerHTML = `
@@ -4300,11 +4375,15 @@ class CustomLobbiesApp {
     const eloEl = document.getElementById('omegleOpponentElo');
     const statusText = document.getElementById('omegleStatusText');
     const clipsContainer = document.getElementById('omegleOpponentAudioClips');
+    const oppVideo = document.getElementById('omegleOpponentVideo');
+    const oppFallback = document.getElementById('omegleOpponentVideoFallback');
 
-    if (nameEl) nameEl.textContent = '🔍 Queueing next Omegle orator...';
+    if (nameEl) nameEl.textContent = '🔍 Queueing next Omegle video partner...';
     if (eloEl) eloEl.textContent = 'Matching ELO rating...';
-    if (statusText) statusText.textContent = '⏳ Omegle Matchmaker searching for available 1v1 orator partner...';
-    if (clipsContainer) clipsContainer.innerHTML = '<div style="font-style: italic; color: var(--text-muted);">Searching for opponent mic stream...</div>';
+    if (statusText) statusText.textContent = '⏳ Omegle Matchmaker searching for available 1v1 video partner...';
+    if (oppVideo) oppVideo.style.display = 'none';
+    if (oppFallback) oppFallback.style.display = 'flex';
+    if (clipsContainer) clipsContainer.innerHTML = '<div style="font-style: italic; color: var(--text-muted);">Searching for opponent video & mic stream...</div>';
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('click');

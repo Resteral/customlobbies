@@ -3063,19 +3063,19 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem; flex-wrap: wrap; gap: 0.6rem;">
         <div style="display: flex; align-items: center; gap: 0.7rem;">
           <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #4facfe); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 15px rgba(0,242,254,0.5);">
-            🎙️
+            📹
           </div>
           <div>
             <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--accent-cyan); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-              <span>Omegle 1v1 Mic Debate Room</span>
-              <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); font-size: 0.72rem;">LIVE MIC PAIRING</span>
+              <span>Omegle 1v1 Video & Mic Debate Room</span>
+              <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); font-size: 0.72rem;">LIVE WEBCAM STREAM</span>
             </h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Omegle-Style Instant Orator Matching • Mic Audio Recording • Fast Re-Pairing</p>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Omegle-Style Instant Orator Matching • WebCam Stream • Speech Recording • Fast Re-Pairing</p>
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <span id="omegleMicStatusBadge" class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); font-weight: 800;">
-            🎙️ Mic Ready
+          <span id="omegleCamStatusBadge" class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); font-weight: 800;">
+            📹 WebCam Active
           </span>
           <button class="btn btn-secondary btn-sm" onclick="window.app.closeOmegleDebateModal()">✕ Exit Stage</button>
         </div>
@@ -3094,49 +3094,81 @@
         </button>
       </div>
 
-      <!-- 1v1 Podiums & Live Mic Visualizer Grid -->
+      <!-- 1v1 Podiums with 16:9 Video Viewports -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem;" class="responsive-grid-2">
         
-        <!-- PRO Speaker (You) -->
+        <!-- PRO Speaker (You Video Viewport) -->
         <div style="background: rgba(0, 242, 254, 0.05); border: 1.5px solid var(--accent-cyan); border-radius: 12px; padding: 1rem; text-align: center; position: relative;">
-          <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.25); color: var(--accent-cyan); font-weight: 900; margin-bottom: 0.6rem; border: 1px solid var(--accent-cyan);">
-            🔵 YOU (PRO / Affirmative)
-          </span>
-          <h4 id="omegleUserName" style="font-size: 1.15rem; font-weight: 900; color: #fff; margin: 0.4rem 0 0.1rem 0;">Sean (Host)</h4>
-          <div style="font-size: 0.78rem; color: var(--accent-gold); font-weight: 800; margin-bottom: 0.8rem;">1890 Orator ELO</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.25); color: var(--accent-cyan); font-weight: 900; border: 1px solid var(--accent-cyan);">
+              🔵 YOU (PRO / Affirmative)
+            </span>
+            <span class="lobby-game-tag" style="background: rgba(0,0,0,0.6); color: var(--accent-cyan); border: 1px solid var(--border-color); font-size: 0.7rem; font-family: monospace;">
+              📹 1080p WebRTC
+            </span>
+          </div>
+
+          <!-- Video Stream Container -->
+          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #080c14; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-cyan); margin-bottom: 0.8rem; box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);">
+            <video id="omegleUserVideo" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>
+            <!-- Fallback Cyber Avatar Overlay when Camera Off -->
+            <div id="omegleUserVideoFallback" style="display: none; position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,242,254,0.15) 0%, rgba(5,10,20,0.95) 100%); flex-direction: column; align-items: center; justify-content: center;">
+              <span style="font-size: 3rem; filter: drop-shadow(0 0 10px var(--accent-cyan));">👤</span>
+              <span style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 800; margin-top: 0.4rem;">Camera Off / Standby</span>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 800; color: #fff;">
+              <span id="omegleUserName">Sean (Host)</span> (1890 ELO)
+            </div>
+          </div>
 
           <!-- Waveform Canvas Visualizer for User Mic -->
-          <div style="background: rgba(0,0,0,0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; margin-bottom: 0.8rem; text-align: center;">
-            <canvas id="omegleUserWaveform" width="320" height="48" style="width: 100%; height: 48px; display: block; border-radius: 4px;"></canvas>
-            <div id="omegleUserRecStatus" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-top: 0.3rem;">
+          <div style="background: rgba(0,0,0,0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.4rem; margin-bottom: 0.8rem; text-align: center;">
+            <canvas id="omegleUserWaveform" width="320" height="36" style="width: 100%; height: 36px; display: block; border-radius: 4px;"></canvas>
+            <div id="omegleUserRecStatus" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-top: 0.2rem;">
               🎙️ Mic Standing By...
             </div>
           </div>
 
-          <!-- User Audio Clip Log Container -->
-          <div id="omegleUserAudioClips" style="max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.5rem; font-size: 0.8rem; color: var(--text-muted); text-align: left;">
+          <!-- User Audio/Video Clip Log Container -->
+          <div id="omegleUserAudioClips" style="max-height: 100px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.5rem; font-size: 0.8rem; color: var(--text-muted); text-align: left;">
             <div style="font-style: italic; color: var(--text-muted);">No speech clip recorded yet. Press 🔴 Record Speech to speak!</div>
           </div>
         </div>
 
-        <!-- CON Speaker (Random Omegle Opponent) -->
+        <!-- CON Speaker (Opponent Video Viewport) -->
         <div style="background: rgba(255, 82, 82, 0.05); border: 1.5px solid #ff5252; border-radius: 12px; padding: 1rem; text-align: center; position: relative;">
-          <span class="lobby-game-tag" style="background: rgba(255, 82, 82, 0.25); color: #ff5252; font-weight: 900; margin-bottom: 0.6rem; border: 1px solid #ff5252;">
-            🔴 OPPONENT (CON / Negative)
-          </span>
-          <h4 id="omegleOpponentName" style="font-size: 1.15rem; font-weight: 900; color: #fff; margin: 0.4rem 0 0.1rem 0;">Apex_Orator_99</h4>
-          <div id="omegleOpponentElo" style="font-size: 0.78rem; color: var(--accent-gold); font-weight: 800; margin-bottom: 0.8rem;">1940 Orator ELO</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <span class="lobby-game-tag" style="background: rgba(255, 82, 82, 0.25); color: #ff5252; font-weight: 900; border: 1px solid #ff5252;">
+              🔴 OPPONENT (CON / Negative)
+            </span>
+            <span class="lobby-game-tag" style="background: rgba(0,0,0,0.6); color: #ff5252; border: 1px solid var(--border-color); font-size: 0.7rem; font-family: monospace;">
+              📹 1080p WebRTC
+            </span>
+          </div>
+
+          <!-- Opponent Video Stream Container -->
+          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #0c0814; border-radius: 8px; overflow: hidden; border: 1px solid #ff5252; margin-bottom: 0.8rem; box-shadow: 0 0 15px rgba(255, 82, 82, 0.2);">
+            <video id="omegleOpponentVideo" autoplay playsinline loop style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>
+            <!-- Fallback Avatar Overlay when Opponent Video Loading -->
+            <div id="omegleOpponentVideoFallback" style="display: none; position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,82,82,0.15) 0%, rgba(15,5,10,0.95) 100%); flex-direction: column; align-items: center; justify-content: center;">
+              <span style="font-size: 3rem; filter: drop-shadow(0 0 10px #ff5252);">👾</span>
+              <span style="font-size: 0.8rem; color: #ff5252; font-weight: 800; margin-top: 0.4rem;">Opponent Stream Connecting...</span>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 800; color: #fff;">
+              <span id="omegleOpponentName">Apex_Orator_99</span> (<span id="omegleOpponentElo">1940 ELO</span>)
+            </div>
+          </div>
 
           <!-- Opponent Audio Waveform Visualizer -->
-          <div style="background: rgba(0,0,0,0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; margin-bottom: 0.8rem; text-align: center;">
-            <canvas id="omegleOpponentWaveform" width="320" height="48" style="width: 100%; height: 48px; display: block; border-radius: 4px;"></canvas>
-            <div id="omegleOpponentRecStatus" style="font-size: 0.75rem; color: #00e676; font-weight: 700; margin-top: 0.3rem;">
-              🔊 Opponent Mic Connected
+          <div style="background: rgba(0,0,0,0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.4rem; margin-bottom: 0.8rem; text-align: center;">
+            <canvas id="omegleOpponentWaveform" width="320" height="36" style="width: 100%; height: 36px; display: block; border-radius: 4px;"></canvas>
+            <div id="omegleOpponentRecStatus" style="font-size: 0.75rem; color: #00e676; font-weight: 700; margin-top: 0.2rem;">
+              🔊 Opponent Mic & Video Active
             </div>
           </div>
 
           <!-- Opponent Audio Clip Log Container -->
-          <div id="omegleOpponentAudioClips" style="max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.5rem; font-size: 0.8rem; color: var(--text-muted); text-align: left;">
+          <div id="omegleOpponentAudioClips" style="max-height: 100px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.5rem; font-size: 0.8rem; color: var(--text-muted); text-align: left;">
             <div style="margin-bottom: 0.4rem; padding: 0.4rem; background: rgba(255,82,82,0.1); border-radius: 4px; border: 1px solid rgba(255,82,82,0.2);">
               <div style="font-weight: 800; font-size: 0.75rem; color: #ff5252; margin-bottom: 0.2rem;">🎙️ Apex_Orator_99 (Opening Argument):</div>
               <audio controls style="width: 100%; height: 32px;" src="https://actions.google.com/sounds/v1/speech/person_talking.ogg"></audio>
@@ -3146,24 +3178,36 @@
 
       </div>
 
-      <!-- Live Mic Recording Controls Bar -->
-      <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
+      <!-- Live Media Controls Bar (Camera, Mic, Recording, Skip) -->
+      <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.9rem 1.2rem; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
+        
+        <!-- Camera & Mic Toggle Buttons -->
         <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <button id="btnOmegleRecord" class="btn btn-danger" onclick="window.app.toggleOmegleRecording()" style="padding: 0.65rem 1.4rem; font-size: 0.95rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 0 15px rgba(255,82,82,0.4);">
-            <span id="recDotIcon" style="width: 12px; height: 12px; border-radius: 50%; background: #fff; display: inline-block;"></span>
-            <span id="recBtnText">🔴 Record Mic Speech Clip</span>
+          <button id="btnToggleOmegleCamera" class="btn btn-cyan btn-sm" onclick="window.app.toggleOmegleCamera()" style="font-weight: 800; padding: 0.5rem 0.9rem;">
+            📹 Camera: ON
           </button>
-          <span id="omegleTimerDisplay" style="font-family: monospace; font-size: 1.1rem; font-weight: 900; color: var(--accent-cyan); background: rgba(0,0,0,0.6); padding: 0.5rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color);">
+          <button id="btnToggleOmegleMic" class="btn btn-cyan btn-sm" onclick="window.app.toggleOmegleMicMute()" style="font-weight: 800; padding: 0.5rem 0.9rem;">
+            🎙️ Mic: ON
+          </button>
+        </div>
+
+        <!-- Recording & Timer Controls -->
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <button id="btnOmegleRecord" class="btn btn-danger" onclick="window.app.toggleOmegleRecording()" style="padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 0 15px rgba(255,82,82,0.4);">
+            <span id="recDotIcon" style="width: 12px; height: 12px; border-radius: 50%; background: #fff; display: inline-block;"></span>
+            <span id="recBtnText">🔴 Record Speech Clip</span>
+          </button>
+          <span id="omegleTimerDisplay" style="font-family: monospace; font-size: 1.1rem; font-weight: 900; color: var(--accent-cyan); background: rgba(0,0,0,0.6); padding: 0.4rem 0.7rem; border-radius: 6px; border: 1px solid var(--border-color);">
             00:00
           </span>
         </div>
 
         <!-- Omegle Fast Controls: NEXT / SKIP OPPONENT -->
         <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <button class="btn btn-cyan" onclick="window.app.skipOmeglePartner()" style="padding: 0.65rem 1.4rem; font-size: 0.95rem; font-weight: 900; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; border: none; box-shadow: 0 0 20px rgba(0,242,254,0.4);">
+          <button class="btn btn-cyan" onclick="window.app.skipOmeglePartner()" style="padding: 0.6rem 1.3rem; font-size: 0.92rem; font-weight: 900; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; border: none; box-shadow: 0 0 20px rgba(0,242,254,0.4);">
             ⏭️ NEXT / SKIP OPPONENT
           </button>
-          <button class="btn btn-secondary" onclick="window.app.closeOmegleDebateModal()" style="padding: 0.65rem 1rem; font-size: 0.88rem;">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.closeOmegleDebateModal()" style="padding: 0.5rem 0.8rem; font-size: 0.85rem;">
             🛑 Disconnect
           </button>
         </div>
