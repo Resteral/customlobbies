@@ -1626,13 +1626,35 @@
         <div style="display: grid; grid-template-columns: 2fr 1.5fr 1fr; gap: 1rem; margin-bottom: 1.25rem;" class="responsive-grid-3">
           <!-- Topic Picker -->
           <div class="input-group" style="margin: 0;">
-            <label class="input-label">Select Debate Topic / Category</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="input-label" style="margin: 0;">Select Debate Topic / Category</label>
+              <button type="button" class="btn btn-purple btn-sm" onclick="window.app.pickRandomDebateTopic('debateQueueTopic')" style="padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 4px;" title="Pick a Random Debate Topic">
+                🎲 Pick Random Question
+              </button>
+            </div>
             <select class="input-field" id="debateQueueTopic">
               <option value="Is Controller Aim Assist Overpowered in Competitive Shooters?" selected>🎮 Is Controller Aim Assist Overpowered in Competitive Shooters?</option>
               <option value="Will AI Companions Replace Human Teammates in Esports by 2030?">🤖 Will AI Companions Replace Human Teammates in Esports by 2030?</option>
               <option value="Should In-Game Skins Have Real-Money Cash Tradeability?">💰 Should In-Game Skins Have Real-Money Cash Tradeability?</option>
               <option value="Is PC Superior to Next-Gen Consoles for Professional Esports?">🏆 Is PC Superior to Next-Gen Consoles for Professional Esports?</option>
               <option value="Are 33v33 WARDOG Battles Superior to 5v5 Arena Shooters?">⚔️ Are 33v33 WARDOG Battles Superior to 5v5 Arena Shooters?</option>
+              <option value="Should Tactical Shooters Ban Instant Headshot One-Tap Mechanics?">🎯 Should Tactical Shooters Ban Instant Headshot One-Tap Mechanics?</option>
+              <option value="Is Regional Server Locking Necessary to Prevent High Ping Advantages?">🌐 Is Regional Server Locking Necessary to Prevent High Ping Advantages?</option>
+              <option value="Should Pay-to-Win Mechanics in Free-to-Play Games Be Legally Banned?">🚫 Should Pay-to-Win Mechanics in Free-to-Play Games Be Legally Banned?</option>
+              <option value="Are Fighting Game Hitboxes Too Lenient in Modern Fighting Titles?">🥊 Are Fighting Game Hitboxes Too Lenient in Modern Fighting Titles?</option>
+              <option value="Does 240Hz+ High Refresh Rate Provide an Unfair Pay-to-Win Advantage?">⚡ Does 240Hz+ High Refresh Rate Provide an Unfair Pay-to-Win Advantage?</option>
+              <option value="Is Battle Royale RNG Inherently Inferior to Round-Based Tactical FPS?">🧠 Is Battle Royale RNG Inherently Inferior to Round-Based Tactical FPS?</option>
+              <option value="Should Kernel-Level Anti-Cheat Drivers Be Mandatory for Ranked Play?">🛡️ Should Kernel-Level Anti-Cheat Drivers Be Mandatory for Ranked Play?</option>
+              <option value="Is Movement Tech (Bunny Hopping, Tap Strafing) Skill or Exploit?">🕹️ Is Movement Tech (Bunny Hopping, Tap Strafing) Skill or Exploit?</option>
+              <option value="Should Esports Leagues Institute Hard Salary Caps for Rosters?">📺 Should Esports Leagues Institute Hard Salary Caps for Rosters?</option>
+              <option value="Should Neural-Network AI Bots Be Allowed to Train Pros in Scrims?">🤖 Should Neural-Network AI Bots Be Allowed to Train Pros in Scrims?</option>
+              <option value="Is Loot Box Gacha Gambling Harmful to Video Game Ecosystems?">🎒 Is Loot Box Gacha Gambling Harmful to Video Game Ecosystems?</option>
+              <option value="Are Open-World MMOs Superior to Instanced Session Lobbies?">🏰 Are Open-World MMOs Superior to Instanced Session Lobbies?</option>
+              <option value="Does Spatial 3D Audio Give Sound-Engine Whales Unmatched Advantage?">🎧 Does Spatial 3D Audio Give Sound-Engine Whales Unmatched Advantage?</option>
+              <option value="Should Franchise Leagues Replace Open Open-Qualifier Ecosystems?">🥇 Should Franchise Leagues Replace Open Open-Qualifier Ecosystems?</option>
+              <option value="Is Cloud Gaming Streaming Capable of Supporting 128-Tick Esports Play by 2028?">🚀 Is Cloud Gaming Streaming Capable of Supporting 128-Tick Esports Play by 2028?</option>
+              <option value="Should Smurfing in Low-Ranked Play Be Punished with Hardware-ID Bans?">⚖️ Should Smurfing in Low-Ranked Play Be Punished with Hardware-ID Bans?</option>
+              <option value="Is Cross-Platform Play Damaging the Competitive Integrity of PC Shooters?">🧩 Is Cross-Platform Play Damaging the Competitive Integrity of PC Shooters?</option>
             </select>
           </div>
 
@@ -2982,7 +3004,12 @@
       </div>
 
       <div class="input-group">
-        <label class="input-label">Debate Motion / Topic Title</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <label class="input-label" style="margin: 0;">Debate Motion / Topic Title</label>
+          <button type="button" class="btn btn-purple btn-sm" onclick="window.app.pickRandomDebateTopic('modalDebateTopic')" style="padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 4px;" title="Pick a Random Debate Topic">
+            🎲 Pick Random Topic
+          </button>
+        </div>
         <input type="text" class="input-field" id="modalDebateTopic" value="Is Controller Aim Assist Overpowered in Competitive Shooters?">
       </div>
 

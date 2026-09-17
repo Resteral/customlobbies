@@ -3869,6 +3869,49 @@ class CustomLobbiesApp {
     this.debateSiding = 'PRO';
     this.activeDebateFilter = 'all';
 
+    this.masterDebateTopics = [
+      { topic: "Is Controller Aim Assist Overpowered in Competitive Shooters?", category: "Gaming Meta" },
+      { topic: "Will AI Companions Replace Human Teammates in Esports by 2030?", category: "Tech & AI" },
+      { topic: "Should In-Game Skins Have Real-Money Cash Tradeability?", category: "Gaming Economy" },
+      { topic: "Is PC Superior to Next-Gen Consoles for Professional Esports?", category: "Esports Formats" },
+      { topic: "Are 33v33 WARDOG Battles Superior to 5v5 Arena Shooters?", category: "Gaming Meta" },
+      { topic: "Should Tactical Shooters Ban Instant Headshot One-Tap Mechanics?", category: "Gaming Meta" },
+      { topic: "Is Regional Server Locking Necessary to Prevent High Ping Advantages?", category: "Esports Formats" },
+      { topic: "Should Pay-to-Win Mechanics in Free-to-Play Games Be Legally Banned?", category: "Gaming Economy" },
+      { topic: "Are Fighting Game Hitboxes Too Lenient in Modern Fighting Titles?", category: "Gaming Meta" },
+      { topic: "Does 240Hz+ High Refresh Rate Provide an Unfair Pay-to-Win Advantage?", category: "Gaming Meta" },
+      { topic: "Is Battle Royale RNG Inherently Inferior to Round-Based Tactical FPS?", category: "Esports Formats" },
+      { topic: "Should Kernel-Level Anti-Cheat Drivers Be Mandatory for Ranked Play?", category: "Tech & AI" },
+      { topic: "Is Movement Tech (Bunny Hopping, Tap Strafing) Skill or Exploit?", category: "Gaming Meta" },
+      { topic: "Should Esports Leagues Institute Hard Salary Caps for Rosters?", category: "Esports Formats" },
+      { topic: "Should Neural-Network AI Bots Be Allowed to Train Pros in Scrims?", category: "Tech & AI" },
+      { topic: "Is Loot Box Gacha Gambling Harmful to Video Game Ecosystems?", category: "Gaming Economy" },
+      { topic: "Are Open-World MMOs Superior to Instanced Session Lobbies?", category: "Gaming Meta" },
+      { topic: "Does Spatial 3D Audio Give Sound-Engine Whales Unmatched Advantage?", category: "Gaming Meta" },
+      { topic: "Should Franchise Leagues Replace Open Open-Qualifier Ecosystems?", category: "Esports Formats" },
+      { topic: "Is Cloud Gaming Streaming Capable of Supporting 128-Tick Esports Play by 2028?", category: "Tech & AI" },
+      { topic: "Should Smurfing in Low-Ranked Play Be Punished with Hardware-ID Bans?", category: "Esports Formats" },
+      { topic: "Is Cross-Platform Play Damaging the Competitive Integrity of PC Shooters?", category: "Gaming Meta" }
+    ];
+
+    this.masterJuryQuestions = [
+      "How do you reconcile rotational aim-tracking assistance with physical human reaction limits in CQC duels?",
+      "If financial skin trading is legalized, what safeguards prevent fraud and money laundering in player marketplaces?",
+      "Does frame-rate cap standardization equalize competitive advantage between entry-level and enthusiast rigs?",
+      "Where is the definitive boundary between permissible QoL keybind macros and illegal automated scripting?",
+      "If AI companions reach Radiant/Global Elite rank, how can tournament organizers verify human input integrity?",
+      "Doesn't kernel-level anti-cheat telemetry represent an unacceptable privacy risk for casual PC players?",
+      "How can battle royale tournaments maintain competitive fairness when circle RNG dictates late-game positioning?",
+      "If movement exploits like tap-strafing are preserved, does it unfairly exclude casual console players from cross-play?",
+      "Should salary caps in esports protect org sustainability or allow top talent to maximize market value?",
+      "If hardware-ID bans are enforced for smurfing, how do LAN centers and shared family PCs handle false positives?",
+      "Does instant one-tap TTK reward tactical crosshair placement or punish strategic utility usage?",
+      "Are open-qualifier esports ecosystems healthier for organic grass-roots talent than closed franchise leagues?",
+      "If cloud streaming adds 15ms latency, can speculative input prediction bridge the gap in 128-tick shooters?",
+      "Does spatial audio height-cue ambiguity necessitate standardized 7.1 surround profiles in pro tournaments?",
+      "Should game developers balance mechanics based on top 0.1% esports pros or the 99.9% casual player base?"
+    ];
+
     const savedDebates = localStorage.getItem('cl_debate_lobbies_v1');
     if (savedDebates) {
       try {
@@ -3981,6 +4024,58 @@ class CustomLobbiesApp {
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('click');
+    }
+  }
+
+  pickRandomDebateTopic(targetId = 'debateQueueTopic') {
+    if (!this.masterDebateTopics || this.masterDebateTopics.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * this.masterDebateTopics.length);
+    const selected = this.masterDebateTopics[randomIndex];
+
+    const targetEl = document.getElementById(targetId);
+    if (targetEl) {
+      if (targetEl.tagName === 'SELECT') {
+        let foundOption = Array.from(targetEl.options).find(opt => opt.value === selected.topic || opt.value.includes(selected.topic));
+        if (foundOption) {
+          targetEl.value = foundOption.value;
+        } else {
+          targetEl.selectedIndex = randomIndex % targetEl.options.length;
+        }
+      } else if (targetEl.tagName === 'INPUT') {
+        targetEl.value = selected.topic;
+      }
+    }
+
+    if (targetId !== 'modalDebateTopic') {
+      const modalTopicInput = document.getElementById('modalDebateTopic');
+      if (modalTopicInput) modalTopicInput.value = selected.topic;
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+      window.widgetBuilderEngine.showToast(`🎲 Picked Random Topic: "${selected.topic.slice(0, 45)}..."`, 'info');
+    }
+  }
+
+  generateRandomJuryQuestion(debateId) {
+    if (!this.masterJuryQuestions || this.masterJuryQuestions.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * this.masterJuryQuestions.length);
+    const question = this.masterJuryQuestions[randomIndex];
+
+    const displayEl = document.getElementById(`juryQuestionDisplay_${debateId}`);
+    if (displayEl) {
+      displayEl.style.transition = 'all 0.3s ease';
+      displayEl.style.opacity = '0.3';
+      setTimeout(() => {
+        displayEl.innerHTML = `<strong>❓ Jury Question #${randomIndex + 1}:</strong> "${question}"`;
+        displayEl.style.opacity = '1';
+        displayEl.style.borderColor = 'var(--accent-cyan)';
+      }, 150);
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+      window.widgetBuilderEngine.showToast('❓ Generated New Jury Cross-Examination Question!', 'success');
     }
   }
 
@@ -4185,6 +4280,21 @@ class CustomLobbiesApp {
             <div style="background: rgba(0,0,0,0.4); border-radius: 6px; padding: 0.6rem; font-size: 0.8rem; color: var(--text-muted); font-style: italic; min-height: 60px; text-align: left;">
               "Analogs lack arm-length precision, recoil control ranges, and keybind flexibility; friction slowdown compensates for inferior mechanical hardware input."
             </div>
+          </div>
+        </div>
+
+        <!-- Jury Cross-Examination Prompt Generator Card -->
+        <div style="background: rgba(168, 85, 247, 0.08); border: 1px dashed var(--accent-purple); border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="font-weight: 900; font-size: 0.88rem; color: #d8b4fe; display: flex; align-items: center; gap: 0.4rem;">
+              <span>❓</span> Jury Cross-Examination Prompt Generator
+            </div>
+            <button class="btn btn-purple btn-sm" onclick="window.app.generateRandomJuryQuestion('${debate.id}')" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
+              🎲 Random Jury Question
+            </button>
+          </div>
+          <div id="juryQuestionDisplay_${debate.id}" style="background: rgba(0, 0, 0, 0.4); padding: 0.7rem; border-radius: 6px; font-size: 0.84rem; color: var(--accent-cyan); font-style: italic; border-left: 3px solid var(--accent-purple);">
+            Click "Random Jury Question" to generate sharp cross-examination questions for PRO and CON speakers!
           </div>
         </div>
 
