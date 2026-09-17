@@ -2517,10 +2517,21 @@ class CustomLobbiesApp {
 
   initAuthSession() {
     try {
-      const savedUser = localStorage.getItem('cl_auth_user');
-      if (savedUser) {
-        this.user = JSON.parse(savedUser);
-        this.updateUserAuthUI();
+      if (window.authBackend) {
+        const val = window.authBackend.validateJWT();
+        if (val.valid) {
+          const savedUser = localStorage.getItem('cl_auth_user');
+          if (savedUser) {
+            this.user = JSON.parse(savedUser);
+            this.updateUserAuthUI();
+          }
+        }
+      } else {
+        const savedUser = localStorage.getItem('cl_auth_user');
+        if (savedUser) {
+          this.user = JSON.parse(savedUser);
+          this.updateUserAuthUI();
+        }
       }
     } catch (err) {
       console.warn('Auth session load fallback:', err);
@@ -2561,99 +2572,157 @@ class CustomLobbiesApp {
     }
   }
 
-  handleEmailSignIn() {
+  async handleEmailSignIn() {
     const usernameInput = document.getElementById('signInUsername');
-    const username = usernameInput ? usernameInput.value.trim() : 'Gamer';
+    const passwordInput = document.getElementById('signInPassword');
+
+    const username = usernameInput ? usernameInput.value.trim() : 'Sean';
+    const password = passwordInput ? passwordInput.value : 'password123';
+
     if (!username) return;
 
     if (this.user) {
-      // Toggle Sign Out if already logged in
       this.signOutUser();
       return;
     }
 
-    this.user = {
-      username: username,
-      displayName: username,
-      email: `${username.toLowerCase()}@customlobbies.com`,
-      elo: 1840,
-      level: 8,
-      title: '💎 Diamond Veteran',
-      avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
-      acVerified: true,
-      provider: 'email'
-    };
+    if (window.authBackend) {
+      const res = await window.authBackend.authenticateUser(username, password);
+      if (!res.success) {
+        alert(res.error);
+        return;
+      }
 
-    localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
-    this.updateUserAuthUI();
-    this.closeAuthModal();
+      if (res.requires2FA) {
+        this.pending2FAUser = res.user;
+        this.open2FAModal(res.otpCodeHint);
+        return;
+      }
 
-    if (window.firebaseGoogleEngine && typeof window.firebaseGoogleEngine.speakTextAlert === 'function') {
-      window.firebaseGoogleEngine.speakTextAlert(`Welcome back ${this.user.displayName}`);
+      this.user = res.user;
+      localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+      this.updateUserAuthUI();
+      this.closeAuthModal();
+
+      if (window.firebaseGoogleEngine && typeof window.firebaseGoogleEngine.speakTextAlert === 'function') {
+        window.firebaseGoogleEngine.speakTextAlert(`Welcome back ${this.user.displayName}`);
+      }
+
+      alert(`🎉 SIGN IN SUCCESSFUL (JWT SIGNED & VERIFIED)!\n\nWelcome back, ${this.user.displayName}!\nJWT Token Issued • Ring 0 Guardian Anti-Cheat Active.`);
+    } else {
+      this.user = {
+        username: username,
+        displayName: username,
+        email: `${username.toLowerCase()}@customlobbies.com`,
+        elo: 1840,
+        level: 8,
+        title: '💎 Diamond Veteran',
+        avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
+        acVerified: true,
+        provider: 'email'
+      };
+
+      localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+      this.updateUserAuthUI();
+      this.closeAuthModal();
+
+      alert(`🎉 SIGN IN SUCCESSFUL!\n\nWelcome back, ${this.user.displayName}!`);
     }
-
-    alert(`🎉 SIGN IN SUCCESSFUL!\n\nWelcome back, ${this.user.displayName}!\nGuardian Kernel Anti-Cheat Active. 128-tick server node access unlocked.`);
   }
 
-  handleUserRegistration() {
+  async handleUserRegistration() {
     const usernameInput = document.getElementById('regUsername');
     const emailInput = document.getElementById('regEmail');
+    const passwordInput = document.getElementById('regPassword');
     const primaryGameSelect = document.getElementById('regPrimaryGame');
 
     const username = usernameInput ? usernameInput.value.trim() : 'Recruit';
     const email = emailInput ? emailInput.value.trim() : 'recruit@customlobbies.com';
+    const password = passwordInput ? passwordInput.value : 'password123';
     const primaryGame = primaryGameSelect ? primaryGameSelect.value : 'Counter-Strike 2';
 
     if (!username || !email) return;
 
-    this.user = {
-      username: username,
-      displayName: username,
-      email: email,
-      primaryGame: primaryGame,
-      elo: 1200,
-      level: 1,
-      title: '🌟 Verified Recruit',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
-      acVerified: true,
-      provider: 'registration'
-    };
+    if (window.authBackend) {
+      const res = await window.authBackend.registerUser({ username, email, password, primaryGame });
+      if (!res.success) {
+        alert(res.error);
+        return;
+      }
 
-    localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
-    this.updateUserAuthUI();
-    this.closeAuthModal();
+      this.user = res.user;
+      localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+      this.updateUserAuthUI();
+      this.closeAuthModal();
 
-    alert(`✨ ACCOUNT CREATED SUCCESSFULLY!\n\nWelcome to CustomLobbies, ${this.user.displayName}!\nRanked Placement Matches unlocked for ${primaryGame}.`);
+      alert(`✨ VERIFIED ACCOUNT CREATED!\n\nWelcome to CustomLobbies, ${this.user.displayName}!\nPassword hashed via WebCrypto SHA-256 + Salt • JWT Token Issued.`);
+    }
   }
 
   handleOAuthSignIn(provider) {
-    const providerNames = {
-      google: 'Google Cloud Auth',
-      steam: 'Steam Community OAuth',
-      discord: 'Discord OAuth2',
-      twitch: 'Twitch Streamer Profile',
-      riot: 'Riot Games ID'
-    };
+    if (window.authBackend) {
+      const res = window.authBackend.processOAuthLogin(provider);
+      if (res.success) {
+        this.user = res.user;
+        localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+        this.updateUserAuthUI();
+        this.closeAuthModal();
 
-    const provName = providerNames[provider] || provider;
+        alert(`🎮 LINKED WITH ${provider.toUpperCase()}!\n\nSigned in as ${this.user.displayName}.\nOAuth 2.0 Identity Verified & JWT Token Issued!`);
+      }
+    }
+  }
 
-    this.user = {
-      username: `Sean_${provider.toUpperCase()}`,
-      displayName: `Sean (${provider.charAt(0).toUpperCase() + provider.slice(1)} Verified)`,
-      email: `sean.${provider}@customlobbies.com`,
-      elo: 1840,
-      level: 17,
-      title: '👑 Grandmaster Captain',
-      avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
-      acVerified: true,
-      provider: provider
-    };
+  open2FAModal(hintCode) {
+    const modal = document.getElementById('twoFactorAuthModal');
+    const hint = document.getElementById('twoFactorOtpHint');
+    const input = document.getElementById('twoFactorOtpInput');
 
-    localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
-    this.updateUserAuthUI();
-    this.closeAuthModal();
+    if (hint) hint.textContent = hintCode || '123456';
+    if (input) input.value = '';
+    if (modal) modal.classList.add('active');
+  }
 
-    alert(`🎮 LINKED WITH ${provName.toUpperCase()}!\n\nSigned in as ${this.user.displayName}.\nYour competitive stats and badge rankings are active!`);
+  close2FAModal() {
+    const modal = document.getElementById('twoFactorAuthModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  submit2FAVerification() {
+    const input = document.getElementById('twoFactorOtpInput');
+    const code = input ? input.value.trim() : '123456';
+
+    if (window.authBackend) {
+      const valid = window.authBackend.verify2FAOTP(code);
+      if (!valid) {
+        alert('❌ INVALID 2FA CODE!\n\nPlease enter a 6-digit numeric OTP code.');
+        return;
+      }
+
+      this.user = this.pending2FAUser || {
+        username: 'Sean',
+        displayName: 'Sean',
+        email: 'sean@customlobbies.com',
+        elo: 1840,
+        level: 8,
+        title: '💎 Diamond Veteran',
+        avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
+        acVerified: true
+      };
+
+      window.authBackend.generateJWT(this.user);
+      localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+
+      this.updateUserAuthUI();
+      this.close2FAModal();
+      this.closeAuthModal();
+
+      if (window.widgetBuilderEngine && typeof window.widgetBuilderEngine.playSoundEffect === 'function') {
+        window.widgetBuilderEngine.playSoundEffect('fanfare');
+      }
+
+      alert(`🔒 2FA VERIFICATION SUCCESSFUL!\n\nWelcome back, ${this.user.displayName}!\n2FA Verified • Bearer JWT Authorized.`);
+    }
   }
 
   signOutUser() {

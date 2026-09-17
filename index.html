@@ -1870,6 +1870,30 @@
     </div>
   </div>
 
+  <!-- TWO-FACTOR AUTHENTICATION (2FA) OTP MODAL -->
+  <div class="modal-overlay" id="twoFactorAuthModal">
+    <div class="modal-card" style="max-width: 480px; border-color: var(--accent-gold); text-align: center;">
+      <div style="margin-bottom: 1rem;">
+        <span style="font-size: 2.4rem;">🔒</span>
+        <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--accent-gold); margin: 0.4rem 0 0.2rem 0;">Two-Factor Authentication (2FA)</h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">Enter 6-digit TOTP security code dispatched to your registered authenticator app</p>
+      </div>
+
+      <div style="background: rgba(255, 215, 0, 0.1); border: 1px dashed var(--accent-gold); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.25rem;">
+        <span style="font-size: 0.78rem; color: var(--accent-gold); font-weight: 800;">🔑 TEST OTP HINT: <code id="twoFactorOtpHint" style="font-size: 1.1rem; color: #fff; background: rgba(0,0,0,0.5); padding: 0.2rem 0.5rem; border-radius: 4px;">123456</code></span>
+      </div>
+
+      <div class="auth-input-group" style="margin-bottom: 1.25rem;">
+        <input type="text" id="twoFactorOtpInput" class="auth-input" placeholder="0 0 0 0 0 0" maxlength="6" style="font-size: 1.4rem; letter-spacing: 0.5rem; text-align: center; font-family: monospace; font-weight: 900;">
+      </div>
+
+      <div style="display: flex; gap: 0.8rem;">
+        <button class="btn btn-secondary" onclick="window.app.close2FAModal()" style="flex: 1;">Cancel</button>
+        <button class="btn btn-gold" onclick="window.app.submit2FAVerification()" style="flex: 1;">Verify & Authorize JWT 🔒</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Sign-Up Matchmaking Queue Selection Modal -->
   <div class="modal-overlay" id="signUpQueueModal">
     <div class="modal-card" style="border-color: var(--accent-cyan); max-width: 650px;">
@@ -3278,6 +3302,7 @@
   <script src="js/leagues-engine.js"></script>
   <script src="js/wardogs-engine.js"></script>
   <script src="js/matchmaking-hub.js"></script>
+  <script src="js/auth-backend.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
