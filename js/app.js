@@ -4329,6 +4329,22 @@ class CustomLobbiesApp {
     container.prepend(clipDiv);
   }
 
+  triggerOmegleReaction(emoji, label) {
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect(label.includes('Mic Drop') ? 'fanfare' : 'click');
+      window.widgetBuilderEngine.showToast(`${emoji} ${label} broadcasted to 1v1 Omegle stage!`, 'success');
+    }
+
+    const statusText = document.getElementById('omegleStatusText');
+    if (statusText) {
+      const orig = statusText.textContent;
+      statusText.textContent = `${emoji} REACTION: ${label}! (${orig})`;
+      setTimeout(() => {
+        if (statusText) statusText.textContent = orig;
+      }, 2500);
+    }
+  }
+
   connectOmeglePartner() {
     const partners = [
       { name: 'Apex_Orator_99', elo: 1940, badge: '🎯 Debate Grandmaster', streamUrl: 'https://assets.mixkit.co/videos/preview/mixkit-man-holding-a-video-call-on-his-laptop-40348-large.mp4' },

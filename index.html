@@ -3255,6 +3255,27 @@
         </div>
       </div>
 
+      <!-- Soundboard & Live Reaction Bar -->
+      <div style="background: rgba(168, 85, 247, 0.08); border: 1px dashed var(--accent-purple); border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem;">
+        <div style="font-weight: 900; font-size: 0.85rem; color: #d8b4fe; display: flex; align-items: center; gap: 0.4rem;">
+          <span>🔊</span> Live Orator Soundboard & Reactions:
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="window.app.triggerOmegleReaction('👏', 'Applause!')" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">
+            👏 Applause
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.triggerOmegleReaction('🔔', 'Order in the Court!')" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">
+            🔔 Order!
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="window.app.triggerOmegleReaction('🎉', 'Cheering Crowd!')" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">
+            🎉 Cheering
+          </button>
+          <button class="btn btn-purple btn-sm" onclick="window.app.triggerOmegleReaction('💥', 'MIC DROP!')" style="font-size: 0.78rem; padding: 0.3rem 0.6rem; font-weight: 900;">
+            💥 Mic Drop
+          </button>
+        </div>
+      </div>
+
       <!-- Omegle Live Queue Matchmaking Status Footer -->
       <div id="omegleStatusLog" style="background: rgba(0, 242, 254, 0.08); border: 1px dashed var(--accent-cyan); border-radius: 8px; padding: 0.7rem 1rem; font-size: 0.84rem; color: #d8b4fe; display: flex; justify-content: space-between; align-items: center;">
         <span id="omegleStatusText">⚡ Live connected to 1v1 Omegle orator partner Apex_Orator_99! Record your speech clip or click NEXT to pair with a new opponent.</span>
