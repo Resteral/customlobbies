@@ -833,15 +833,28 @@
         </div>
 
         <!-- 3. Main Chat Panel -->
-        <div class="chat-main-panel">
+        <div class="chat-main-panel" id="chatMainPanelContainer">
           <div class="chat-header">
             <div style="display: flex; align-items: center; gap: 0.6rem;">
               <span style="font-size: 1.2rem; font-weight: 800; color: var(--accent-cyan);" id="currentChannelHeader"># general</span>
               <span style="font-size: 0.85rem; color: var(--text-muted);" id="currentChannelTopic">General community chat & CustomLobbies discussion</span>
             </div>
-            <button class="btn btn-purple btn-sm" id="btnHeaderOpenStickers" onclick="window.chatVoiceManager.toggleStickerDrawer()">
-              <span>✨</span> Sticker Palette
-            </button>
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
+              <button class="btn btn-secondary btn-sm" id="btnOpenChatCustomizer" onclick="window.chatVoiceManager.toggleChatCustomizerModal()" title="Customize Chat Wallpapers & Skins">
+                <span>🎨</span> Theme
+              </button>
+              <button class="btn btn-purple btn-sm" id="btnToggleInChatGames" onclick="window.chatVoiceManager.toggleChatMiniGameStage()" title="Play In-Chat Games">
+                <span>🎮</span> Play Games
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnHeaderOpenStickers" onclick="window.chatVoiceManager.toggleStickerDrawer()" title="Stickers & Emotes">
+                <span>✨</span> Stickers
+              </button>
+            </div>
+          </div>
+
+          <!-- Playable In-Chat Mini-Games Stage -->
+          <div id="chatMiniGameStage" class="chat-mini-game-stage" style="display: none;">
+            <!-- Game UI Injected dynamically via chat-voice.js -->
           </div>
 
           <div class="chat-messages-container" id="chatMessagesBox">
@@ -3594,9 +3607,42 @@
         <button class="btn btn-secondary btn-sm" id="btnCloseStickerDrawer">❌ Close</button>
       </div>
 
-      <!-- Sticker Grid -->
-      <div id="stickerPaletteGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 0.8rem; max-height: 380px; overflow-y: auto; padding: 0.4rem; margin-bottom: 1rem;">
-        <!-- Injected via chat-voice.js -->
+  <!-- IN-CHAT CUSTOMIZER & WALLPAPER THEME MODAL -->
+  <div class="modal-overlay" id="chatCustomizerModal">
+    <div class="modal-card" style="max-width: 600px; width: 92%; border-color: var(--accent-purple);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.6rem;">🎨</span>
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 900; color: var(--accent-purple); margin: 0;">Customize Chat Screen & Wallpapers</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Pick custom background skins and wallpaper overlays for your chatbox window</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.chatVoiceManager.toggleChatCustomizerModal()">❌ Close</button>
+      </div>
+
+      <div style="margin-bottom: 1.2rem;">
+        <h4 style="font-size: 0.9rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 0.8rem;">🌌 Chat Background Wallpaper Skins</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.8rem;">
+          <button class="btn btn-secondary chat-theme-select-btn active" data-theme-btn="cyber" onclick="window.chatVoiceManager.setChatTheme('cyber')">
+            <span>🌌</span> Cyber Neon
+          </button>
+          <button class="btn btn-secondary chat-theme-select-btn" data-theme-btn="dragon" onclick="window.chatVoiceManager.setChatTheme('dragon')">
+            <span>🔥</span> Dragon Fire
+          </button>
+          <button class="btn btn-secondary chat-theme-select-btn" data-theme-btn="matrix" onclick="window.chatVoiceManager.setChatTheme('matrix')">
+            <span>⚡</span> Matrix Rain
+          </button>
+          <button class="btn btn-secondary chat-theme-select-btn" data-theme-btn="arcade" onclick="window.chatVoiceManager.setChatTheme('arcade')">
+            <span>👾</span> Retro Arcade
+          </button>
+          <button class="btn btn-secondary chat-theme-select-btn" data-theme-btn="gold" onclick="window.chatVoiceManager.setChatTheme('gold')">
+            <span>🏆</span> CS2 Premier Gold
+          </button>
+          <button class="btn btn-secondary chat-theme-select-btn" data-theme-btn="wardog" onclick="window.chatVoiceManager.setChatTheme('wardog')">
+            <span>🐕</span> WARDOG Crimson
+          </button>
+        </div>
       </div>
     </div>
   </div>

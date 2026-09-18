@@ -1489,3 +1489,104 @@ body.obs-transparent-mode {
   font-size: 0.8rem;
 }
 
+/* In-Chat Custom Wallpaper Skins */
+.theme-cyber #chatMessagesBox {
+  background: linear-gradient(135deg, rgba(10, 14, 26, 0.95), rgba(4, 6, 14, 0.98)), radial-gradient(circle at center, rgba(0, 242, 254, 0.15) 0%, transparent 70%);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+}
+
+.theme-dragon #chatMessagesBox {
+  background: linear-gradient(135deg, rgba(30, 8, 8, 0.95), rgba(12, 4, 4, 0.98)), radial-gradient(circle at center, rgba(255, 60, 60, 0.2) 0%, transparent 70%);
+  border: 1px solid rgba(255, 82, 82, 0.4);
+}
+
+.theme-matrix #chatMessagesBox {
+  background: linear-gradient(135deg, rgba(4, 20, 10, 0.95), rgba(2, 10, 4, 0.98)), repeating-linear-gradient(0deg, rgba(0,255,100,0.03) 0px, rgba(0,255,100,0.03) 1px, transparent 1px, transparent 4px);
+  border: 1px solid rgba(0, 230, 118, 0.4);
+}
+
+.theme-arcade #chatMessagesBox {
+  background: linear-gradient(135deg, rgba(25, 10, 35, 0.95), rgba(10, 4, 18, 0.98)), radial-gradient(circle at center, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.theme-gold #chatMessagesBox {
+  background: linear-gradient(135deg, rgba(30, 24, 10, 0.95), rgba(12, 10, 4, 0.98)), radial-gradient(circle at center, rgba(255, 215, 0, 0.2) 0%, transparent 70%);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+}
+
+.theme-wardog #chatMessagesBox {
+  background: linear-gradient(135deg, rgba(35, 12, 12, 0.95), rgba(16, 4, 4, 0.98)), radial-gradient(circle at center, rgba(255, 82, 82, 0.25) 0%, transparent 70%);
+  border: 1px solid rgba(255, 82, 82, 0.5);
+}
+
+/* Playable In-Chat Mini-Games Stage */
+.chat-mini-game-stage {
+  background: rgba(14, 18, 28, 0.96);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem;
+  position: relative;
+  min-height: 250px;
+  max-height: 320px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.aim-target-circle {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ff0055 0%, #ff5252 65%, #ffffff 100%);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 15px #ff0055;
+  cursor: pointer;
+  animation: popTarget 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popTarget {
+  from { transform: scale(0.2); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.tic-tac-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  gap: 0.5rem;
+  margin: 0.8rem auto;
+  width: fit-content;
+}
+
+.tic-cell {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1.8rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tic-cell:hover {
+  background: rgba(0, 242, 254, 0.2);
+  border-color: var(--accent-cyan);
+}
+
+.chat-game-score-card {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(0, 242, 254, 0.15));
+  border: 1px solid var(--accent-purple);
+  padding: 0.65rem 1rem;
+  border-radius: 12px;
+  margin-top: 0.4rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+
