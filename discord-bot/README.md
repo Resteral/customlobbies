@@ -6,12 +6,17 @@ An official Discord bot for CustomLobbies.com enabling players to join matchmaki
 
 | Command | Description |
 |---|---|
-| `-join` / `!join` / `/join` | Join the active matchmaking queue. Auto-creates balanced teams at 10 players. |
-| `-leave` / `!leave` / `/leave` | Leave the matchmaking queue. |
+| `-join` / `-j [1\|2]` | Join the active channel match pool (Team Alpha or Team Bravo). Auto-starts match at 10 players. |
+| `-fill` / `-autostart` | Instantly fill empty roster slots with top AI competitors and auto-start the match server node! |
+| `-leave` / `-l` | Leave the active channel match pool. |
+| `-lobby` / `-queue` | View current channel's queued team rosters and player MMR. |
+| `-bracket` / `-b` | View live esports tournament bracket tree. |
+| `-configtourney` | Open 1-click tournament configurator guide. |
 | `-stats [user]` | Display detailed ELO, rank badge, win-rate, and streak. |
 | `-reportwin <team1\|team2>` | Record match winner, calculate ELO rating adjustments, and update leaderboards. |
 | `-createchannel <name> <text\|voice>` | Create new Discord channels directly from the bot. |
 | `-leaderboard` | Show top ELO players on the server. |
+| `-help` | View complete command guide in Discord. |
 
 ## Quick Setup Instructions
 
