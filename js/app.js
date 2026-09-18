@@ -2800,6 +2800,7 @@ class CustomLobbiesApp {
     btns.forEach(btn => {
       btn.addEventListener('click', () => {
         const tabId = btn.getAttribute('data-tab');
+        if (!tabId) return;
         
         btns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -2810,6 +2811,30 @@ class CustomLobbiesApp {
 
         const targetSection = document.getElementById(tabId);
         if (targetSection) targetSection.classList.add('active');
+
+        // Dynamically re-render target view components so user never needs a manual page refresh!
+        if (tabId === 'lobbies-view') {
+          this.renderLobbies();
+          this.renderMyCreatedTeams();
+          if (window.tournamentsStoreEngine) window.tournamentsStoreEngine.renderDashboardBracketWidget();
+        } else if (tabId === 'tournaments-view') {
+          if (window.tournamentsStoreEngine) {
+            window.tournamentsStoreEngine.renderTournaments();
+            window.tournamentsStoreEngine.renderMonthlyCalendarGrid();
+          }
+        } else if (tabId === 'community-view') {
+          if (window.chatVoiceManager) {
+            window.chatVoiceManager.renderMessages();
+            window.chatVoiceManager.renderOnlineUsers();
+            window.chatVoiceManager.renderDashboardStickers();
+          }
+        } else if (tabId === 'debate-view') {
+          this.renderDebateLobbies();
+        } else if (tabId === 'leaderboard-view') {
+          this.renderLeaderboard();
+        } else if (tabId === 'wardogs-view') {
+          this.renderWardogsView();
+        }
       });
     });
   }
@@ -3884,6 +3909,58 @@ class CustomLobbiesApp {
     if (btnClosePool) btnClosePool.addEventListener('click', () => poolModal?.classList.remove('active'));
     if (btnCancelPool) btnCancelPool.addEventListener('click', () => poolModal?.classList.remove('active'));
     if (btnSubmitPool) btnSubmitPool.addEventListener('click', () => this.submitJoinPlayerPool());
+
+    // Global ESC Key Listener to dismiss any active modal overlay without page refresh
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+      }
+    });
+
+    // Global Modal Backdrop Click Listener
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-overlay') && e.target.classList.contains('active')) {
+        e.target.classList.remove('active');
+      }
+    });
+
+    // Auto-sync state when localStorage changes across browser tabs
+    window.addEventListener('storage', () => {
+      this.liveRefreshAllUI();
+    });
+  }
+
+  liveRefreshAllUI() {
+    this.loadState();
+    this.renderFavoriteStarTags();
+    this.renderActiveGamesBar();
+    this.renderSponsoredServers();
+    this.renderMyCreatedTeams();
+    this.renderPoolFeed();
+    this.renderLobbies();
+    this.renderDebateLobbies();
+    this.renderLeaderboard();
+    this.renderLeaguesView();
+    this.renderWardogsView();
+    this.renderMatchmakingHub();
+    this.updatePointsWidget();
+
+    if (window.tournamentsStoreEngine) {
+      window.tournamentsStoreEngine.renderTournaments();
+      window.tournamentsStoreEngine.renderMonthlyCalendarGrid();
+      window.tournamentsStoreEngine.renderDashboardBracketWidget();
+    }
+
+    if (window.chatVoiceManager) {
+      window.chatVoiceManager.renderMessages();
+      window.chatVoiceManager.renderOnlineUsers();
+      window.chatVoiceManager.renderDashboardStickers();
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+      window.widgetBuilderEngine.showToast('🔄 Dynamic UI State Re-Synced & Rendered!', 'success');
+    }
   }
 
   // --- DEBATE ARENA & SIDING MATCHMAKER ENGINE ---
