@@ -856,7 +856,13 @@ class ChatVoiceManager {
     const isFull = totalCount >= maxTotal;
     const serverDispatchCmd = isFull ? `connect 144.76.12.89:27015; password scrim${Math.floor(Math.random() * 900 + 100)}` : null;
 
-    lobby.status = isFull ? '🔥 FULL (10/10) - SERVER DISPATCHED' : `RECRUITING (${totalCount}/${maxTotal} Players)`;
+    lobby.status = isFull ? '🚀 MATCH STARTED - SERVER LIVE' : `RECRUITING (${totalCount}/${maxTotal} Players)`;
+
+    if (isFull) {
+      setTimeout(() => {
+        this.fillAndStartChannelMatch(channelKey);
+      }, 300);
+    }
 
     return {
       assignedTeam,
@@ -866,6 +872,62 @@ class ChatVoiceManager {
       isFull,
       serverDispatchCmd
     };
+  }
+
+  fillAndStartChannelMatch(channelKey = this.currentTextChannel) {
+    const lobby = this.getChannelLobby(channelKey);
+    const bots = [
+      { name: 'S1mple_Fragger', mmr: 2650, role: 'AWPer / Sniper' },
+      { name: 'ZywOo_Master', mmr: 2620, role: 'Entry Fragger' },
+      { name: 'NiKo_OneTap', mmr: 2590, role: 'Rifler' },
+      { name: 'B1t_Headshot', mmr: 2480, role: 'Flex Specialist' },
+      { name: 'Dev1ce_Tactician', mmr: 2510, role: 'Support' },
+      { name: 'Rain_EntryGod', mmr: 2420, role: 'Entry Fragger' },
+      { name: 'Broky_Clutcher', mmr: 2550, role: 'AWPer' },
+      { name: 'Ropz_Lurker', mmr: 2590, role: 'Lurker / Anchor' }
+    ];
+
+    let botIdx = 0;
+    while (lobby.team1.length < lobby.maxPerTeam && botIdx < bots.length) {
+      lobby.team1.push({ ...bots[botIdx], isCaptain: lobby.team1.length === 0 });
+      botIdx++;
+    }
+
+    while (lobby.team2.length < lobby.maxPerTeam && botIdx < bots.length) {
+      lobby.team2.push({ ...bots[botIdx], isCaptain: lobby.team2.length === 0 });
+      botIdx++;
+    }
+
+    const totalCount = lobby.team1.length + lobby.team2.length;
+    const maxTotal = lobby.maxPerTeam * 2;
+    const serverDispatchCmd = `connect 144.76.12.89:27015; password scrim${Math.floor(Math.random() * 900 + 100)}`;
+    lobby.status = '🚀 MATCH STARTED - SERVER LIVE';
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('match_found');
+      window.widgetBuilderEngine.showToast('🚀 MATCH POPPED! All roster slots filled & server node dispatched!', 'success');
+    }
+
+    if (window.app) {
+      window.app.launchFaceitMatchRoom(lobby.game, `Channel #${channelKey.toUpperCase()}`);
+    }
+
+    const matchMsg = {
+      id: Date.now(),
+      author: 'CustomLobbiesBot',
+      text: `🎉 LOBBY MATCH STARTED IN #${channelKey.toUpperCase()}! Server Node Dispatched: ${serverDispatchCmd}`,
+      channelLobbyCard: true,
+      commandBadge: {
+        title: `🚀 MATCH STARTED & LIVE SERVER DISPATCHED!`,
+        text: `Match popped! All ${maxTotal} roster slots filled.<br><b>1-Click Server Command:</b> <code>${serverDispatchCmd}</code>`
+      },
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+    };
+
+    if (!this.textMessages[channelKey]) this.textMessages[channelKey] = [];
+    this.textMessages[channelKey].push(matchMsg);
+    this.renderMessages();
   }
 
   leaveChannelTeamPool(channelKey = this.currentTextChannel) {
@@ -1214,6 +1276,7 @@ class ChatVoiceManager {
                 <div style="display: flex; gap: 0.4rem; margin-top: 0.6rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                   <span style="font-size: 0.72rem; color: var(--text-dim);">Map Veto: <b>${l.map}</b></span>
                   <div style="display: flex; gap: 0.4rem;">
+                    <button class="btn btn-success btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background: rgba(0, 230, 118, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green);" onclick="window.chatVoiceManager.fillAndStartChannelMatch()">⚡ Fill AI & Auto-Start</button>
                     <button class="btn btn-primary btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="window.chatVoiceManager.executeInChatJoin(null)">⚡ Auto-Join (-j)</button>
                     <button class="btn btn-danger btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="window.chatVoiceManager.executeInChatLeave()">❌ Leave (-l)</button>
                   </div>
