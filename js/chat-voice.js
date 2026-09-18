@@ -61,9 +61,58 @@ class ChatVoiceManager {
 
     this.pinnedStickers = [];
 
+    // Per-Channel Match Lobby & Team Pool Engine
+    this.channelLobbies = {
+      'general': {
+        game: 'Counter-Strike 2 5v5',
+        maxPerTeam: 5,
+        team1Name: 'Team Alpha 🔵',
+        team2Name: 'Team Bravo 🔴',
+        team1: [
+          { name: 'ApexGod99', mmr: 2150, role: 'Entry Fragger', isCaptain: true },
+          { name: 'ShadowNinja', mmr: 1920, role: 'Support' }
+        ],
+        team2: [
+          { name: 'Valkyrie_CS', mmr: 1840, role: 'AWPer', isCaptain: true }
+        ],
+        map: 'Mirage & Inferno',
+        status: 'RECRUITING (3/10 Players)'
+      },
+      'lfg-cs2': {
+        game: 'CS2 Premier Scrims',
+        maxPerTeam: 5,
+        team1Name: 'Squad Red 🔴',
+        team2Name: 'Squad Blue 🔵',
+        team1: [
+          { name: 'RadiantReaper', mmr: 2540, role: 'IGL / Commander', isCaptain: true },
+          { name: 'ProSniper_2026', mmr: 1450, role: 'Sniper' }
+        ],
+        team2: [
+          { name: 'Valkyrie_CS', mmr: 1840, role: 'Flex Specialist', isCaptain: true }
+        ],
+        map: 'Dust II & Nuke',
+        status: 'RECRUITING (3/10 Players)'
+      },
+      'tournaments': {
+        game: 'CS2 $1,500 Scrim Tournament',
+        maxPerTeam: 5,
+        team1Name: 'FaZe Clan ⚡',
+        team2Name: 'G2 Esports 🐉',
+        team1: [
+          { name: 'FaZe_Karrigan', mmr: 2600, role: 'IGL', isCaptain: true },
+          { name: 'ApexGod99', mmr: 2150, role: 'Rifler' }
+        ],
+        team2: [
+          { name: 'G2_NiKo', mmr: 2650, role: 'Entry Fragger', isCaptain: true }
+        ],
+        map: 'Anubis & Inferno',
+        status: 'RECRUITING (3/10 Players)'
+      }
+    };
+
     this.textMessages = {
       'general': [
-        { id: 1, author: 'ApexGod99', text: 'Anyone hosting 5v5 CS2 scrims tonight?', time: '7:42 PM', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80' },
+        { id: 1, author: 'ApexGod99', text: 'Anyone hosting 5v5 CS2 scrims tonight? Type -j or -j 1 / -j 2 to join team pool!', time: '7:42 PM', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80', channelLobbyCard: true },
         { id: 2, author: 'ShadowNinja', text: 'Queue up on quick queue! Need 2 more high Diamond players.', time: '7:44 PM', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '⚡', name: 'Electro GG' } }
       ],
       'welcome': [
@@ -82,10 +131,10 @@ class ChatVoiceManager {
         { id: 7, author: 'ProStreamer', text: 'Live testing new tournament widgets at twitch.tv/CustomLobbiesHost', time: '4:30 PM', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80' }
       ],
       'lfg-cs2': [
-        { id: 8, author: 'Valkyrie_CS', text: 'LFG 5v5 Mirage/Inferno. 1900+ MMR only.', time: '7:30 PM', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80' }
+        { id: 8, author: 'Valkyrie_CS', text: 'LFG 5v5 Mirage/Inferno. 1900+ MMR only. Type -j to join team pool!', time: '7:30 PM', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80', channelLobbyCard: true }
       ],
       'tournaments': [
-        { id: 9, author: 'CustomLobbiesBot', text: '🏆 Weekly $1,500 CS2 Esports Tournament is LIVE! Use -b or click 🏆 Bracket above to post live tree.', time: '6:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🏆', name: 'Champion' }, bracketCard: true }
+        { id: 9, author: 'CustomLobbiesBot', text: '🏆 Weekly $1,500 CS2 Esports Tournament is LIVE! Use -b for bracket or -j to join tournament team pool.', time: '6:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🏆', name: 'Champion' }, bracketCard: true, channelLobbyCard: true }
       ]
     };
 
@@ -739,6 +788,129 @@ class ChatVoiceManager {
     this.renderMessages();
   }
 
+  // --- PER-CHANNEL LOBBY & TEAM POOL ENGINE (-j SYSTEM) ---
+  getChannelLobby(channelKey = this.currentTextChannel) {
+    if (!this.channelLobbies[channelKey]) {
+      this.channelLobbies[channelKey] = {
+        game: `Channel #${channelKey.toUpperCase()} Match`,
+        maxPerTeam: 5,
+        team1Name: 'Team Alpha 🔵',
+        team2Name: 'Team Bravo 🔴',
+        team1: [
+          { name: 'ApexGod99', mmr: 2150, role: 'Entry Fragger', isCaptain: true }
+        ],
+        team2: [
+          { name: 'Valkyrie_CS', mmr: 1840, role: 'AWPer', isCaptain: true }
+        ],
+        map: 'Mirage',
+        status: 'RECRUITING (2/10 Players)'
+      };
+    }
+    return this.channelLobbies[channelKey];
+  }
+
+  joinChannelTeamPool(targetTeam = null, channelKey = this.currentTextChannel) {
+    const lobby = this.getChannelLobby(channelKey);
+    const userName = (window.app && window.app.user) ? window.app.user.displayName : 'You (Host)';
+    const userMmr = 2580;
+
+    // Filter out existing entries for user
+    lobby.team1 = lobby.team1.filter(p => !p.name.includes('You') && p.name !== userName);
+    lobby.team2 = lobby.team2.filter(p => !p.name.includes('You') && p.name !== userName);
+
+    let assignedTeam = 1;
+    const teamArg = String(targetTeam || '').toLowerCase();
+    if (teamArg.includes('2') || teamArg.includes('bravo') || teamArg.includes('blue') || teamArg.includes('con')) {
+      assignedTeam = 2;
+    } else if (teamArg.includes('1') || teamArg.includes('alpha') || teamArg.includes('red') || teamArg.includes('pro')) {
+      assignedTeam = 1;
+    } else {
+      assignedTeam = lobby.team1.length <= lobby.team2.length ? 1 : 2;
+    }
+
+    const playerObj = {
+      name: `${userName}`,
+      mmr: userMmr,
+      role: 'Flex Specialist',
+      isCaptain: (assignedTeam === 1 && lobby.team1.length === 0) || (assignedTeam === 2 && lobby.team2.length === 0)
+    };
+
+    if (assignedTeam === 1) {
+      if (lobby.team1.length >= lobby.maxPerTeam) {
+        assignedTeam = 2;
+        lobby.team2.push(playerObj);
+      } else {
+        lobby.team1.push(playerObj);
+      }
+    } else {
+      if (lobby.team2.length >= lobby.maxPerTeam) {
+        assignedTeam = 1;
+        lobby.team1.push(playerObj);
+      } else {
+        lobby.team2.push(playerObj);
+      }
+    }
+
+    const totalCount = lobby.team1.length + lobby.team2.length;
+    const maxTotal = lobby.maxPerTeam * 2;
+    const isFull = totalCount >= maxTotal;
+    const serverDispatchCmd = isFull ? `connect 144.76.12.89:27015; password scrim${Math.floor(Math.random() * 900 + 100)}` : null;
+
+    lobby.status = isFull ? '🔥 FULL (10/10) - SERVER DISPATCHED' : `RECRUITING (${totalCount}/${maxTotal} Players)`;
+
+    return {
+      assignedTeam,
+      teamName: assignedTeam === 1 ? lobby.team1Name : lobby.team2Name,
+      totalCount,
+      maxTotal,
+      isFull,
+      serverDispatchCmd
+    };
+  }
+
+  leaveChannelTeamPool(channelKey = this.currentTextChannel) {
+    const lobby = this.getChannelLobby(channelKey);
+    const userName = (window.app && window.app.user) ? window.app.user.displayName : 'You (Host)';
+
+    lobby.team1 = lobby.team1.filter(p => !p.name.includes('You') && p.name !== userName);
+    lobby.team2 = lobby.team2.filter(p => !p.name.includes('You') && p.name !== userName);
+
+    const totalCount = lobby.team1.length + lobby.team2.length;
+    const maxTotal = lobby.maxPerTeam * 2;
+    lobby.status = `RECRUITING (${totalCount}/${maxTotal} Players)`;
+  }
+
+  postChannelLobbyToChat() {
+    if (!this.textMessages[this.currentTextChannel]) {
+      this.textMessages[this.currentTextChannel] = [];
+    }
+
+    const newMsg = {
+      id: Date.now(),
+      author: 'You (Host)',
+      text: '-pool',
+      channelLobbyCard: true,
+      commandBadge: {
+        title: `🎮 #${this.currentTextChannel.toUpperCase()} Active Team Roster Pool`,
+        text: `Live Team 1 vs Team 2 player pool in #${this.currentTextChannel}`
+      },
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80'
+    };
+
+    this.textMessages[this.currentTextChannel].push(newMsg);
+    this.renderMessages();
+  }
+
+  executeInChatJoin(teamNum) {
+    const cmdStr = teamNum ? `-j ${teamNum}` : `-j`;
+    this.sendMessage(cmdStr);
+  }
+
+  executeInChatLeave() {
+    this.sendMessage('-l');
+  }
+
   pinStickerToDashboard(stickerEmoji, stickerName) {
     const exists = this.pinnedStickers.some(s => s.emoji === stickerEmoji && s.name === stickerName);
     if (exists) {
@@ -788,36 +960,50 @@ class ChatVoiceManager {
     const arg = parts.slice(1).join(' ').toLowerCase();
 
     if (cmd === '-j' || cmd === '-join') {
-      let targetGame = 'Counter-Strike 2';
-      if (arg.includes('val')) targetGame = 'Valorant';
-      else if (arg.includes('slap')) targetGame = 'Slapshot: Rebound';
-      else if (arg.includes('dog') || arg.includes('war')) targetGame = 'WARDOGS 33v33v33';
-      else if (arg.includes('deb')) targetGame = 'Debate Arena';
-      else if (arg.includes('emp')) targetGame = 'Empulse';
-      else if (arg.includes('tourn') || arg.includes('brack')) targetGame = 'CS2 $1,500 Summer Scrim Tournament';
+      const joinRes = this.joinChannelTeamPool(arg, this.currentTextChannel);
 
       if (window.app) {
-        window.app.startQueueFromWidget(targetGame, 'NA East', 'Any Role');
+        window.app.clPoints += 25;
+        window.app.updatePointsWidget();
+      }
+
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('queue_join');
       }
 
       return {
         isCommand: true,
         text: raw,
+        channelLobbyCard: true,
         commandBadge: {
-          title: `⚡ Command Executed (${cmd})`,
-          text: `Joined Matchmaking & Roster Queue for <b>${targetGame}</b>! (+25 🪙 CL-Points Queue Bonus)`
+          title: `⚡ Joined ${joinRes.teamName} (#${this.currentTextChannel})`,
+          text: `Registered in #${this.currentTextChannel} team pool! Pool Status: <b>${joinRes.totalCount}/${joinRes.maxTotal} Players</b> (+25 🪙 CL-Points Bonus)${joinRes.isFull ? `<br>🚀 <b>MATCH FULL! Dedicated 128-Tick Server Command:</b> <code>${joinRes.serverDispatchCmd}</code>` : ''}`
         }
       };
     } else if (cmd === '-l' || cmd === '-leave') {
+      this.leaveChannelTeamPool(this.currentTextChannel);
+
       if (window.app) {
         window.app.leaveQueue();
       }
+
       return {
         isCommand: true,
         text: raw,
+        channelLobbyCard: true,
         commandBadge: {
-          title: `❌ Command Executed (${cmd})`,
-          text: `Successfully exited active matchmaking queue.`
+          title: `❌ Left #${this.currentTextChannel} Team Pool`,
+          text: `Successfully exited #${this.currentTextChannel} match team pool.`
+        }
+      };
+    } else if (cmd === '-pool' || cmd === '-roster' || cmd === '-lobby') {
+      return {
+        isCommand: true,
+        text: raw,
+        channelLobbyCard: true,
+        commandBadge: {
+          title: `🎮 #${this.currentTextChannel.toUpperCase()} Active Team Roster Pool`,
+          text: `Fetched active Team 1 vs Team 2 player pool for #${this.currentTextChannel}.`
         }
       };
     } else if (cmd === '-b' || cmd === '-bracket' || cmd === '-tourney' || cmd === '-tournament' || cmd === '-tournaments') {
@@ -848,7 +1034,7 @@ class ChatVoiceManager {
         text: raw,
         commandBadge: {
           title: `⌨️ CustomLobbies Chat Commands`,
-          text: `• <b>-j</b> or <b>-join [game/tourney]</b> : Join queue (e.g. <i>-j</i>, <i>-j val</i>, <i>-j tourney</i>)<br>• <b>-b</b> or <b>-bracket</b> : Display live visual bracket tree in chat<br>• <b>-configtourney</b> : Open 1-click Tournament Configurator modal<br>• <b>-l</b> or <b>-leave</b> : Exit queue<br>• <b>-status</b> : Telemetry & MMR rating<br>• <b>-scrim</b> : Team Scrim Dispatcher`
+          text: `• <b>-j</b> or <b>-join [1|2]</b> : Join channel team pool (e.g. <i>-j</i>, <i>-j 1</i>, <i>-j 2</i>)<br>• <b>-l</b> or <b>-leave</b> : Leave channel team pool<br>• <b>-pool</b> or <b>-roster</b> : Display channel team pool roster card<br>• <b>-b</b> or <b>-bracket</b> : Display live visual bracket tree in chat<br>• <b>-configtourney</b> : Open 1-click Tournament Configurator modal<br>• <b>-status</b> : Telemetry & MMR rating<br>• <b>-scrim</b> : Team Scrim Dispatcher`
         }
       };
     } else if (cmd === '-status') {
@@ -977,6 +1163,64 @@ class ChatVoiceManager {
               </div>
             </div>
           ` : ''}
+          ${m.channelLobbyCard ? (() => {
+            const l = this.getChannelLobby(this.currentTextChannel);
+            const total = l.team1.length + l.team2.length;
+            const maxT = l.maxPerTeam * 2;
+            return `
+              <div class="chat-command-badge" style="background: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(168, 85, 247, 0.12)); border: 1px solid var(--accent-cyan); padding: 0.8rem; border-radius: 10px; margin-top: 0.4rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.4rem;">
+                  <div>
+                    <span style="font-size: 0.9rem; font-weight: 900; color: var(--accent-cyan);">🎮 #${this.currentTextChannel.toUpperCase()} MATCH LOBBY POOL</span>
+                    <span style="font-size: 0.75rem; color: var(--text-dim); margin-left: 0.5rem;">(${l.game})</span>
+                  </div>
+                  <span class="lobby-game-tag" style="background: ${total >= maxT ? 'rgba(0,230,118,0.2)' : 'rgba(255,215,0,0.2)'}; color: ${total >= maxT ? 'var(--accent-green)' : 'var(--accent-gold)'}; font-size: 0.72rem;">
+                    ${l.status}
+                  </span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; font-size: 0.78rem;">
+                  <!-- Team 1 -->
+                  <div style="background: rgba(0, 242, 254, 0.08); padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(0, 242, 254, 0.3);">
+                    <div style="display: flex; justify-content: space-between; font-weight: 900; color: var(--accent-cyan); margin-bottom: 0.4rem;">
+                      <span>${l.team1Name}</span>
+                      <span>${l.team1.length}/${l.maxPerTeam}</span>
+                    </div>
+                    ${l.team1.map(p => `
+                      <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; border-bottom: 1px dashed rgba(255,255,255,0.08);">
+                        <span>${p.isCaptain ? '👑 ' : ''}<b>${p.name}</b> <span style="font-size: 0.68rem; color: var(--text-dim);">(${p.role})</span></span>
+                        <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.72rem;">${p.mmr}</span>
+                      </div>
+                    `).join('')}
+                    <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 0.5rem; font-size: 0.7rem; padding: 0.2rem;" onclick="window.chatVoiceManager.executeInChatJoin(1)">➕ Join ${l.team1Name} (-j 1)</button>
+                  </div>
+
+                  <!-- Team 2 -->
+                  <div style="background: rgba(255, 82, 82, 0.08); padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255, 82, 82, 0.3);">
+                    <div style="display: flex; justify-content: space-between; font-weight: 900; color: var(--accent-red); margin-bottom: 0.4rem;">
+                      <span>${l.team2Name}</span>
+                      <span>${l.team2.length}/${l.maxPerTeam}</span>
+                    </div>
+                    ${l.team2.map(p => `
+                      <div style="display: flex; justify-content: space-between; padding: 0.2rem 0; border-bottom: 1px dashed rgba(255,255,255,0.08);">
+                        <span>${p.isCaptain ? '👑 ' : ''}<b>${p.name}</b> <span style="font-size: 0.68rem; color: var(--text-dim);">(${p.role})</span></span>
+                        <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.72rem;">${p.mmr}</span>
+                      </div>
+                    `).join('')}
+                    <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 0.5rem; font-size: 0.7rem; padding: 0.2rem;" onclick="window.chatVoiceManager.executeInChatJoin(2)">➕ Join ${l.team2Name} (-j 2)</button>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 0.4rem; margin-top: 0.6rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                  <span style="font-size: 0.72rem; color: var(--text-dim);">Map Veto: <b>${l.map}</b></span>
+                  <div style="display: flex; gap: 0.4rem;">
+                    <button class="btn btn-primary btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="window.chatVoiceManager.executeInChatJoin(null)">⚡ Auto-Join (-j)</button>
+                    <button class="btn btn-danger btn-sm" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="window.chatVoiceManager.executeInChatLeave()">❌ Leave (-l)</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          })() : ''}
         </div>
       </div>
     `).join('');
