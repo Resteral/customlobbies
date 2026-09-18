@@ -1589,4 +1589,17 @@ body.obs-transparent-mode {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
+.chat-command-badge {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(0, 230, 118, 0.15));
+  border: 1px solid var(--accent-cyan);
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  margin-top: 0.35rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+
 

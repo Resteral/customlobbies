@@ -759,9 +759,101 @@ class ChatVoiceManager {
     `).join('');
   }
 
+  handleChatCommand(text) {
+    const raw = text.trim();
+    const parts = raw.split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+    const arg = parts.slice(1).join(' ').toLowerCase();
+
+    if (cmd === '-j' || cmd === '-join') {
+      let targetGame = 'Counter-Strike 2';
+      if (arg.includes('val')) targetGame = 'Valorant';
+      else if (arg.includes('slap')) targetGame = 'Slapshot: Rebound';
+      else if (arg.includes('dog') || arg.includes('war')) targetGame = 'WARDOGS 33v33v33';
+      else if (arg.includes('deb')) targetGame = 'Debate Arena';
+      else if (arg.includes('emp')) targetGame = 'Empulse';
+
+      if (window.app) {
+        window.app.startQueueFromWidget(targetGame, 'NA East', 'Any Role');
+      }
+
+      return {
+        isCommand: true,
+        text: raw,
+        commandBadge: {
+          title: `⚡ Command Executed (${cmd})`,
+          text: `Joined 5v5 Competitive Matchmaking Queue for <b>${targetGame}</b>! (+25 🪙 CL-Points Queue Bonus)`
+        }
+      };
+    } else if (cmd === '-l' || cmd === '-leave') {
+      if (window.app) {
+        window.app.leaveQueue();
+      }
+      return {
+        isCommand: true,
+        text: raw,
+        commandBadge: {
+          title: `❌ Command Executed (${cmd})`,
+          text: `Successfully exited active matchmaking queue.`
+        }
+      };
+    } else if (cmd === '-help' || cmd === '-cmd' || cmd === '-cmds') {
+      return {
+        isCommand: true,
+        text: raw,
+        commandBadge: {
+          title: `⌨️ CustomLobbies Chat Commands`,
+          text: `• <b>-j</b> or <b>-join [game]</b> : Join queue (e.g. <i>-j</i>, <i>-j val</i>, <i>-j debate</i>)<br>• <b>-l</b> or <b>-leave</b> : Exit queue<br>• <b>-status</b> : Telemetry & MMR rating<br>• <b>-scrim</b> : Team Scrim Dispatcher`
+        }
+      };
+    } else if (cmd === '-status') {
+      const activeQ = (window.app && window.app.activeQueue) ? 'SEARCHING FOR MATCH' : 'IDLE / NOT IN QUEUE';
+      return {
+        isCommand: true,
+        text: raw,
+        commandBadge: {
+          title: `📊 Player Telemetry Status`,
+          text: `Handle: BDroplE | Base ELO: 2,580 MMR (+200 Performance Bonus) | Queue Status: ${activeQ}`
+        }
+      };
+    } else if (cmd === '-scrim') {
+      if (window.app) {
+        window.app.openTeamScrimDispatchModal();
+      }
+      return {
+        isCommand: true,
+        text: raw,
+        commandBadge: {
+          title: `⚔️ Scrim Dispatch Launcher`,
+          text: `Opened Interactive Team Scrim Dispatcher!`
+        }
+      };
+    }
+
+    return { isCommand: false };
+  }
+
   sendMessage(text) {
     if (!this.textMessages[this.currentTextChannel]) {
       this.textMessages[this.currentTextChannel] = [];
+    }
+
+    const trimmed = text.trim();
+    if (trimmed.startsWith('-')) {
+      const cmdResult = this.handleChatCommand(trimmed);
+      if (cmdResult.isCommand) {
+        const cmdMsg = {
+          id: Date.now(),
+          author: 'You (Host)',
+          text: cmdResult.text,
+          commandBadge: cmdResult.commandBadge,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80'
+        };
+        this.textMessages[this.currentTextChannel].push(cmdMsg);
+        this.renderMessages();
+        return;
+      }
     }
 
     const newMsg = {
@@ -801,6 +893,12 @@ class ChatVoiceManager {
               <div style="font-size: 0.78rem; font-weight: 800; color: var(--accent-purple); text-transform: uppercase;">🎮 In-Chat Game Result</div>
               <div style="font-weight: 900; font-size: 0.95rem; color: #fff;">${m.gameScoreCard.title}: <span style="color: var(--accent-cyan);">${m.gameScoreCard.score}</span></div>
               <div style="font-size: 0.78rem; color: var(--text-muted);">${m.gameScoreCard.detail}</div>
+            </div>
+          ` : ''}
+          ${m.commandBadge ? `
+            <div class="chat-command-badge">
+              <div style="font-size: 0.78rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase;">${m.commandBadge.title}</div>
+              <div style="font-size: 0.85rem; color: #fff; margin-top: 0.2rem;">${m.commandBadge.text}</div>
             </div>
           ` : ''}
         </div>
