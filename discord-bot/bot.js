@@ -78,25 +78,30 @@ client.on('messageCreate', async (message) => {
   const args = content.slice(prefixUsed.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
 
-  // COMMAND 1: -join (Join Queue)
-  if (command === 'join') {
+  // COMMAND 1: -j / -join (Join Queue & Team Pool)
+  if (command === 'join' || command === 'j') {
     const player = getOrCreatePlayer(message.author.id, message.author.username);
     if (queuePool.has(message.author.id)) {
-      return message.reply('⚠️ You are already in the matchmaking queue!');
+      return message.reply('⚠️ You are already in the matchmaking lobby queue!');
     }
 
     queuePool.add(message.author.id);
+    const playersList = Array.from(queuePool).map(id => playerStats.get(id));
+
     const embed = new EmbedBuilder()
       .setColor('#00f2fe')
-      .setTitle('⚡ CustomLobbies Matchmaking Queue')
-      .setDescription(`**${message.author.username}** joined the queue! (${player.elo} MMR)\n\n**Queue Status:** ${queuePool.size} / 10 Players`)
-      .setFooter({ text: 'Type -leave to exit queue' });
+      .setTitle('⚡ CustomLobbies Matchmaking Queue & Team Pool')
+      .setDescription(`**${message.author.username}** joined the lobby queue! (${player.elo} MMR)\n\n**Lobby Status:** ${queuePool.size} / 10 Players Joined`)
+      .addFields({
+        name: '👥 Queued Players in Lobby',
+        value: playersList.map((p, i) => `${i + 1}. **${p.username}** (${p.elo} MMR - ${getRankBadge(p.elo)})`).join('\n')
+      })
+      .setFooter({ text: 'Type -j to join, -l to leave, -lobby to view players in queue' });
 
     message.channel.send({ embeds: [embed] });
 
     // Auto-pop match when 10 players join
     if (queuePool.size >= 10) {
-      const playersList = Array.from(queuePool).map(id => playerStats.get(id));
       queuePool.clear();
 
       // Split into Team 1 and Team 2
@@ -107,25 +112,51 @@ client.on('messageCreate', async (message) => {
 
       const matchEmbed = new EmbedBuilder()
         .setColor('#ffd700')
-        .setTitle('🎉 MATCH POPPED! (5v5 Balanced Lobby)')
+        .setTitle('🎉 LOBBY MATCH POPPED! (5v5 Balanced Server Node)')
         .addFields(
-          { name: '🔵 Team Alpha', value: team1.map(p => `• ${p.username} (${p.elo} MMR)`).join('\n'), inline: true },
-          { name: '🔴 Team Bravo', value: team2.map(p => `• ${p.username} (${p.elo} MMR)`).join('\n'), inline: true }
+          { name: '🔵 Team Alpha', value: team1.map(p => `• **${p.username}** (${p.elo} MMR)`).join('\n'), inline: true },
+          { name: '🔴 Team Bravo', value: team2.map(p => `• **${p.username}** (${p.elo} MMR)`).join('\n'), inline: true }
         )
+        .addFields({
+          name: '🚀 Dedicated Server Connect Command',
+          value: '`connect 144.76.12.89:27015; password scrim33`'
+        })
         .setFooter({ text: 'Report outcome using -reportwin team1 OR -reportwin team2' });
 
       message.channel.send({ embeds: [matchEmbed] });
     }
   }
 
-  // COMMAND 2: -leave (Leave Queue)
-  else if (command === 'leave') {
+  // COMMAND 2: -l / -leave (Leave Queue)
+  else if (command === 'leave' || command === 'l') {
     if (!queuePool.has(message.author.id)) {
-      return message.reply('⚠️ You are not currently in the queue.');
+      return message.reply('⚠️ You are not currently in the lobby queue.');
     }
 
     queuePool.delete(message.author.id);
-    message.reply(`✅ Removed from queue. Queue Status: ${queuePool.size} / 10 Players.`);
+    message.reply(`✅ Removed from lobby queue. Lobby Queue Status: ${queuePool.size} / 10 Players.`);
+  }
+
+  // COMMAND 3: -lobby / -queue / -players / -pool (View Players in Lobby Queue)
+  else if (command === 'lobby' || command === 'queue' || command === 'players' || command === 'pool') {
+    if (queuePool.size === 0) {
+      const embed = new EmbedBuilder()
+        .setColor('#9d4edd')
+        .setTitle('🎮 CustomLobbies Active Queue')
+        .setDescription('No players currently queued in the lobby. Type **-j** or **-join** to join!');
+      return message.channel.send({ embeds: [embed] });
+    }
+
+    const playersList = Array.from(queuePool).map(id => playerStats.get(id));
+    const playersText = playersList.map((p, i) => `${i + 1}. **${p.username}** - ${p.elo} MMR (${getRankBadge(p.elo)})`).join('\n');
+
+    const embed = new EmbedBuilder()
+      .setColor('#00f2fe')
+      .setTitle(`🎮 CustomLobbies Active Queue Pool (${queuePool.size} / 10 Players)`)
+      .setDescription(playersText)
+      .setFooter({ text: 'Type -j to join, -l to leave, -lobby to view players' });
+
+    message.channel.send({ embeds: [embed] });
   }
 
   // COMMAND 3: -stats (View Player ELO & Record)
