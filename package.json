@@ -5,6 +5,11 @@
   "author": "HelixGame",
   "main": "js/index.js",
   "scripts": {
+    "start": "node js/index.js",
+    "start:desktop": "node tools/launch_desktop_program.js",
+    "desktop": "node tools/launch_desktop_program.js",
+    "electron": "npx electron main-desktop.js",
+    "dev": "node js/index.js",
     "import-models": "node tools/auto_model_importer.js",
     "watch-models": "node tools/auto_model_importer.js --watch",
     "generate-meshy": "node tools/meshy_model_generator.js",
@@ -13,6 +18,7 @@
     "helix:station": "node tools/helix-system-builder.js station",
     "helix:client": "node tools/helix-system-builder.js client",
     "helix:ui": "node tools/helix-system-builder.js ui",
+    "helix:poi": "node tools/helix-system-builder.js poi",
     "helix:help": "node tools/helix-system-builder.js help"
   },
   "dependencies": {}

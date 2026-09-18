@@ -1668,6 +1668,48 @@ body.obs-transparent-mode {
   font-weight: 700;
 }
 
+/* Desktop Program Client Titlebar & Controls */
+.desktop-program-titlebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(10, 11, 16, 0.95);
+  border-bottom: 1px solid rgba(0, 242, 254, 0.25);
+  padding: 0.35rem 1rem;
+  font-size: 0.8rem;
+  user-select: none;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+}
 
+.desktop-program-badge {
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(168, 85, 247, 0.2));
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+}
 
+.desktop-win-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
 
+.desktop-win-btn:hover {
+  background: rgba(0, 242, 254, 0.3);
+  border-color: var(--accent-cyan);
+}
+
+.desktop-win-btn.close:hover {
+  background: rgba(255, 82, 82, 0.8);
+  border-color: #ff5252;
+}
