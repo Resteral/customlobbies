@@ -1306,3 +1306,186 @@ body.obs-transparent-mode {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-cyan);
 }
+
+/* Discord-Style Community Friend Lobby & Sticker Engine */
+.discord-hub-container {
+  display: grid;
+  grid-template-columns: 72px 240px 1fr 280px;
+  gap: 0.8rem;
+  height: calc(100vh - 140px);
+  min-height: 650px;
+}
+
+@media (max-width: 1200px) {
+  .discord-hub-container {
+    grid-template-columns: 64px 210px 1fr;
+  }
+  .discord-hub-container > div:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .discord-hub-container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+.discord-server-rail {
+  background: rgba(10, 14, 23, 0.95);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.8rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.server-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.server-icon:hover {
+  border-radius: 16px;
+  background: rgba(0, 242, 254, 0.2);
+  border-color: var(--accent-cyan);
+}
+
+.server-icon.active {
+  border-radius: 16px;
+  background: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 18px rgba(0, 242, 254, 0.6);
+}
+
+.server-boost-badge {
+  background: rgba(255, 115, 250, 0.15);
+  border: 1px solid rgba(255, 115, 250, 0.4);
+  border-radius: 20px;
+  padding: 0.4rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.discord-user-card {
+  margin-top: auto;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.icon-btn-sm {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+}
+
+.icon-btn-sm:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+/* Chat Sticker Badges & Palette */
+.chat-sticker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(168, 85, 247, 0.12));
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  padding: 0.5rem 0.85rem;
+  border-radius: 12px;
+  margin-top: 0.4rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.chat-sticker-emoji {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.chat-sticker-label {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--accent-cyan);
+}
+
+.sticker-grid-card {
+  background: rgba(14, 18, 28, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.sticker-grid-card:hover {
+  border-color: var(--accent-cyan);
+  transform: translateY(-2px);
+  background: rgba(20, 28, 45, 0.9);
+}
+
+.sticker-card-emoji {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.sticker-card-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Dashboard Sticker Pin Card */
+.pinned-sticker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(0, 242, 254, 0.1);
+  border: 1px solid var(--accent-cyan);
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  position: relative;
+}
+
+.pinned-sticker-remove {
+  background: none;
+  border: none;
+  color: var(--accent-red);
+  cursor: pointer;
+  font-weight: 900;
+  margin-left: 0.3rem;
+  font-size: 0.8rem;
+}
+
