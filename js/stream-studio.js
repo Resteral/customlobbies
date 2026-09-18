@@ -522,8 +522,14 @@ class StreamStudioEngine {
   }
 
   startCanvasRenderLoop(videoEl) {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+
     const render = () => {
-      if (videoEl && !videoEl.paused && !videoEl.ended) {
+      if (!this.isStreaming) return;
+      if (videoEl && !videoEl.paused && !videoEl.ended && this.canvas && this.ctx) {
         this.ctx.drawImage(videoEl, 0, 0, this.canvas.width, this.canvas.height);
       }
       this.animationFrameId = requestAnimationFrame(render);

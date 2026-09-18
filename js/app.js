@@ -3676,12 +3676,35 @@ class CustomLobbiesApp {
         window.widgetBuilderEngine.playSoundEffect('queue_join');
       }
 
+      if (this.autoJoinInterval) {
+        clearInterval(this.autoJoinInterval);
+        this.autoJoinInterval = null;
+      }
+
       this.autoJoinInterval = setInterval(() => {
-        if (!this.isAutoJoinActive) return;
+        if (!this.isAutoJoinActive) {
+          if (this.autoJoinInterval) {
+            clearInterval(this.autoJoinInterval);
+            this.autoJoinInterval = null;
+          }
+          return;
+        }
 
         // Scan lobbies for available slot matching favorite games
         const openLobby = this.lobbies.find(l => this.favoriteGames.has(l.game) && l.players < l.max);
         if (openLobby) {
+          this.isAutoJoinActive = false;
+          if (this.autoJoinInterval) {
+            clearInterval(this.autoJoinInterval);
+            this.autoJoinInterval = null;
+          }
+
+          if (btn) {
+            btn.innerHTML = '⚡ Auto-Join: OFF';
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-purple');
+          }
+
           if (statusText) statusText.innerText = `🎯 OPEN SLOT DISCOVERED! Auto-joining node "${openLobby.title}" (${openLobby.game})...`;
           openLobby.players += 1;
           this.saveState();
@@ -3689,9 +3712,8 @@ class CustomLobbiesApp {
 
           if (window.widgetBuilderEngine) {
             window.widgetBuilderEngine.playSoundEffect('match_found');
+            window.widgetBuilderEngine.showToast(`⚡ AUTO-JOIN: Matched slot in ${openLobby.title}!`, 'success');
           }
-
-          alert(`⚡ AUTO-JOIN SUCCESSFUL!\n\nMatched open lobby slot:\n🎮 ${openLobby.game}\n🏆 ${openLobby.title}\n👤 Host: ${openLobby.host}\n\nConnecting to 128-tick dedicated server node...`);
 
           this.launchFaceitMatchRoom(openLobby.id);
         }
