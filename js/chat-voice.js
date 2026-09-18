@@ -85,7 +85,7 @@ class ChatVoiceManager {
         { id: 8, author: 'Valkyrie_CS', text: 'LFG 5v5 Mirage/Inferno. 1900+ MMR only.', time: '7:30 PM', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80' }
       ],
       'tournaments': [
-        { id: 9, author: 'CustomLobbiesBot', text: '🏆 Weekly $500 5v5 Tournament registrations open tomorrow at 12:00 PM EST!', time: '6:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🏆', name: 'Champion' } }
+        { id: 9, author: 'CustomLobbiesBot', text: '🏆 Weekly $1,500 CS2 Esports Tournament is LIVE! Use -b or click 🏆 Bracket above to post live tree.', time: '6:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🏆', name: 'Champion' }, bracketCard: true }
       ]
     };
 
@@ -717,6 +717,28 @@ class ChatVoiceManager {
     this.toggleStickerDrawer();
   }
 
+  postTournamentBracketToChat() {
+    if (!this.textMessages[this.currentTextChannel]) {
+      this.textMessages[this.currentTextChannel] = [];
+    }
+
+    const newMsg = {
+      id: Date.now(),
+      author: 'You (Host)',
+      text: '-bracket',
+      bracketCard: true,
+      commandBadge: {
+        title: `🏆 Live Tournament Bracket Shared`,
+        text: `Shared active esports visual bracket tree directly in #${this.currentTextChannel}`
+      },
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80'
+    };
+
+    this.textMessages[this.currentTextChannel].push(newMsg);
+    this.renderMessages();
+  }
+
   pinStickerToDashboard(stickerEmoji, stickerName) {
     const exists = this.pinnedStickers.some(s => s.emoji === stickerEmoji && s.name === stickerName);
     if (exists) {
@@ -772,6 +794,7 @@ class ChatVoiceManager {
       else if (arg.includes('dog') || arg.includes('war')) targetGame = 'WARDOGS 33v33v33';
       else if (arg.includes('deb')) targetGame = 'Debate Arena';
       else if (arg.includes('emp')) targetGame = 'Empulse';
+      else if (arg.includes('tourn') || arg.includes('brack')) targetGame = 'CS2 $1,500 Summer Scrim Tournament';
 
       if (window.app) {
         window.app.startQueueFromWidget(targetGame, 'NA East', 'Any Role');
@@ -782,7 +805,7 @@ class ChatVoiceManager {
         text: raw,
         commandBadge: {
           title: `⚡ Command Executed (${cmd})`,
-          text: `Joined 5v5 Competitive Matchmaking Queue for <b>${targetGame}</b>! (+25 🪙 CL-Points Queue Bonus)`
+          text: `Joined Matchmaking & Roster Queue for <b>${targetGame}</b>! (+25 🪙 CL-Points Queue Bonus)`
         }
       };
     } else if (cmd === '-l' || cmd === '-leave') {
@@ -797,13 +820,35 @@ class ChatVoiceManager {
           text: `Successfully exited active matchmaking queue.`
         }
       };
+    } else if (cmd === '-b' || cmd === '-bracket' || cmd === '-tourney' || cmd === '-tournament' || cmd === '-tournaments') {
+      return {
+        isCommand: true,
+        text: raw,
+        bracketCard: true,
+        commandBadge: {
+          title: `🏆 Tournament Bracket Requested`,
+          text: `Fetched active 8-team esports visual bracket tree directly into chat.`
+        }
+      };
+    } else if (cmd === '-configtourney' || cmd === '-create-bracket' || cmd === '-newtourney' || cmd === '-config-tournament') {
+      if (window.tournamentsStoreEngine) {
+        window.tournamentsStoreEngine.openConfiguratorModal();
+      }
+      return {
+        isCommand: true,
+        text: raw,
+        commandBadge: {
+          title: `⚡ Configurator Modal Launched`,
+          text: `Opened 1-Click Tournament Configurator & Bracket Builder!`
+        }
+      };
     } else if (cmd === '-help' || cmd === '-cmd' || cmd === '-cmds') {
       return {
         isCommand: true,
         text: raw,
         commandBadge: {
           title: `⌨️ CustomLobbies Chat Commands`,
-          text: `• <b>-j</b> or <b>-join [game]</b> : Join queue (e.g. <i>-j</i>, <i>-j val</i>, <i>-j debate</i>)<br>• <b>-l</b> or <b>-leave</b> : Exit queue<br>• <b>-status</b> : Telemetry & MMR rating<br>• <b>-scrim</b> : Team Scrim Dispatcher`
+          text: `• <b>-j</b> or <b>-join [game/tourney]</b> : Join queue (e.g. <i>-j</i>, <i>-j val</i>, <i>-j tourney</i>)<br>• <b>-b</b> or <b>-bracket</b> : Display live visual bracket tree in chat<br>• <b>-configtourney</b> : Open 1-click Tournament Configurator modal<br>• <b>-l</b> or <b>-leave</b> : Exit queue<br>• <b>-status</b> : Telemetry & MMR rating<br>• <b>-scrim</b> : Team Scrim Dispatcher`
         }
       };
     } else if (cmd === '-status') {
@@ -847,6 +892,7 @@ class ChatVoiceManager {
           author: 'You (Host)',
           text: cmdResult.text,
           commandBadge: cmdResult.commandBadge,
+          bracketCard: cmdResult.bracketCard,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80'
         };
@@ -899,6 +945,36 @@ class ChatVoiceManager {
             <div class="chat-command-badge">
               <div style="font-size: 0.78rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase;">${m.commandBadge.title}</div>
               <div style="font-size: 0.85rem; color: #fff; margin-top: 0.2rem;">${m.commandBadge.text}</div>
+            </div>
+          ` : ''}
+          ${m.bracketCard ? `
+            <div class="chat-command-badge" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(0, 242, 254, 0.15)); border: 1px solid var(--accent-purple); padding: 0.8rem; border-radius: 10px; margin-top: 0.4rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem;">
+                <span style="font-size: 0.85rem; font-weight: 900; color: var(--accent-gold);">🏆 Live Esports Tournament Bracket</span>
+                <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); font-size: 0.68rem;">CS2 $1,500 Summer Scrim</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; font-size: 0.72rem; background: rgba(0,0,0,0.4); padding: 0.5rem; border-radius: 6px;">
+                <div>
+                  <div style="color: var(--text-dim); font-weight: 800; font-size: 0.65rem; margin-bottom: 0.2rem;">QUARTERFINALS</div>
+                  <div style="background: rgba(255,255,255,0.05); padding: 0.2rem 0.4rem; border-radius: 4px; margin-bottom: 0.2rem;">⚡ FaZe Clan <span style="color: var(--accent-green); float: right;">16</span></div>
+                  <div style="background: rgba(255,255,255,0.05); padding: 0.2rem 0.4rem; border-radius: 4px;">🎯 NAVI <span style="color: var(--accent-red); float: right;">14</span></div>
+                </div>
+                <div>
+                  <div style="color: var(--text-dim); font-weight: 800; font-size: 0.65rem; margin-bottom: 0.2rem;">SEMIFINALS</div>
+                  <div style="background: rgba(255,255,255,0.05); padding: 0.2rem 0.4rem; border-radius: 4px; margin-bottom: 0.2rem;">⚡ FaZe Clan <span style="color: var(--accent-green); float: right;">16</span></div>
+                  <div style="background: rgba(255,255,255,0.05); padding: 0.2rem 0.4rem; border-radius: 4px;">🐺 Vitality <span style="color: var(--accent-gold); float: right;">12</span></div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="color: var(--accent-gold); font-weight: 800; font-size: 0.65rem; margin-bottom: 0.2rem;">👑 GRAND FINALS</div>
+                  <div style="background: rgba(255,215,0,0.15); border: 1px solid var(--accent-gold); padding: 0.3rem; border-radius: 6px; font-weight: 900; color: var(--accent-gold); font-size: 0.75rem;">
+                    ⚡ FaZe vs 🐉 G2
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem; justify-content: flex-end; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.68rem;" onclick="window.tournamentsStoreEngine.autoSimulateRound(101)">⚡ Auto-Simulate Match</button>
+                <button class="btn btn-purple btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.68rem;" onclick="window.tournamentsStoreEngine.openConfiguratorModal()">⚡ Easy Configurator</button>
+              </div>
             </div>
           ` : ''}
         </div>

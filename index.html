@@ -863,7 +863,13 @@
               <span style="font-size: 1.2rem; font-weight: 800; color: var(--accent-cyan);" id="currentChannelHeader"># general</span>
               <span style="font-size: 0.85rem; color: var(--text-muted);" id="currentChannelTopic">General community chat & CustomLobbies discussion</span>
             </div>
-            <div style="display: flex; gap: 0.4rem; align-items: center;">
+            <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-secondary btn-sm" id="btnHeaderPostBracket" onclick="window.chatVoiceManager.postTournamentBracketToChat()" title="Post Live Tournament Bracket to Chat">
+                <span>🏆</span> Bracket
+              </button>
+              <button class="btn btn-primary btn-sm" id="btnHeaderOpenConfigurator" onclick="window.tournamentsStoreEngine.openConfiguratorModal()" title="Open 1-Click Tournament Configurator Modal">
+                <span>⚡</span> Configurator
+              </button>
               <button class="btn btn-secondary btn-sm" id="btnOpenChatCustomizer" onclick="window.chatVoiceManager.toggleChatCustomizerModal()" title="Customize Chat Wallpapers & Skins">
                 <span>🎨</span> Theme
               </button>
@@ -887,7 +893,7 @@
 
           <form class="chat-input-bar" id="chatForm">
             <button type="button" class="btn btn-secondary btn-sm" style="padding: 0 0.6rem;" title="Upload File / Image">➕</button>
-            <input type="text" class="input-field" style="flex: 1;" placeholder="Send a message or type -j to join queue (-leave, -help)..." id="chatInputText" required autocomplete="off">
+            <input type="text" class="input-field" style="flex: 1;" placeholder="Send a message or type -j, -b (bracket), -configtourney, -help..." id="chatInputText" required autocomplete="off">
             <button type="button" class="btn btn-secondary btn-sm" id="btnOpenStickerDrawer" style="display: flex; align-items: center; gap: 0.3rem;" onclick="window.chatVoiceManager.toggleStickerDrawer()">
               <span>✨</span> Stickers
             </button>
