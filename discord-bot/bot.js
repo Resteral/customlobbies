@@ -93,7 +93,7 @@ function getOrCreatePlayer(userId, username) {
 
 // Helper: Trigger Match Start and Server Node Dispatch
 function triggerMatchStart(channel, lobby) {
-  const serverCmd = `connect 144.76.12.89:27015; password scrim${Math.floor(Math.random() * 900 + 100)}`;
+  const serverCmd = `connect 127.0.0.1:7777; password helix_comp_scrim`;
   activeMatch = { team1: [...lobby.team1], team2: [...lobby.team2], serverCmd };
 
   const matchEmbed = new EmbedBuilder()

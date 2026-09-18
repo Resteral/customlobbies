@@ -900,8 +900,9 @@ class ChatVoiceManager {
 
     const totalCount = lobby.team1.length + lobby.team2.length;
     const maxTotal = lobby.maxPerTeam * 2;
-    const serverDispatchCmd = `connect 144.76.12.89:27015; password scrim${Math.floor(Math.random() * 900 + 100)}`;
-    lobby.status = '🚀 MATCH STARTED - SERVER LIVE';
+    const helixIp = window.helixServerNodeIp || '127.0.0.1:7777';
+    const serverDispatchCmd = `connect ${helixIp}; password helix_comp_scrim`;
+    lobby.status = '🚀 MATCH STARTED - HELIX SERVER LIVE';
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('match_found');

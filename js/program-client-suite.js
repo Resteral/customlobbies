@@ -105,9 +105,9 @@ class ProgramClientSuite {
     }, 2500);
   }
 
-  launchDirectGameProtocol(serverIp = '144.76.12.89:27015', gameName = 'Counter-Strike 2') {
+  launchDirectGameProtocol(serverIp = '127.0.0.1:7777', gameName = 'Pacifica Helix Dedicated Server') {
     const protocol = `steam://connect/${serverIp}`;
-    alert(`🚀 LAUNCHING GAME PROTOCOL CLIENT!\n\nGame: ${gameName}\nServer IP: ${serverIp}\nProtocol: ${protocol}\n\nConnecting via Steam Engine Protocol...`);
+    alert(`🚀 LAUNCHING HELIX DEDICATED SERVER PROTOCOL!\n\nGame / Map: ${gameName}\nHelix Server IP: ${serverIp}\nProtocol: ${protocol}\n\nConnecting to Pacifica Helix Competitive Server Engine...`);
     window.location.href = protocol;
   }
 }

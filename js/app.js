@@ -624,10 +624,10 @@ class CustomLobbiesApp {
     alert(`➕ PLAYER RECRUITED!\n\nYou invited ${player.name} (${player.game} - ${player.role}) to join your Custom Lobby or Tournament Squad! Notification dispatched!`);
   }
 
-  // FACEIT-Style Match Room & Ready Check
+  // FACEIT-Style Match Room & Ready Check connected to Helix Server
   launchFaceitMatchRoom(lobbyTitle, gameTitle) {
-    const serverIP = '192.168.1.50:27015';
-    const serverPass = 'cl_scrim_2026';
+    const serverIP = window.helixServerNodeIp || '127.0.0.1:7777';
+    const serverPass = 'helix_comp_scrim';
     const connectCmd = `connect ${serverIP}; password ${serverPass}`;
 
     try {
@@ -636,16 +636,17 @@ class CustomLobbiesApp {
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('match_found');
+      window.widgetBuilderEngine.showToast('🚀 Competitive Match Popped! Connected to Helix Dedicated Server (127.0.0.1:7777)', 'success');
     }
 
     const modal = document.getElementById('matchFoundModal');
     if (modal) {
       const titleEl = document.getElementById('matchFoundTitle');
-      if (titleEl) titleEl.textContent = `🏆 ${lobbyTitle} (${gameTitle})`;
+      if (titleEl) titleEl.textContent = `🏆 ${lobbyTitle} (${gameTitle}) - HELIX SERVER LIVE`;
       modal.classList.add('active');
     } else {
       window.location.href = `steam://connect/${serverIP}`;
-      alert(`🏆 FACEIT COMPETITIVE MATCH ROOM DISPATCHED!\n\nMatch: "${lobbyTitle}" (${gameTitle})\n\n🛡️ Anti-Cheat Status: Guardian AC Verified (Active Ring 0 Driver)\n🎮 Server IP: ${serverIP}\n🔑 Password: ${serverPass}\n\n1-Click Launch Command:\n${connectCmd}\n\n(Command Copied to Clipboard!)`);
+      alert(`🏆 COMPETITIVE MATCH DISPATCHED TO HELIX SERVER!\n\nMatch: "${lobbyTitle}" (${gameTitle})\n\n🎮 Helix Dedicated Server: ${serverIP}\n🔑 Password: ${serverPass}\n\n1-Click Connect Command:\n${connectCmd}\n\n(Command Copied to Clipboard!)`);
     }
   }
 
