@@ -48,10 +48,30 @@ class LobbyManager {
     }
 
     setGameFilter(gameId) {
-        soundManager.playClick();
+        if (typeof soundManager !== 'undefined' && soundManager.playClick) {
+            soundManager.playClick();
+        }
         this.selectedGame = gameId;
+
+        if (typeof app !== 'undefined' && app.currentView !== 'lobbies') {
+            app.switchView('lobbies');
+        }
+
         this.renderGameFilters();
         this.renderLobbies();
+
+        setTimeout(() => {
+            const container = document.getElementById('lobbiesGrid');
+            if (container) {
+                const headerOffset = 140;
+                const elementPosition = container.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }, 40);
     }
 
     renderLobbies() {

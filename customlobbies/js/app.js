@@ -19,6 +19,7 @@ class App {
         streamsManager.init(INITIAL_STREAMS);
         groupsManager.init(INITIAL_SQUADS);
         friendsManager.init(INITIAL_FRIENDS, INITIAL_MESSAGES);
+        if (typeof debateManager !== 'undefined') debateManager.init();
 
         this.renderUserProfileHeader();
         this.setupNavigation();
@@ -79,7 +80,13 @@ class App {
         if (viewName === 'streams') streamsManager.renderStreams();
         if (viewName === 'groups') groupsManager.renderSquads();
         if (viewName === 'lobbies') lobbyManager.renderLobbies();
-        if (viewName === 'vote-arena') this.renderVoteArenaOverview();
+        if (viewName === 'vote-arena') {
+            if (typeof debateManager !== 'undefined') {
+                debateManager.renderDebateArena();
+            } else {
+                this.renderVoteArenaOverview();
+            }
+        }
         if (viewName === 'profile') this.renderProfileView();
     }
 

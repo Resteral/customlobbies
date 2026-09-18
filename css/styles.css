@@ -1601,5 +1601,73 @@ body.obs-transparent-mode {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
+/* Live Esports Visual Bracket Tree */
+.bracket-tree-container {
+  display: flex;
+  gap: 1.25rem;
+  background: rgba(8, 12, 20, 0.95);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+  min-height: 280px;
+}
+
+.bracket-round-column {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 0.8rem;
+}
+
+.bracket-match-card {
+  background: rgba(20, 26, 40, 0.9);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.bracket-match-card:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+}
+
+.bracket-team-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.bracket-team-row.winner {
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.bracket-score-badge {
+  background: rgba(0, 242, 254, 0.15);
+  color: var(--accent-cyan);
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 242, 254, 0.3);
+}
+
+.bracket-seed-tag {
+  font-size: 0.7rem;
+  color: var(--accent-gold);
+  font-weight: 700;
+}
+
+
 
 

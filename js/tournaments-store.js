@@ -83,10 +83,288 @@ class TournamentsStoreEngine {
   init() {
     this.renderBanners();
     this.renderTournaments();
+    this.renderDashboardBracketWidget();
     this.renderTrophyCabinet();
     this.renderLeagueCalendar();
     this.renderMonthlyCalendarGrid();
     this.setupEventListeners();
+  }
+
+  openConfiguratorModal() {
+    const modal = document.getElementById('easyTournamentConfiguratorModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeConfiguratorModal() {
+    const modal = document.getElementById('easyTournamentConfiguratorModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  submitConfiguredTournament() {
+    const title = document.getElementById('cfgTourneyTitle')?.value.trim() || 'Custom Tournament';
+    const game = document.getElementById('cfgTourneyGame')?.value || 'Counter-Strike 2';
+    const format = document.getElementById('cfgTourneyFormat')?.value || '8-single';
+    const seeding = document.getElementById('cfgTourneySeeding')?.value || 'elo';
+    const prize = document.getElementById('cfgTourneyPrize')?.value.trim() || '$1,000 USD';
+    const fee = document.getElementById('cfgTourneyFee')?.value || 'Free to Enter';
+    const rosterText = document.getElementById('cfgTourneyRoster')?.value.trim();
+
+    let teamNames = [];
+    if (rosterText) {
+      teamNames = rosterText.split(',').map(s => s.trim()).filter(Boolean);
+    }
+
+    const defaultPool = [
+      'Alpha Squad (Seed #1 - 2540 ELO)',
+      'Shadow Esports (Seed #2 - 2150 ELO)',
+      'Radiant Titans (Seed #3 - 1920 ELO)',
+      'NightOwls (Seed #4 - 1840 ELO)',
+      'Apex Warriors (Seed #5 - 1720 ELO)',
+      'Pulse 5v5 (Seed #6 - 1590 ELO)',
+      'Nexus Gaming (Seed #7 - 1510 ELO)',
+      'Viper Clan (Seed #8 - 1450 ELO)'
+    ];
+
+    while (teamNames.length < 8) {
+      teamNames.push(defaultPool[teamNames.length] || `Team ${teamNames.length + 1}`);
+    }
+
+    if (seeding === 'random') {
+      teamNames.sort(() => Math.random() - 0.5);
+    }
+
+    const newTourney = {
+      id: Date.now(),
+      title,
+      game,
+      prizePool: prize,
+      hostingPlan: `Easy Configurator (${fee})`,
+      entryFee: fee,
+      teams: 8,
+      status: 'Live Bracket In Progress',
+      bracket: {
+        qf: [
+          { team1: teamNames[0], team2: teamNames[7], winner: null, score1: 0, score2: 0 },
+          { team1: teamNames[1], team2: teamNames[6], winner: null, score1: 0, score2: 0 },
+          { team1: teamNames[2], team2: teamNames[5], winner: null, score1: 0, score2: 0 },
+          { team1: teamNames[3], team2: teamNames[4], winner: null, score1: 0, score2: 0 }
+        ],
+        sf: [
+          { team1: 'TBD (Winner QF 1)', team2: 'TBD (Winner QF 2)', winner: null, score1: 0, score2: 0 },
+          { team1: 'TBD (Winner QF 3)', team2: 'TBD (Winner QF 4)', winner: null, score1: 0, score2: 0 }
+        ],
+        finals: { team1: 'TBD (Winner SF 1)', team2: 'TBD (Winner SF 2)', winner: null, score1: 0, score2: 0 }
+      }
+    };
+
+    this.tournaments.unshift(newTourney);
+    this.saveState();
+    this.renderTournaments();
+    this.renderDashboardBracketWidget();
+    this.closeConfiguratorModal();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    alert(`⚡ TOURNAMENT BRACKET GENERATED!\n\n"${title}" has been configured and rendered directly on the site with live bracket controls!`);
+  }
+
+  autoSimulateRound(tourneyId) {
+    const t = this.tournaments.find(tourn => tourn.id === tourneyId);
+    if (!t) return;
+
+    let unplayedQF = t.bracket.qf.filter(m => !m.winner);
+    if (unplayedQF.length > 0) {
+      t.bracket.qf.forEach((m, idx) => {
+        if (!m.winner) {
+          const winner = Math.random() > 0.4 ? m.team1 : m.team2;
+          m.winner = winner;
+          m.score1 = winner === m.team1 ? 2 : Math.floor(Math.random() * 2);
+          m.score2 = winner === m.team2 ? 2 : Math.floor(Math.random() * 2);
+
+          if (idx === 0) t.bracket.sf[0].team1 = winner;
+          if (idx === 1) t.bracket.sf[0].team2 = winner;
+          if (idx === 2) t.bracket.sf[1].team1 = winner;
+          if (idx === 3) t.bracket.sf[1].team2 = winner;
+        }
+      });
+    } else {
+      let unplayedSF = t.bracket.sf.filter(m => !m.winner);
+      if (unplayedSF.length > 0) {
+        t.bracket.sf.forEach((m, idx) => {
+          if (!m.winner) {
+            const winner = Math.random() > 0.5 ? m.team1 : m.team2;
+            m.winner = winner;
+            m.score1 = winner === m.team1 ? 2 : Math.floor(Math.random() * 2);
+            m.score2 = winner === m.team2 ? 2 : Math.floor(Math.random() * 2);
+
+            if (idx === 0) t.bracket.finals.team1 = winner;
+            if (idx === 1) t.bracket.finals.team2 = winner;
+          }
+        });
+      } else if (!t.bracket.finals.winner) {
+        const winner = Math.random() > 0.5 ? t.bracket.finals.team1 : t.bracket.finals.team2;
+        t.bracket.finals.winner = winner;
+        t.bracket.finals.score1 = winner === t.bracket.finals.team1 ? 3 : 1;
+        t.bracket.finals.score2 = winner === t.bracket.finals.team2 ? 3 : 1;
+        this.awardWinnerTrophy(t.title, winner);
+      }
+    }
+
+    this.saveState();
+    this.renderTournaments();
+    this.renderDashboardBracketWidget();
+  }
+
+  renderDashboardBracketWidget() {
+    const widget = document.getElementById('dashboardBracketTreeWidget');
+    if (!widget) return;
+
+    const t = this.tournaments[0];
+    if (!t) {
+      widget.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">No active tournaments configured.</p>`;
+      return;
+    }
+
+    widget.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <div>
+          <span class="lobby-game-tag" style="background: rgba(0,242,254,0.15); color: var(--accent-cyan);">${t.game}</span>
+          <span style="font-weight: 800; font-size: 0.95rem; color: #fff; margin-left: 0.5rem;">${t.title}</span>
+        </div>
+        <span style="color: var(--accent-gold); font-weight: 900; font-size: 0.9rem;">${t.prizePool}</span>
+      </div>
+
+      <div class="bracket-tree-container">
+        <!-- Quarterfinals -->
+        <div class="bracket-round-column">
+          <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase;">Quarterfinals</div>
+          ${t.bracket.qf.slice(0, 4).map(m => `
+            <div class="bracket-match-card">
+              <div class="bracket-team-row ${m.winner === m.team1 ? 'winner' : ''}">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${m.team1}</span>
+                <span class="bracket-score-badge">${m.score1 || 0}</span>
+              </div>
+              <div class="bracket-team-row ${m.winner === m.team2 ? 'winner' : ''}">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${m.team2}</span>
+                <span class="bracket-score-badge">${m.score2 || 0}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Semifinals -->
+        <div class="bracket-round-column">
+          <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase;">Semifinals</div>
+          ${t.bracket.sf.map(m => `
+            <div class="bracket-match-card" style="border-color: rgba(168, 85, 247, 0.4);">
+              <div class="bracket-team-row ${m.winner === m.team1 ? 'winner' : ''}">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${m.team1}</span>
+                <span class="bracket-score-badge">${m.score1 || 0}</span>
+              </div>
+              <div class="bracket-team-row ${m.winner === m.team2 ? 'winner' : ''}">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${m.team2}</span>
+                <span class="bracket-score-badge">${m.score2 || 0}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Grand Finals -->
+        <div class="bracket-round-column" style="justify-content: center;">
+          <div style="font-size: 0.72rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase; text-align: center;">👑 Grand Finals</div>
+          <div class="bracket-match-card" style="border-color: var(--accent-gold); background: rgba(255,215,0,0.08); text-align: center;">
+            <div class="bracket-team-row ${t.bracket.finals.winner === t.bracket.finals.team1 ? 'winner' : ''}">
+              <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${t.bracket.finals.team1}</span>
+              <span class="bracket-score-badge">${t.bracket.finals.score1 || 0}</span>
+            </div>
+            <div class="bracket-team-row ${t.bracket.finals.winner === t.bracket.finals.team2 ? 'winner' : ''}">
+              <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${t.bracket.finals.team2}</span>
+              <span class="bracket-score-badge">${t.bracket.finals.score2 || 0}</span>
+            </div>
+            ${t.bracket.finals.winner ? `<div style="font-size: 0.78rem; font-weight: 900; color: var(--accent-gold); margin-top: 0.3rem;">👑 Winner: ${t.bracket.finals.winner}</div>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  renderTournaments() {
+    const container = document.getElementById('tournamentsListContainer');
+    if (!container) return;
+
+    container.innerHTML = this.tournaments.map(t => `
+      <div class="card" style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.8rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span class="lobby-game-tag">${t.game}</span>
+              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">${t.hostingPlan || 'Verified Host'}</span>
+              <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold);">👑 Seeding Active</span>
+            </div>
+            <h2 style="font-size: 1.4rem; font-weight: 900; margin-top: 0.4rem;">${t.title}</h2>
+          </div>
+          <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem;">
+            <span style="font-size: 1.3rem; font-weight: 900; color: var(--accent-gold);">${t.prizePool}</span>
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
+              <button class="btn btn-purple btn-sm" onclick="window.tournamentsStoreEngine.autoSimulateRound(${t.id})">⚡ Auto-Simulate Round</button>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="font-size: 1rem; font-weight: 800; color: var(--accent-cyan); margin-bottom: 1rem;">Live Esports Visual Bracket Tree (Click "Advance" to promote winners)</h3>
+
+        <div class="bracket-tree-container">
+          <!-- Quarterfinals -->
+          <div class="bracket-round-column">
+            <h4 style="font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem;">Quarterfinals (Seeded)</h4>
+            ${t.bracket.qf.map((m, idx) => `
+              <div class="bracket-match-card">
+                <div class="bracket-team-row ${m.winner === m.team1 ? 'winner' : ''}">
+                  <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px;">${m.team1}</span>
+                  <button class="btn btn-secondary btn-sm" style="padding: 0.1rem 0.3rem; font-size: 0.65rem;" onclick="window.tournamentsStoreEngine.advanceBracketWinner(${t.id}, 'qf', ${idx}, '${m.team1}')">Advance</button>
+                </div>
+                <div class="bracket-team-row ${m.winner === m.team2 ? 'winner' : ''}">
+                  <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px;">${m.team2}</span>
+                  <button class="btn btn-secondary btn-sm" style="padding: 0.1rem 0.3rem; font-size: 0.65rem;" onclick="window.tournamentsStoreEngine.advanceBracketWinner(${t.id}, 'qf', ${idx}, '${m.team2}')">Advance</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Semifinals -->
+          <div class="bracket-round-column">
+            <h4 style="font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem;">Semifinals</h4>
+            ${t.bracket.sf.map((m, idx) => `
+              <div class="bracket-match-card" style="border-color: rgba(168, 85, 247, 0.4);">
+                <div class="bracket-team-row ${m.winner === m.team1 ? 'winner' : ''}">
+                  <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px;">${m.team1}</span>
+                  <button class="btn btn-secondary btn-sm" style="padding: 0.1rem 0.3rem; font-size: 0.65rem;" onclick="window.tournamentsStoreEngine.advanceBracketWinner(${t.id}, 'sf', ${idx}, '${m.team1}')">Advance</button>
+                </div>
+                <div class="bracket-team-row ${m.winner === m.team2 ? 'winner' : ''}">
+                  <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px;">${m.team2}</span>
+                  <button class="btn btn-secondary btn-sm" style="padding: 0.1rem 0.3rem; font-size: 0.65rem;" onclick="window.tournamentsStoreEngine.advanceBracketWinner(${t.id}, 'sf', ${idx}, '${m.team2}')">Advance</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Grand Finals -->
+          <div class="bracket-round-column" style="justify-content: center;">
+            <h4 style="font-size: 0.78rem; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 0.4rem; text-align: center;">👑 Grand Finals</h4>
+            <div class="bracket-match-card" style="border-color: var(--accent-gold); background: rgba(255,215,0,0.08); text-align: center;">
+              <div style="font-size: 0.95rem; font-weight: 900; color: var(--accent-gold);">${t.bracket.finals.team1} vs ${t.bracket.finals.team2}</div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0.4rem 0 0.8rem 0;">Winner receives ${t.prizePool} + Champion Trophy</p>
+              <div style="display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-primary btn-sm" onclick="window.tournamentsStoreEngine.advanceBracketWinner(${t.id}, 'finals', 0, '${t.bracket.finals.team1}')">👑 Trophy to ${t.bracket.finals.team1}</button>
+                <button class="btn btn-primary btn-sm" onclick="window.tournamentsStoreEngine.advanceBracketWinner(${t.id}, 'finals', 0, '${t.bracket.finals.team2}')">👑 Trophy to ${t.bracket.finals.team2}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
   }
 
   renderMonthlyCalendarGrid() {

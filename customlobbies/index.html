@@ -47,7 +47,7 @@
                 <span>🛡️</span> Squads
             </button>
             <button class="nav-tab-btn" data-view="vote-arena">
-                <span>⚡</span> 5s Vote Arena
+                <span>⚔️</span> Debate Arena
             </button>
             <button class="nav-tab-btn" data-view="profile">
                 <span>👤</span> Profile
@@ -252,27 +252,39 @@
 
 
             <!-- ==========================================
-                 VIEW 6: 5-SECOND PUBLICITY VOTE ARENA
+                 VIEW 6: DEBATE BATTLE ARENA & GOV/INSURANCE INTELLIGENCE
                  ========================================== -->
             <section id="view-vote-arena" class="view-section" style="display: none;">
-                <div class="hero-banner">
-                    <div class="relative z-10 max-w-xl">
-                        <div class="badge badge-publicity mb-2">⚡ The 5-Second Gatekeeper</div>
-                        <h1 class="text-3xl font-extrabold text-white leading-tight">
-                            Live <span class="text-gradient">Publicity Vote</span> Arena
-                        </h1>
-                        <p class="text-sm text-gray-300 mt-2">
-                            Experience the 5-second video audition review. When gamers knock on a locked lobby or squad, members cast fast votes in a 5-second countdown window!
-                        </p>
-                    </div>
-                </div>
+                <!-- Sub-tabs Navigation -->
+                <div id="debateSubTabsContainer"></div>
 
-                <div class="glass-panel p-4 mb-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="font-bold text-lg text-white">🔥 Active Applicant Knock Queue</h3>
-                        <span class="badge badge-publicity">Auditions Ready</span>
+                <!-- Sub-tab 1: Gov & Insurance Intelligence (Information Tab) -->
+                <div id="debate-tab-info" class="debate-subtab-content"></div>
+
+                <!-- Sub-tab 2: Live Policy Debate Battles -->
+                <div id="debate-tab-battles" class="debate-subtab-content" style="display: none;"></div>
+
+                <!-- Sub-tab 3: 5-Second Member Knock Arena -->
+                <div id="debate-tab-knocks" class="debate-subtab-content" style="display: none;">
+                    <div class="hero-banner mb-4">
+                        <div class="relative z-10 max-w-xl">
+                            <div class="badge badge-publicity mb-2">⚡ The 5-Second Gatekeeper</div>
+                            <h1 class="text-3xl font-extrabold text-white leading-tight">
+                                Live <span class="text-gradient">Publicity Vote</span> Arena
+                            </h1>
+                            <p class="text-sm text-gray-300 mt-2">
+                                Experience the 5-second video audition review. When gamers knock on a locked lobby or squad, members cast fast votes in a 5-second countdown window!
+                            </p>
+                        </div>
                     </div>
-                    <div class="space-y-3" id="voteArenaApplicantsList"></div>
+
+                    <div class="glass-panel p-4 mb-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-lg text-white">🔥 Active Applicant Knock Queue</h3>
+                            <span class="badge badge-publicity">Auditions Ready</span>
+                        </div>
+                        <div class="space-y-3" id="voteArenaApplicantsList"></div>
+                    </div>
                 </div>
             </section>
 
@@ -944,6 +956,7 @@
     <script src="js/streams.js"></script>
     <script src="js/friends.js"></script>
     <script src="js/groups.js"></script>
+    <script src="js/debateManager.js"></script>
     <script src="js/app.js"></script>
 
 </body>

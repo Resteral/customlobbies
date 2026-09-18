@@ -735,3 +735,20 @@ body {
     .app-layout { padding: 1rem; }
     .hero-banner { flex-direction: column; text-align: center; gap: 1.25rem; }
 }
+
+/* Debate & Policy Arena System */
+.debate-subtab-btn {
+    transition: all 0.2s ease;
+}
+.debate-subtab-btn.active {
+    background: linear-gradient(135deg, var(--primary-cyan), var(--primary-blue)) !important;
+    color: #000 !important;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    border-color: transparent !important;
+}
+
+.meter-yes, .meter-no {
+    transition: width 0.4s ease;
+}
+

@@ -213,6 +213,30 @@
         </div>
       </div>
 
+      <!-- Featured Tournament Bracket Showcase Card on Dashboard -->
+      <div id="dashboardLiveBracketShowcaseCard" class="card" style="margin-bottom: 1.5rem; border-color: var(--accent-gold); background: linear-gradient(135deg, rgba(25, 20, 10, 0.9), rgba(12, 10, 5, 0.95)); border: 1px solid rgba(255, 215, 0, 0.35);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span style="font-size: 1.3rem;">🏆</span>
+            <div>
+              <h3 style="font-size: 1.1rem; font-weight: 900; color: var(--accent-gold); margin: 0;">Live Tournament Bracket Showcase</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.1rem 0 0 0;">View & track real-time esports tournament bracket trees directly on the site</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <button class="btn btn-primary btn-sm" onclick="window.tournamentsStoreEngine.openConfiguratorModal()">
+              <span>⚡</span> Configure Bracket
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="document.querySelector('[data-tab=tournaments-view]').click();">
+              <span>🏆</span> All Brackets
+            </button>
+          </div>
+        </div>
+        <div id="dashboardBracketTreeWidget">
+          <!-- Injected via tournaments-store.js -->
+        </div>
+      </div>
+
       <!-- Queue Status Card (Hidden until joining queue) -->
       <div id="queueStatusCard" class="card" style="display: none; margin-bottom: 1.5rem; border-color: var(--accent-cyan);">
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -1100,9 +1124,14 @@
           <h1 style="font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem;">Esports Tournament & League Hub</h1>
           <p style="color: var(--text-muted); font-size: 0.95rem;">Host, participate, and stream 8-Team or 16-Team brackets with live prize pools.</p>
         </div>
-        <button class="btn btn-primary" id="btnCreateTournament">
-          <span>🏆</span> Create Paid Tournament
-        </button>
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="btnCreateEasyTourney" onclick="window.tournamentsStoreEngine.openConfiguratorModal()">
+            <span>⚡</span> Easy Configurator & Bracket Builder
+          </button>
+          <button class="btn btn-secondary" id="btnCreateTournament">
+            <span>🏆</span> Create Paid Host
+          </button>
+        </div>
       </div>
 
       <!-- League Calendar Schedule Card -->
@@ -3604,8 +3633,85 @@
             <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Send stickers in channel chat or pin them on your Dashboard screen!</p>
           </div>
         </div>
-        <button class="btn btn-secondary btn-sm" id="btnCloseStickerDrawer">❌ Close</button>
+  <!-- EASY TOURNAMENT CONFIGURATOR & BRACKET BUILDER MODAL -->
+  <div class="modal-overlay" id="easyTournamentConfiguratorModal">
+    <div class="modal-card" style="max-width: 680px; width: 92%; border-color: var(--accent-gold);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.8rem;">⚡</span>
+          <div>
+            <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--accent-gold); margin: 0;">Easy Tournament & Bracket Configurator</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Configure single or double elimination bracket trees rendered directly on the site</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.tournamentsStoreEngine.closeConfiguratorModal()">❌ Close</button>
       </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div class="input-group">
+          <label class="input-label">Tournament Title</label>
+          <input type="text" class="input-field" id="cfgTourneyTitle" value="$1,000 CS2 Premier Cup" placeholder="e.g. $1,000 CS2 Premier Cup">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Esports Game</label>
+          <select class="input-field" id="cfgTourneyGame">
+            <option value="Counter-Strike 2">Counter-Strike 2 (5v5)</option>
+            <option value="Valorant">Valorant (5v5)</option>
+            <option value="WARDOGS 33v33">WARDOGS (33v33 Tri-Faction)</option>
+            <option value="Slapshot: Rebound">Slapshot: Rebound (3v3)</option>
+            <option value="Rocket League">Rocket League (3v3)</option>
+            <option value="Empulse">Empulse (5v5)</option>
+            <option value="Debate Arena">Debate Arena 1v1</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Bracket Format & Size</label>
+          <select class="input-field" id="cfgTourneyFormat">
+            <option value="8-single">8 Teams - Single Elimination</option>
+            <option value="4-single">4 Teams - Single Elimination</option>
+            <option value="16-single">16 Teams - Single Elimination</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Bracket Seeding Mode</label>
+          <select class="input-field" id="cfgTourneySeeding">
+            <option value="elo">👑 Highest ELO MMR Auto-Seeding</option>
+            <option value="random">🎲 Random Draw Seeding</option>
+            <option value="manual">📋 Manual Roster Order</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Prize Pool ($ USD)</label>
+          <input type="text" class="input-field" id="cfgTourneyPrize" value="$1,000 USD" placeholder="$1,000 USD">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Entry Fee</label>
+          <select class="input-field" id="cfgTourneyFee">
+            <option value="Free to Enter">Free to Enter (Community Open)</option>
+            <option value="100 CL-Points">100 🪙 CL-Points</option>
+            <option value="$10 Per Team">$10 Per Team</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group" style="margin-bottom: 1.2rem;">
+        <label class="input-label">Custom Team Roster Names (Comma-Separated, or leave blank to auto-fill top ELO teams)</label>
+        <textarea class="input-field" id="cfgTourneyRoster" rows="2" placeholder="Alpha Squad, Shadow Esports, Radiant Titans, NightOwls, Apex Warriors, Pulse 5v5, Nexus Gaming, Viper Clan"></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn btn-secondary" onclick="window.tournamentsStoreEngine.closeConfiguratorModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.tournamentsStoreEngine.submitConfiguredTournament()" style="box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);">
+          <span>⚡</span> Generate & Render Bracket Directly on Site
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- IN-CHAT CUSTOMIZER & WALLPAPER THEME MODAL -->
   <div class="modal-overlay" id="chatCustomizerModal">
