@@ -290,19 +290,27 @@ class LobbyManager {
                         </button>
                     </div>
 
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 flex-wrap">
+                        <button class="btn btn-secondary btn-sm" onclick="lobbyManager.copyConsoleCommand('${lobby.id}')">
+                            📋 Copy Console Cmd
+                        </button>
                         <button class="btn btn-primary pulse-btn" onclick="programClient.openGameConnectModal(${JSON.stringify(lobby).replace(/"/g, '&quot;')})">
                             🎮 Connect Game Client
                         </button>
                         ${lobby.host.id === app.currentUser.id ? `
+                            <button class="btn btn-secondary btn-sm" onclick="lobbyManager.autoBalanceTeams('${lobby.id}')">
+                                ⚖️ Auto-Balance
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="lobbyManager.fillAICompetitors('${lobby.id}')">
+                                ⚡ Fill AI & Auto-Start
+                            </button>
                             <button class="btn btn-success" onclick="lobbyManager.launchMatch('${lobby.id}')">
                                 🚀 START MATCH NOW
                             </button>
                         ` : ''}
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
     renderRosterSlot(player, lobby) {
@@ -426,18 +434,91 @@ class LobbyManager {
         soundManager.playVoteApproved();
         app.showToast('🔥 MATCH LAUNCHING! Allocating Dedicated Game Server...', 'success');
         
-        databaseManager.logQuery(`SERVER_FLEET: Allocated dedicated port ${lobby ? lobby.serverIp : '7777'} to match session ${lobbyId}. Synced across 14 database nodes.`);
+        databaseManager.logQuery(`SERVER_FLEET: Allocated dedicated port ${lobby ? lobby.serverIp : '127.0.0.1:7777'} to match session ${lobbyId}. Synced across 14 database nodes.`);
 
         setTimeout(() => {
             if (lobby) programClient.openGameConnectModal(lobby);
         }, 600);
     }
 
+    fillAICompetitors(lobbyId) {
+        const lobby = this.lobbies.find(l => l.id === lobbyId);
+        if (!lobby) return;
+
+        const bots = [
+            { id: 'bot_s1mple', username: 'S1mple_Fragger', mmr: 2650 },
+            { id: 'bot_zywoo', username: 'ZywOo_Master', mmr: 2620 },
+            { id: 'bot_niko', username: 'NiKo_OneTap', mmr: 2590 },
+            { id: 'bot_b1t', username: 'B1t_Headshot', mmr: 2480 },
+            { id: 'bot_device', username: 'Dev1ce_Tactician', mmr: 2510 },
+            { id: 'bot_rain', username: 'Rain_EntryGod', mmr: 2420 },
+            { id: 'bot_broky', username: 'Broky_Clutcher', mmr: 2550 },
+            { id: 'bot_ropz', username: 'Ropz_Lurker', mmr: 2590 }
+        ];
+
+        let botIndex = 0;
+        const halfSlots = Math.floor(lobby.maxSlots / 2);
+
+        while (lobby.currentPlayers.length < lobby.maxSlots && botIndex < bots.length) {
+            const bot = bots[botIndex++];
+            if (!lobby.currentPlayers.some(p => p.id === bot.id)) {
+                const alphaCount = lobby.currentPlayers.filter(p => p.team === 'Alpha').length;
+                const assignedTeam = alphaCount < halfSlots ? 'Alpha' : 'Omega';
+
+                lobby.currentPlayers.push({
+                    id: bot.id,
+                    username: bot.username,
+                    team: assignedTeam,
+                    ready: true,
+                    role: 'AI Bot Competitor',
+                    ping: Math.floor(10 + Math.random() * 8),
+                    mmr: bot.mmr
+                });
+            }
+        }
+
+        soundManager.playJoinChime();
+        app.showToast('⚡ AI Bots Added! All slots filled & unreadied players marked READY!', 'success');
+        this.openLobbyDetails(lobbyId);
+        this.renderLobbies();
+        this.launchMatch(lobbyId);
+    }
+
+    autoBalanceTeams(lobbyId) {
+        const lobby = this.lobbies.find(l => l.id === lobbyId);
+        if (!lobby) return;
+
+        const activePlayers = lobby.currentPlayers.filter(p => p.team !== 'Spectator');
+        activePlayers.sort((a, b) => (b.mmr || 1500) - (a.mmr || 1500));
+
+        activePlayers.forEach((p, idx) => {
+            p.team = idx % 2 === 0 ? 'Alpha' : 'Omega';
+        });
+
+        soundManager.playClick();
+        app.showToast('⚖️ Teams snake-drafted & auto-balanced by player MMR ratings!', 'info');
+        this.openLobbyDetails(lobbyId);
+    }
+
+    copyConsoleCommand(lobbyId) {
+        const lobby = this.lobbies.find(l => l.id === lobbyId);
+        const serverIp = lobby ? (lobby.serverIp || '127.0.0.1:7777') : '127.0.0.1:7777';
+        const cmd = `connect ${serverIp}; password helix_comp_scrim`;
+
+        try {
+            navigator.clipboard.writeText(cmd);
+            app.showToast(`📋 Copied console command: "${cmd}"!`, 'success');
+        } catch(e) {
+            app.showToast(`Command: ${cmd}`, 'info');
+        }
+    }
+
     createLobby(formData) {
         soundManager.playClick();
-        const gameObj = INITIAL_GAMES.find(g => g.id === formData.game) || { name: 'Custom Game', icon: '🎮', defaultPort: 27015, protocol: 'customlobbies://direct-connect' };
+        const gameObj = INITIAL_GAMES.find(g => g.id === formData.game) || { name: 'Custom Game', icon: '🎮', defaultPort: 7777, protocol: 'steam://connect/127.0.0.1:7777' };
 
-        const randomPort = gameObj.defaultPort || 27015;
+        const randomPort = gameObj.defaultPort || 7777;
+        const helixServerIp = formData.region && formData.region.includes('Local') ? `127.0.0.1:${randomPort}` : `127.0.0.1:${randomPort}`;
         const newLobby = {
             id: 'lobby_' + Date.now(),
             title: formData.title || `${app.currentUser.username}'s ${gameObj.name} Lobby`,
@@ -449,12 +530,12 @@ class LobbyManager {
                 avatar: app.currentUser.avatar
             },
             mode: formData.mode || 'Competitive',
-            region: formData.region || 'NA East (Virginia)',
-            serverIp: `142.250.190.${Math.floor(Math.random() * 200)}:${randomPort}`,
-            connectLink: gameObj.protocol || 'customlobbies://direct-connect',
-            consoleCommand: `connect 142.250.190.50:${randomPort}; password customlobbies`,
+            region: formData.region || 'Helix Dedicated (127.0.0.1:7777)',
+            serverIp: helixServerIp,
+            connectLink: `steam://connect/${helixServerIp}`,
+            consoleCommand: `connect ${helixServerIp}; password helix_comp_scrim`,
             tier: formData.tier || 'Open Tier',
-            ping: Math.floor(14 + Math.random() * 10),
+            ping: Math.floor(10 + Math.random() * 8),
             maxSlots: parseInt(formData.maxSlots) || 10,
             currentPlayers: [
                 {
@@ -463,7 +544,7 @@ class LobbyManager {
                     team: 'Alpha',
                     ready: true,
                     role: 'Host',
-                    ping: 14,
+                    ping: 12,
                     mmr: app.currentUser.mmr
                 }
             ],
