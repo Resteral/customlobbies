@@ -1069,6 +1069,40 @@ class ChatVoiceManager {
           text: `Fetched active Team 1 vs Team 2 player pool for #${this.currentTextChannel}.`
         }
       };
+    } else if (cmd === '-createlobby' || cmd === '-create' || cmd === '-host') {
+      const title = arg || `Custom 5v5 Lobby (#${this.currentTextChannel.toUpperCase()})`;
+      if (window.app) {
+        window.app.lobbies.unshift({
+          id: Date.now(),
+          title,
+          game: 'Counter-Strike 2',
+          host: 'You (Host)',
+          players: 1,
+          max: 10,
+          region: 'NA East',
+          draftType: 'FACEIT Competitive',
+          serverIp: '127.0.0.1:7777',
+          matchStatus: '🔥 RECRUITING (1/10)'
+        });
+        window.app.addCoins(50);
+        window.app.renderLobbies();
+        window.app.renderActiveGamesBar();
+      }
+
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('lobby_start');
+        window.widgetBuilderEngine.showToast(`🎮 Custom Lobby "${title}" Created! +50 🪙 Host Reward Added!`, 'success');
+      }
+
+      return {
+        isCommand: true,
+        text: raw,
+        channelLobbyCard: true,
+        commandBadge: {
+          title: `🎮 Custom Lobby Created: "${title}"`,
+          text: `Host: <b>You (Host)</b> | Region: <b>NA East</b> | Format: <b>5v5 FACEIT Competitive</b> (+50 🪙 CL-Points Awarded)`
+        }
+      };
     } else if (cmd === '-b' || cmd === '-bracket' || cmd === '-tourney' || cmd === '-tournament' || cmd === '-tournaments') {
       return {
         isCommand: true,

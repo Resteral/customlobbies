@@ -2339,43 +2339,85 @@
 
   <!-- Create Lobby Modal -->
   <div class="modal-overlay" id="createLobbyModal">
-    <div class="modal-card">
-      <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">Host Custom Lobby</h3>
+    <div class="modal-card" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin: 0;">🎮 Host Custom Lobby</h3>
+        <span class="mmr-badge" style="background: rgba(255,215,0,0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold);">🪙 +50 CL-Points Host Reward</span>
+      </div>
       
       <div class="input-group">
         <label class="input-label">Lobby Title</label>
-        <input type="text" class="input-field" id="newLobbyTitle" placeholder="e.g. 5v5 High MMR Scrims">
+        <input type="text" class="input-field" id="newLobbyTitle" placeholder="e.g. 5v5 High MMR Scrims & Map Veto">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Game Title</label>
+          <select class="input-field" id="newLobbyGame">
+            <option value="Counter-Strike 2">Counter-Strike 2</option>
+            <option value="Valorant">Valorant</option>
+            <option value="Pacifica Crime 5v5">Pacifica Crime 5v5</option>
+            <option value="WARDOG 33v33">WARDOG 33v33</option>
+            <option value="Dota 2">Dota 2</option>
+            <option value="StarCraft II">StarCraft II</option>
+            <option value="PUBG">PUBG: Battlegrounds</option>
+            <option value="Arkheron">Arkheron</option>
+            <option value="Empulse">Empulse</option>
+            <option value="Rainbow Six Siege">Rainbow Six Siege</option>
+            <option value="Rocket League">Rocket League</option>
+            <option value="Slapshot: Rebound">Slapshot: Rebound</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Max Players & Format</label>
+          <select class="input-field" id="newLobbyMax">
+            <option value="10">10 Players (5v5 Scrim)</option>
+            <option value="6">6 Players (3v3 Arena)</option>
+            <option value="4">4 Players (2v2 Wingman)</option>
+            <option value="2">2 Players (1v1 Duel)</option>
+            <option value="66">66 Players (33v33 WARDOG)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Server Region</label>
+          <select class="input-field" id="newLobbyRegion">
+            <option value="NA East">NA East (Virginia Node)</option>
+            <option value="NA West">NA West (California Node)</option>
+            <option value="EU Central">EU Central (Frankfurt Node)</option>
+            <option value="APAC">APAC (Tokyo / Singapore)</option>
+            <option value="Helix Local">Helix Dedicated (127.0.0.1:7777)</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Map Veto Pool</label>
+          <select class="input-field" id="newLobbyMap">
+            <option value="Mirage & Inferno">Mirage & Inferno</option>
+            <option value="Dust II & Ancient">Dust II & Ancient</option>
+            <option value="Nuke & Anubis">Nuke & Anubis</option>
+            <option value="Pacifica Metro District">Pacifica Metro District</option>
+            <option value="Captain Pick / Ban Veto">Captain Pick / Ban Veto</option>
+          </select>
+        </div>
       </div>
 
       <div class="input-group">
-        <label class="input-label">Game Title</label>
-        <select class="input-field" id="newLobbyGame">
-          <option value="Counter-Strike 2">Counter-Strike 2</option>
-          <option value="Valorant">Valorant</option>
-          <option value="Dota 2">Dota 2</option>
-          <option value="StarCraft II">StarCraft II</option>
-          <option value="PUBG">PUBG: Battlegrounds</option>
-          <option value="Arkheron">Arkheron</option>
-          <option value="Empulse">Empulse</option>
-          <option value="Rainbow Six Siege">Rainbow Six Siege</option>
-          <option value="FiveM GTA RP">FiveM GTA RP</option>
-          <option value="Rocket League">Rocket League</option>
-          <option value="Slapshot: Rebound">Slapshot: Rebound</option>
-        </select>
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Max Players</label>
-        <select class="input-field" id="newLobbyMax">
-          <option value="10">10 Players (5v5)</option>
-          <option value="6">6 Players (3v3)</option>
-          <option value="4">4 Players (2v2)</option>
+        <label class="input-label">Draft Type</label>
+        <select class="input-field" id="newLobbyDraftType">
+          <option value="FACEIT Competitive">FACEIT Competitive (Balanced ELO)</option>
+          <option value="Snake Draft 1-2-2-1">Snake Draft (1-2-2-1 Captain Pick)</option>
+          <option value="Open Community LFG">Open Community LFG (Casual)</option>
+          <option value="Pro Tournament Seeded">Pro Tournament Seeded</option>
         </select>
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
         <button class="btn btn-secondary" id="btnCloseLobbyModal">Cancel</button>
-        <button class="btn btn-primary" id="btnSubmitNewLobby">Create Lobby</button>
+        <button class="btn btn-primary" id="btnSubmitNewLobby">🚀 Create Custom Lobby (+50 🪙)</button>
       </div>
     </div>
   </div>

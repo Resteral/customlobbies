@@ -266,6 +266,37 @@ client.on('messageCreate', async (message) => {
     message.channel.send({ embeds: [embed] });
   }
 
+  // COMMAND 4.5: -createlobby / -create / -host (Create Custom Lobby Pool)
+  else if (command === 'createlobby' || command === 'create' || command === 'host') {
+    const lobbyTitle = args.join(' ') || `5v5 Competitive Scrim (${message.channel.name || 'general'})`;
+    const hostPlayer = getOrCreatePlayer(message.author.id, message.author.username);
+
+    // Add host to Team 1 automatically
+    if (!lobby.team1.some(p => p.id === hostPlayer.id) && !lobby.team2.some(p => p.id === hostPlayer.id)) {
+      lobby.team1.push(hostPlayer);
+    }
+
+    const embed = new EmbedBuilder()
+      .setColor('#00e676')
+      .setTitle(`🎮 Custom Lobby Created: ${lobbyTitle}`)
+      .setDescription(`**Host:** ${message.author.username} (${hostPlayer.elo} MMR)\n**Server Node:** Helix Dedicated (127.0.0.1:7777)\n\nLobby initialized for #${message.channel.name || 'channel'}. Players can join using **-j** or **-j 2**!`)
+      .addFields(
+        {
+          name: `🔵 Team Alpha (1/5)`,
+          value: lobby.team1.map(p => `👑 **${p.username}** (${p.elo} MMR)`).join('\n'),
+          inline: true
+        },
+        {
+          name: `🔴 Team Bravo (0/5)`,
+          value: '*Waiting for challengers...*',
+          inline: true
+        }
+      )
+      .setFooter({ text: 'Type -j to join Team Bravo, -fill to auto-start with AI' });
+
+    message.channel.send({ embeds: [embed] });
+  }
+
   // COMMAND 5: -b / -bracket / -tourney (Esports Tournament Visual Bracket Embed)
   else if (command === 'bracket' || command === 'b' || command === 'tourney') {
     const embed = new EmbedBuilder()

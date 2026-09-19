@@ -3879,6 +3879,9 @@ class CustomLobbiesApp {
         const title = document.getElementById('newLobbyTitle').value.trim() || '5v5 Custom Lobby';
         const game = document.getElementById('newLobbyGame').value;
         const max = parseInt(document.getElementById('newLobbyMax').value);
+        const region = document.getElementById('newLobbyRegion')?.value || 'NA East';
+        const map = document.getElementById('newLobbyMap')?.value || 'Mirage & Inferno';
+        const draftType = document.getElementById('newLobbyDraftType')?.value || 'FACEIT Competitive';
 
         this.lobbies.unshift({
           id: Date.now(),
@@ -3887,18 +3890,24 @@ class CustomLobbiesApp {
           host: 'You (Host)',
           players: 1,
           max,
-          region: 'NA East',
-          draftType: 'FACEIT Competitive'
+          region,
+          map,
+          draftType,
+          serverIp: region === 'Helix Local' ? '127.0.0.1:7777' : '192.168.1.85:27015',
+          matchStatus: '🔥 RECRUITING (1/' + max + ')'
         });
 
+        // Host Reward
+        this.addCoins(50);
         this.saveState();
         this.renderActiveGamesBar();
         this.renderLobbies();
+        
         if (window.widgetBuilderEngine) {
           window.widgetBuilderEngine.playSoundEffect('lobby_start');
+          window.widgetBuilderEngine.showToast(`🎮 Custom Lobby "${title}" Created! +50 🪙 Host Reward Added!`, 'success');
         }
         modal.classList.remove('active');
-        alert(`🔥 Active FACEIT-Style Custom Lobby created for ${game}! Protected by Guardian Anti-Cheat Engine.`);
       });
     }
 
