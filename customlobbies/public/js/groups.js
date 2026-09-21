@@ -15,6 +15,29 @@ class GroupsManager {
     init(squadsData) {
         this.squads = squadsData || [];
         this.renderSquads();
+
+        // Listen for publicity votes triggered by other clients
+        socket.on('publicity_review_started', (data) => {
+            app.showToast('🔔 A player is requesting to join your squad. Reviewing 5-Second Intro!', 'info');
+            // Normally we'd fetch the applicant details. Mocking it here for the UI demo:
+            this.openLiveVoteReviewArena({
+                id: data.applicant_id,
+                applicantName: 'New Applicant',
+                applicantAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=App',
+                applicantRank: 'Unranked',
+                quote: 'Let me in!',
+                videoUrl: data.video_url,
+                targetInfo: { targetTitle: 'Your Squad' },
+                votesYes: 0,
+                votesNo: 0,
+                requiredVotes: 3
+            });
+        });
+
+        // Listen for the final result
+        socket.on('publicity_vote_result', (data) => {
+            this.finalizeVote(null, data.passed);
+        });
     }
 
     renderSquads() {
@@ -220,21 +243,25 @@ class GroupsManager {
 
         app.showToast('🚀 Your 5-Second Intro has been queued for live member voting!', 'success');
 
+        // Emit to real Socket backend
+        socket.emit('submit_publicity_vote', {
+            squad_id: this.activeApplication.targetId,
+            video_url: this.recordedBlobUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+        });
+
         // Trigger the interactive Group Review Arena so the user can experience the voting gatekeeper!
-        setTimeout(() => {
-            this.openLiveVoteReviewArena({
-                id: 'app_' + Date.now(),
-                applicantName: app.currentUser.username,
-                applicantAvatar: app.currentUser.avatar,
-                applicantRank: app.currentUser.rank,
-                quote: app.currentUser.introQuote,
-                videoUrl: this.recordedBlobUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                targetInfo: this.activeApplication,
-                votesYes: 1,
-                votesNo: 0,
-                requiredVotes: 3
-            });
-        }, 900);
+        this.openLiveVoteReviewArena({
+            id: 'app_' + Date.now(),
+            applicantName: app.currentUser.username,
+            applicantAvatar: app.currentUser.avatar,
+            applicantRank: app.currentUser.rank,
+            quote: app.currentUser.introQuote,
+            videoUrl: this.recordedBlobUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            targetInfo: this.activeApplication,
+            votesYes: 1,
+            votesNo: 0,
+            requiredVotes: 3
+        });
     }
 
     stopWebcam() {

@@ -1,3 +1,27 @@
+// Default User Fallback
+const DEFAULT_USER = {
+    id: 'usr_' + Math.floor(Math.random()*10000),
+    username: 'GuestGamer',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest',
+    rank: 'Unranked',
+    mmr: 1000,
+    reputation: 'Honorable',
+    xp: 450
+};
+
+// Global Socket Connection with Safe Fallback
+let socketObj;
+try {
+    socketObj = (typeof io !== 'undefined') ? io() : {
+        on: () => {},
+        emit: () => {},
+        broadcast: { emit: () => {} }
+    };
+} catch(e) {
+    socketObj = { on: () => {}, emit: () => {}, broadcast: { emit: () => {} } };
+}
+window.socket = socketObj;
+
 // Main Application Router & State Manager for CustomLobbies.com Desktop Program
 class App {
     constructor() {
@@ -11,15 +35,46 @@ class App {
             try { this.currentUser = JSON.parse(savedUser); } catch (e) { }
         }
 
-        // Initialize All Core Subsystems
-        lobbyManager.init(INITIAL_LOBBIES);
+        // Emit identity to server
+        if (window.socket && window.socket.emit) {
+            try { window.socket.emit('user_connected', this.currentUser); } catch(e){}
+        }
+
+        // Initialize All Core Subsystems with mock fallbacks
+        const initialLobbies = typeof INITIAL_LOBBIES !== 'undefined' ? [...INITIAL_LOBBIES] : [];
+        const initialStreams = typeof INITIAL_STREAMS !== 'undefined' ? [...INITIAL_STREAMS] : [];
+        const initialGroups = typeof INITIAL_GROUPS !== 'undefined' ? [...INITIAL_GROUPS] : [];
+        const initialFriends = typeof INITIAL_FRIENDS !== 'undefined' ? [...INITIAL_FRIENDS] : [];
+
+        lobbyManager.init(initialLobbies);
         queueManager.init();
         databaseManager.init();
         programClient.init();
-        streamsManager.init(INITIAL_STREAMS);
-        groupsManager.init(INITIAL_SQUADS);
-        friendsManager.init(INITIAL_FRIENDS, INITIAL_MESSAGES);
+        streamsManager.init(initialStreams);
+        groupsManager.init(initialGroups);
+        friendsManager.init(initialFriends, []);
         if (typeof debateManager !== 'undefined') debateManager.init();
+
+        // Fetch Lobbies from real backend
+        fetch('/api/lobbies')
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.lobbies && data.lobbies.length > 0) {
+                    lobbyManager.lobbies = data.lobbies;
+                    if (this.currentView === 'lobbies') lobbyManager.renderLobbies();
+                }
+            })
+            .catch(err => console.log("Using local lobbies state:", err));
+
+        // Listen for new lobbies via Socket
+        if (window.socket && window.socket.on) {
+            try {
+                window.socket.on('lobby_created', (newLobby) => {
+                    lobbyManager.lobbies.unshift(newLobby);
+                    if (this.currentView === 'lobbies') lobbyManager.renderLobbies();
+                });
+            } catch(e){}
+        }
 
         this.renderUserProfileHeader();
         this.setupNavigation();

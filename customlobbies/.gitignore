@@ -1,0 +1,4 @@
+node_modules/
+customlobbies.db
+.env
+.DS_Store

@@ -1,0 +1,11 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm install"
+
+[deploy]
+startCommand = "npm start"
+restartPolicyType = "ON_FAILURE"
+
+[env]
+PORT = "3000"
+NODE_ENV = "production"

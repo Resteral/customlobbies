@@ -1,3 +1,10 @@
+const GAMES = [
+    { id: 'csgo', name: 'CS:GO', category: 'FPS', icon: '🔫', tickrate: '128-Tick', avgQueueSec: 4, activeQueues: 1420 },
+    { id: 'valorant', name: 'Valorant', category: 'FPS', icon: '🎯', tickrate: '128-Tick', avgQueueSec: 6, activeQueues: 2150 },
+    { id: 'rocketleague', name: 'Rocket League', category: 'Sports', icon: '🏎️', tickrate: '120-Tick', avgQueueSec: 3, activeQueues: 840 },
+    { id: 'rust', name: 'Rust', category: 'Survival', icon: '🪨', tickrate: 'Modded', avgQueueSec: 12, activeQueues: 320 }
+];
+
 // Auto-Join Queue & Real-Time Matchmaker System for CustomLobbies.com
 class QueueManager {
     constructor() {
@@ -13,13 +20,33 @@ class QueueManager {
     init() {
         this.renderAutoQueueHub();
         this.updateQueueWidgetUI();
+
+        // Listen for socket events
+        socket.on('match_found', (data) => {
+            if (this.status === 'QUEUED' && this.queuedGame && this.queuedGame.id === data.game) {
+                clearInterval(this.queueTimer);
+                this.triggerMatchFound(this.queuedGame, data.match_id);
+            }
+        });
+
+        socket.on('route_to_lobby', (data) => {
+            app.showToast(`Routing to lobby ${data.lobby_id}...`, 'success');
+            // Hide modal and join logic could go here
+            setTimeout(() => {
+                app.closeModal('matchFoundModal');
+                this.status = 'IDLE';
+                this.queuedGame = null;
+                this.updateQueueWidgetUI();
+                app.switchView('lobbies');
+            }, 1000);
+        });
     }
 
     renderAutoQueueHub() {
         const container = document.getElementById('autoQueueGamesGrid');
         if (!container) return;
 
-        const games = INITIAL_GAMES.filter(g => g.id !== 'all');
+        const games = GAMES;
 
         container.innerHTML = games.map(game => `
             <div class="auto-queue-card glass-panel glow-hover p-4 flex flex-col justify-between">
@@ -47,7 +74,7 @@ class QueueManager {
 
     startQueue(gameId) {
         soundManager.playClick();
-        const game = INITIAL_GAMES.find(g => g.id === gameId);
+        const game = GAMES.find(g => g.id === gameId);
         if (!game) return;
 
         // If already in queue for this game, ignore
@@ -60,6 +87,9 @@ class QueueManager {
         this.queuedGame = game;
         this.elapsedSeconds = 0;
 
+        // Emit queue event to backend
+        socket.emit('join_queue', { game: game.id });
+
         // Log to database console
         databaseManager.logQuery(`REDIS: ZADD queue:${game.id} ${app.currentUser.mmr} "${app.currentUser.id}"`);
         databaseManager.logQuery(`POSTGRES: INSERT INTO queue_telemetry (user_id, game, elo, region) VALUES ('${app.currentUser.id}', '${game.id}', ${app.currentUser.mmr}, 'NA-East');`);
@@ -71,12 +101,6 @@ class QueueManager {
         this.queueTimer = setInterval(() => {
             this.elapsedSeconds++;
             this.updateQueueWidgetUI();
-
-            // Match finding simulation (triggers based on average queue time)
-            if (this.elapsedSeconds >= (game.avgQueueSec || 6)) {
-                clearInterval(this.queueTimer);
-                this.triggerMatchFound(game);
-            }
         }, 1000);
     }
 
@@ -183,19 +207,23 @@ class QueueManager {
     acceptMatch() {
         soundManager.playClick();
         clearInterval(this.matchCountdownTimer);
-        app.closeModal('matchFoundModal');
+
+        // Tell the backend we accepted the match
+        socket.emit('accept_match', { 
+            game: this.queuedGame.id, 
+            match_id: this.foundLobby.id 
+        });
 
         this.status = 'CONNECTED';
-        this.updateQueueWidgetUI();
-
-        // Database log
+        
+        // Database log (UI telemetry simulation still shows for effect)
         databaseManager.logQuery(`POSTGRES: INSERT INTO match_participants (match_id, user_id, team, ping) VALUES ('${this.foundLobby.id}', '${app.currentUser.id}', 'Alpha', ${this.foundLobby.ping});`);
         databaseManager.logQuery(`SERVER_FLEET: Allocated dedicated port ${this.foundLobby.serverIp} to match session ${this.foundLobby.id}.`);
 
         soundManager.playVoteApproved();
-        app.showToast('🚀 MATCH ACCEPTED! Connecting to dedicated game server database...', 'success');
+        app.showToast('🚀 MATCH ACCEPTED! Waiting for server allocation...', 'success');
 
-        // Add user to lobby
+        // Add user to local lobby representation
         if (this.foundLobby && !this.foundLobby.currentPlayers.some(p => p.id === app.currentUser.id)) {
             this.foundLobby.currentPlayers.push({
                 id: app.currentUser.id,
@@ -207,12 +235,6 @@ class QueueManager {
                 mmr: app.currentUser.mmr
             });
         }
-
-        setTimeout(() => {
-            lobbyManager.renderLobbies();
-            lobbyManager.openLobbyDetails(this.foundLobby.id);
-            programClient.openGameConnectModal(this.foundLobby);
-        }, 700);
     }
 
     declineMatch() {

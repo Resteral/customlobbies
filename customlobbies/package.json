@@ -4,9 +4,22 @@
   "description": "CustomLobbies.com - Game Lobbies, Streaming Channels, Friends, and 5-Second Publicity Vote Gatekeeper",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve -l 3000 ."
+    "start": "node server.js"
   },
-  "keywords": ["gaming", "lobbies", "matchmaking", "streaming", "social", "publicity-vote"],
+  "keywords": [
+    "gaming",
+    "lobbies",
+    "matchmaking",
+    "streaming",
+    "social",
+    "publicity-vote"
+  ],
   "author": "CustomLobbies Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3",
+    "sqlite3": "^6.0.1"
+  }
 }
