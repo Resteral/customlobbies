@@ -25,20 +25,46 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
 app.get('/api/lobbies', (req, res) => {
-    db.all("SELECT * FROM lobbies", [], (err, rows) => {
+    db.all("SELECT * FROM lobbies ORDER BY id DESC", [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ lobbies: rows });
+        const formatted = rows.map(r => ({
+            ...r,
+            host: r.host_name ? { id: r.host_id || 1, username: r.host_name, avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80' } : { id: 1, username: 'System', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80' },
+            currentPlayers: typeof r.currentPlayers === 'string' ? (tryParseJson(r.currentPlayers) || []) : (r.currentPlayers || []),
+            tags: [r.gameName || r.game, r.mode || 'Competitive', 'DirectConnect']
+        }));
+        res.json({ lobbies: formatted });
     });
 });
 
+function tryParseJson(str) {
+    try { return JSON.parse(str); } catch(e) { return []; }
+}
+
 app.post('/api/lobbies', (req, res) => {
-    const { game, title, host_id } = req.body;
-    db.run(`INSERT INTO lobbies (game, title, host_id) VALUES (?, ?, ?)`, [game, title, host_id || 1], function(err) {
-        if (err) return res.status(500).json({ error: err.message });
-        const newLobby = { id: this.lastID, game, title, host_id };
-        io.emit('lobby_created', newLobby); // Broadcast to all connected clients
-        res.status(201).json(newLobby);
-    });
+    const { game, gameName, title, host_id, host_name, mode, region, serverIp, consoleCommand, maxSlots } = req.body;
+    db.run(
+        `INSERT INTO lobbies (game, gameName, title, host_id, host_name, mode, region, serverIp, consoleCommand, maxSlots) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [game, gameName || game, title, host_id || 1, host_name || 'Host', mode || 'Competitive', region || 'NA East', serverIp || '127.0.0.1:7777', consoleCommand || 'connect 127.0.0.1:7777', maxSlots || 10],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            const newLobby = {
+                id: this.lastID,
+                game,
+                gameName: gameName || game,
+                title,
+                host: { id: host_id || 1, username: host_name || 'Host', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80' },
+                mode: mode || 'Competitive',
+                region: region || 'NA East',
+                serverIp: serverIp || '127.0.0.1:7777',
+                consoleCommand: consoleCommand || 'connect 127.0.0.1:7777',
+                maxSlots: maxSlots || 10,
+                currentPlayers: []
+            };
+            io.emit('lobby_created', newLobby); // Broadcast to all connected clients
+            res.status(201).json(newLobby);
+        }
+    );
 });
 
 // Real-time Socket.io logic
