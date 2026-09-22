@@ -1534,6 +1534,313 @@ class CustomLobbiesApp {
     }
   }
 
+  // 1. PLAY TONIGHT BOARD HANDLERS
+  openPlayTonightModal() {
+    const modal = document.getElementById('playTonightBoardModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+    this.renderPlayTonightListings();
+  }
+
+  closePlayTonightModal() {
+    const modal = document.getElementById('playTonightBoardModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  renderPlayTonightListings() {
+    const container = document.getElementById('playTonightListingsContainer');
+    if (!container || !window.leaguesEngine) return;
+
+    const posts = window.leaguesEngine.playTonightPosts || [];
+    container.innerHTML = posts.map(p => `
+      <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(0,242,254,0.2); padding: 0.75rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 0.8rem;">
+        <div>
+          <div style="font-size: 0.88rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+            <span>${p.gameIcon || '🎮'}</span> <span>${p.game}</span>
+            <span style="font-size: 0.7rem; color: var(--accent-cyan); font-weight: normal;">• ${p.timeSlot} (${p.region})</span>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">${p.note}</div>
+          <div style="font-size: 0.7rem; color: #00e676; margin-top: 0.2rem;">Roster: ${p.participants.join(', ')}</div>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 800; display: block; margin-bottom: 0.3rem;">${p.openSlots} / ${p.totalSlots} Slots Open</span>
+          <button class="btn btn-primary btn-xs" onclick="window.app.joinPlayTonightPost('${p.id}')" ${p.openSlots === 0 ? 'disabled' : ''}>
+            ${p.openSlots === 0 ? 'Full' : '⚡ Express Join'}
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  submitPlayTonightPost() {
+    const game = document.getElementById('ptGameSelect').value;
+    const timeSlot = document.getElementById('ptTimeInput').value.trim() || 'Tonight 20:00 EST';
+    const region = document.getElementById('ptRegionSelect').value;
+    const slots = document.getElementById('ptSlotsSelect').value;
+    const note = document.getElementById('ptNoteInput').value.trim() || 'Looking for squad mates tonight!';
+
+    if (window.leaguesEngine) {
+      window.leaguesEngine.createPlayTonightPost({
+        host: 'RadiantReaper',
+        game,
+        timeSlot,
+        region,
+        totalSlots: slots,
+        note
+      });
+    }
+
+    if (typeof this.showToast === 'function') {
+      this.showToast('🎉 Availability Posted to "Play Tonight" Board!', 'success');
+    }
+    this.renderPlayTonightListings();
+  }
+
+  joinPlayTonightPost(postId) {
+    if (window.leaguesEngine) {
+      const updated = window.leaguesEngine.joinPlayTonightSpot(postId, 'RadiantReaper');
+      if (updated) {
+        if (typeof this.showToast === 'function') {
+          this.showToast(`✅ Joined ${updated.game} Squad!`, 'success');
+        }
+        this.renderPlayTonightListings();
+      }
+    }
+  }
+
+  // 2. READY CHECK & SUBSTITUTE BEACON HANDLERS
+  triggerReadyCheckModal() {
+    const modal = document.getElementById('matchReadyCheckModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+
+    let timeLeft = 15.0;
+    const countdownEl = document.getElementById('readyCheckCountdown');
+    const beaconEl = document.getElementById('substituteBeaconStatus');
+
+    if (window.readyCheckTimer) clearInterval(window.readyCheckTimer);
+
+    window.readyCheckTimer = setInterval(() => {
+      timeLeft -= 0.1;
+      if (countdownEl) countdownEl.textContent = `${Math.max(0, timeLeft).toFixed(1)}s`;
+
+      if (timeLeft <= 0) {
+        clearInterval(window.readyCheckTimer);
+        if (beaconEl) beaconEl.innerHTML = '🚨 <strong style="color:#ff5252;">SUB BEACON ACTIVE:</strong> Player dropped! Dispatching substitute from queue...';
+        if (typeof this.showToast === 'function') {
+          this.showToast('📢 Substitute Beacon Dispatched! Finding replacement player...', 'warning');
+        }
+      }
+    }, 100);
+  }
+
+  acceptReadyCheck() {
+    if (window.readyCheckTimer) clearInterval(window.readyCheckTimer);
+    const modal = document.getElementById('matchReadyCheckModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+    if (typeof this.showToast === 'function') {
+      this.showToast('✅ Match Accepted! Server Node Allocated.', 'success');
+    }
+  }
+
+  declineReadyCheck() {
+    if (window.readyCheckTimer) clearInterval(window.readyCheckTimer);
+    const modal = document.getElementById('matchReadyCheckModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+    if (typeof this.showToast === 'function') {
+      this.showToast('❌ Match Declined. Returned to queue.', 'warning');
+    }
+  }
+
+  // 3. CUSTOM RULES PRESETS HANDLERS
+  openRulesPresetModal() {
+    const modal = document.getElementById('rulesPresetModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+    this.renderPresetCards();
+  }
+
+  closeRulesPresetModal() {
+    const modal = document.getElementById('rulesPresetModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  renderPresetCards() {
+    const container = document.getElementById('presetGridContainer');
+    if (!container || !window.leaguesEngine) return;
+
+    const presets = window.leaguesEngine.rulesPresets || [];
+    container.innerHTML = presets.map(p => `
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(157, 78, 221, 0.3); padding: 0.8rem; border-radius: 8px;">
+        <div style="font-size: 0.88rem; font-weight: 800; color: #fff;">${p.name}</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin: 0.3rem 0;">${p.description}</div>
+        <div style="font-size: 0.7rem; color: var(--accent-cyan); margin-bottom: 0.6rem;">${p.game} • ${p.map}</div>
+        <button class="btn btn-purple btn-xs" onclick="window.app.applyPresetToLobby('${p.id}')">
+          ⚡ Apply Preset
+        </button>
+      </div>
+    `).join('');
+  }
+
+  saveNewLobbyPreset() {
+    const name = document.getElementById('newPresetName').value.trim();
+    if (!name) return;
+
+    if (window.leaguesEngine) {
+      window.leaguesEngine.saveRulesPreset({
+        name,
+        description: 'Custom saved user ruleset',
+        game: 'Counter-Strike 2',
+        map: 'de_inferno',
+        draftType: 'Competitive 5v5',
+        maxSlots: 10
+      });
+    }
+
+    document.getElementById('newPresetName').value = '';
+    if (typeof this.showToast === 'function') {
+      this.showToast('💾 Custom Rules Preset Saved!', 'success');
+    }
+    this.renderPresetCards();
+  }
+
+  applyPresetToLobby(presetId) {
+    this.closeRulesPresetModal();
+    if (typeof this.showToast === 'function') {
+      this.showToast(`⚡ Preset Applied to Host Lobby Settings!`, 'success');
+    }
+  }
+
+  // 4. PLAYER RELIABILITY HANDLERS
+  openReliabilityModal(userHandle = 'DEFAULT_USER') {
+    const modal = document.getElementById('reliabilityProfileModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+
+    if (window.leaguesEngine) {
+      const p = window.leaguesEngine.getReliabilityProfile(userHandle);
+      const title = document.getElementById('relUserTitle');
+      const rate = document.getElementById('relRate');
+      const count = document.getElementById('relCount');
+      const badge = document.getElementById('relBadge');
+      const noShows = document.getElementById('relNoShows');
+
+      if (title) title.textContent = `Reliability Rating: ${userHandle}`;
+      if (rate) rate.textContent = p.completionRate;
+      if (count) count.textContent = `${p.completedMatches} Matches`;
+      if (badge) badge.textContent = p.trustBadge;
+      if (noShows) noShows.textContent = `${p.noShows} No-Shows`;
+    }
+  }
+
+  closeReliabilityModal() {
+    const modal = document.getElementById('reliabilityProfileModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  submitDisputeAppeal() {
+    if (typeof this.showToast === 'function') {
+      this.showToast('⚠️ No-Show Report Appeal Submitted to Platform Moderation.', 'info');
+    }
+  }
+
+  // 5. MATCH DISPUTES HANDLERS
+  openDisputeModal() {
+    const modal = document.getElementById('matchDisputeModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
+
+  closeDisputeModal() {
+    const modal = document.getElementById('matchDisputeModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  submitScoreConfirmation() {
+    const scoreA = document.getElementById('disputeScoreA').value;
+    const scoreB = document.getElementById('disputeScoreB').value;
+
+    if (window.leaguesEngine) {
+      const res = window.leaguesEngine.recordMatchResult('lobby_99', 'Captain Alpha', scoreA, 'Captain Bravo', scoreB);
+      if (res.status === 'CONFIRMED') {
+        if (typeof this.showToast === 'function') {
+          this.showToast(`✅ Match Score Confirmed: ${res.score}! ELO Ratings updated.`, 'success');
+        }
+      } else {
+        if (typeof this.showToast === 'function') {
+          this.showToast(`⚠️ Score Discrepancy (${scoreA} vs ${scoreB})! Dispute ticket opened.`, 'warning');
+        }
+      }
+    }
+    this.closeDisputeModal();
+  }
+
+  // 6. SQUAD RIVALRIES HANDLERS
+  openRivalryModal(squadA = 'Valkyrie Esports', squadB = 'Cyber Titans') {
+    const modal = document.getElementById('rivalryStatsModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+
+    if (window.leaguesEngine) {
+      const r = window.leaguesEngine.getRivalryRecord(squadA, squadB);
+      const title = document.getElementById('rivalryModalTitle');
+      const elA = document.getElementById('rivalSquadA');
+      const elB = document.getElementById('rivalSquadB');
+      const winsA = document.getElementById('rivalWinsA');
+      const winsB = document.getElementById('rivalWinsB');
+      const lastText = document.getElementById('rivalLastMatchText');
+
+      if (title) title.textContent = `Squad Rivalry: ${squadA} vs ${squadB}`;
+      if (elA) elA.textContent = squadA;
+      if (elB) elB.textContent = squadB;
+      if (winsA) winsA.textContent = r.winsA;
+      if (winsB) winsB.textContent = r.winsB;
+      if (lastText) lastText.textContent = `Last Match: ${r.lastMatch}`;
+    }
+  }
+
+  closeRivalryModal() {
+    const modal = document.getElementById('rivalryStatsModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  challengeRivalRematch() {
+    this.closeRivalryModal();
+    if (typeof this.showToast === 'function') {
+      this.showToast('⚔️ REMATCH CHALLENGE DISPATCHED! Waiting for rival captain to accept...', 'success');
+    }
+  }
+
 
   submitWardogsTeam() {
     const squadName = document.getElementById('modalWardogsTeamName').value.trim() || 'WARDOG Alpha';

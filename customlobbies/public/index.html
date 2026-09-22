@@ -943,6 +943,86 @@
         </div>
     </div>
 
+    <!-- 1. "PLAY TONIGHT" AVAILABILITY BOARD MODAL -->
+    <div class="modal-overlay" id="playTonightBoardModal" style="display: none;">
+        <div class="modal-card" style="max-width: 680px; width: 94%; border-color: var(--primary-cyan);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <span style="font-size: 1.6rem;">🌙</span>
+                    <div>
+                        <h3 style="font-size: 1.25rem; font-weight: 900; color: var(--primary-cyan); margin: 0;">"Play Tonight" Availability Board</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Post your game availability or join open squad slots</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="app.closeModal('playTonightBoardModal')">❌ Close</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+                <div class="input-group">
+                    <label class="input-label">Game Title</label>
+                    <select class="input-field" id="ptGameSelect">
+                        <option value="Counter-Strike 2">🎯 Counter-Strike 2</option>
+                        <option value="Valorant">🔥 Valorant</option>
+                        <option value="Slapshot: Rebound">🏒 Slapshot: Rebound</option>
+                        <option value="WARDOGS 33v33">🐕 WARDOGS 33v33</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Time Slot / Availability</label>
+                    <input type="text" class="input-field" id="ptTimeInput" placeholder="e.g. Tonight 20:00 EST">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Region</label>
+                    <select class="input-field" id="ptRegionSelect">
+                        <option value="NA-East">NA-East (Virginia)</option>
+                        <option value="NA-West">NA-West (Oregon)</option>
+                        <option value="EU-Central">EU-Central (Frankfurt)</option>
+                        <option value="APAC">APAC (Singapore)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Open Spots Sizing</label>
+                    <select class="input-field" id="ptSlotsSelect">
+                        <option value="5">5 Players (Full 5v5 Squad)</option>
+                        <option value="3">3 Players (3v3 Arena)</option>
+                        <option value="2">2 Players (2v2 Wingman)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 1rem;">
+                <label class="input-label">Roster Note & Role Requirements</label>
+                <input type="text" class="input-field" id="ptNoteInput" placeholder="Looking for 2 solid riflers/anchors for 128-tick Premier scrims!">
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <button class="btn btn-primary" onclick="app.showToast('🎉 Availability Posted to Play Tonight Board!', 'success')" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
+                    <span>⚡</span> Post Availability Listing
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MATCH READY CHECK & SUBSTITUTE BEACON MODAL -->
+    <div class="modal-overlay" id="matchReadyCheckModal" style="display: none;">
+        <div class="modal-card" style="max-width: 520px; width: 92%; border-color: #ffb703; text-align: center;">
+            <span style="font-size: 3rem; display: block; margin-bottom: 0.5rem;">⏱️</span>
+            <h3 style="font-size: 1.4rem; font-weight: 900; color: #ffb703; margin-bottom: 0.3rem;">MATCH READY CHECK</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Confirm presence before launching dedicated 128-tick server node!</p>
+
+            <div style="font-size: 2.2rem; font-weight: 900; color: var(--primary-cyan); font-family: monospace; margin-bottom: 1rem;">15.0s</div>
+
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 1rem;">
+                <button class="btn btn-success" onclick="app.closeModal('matchReadyCheckModal'); app.showToast('✅ Match Accepted! Server Node Allocated.', 'success');" style="padding: 0.8rem 2rem; font-size: 1.1rem;">
+                    ✅ ACCEPT MATCH
+                </button>
+                <button class="btn btn-secondary" onclick="app.closeModal('matchReadyCheckModal'); app.showToast('❌ Match Declined. Returned to queue.', 'warning');">
+                    ❌ Decline
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- LIVE MATCH TELEMETRY & SERVER PERFORMANCE MODAL -->
     <div class="modal-overlay" id="matchTelemetryModal" style="display: none;">
         <div class="modal-card" style="max-width: 780px; width: 94%; border-color: var(--primary-cyan, #00f2fe);">

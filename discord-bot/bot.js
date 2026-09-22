@@ -441,6 +441,74 @@ client.on('messageCreate', async (message) => {
     message.channel.send({ embeds: [embed] });
   }
 
+  // COMMAND: -playtonight (Post / View Availability Board)
+  else if (command === 'playtonight' || command === 'board') {
+    const embed = new EmbedBuilder()
+      .setColor('#00f2fe')
+      .setTitle('🌙 CustomLobbies "Play Tonight" Availability Board')
+      .setDescription('**Active Tonight Board Listings:**\n' +
+        '1. 🎯 **S1mple_Pro** - CS2 NA-East (Tonight 20:00 EST) - *2/5 Slots Open*\n' +
+        '2. 🔥 **Valkyrie_CS** - Valorant NA-West (Tonight 21:30 EST) - *1/5 Slots Open*\n' +
+        '3. 🏒 **PuckMaster99** - Slapshot EU-Central (Tonight 22:00 EST) - *3/6 Slots Open*')
+      .addFields({ name: '⚡ Post Availability', value: 'Type `-playtonight post <game> <time>` or join directly on CustomLobbies.com!' });
+
+    message.channel.send({ embeds: [embed] });
+  }
+
+  // COMMAND: -readycheck (Trigger Match Presence Check)
+  else if (command === 'readycheck' || command === 'rc') {
+    const embed = new EmbedBuilder()
+      .setColor('#ffb703')
+      .setTitle('⏱️ 15-Second Match Ready Check Triggered!')
+      .setDescription('All 10 players must react with ✅ within **15 seconds** to confirm match readiness.\n\n*If any player declines or times out, the Automated Substitute Beacon will call the next waiting queue player!*');
+
+    message.channel.send({ embeds: [embed] });
+  }
+
+  // COMMAND: -presets (Custom Lobby Rules Presets)
+  else if (command === 'presets' || command === 'preset') {
+    const embed = new EmbedBuilder()
+      .setColor('#9d4edd')
+      .setTitle('📜 Custom Lobby Rules Presets')
+      .addFields(
+        { name: '🎯 Sniper-Only 1v1 AWP Duel', value: 'AWP only, infinite ammo, instant respawn, no armor' },
+        { name: '👑 FACEIT Competitive Snake Draft', value: '10 Players, 2 Captains snake draft 1-2-2-1, BO3 veto' },
+        { name: '🌱 Beginners & Chill Welcome', value: 'No toxic behavior, open microphone advice, casual rounds' },
+        { name: '⚔️ Hardcore Pistol Only', value: 'Desert Eagle & USP-S only, Headshots multiplier x2' }
+      )
+      .setFooter({ text: 'Load presets directly in the CustomLobbies.com Host Modal!' });
+
+    message.channel.send({ embeds: [embed] });
+  }
+
+  // COMMAND: -squad / -rivalry (Persistent Teams & Head-to-Head Records)
+  else if (command === 'squad' || command === 'rivalry') {
+    const embed = new EmbedBuilder()
+      .setColor('#ff007f')
+      .setTitle('⚔️ Persistent Squad Roster & Head-to-Head Rivalries')
+      .setDescription('**Valkyrie Esports [VCS] vs Cyber Titans [TITAN]**\n' +
+        '• Head-to-Head Record: **4 - 2** (6 Matches Played)\n' +
+        '• Last Duel: *Valkyrie won 16-14 on de_inferno*\n' +
+        '• Team Synergy: 100% (+5% ELO Bonus)')
+      .setFooter({ text: 'Type -j 1 or -j 2 to queue team scrims!' });
+
+    message.channel.send({ embeds: [embed] });
+  }
+
+  // COMMAND: -discover (Platform Lobbies Search)
+  else if (command === 'discover' || command === 'find') {
+    const embed = new EmbedBuilder()
+      .setColor('#00e676')
+      .setTitle('🌐 Discover CustomLobbies Platform Matches')
+      .setDescription('**Active Platform Lobbies Available Now:**\n' +
+        '🎮 **CS2 128-Tick Premier Scrim #104** - NA-East (128 Hz) - *8/10 Players*\n' +
+        '🏒 **Slapshot 3v3 Puck Arena #12** - EU-Central - *5/6 Players*\n' +
+        '🐕 **WARDOGS 33v33 Tri-Faction Siege** - US-Central - *58/66 Players*')
+      .setFooter({ text: 'Connect directly at CustomLobbies.com or via steam://connect/127.0.0.1:7777' });
+
+    message.channel.send({ embeds: [embed] });
+  }
+
   // COMMAND 11: -help (Bot Commands Guide)
   else if (command === 'help') {
     const embed = new EmbedBuilder()
@@ -448,8 +516,9 @@ client.on('messageCreate', async (message) => {
       .setTitle('🤖 CustomLobbies Discord Bot - Command Reference')
       .addFields(
         { name: '🎮 Matchmaking & Queue', value: '• `-j` / `-join [1|2]`: Join match lobby pool (Team 1 or 2)\n• `-l` / `-leave`: Leave active match pool\n• `-lobby` / `-queue`: View current channel players\n• `-fill` / `-autostart`: Quick fill AI competitors & auto-start match', inline: false },
-        { name: '🏆 Tournaments & Brackets', value: '• `-b` / `-bracket`: View live tournament bracket tree\n• `-configtourney`: Open easy tournament configurator guide', inline: false },
-        { name: '📊 Stats & Admin', value: '• `-stats [@user]`: View player MMR & record\n• `-leaderboard`: Top ELO leaderboards\n• `-reportwin <team1|team2>`: Report match outcome\n• `-createchannel <name> [text|voice]`: Create Discord channel', inline: false }
+        { name: '🌙 Availability & Presets', value: '• `-playtonight`: View / Post availability on Play Tonight Board\n• `-readycheck`: Trigger 15s presence check & sub beacon\n• `-presets`: View saved lobby rules presets\n• `-discover`: Browse live platform matches', inline: false },
+        { name: '🏆 Tournaments & Rivalries', value: '• `-b` / `-bracket`: View live tournament bracket tree\n• `-configtourney`: Open easy tournament configurator guide\n• `-squad` / `-rivalry`: View head-to-head squad records', inline: false },
+        { name: '📊 Stats & Admin', value: '• `-stats [@user]`: View player MMR & record\n• `-leaderboard`: Top ELO leaderboards\n• `-reportwin <team1|team2>`: Report match outcome', inline: false }
       )
       .setFooter({ text: 'CustomLobbies.com Discord Bot v2.5' });
 
