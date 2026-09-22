@@ -160,6 +160,9 @@ class LobbyManager {
                                 onclick="event.stopPropagation(); lobbyManager.handleJoinLobby('${lobby.id}')">
                             ${isFull ? '👁️ Spectate' : isPublicity ? '⚡ Knock & 5s Vote' : '🚀 Join Match'}
                         </button>
+                        <button class="btn btn-secondary btn-xs px-2" title="Match Telemetry & 128-Tick Diagnostics" onclick="event.stopPropagation(); app.openModal('matchTelemetryModal')">
+                            📊 Stats
+                        </button>
                         <button class="btn btn-secondary btn-xs px-2" title="Launch Game Protocol" onclick="event.stopPropagation(); programClient.openGameConnectModal(${JSON.stringify(lobby).replace(/"/g, '&quot;')})">
                             🎮 Connect
                         </button>

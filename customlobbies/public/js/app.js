@@ -225,19 +225,85 @@ class App {
     openModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
+            modal.style.display = 'flex';
             modal.classList.add('active');
             document.body.classList.add('modal-open');
+            if (modalId === 'matchTelemetryModal') {
+                this.populateMatchTelemetryData();
+            }
         }
     }
 
     closeModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
+            modal.style.display = 'none';
             modal.classList.remove('active');
             document.body.classList.remove('modal-open');
             if (modalId === 'publicityVoteApplyModal') {
                 groupsManager.stopWebcam();
             }
+        }
+    }
+
+    populateMatchTelemetryData() {
+        const tickrateEl = document.getElementById('telemTickrate');
+        const pingEl = document.getElementById('telemPing');
+        const scoreEl = document.getElementById('telemScore');
+        const roundEl = document.getElementById('telemRound');
+        const tableBody = document.getElementById('telemKdaTableBody');
+
+        if (tickrateEl) tickrateEl.textContent = `${(127.8 + Math.random() * 0.4).toFixed(1)} Hz`;
+        if (pingEl) pingEl.textContent = `${Math.floor(12 + Math.random() * 6)} ms`;
+        if (scoreEl) scoreEl.textContent = `${7 + Math.floor(Math.random() * 4)} - ${5 + Math.floor(Math.random() * 4)}`;
+        if (roundEl) roundEl.textContent = `Round ${12 + Math.floor(Math.random() * 5)} / 24`;
+
+        if (tableBody) {
+            const team1 = ['S1mple_Pro', 'ZywOo_Clutch', 'Niko_CS', 'Dev1ce_AWP', 'B1t_Headshot'];
+            const team2 = ['Ropz_Lurk', 'Shroud_God', 'Tarik_King', 'TenZ_Aim', 'Hiko_Inhuman'];
+
+            let rowsHtml = '';
+            team1.forEach((p, idx) => {
+                const k = 14 - idx * 2 + Math.floor(Math.random() * 3);
+                const d = 6 + idx + Math.floor(Math.random() * 2);
+                const a = 3 + Math.floor(Math.random() * 4);
+                const adr = Math.floor(110 - idx * 12 + Math.random() * 15);
+                const ping = Math.floor(10 + Math.random() * 12);
+
+                rowsHtml += `
+                    <tr class="telem-kda-row" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 0.4rem 0.6rem; font-weight: 700; color: #00f2fe;">${p}</td>
+                        <td style="padding: 0.4rem 0.6rem; color: #00e676; font-size: 0.75rem;">Team Alpha</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: center; font-weight: 800; color: #ffd700;">${k}</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: center; color: #ff5252;">${d}</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: center; color: #aaa;">${a}</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: center; font-weight: 700; color: #fff;">${adr}</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: right; color: #00e676;">${ping}ms</td>
+                    </tr>
+                `;
+            });
+
+            team2.forEach((p, idx) => {
+                const k = 12 - idx * 2 + Math.floor(Math.random() * 3);
+                const d = 7 + idx + Math.floor(Math.random() * 2);
+                const a = 2 + Math.floor(Math.random() * 4);
+                const adr = Math.floor(95 - idx * 10 + Math.random() * 12);
+                const ping = Math.floor(12 + Math.random() * 14);
+
+                rowsHtml += `
+                    <tr class="telem-kda-row" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 0.4rem 0.6rem; font-weight: 700; color: #ff007f;">${p}</td>
+                        <td style="padding: 0.4rem 0.6rem; color: #ff007f; font-size: 0.75rem;">Team Bravo</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: center; font-weight: 800; color: #ffd700;">${k}</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: center; color: #ff5252;">${d}</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: center; color: #aaa;">${a}</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: center; font-weight: 700; color: #fff;">${adr}</td>
+                        <td style="padding: 0.4rem 0.6rem; text-align: right; color: #00e676;">${ping}ms</td>
+                    </tr>
+                `;
+            });
+
+            tableBody.innerHTML = rowsHtml;
         }
     }
 

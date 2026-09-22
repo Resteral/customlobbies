@@ -41,6 +41,7 @@
   </div>
   <header class="navbar">
     <div class="brand" onclick="document.querySelector('[data-tab=lobbies-view]').click()">
+      <button class="mobile-nav-toggle-btn" onclick="window.app.toggleMobileNavDrawer(event)" title="Toggle Navigation Menu">☰ Menu</button>
       <img src="assets/logo.jpg" alt="CustomLobbies Logo" class="brand-logo-img">
       <span>CustomLobbies.com</span>
     </div>
@@ -3818,6 +3819,125 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- LIVE MATCH TELEMETRY & SERVER PERFORMANCE MODAL -->
+  <div class="modal-overlay" id="matchTelemetryModal" style="display: none;">
+    <div class="modal-card" style="max-width: 780px; width: 94%; border-color: var(--accent-cyan, #00f2fe);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1)); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.6rem;">📊</span>
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 900; color: var(--accent-cyan, #00f2fe); margin: 0;" id="telemetryModalTitle">Match Telemetry & 128-Tick Diagnostics</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted, #888); margin: 0.2rem 0 0 0;" id="telemetryModalSubtitle">Real-time dedicated server metrics, frame timing, ping distribution & live match scoreboard</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeMatchTelemetryModal()">❌ Close</button>
+      </div>
+
+      <!-- Telemetry Highlights Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.8rem; margin-bottom: 1.2rem;">
+        <div class="telemetry-stat-card">
+          <div style="font-size: 0.72rem; color: var(--text-muted, #aaa); font-weight: 700;">TICK RATE</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #00f2fe;" id="telemTickrate">128.0 Hz</div>
+          <div style="font-size: 0.68rem; color: #00e676;">⚡ 100% Stable</div>
+        </div>
+        <div class="telemetry-stat-card">
+          <div style="font-size: 0.72rem; color: var(--text-muted, #aaa); font-weight: 700;">AVG LATENCY</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #9d4edd;" id="telemPing">14 ms</div>
+          <div style="font-size: 0.68rem; color: #00e676;">Jitter: 0.3ms</div>
+        </div>
+        <div class="telemetry-stat-card">
+          <div style="font-size: 0.72rem; color: var(--text-muted, #aaa); font-weight: 700;">MATCH SCORE</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #ffd700;" id="telemScore">7 - 5</div>
+          <div style="font-size: 0.68rem; color: var(--text-muted, #aaa);" id="telemRound">Round 13 / 24</div>
+        </div>
+        <div class="telemetry-stat-card">
+          <div style="font-size: 0.72rem; color: var(--text-muted, #aaa); font-weight: 700;">SERVER HOST</div>
+          <div style="font-size: 0.95rem; font-weight: 900; color: #00e676; margin-top: 0.3rem;" id="telemHostNode">Helix Node #1</div>
+          <div style="font-size: 0.68rem; color: var(--text-muted, #aaa);" id="telemIp">127.0.0.1:7777</div>
+        </div>
+      </div>
+
+      <!-- Live Scoreboard & KDA Table -->
+      <div style="margin-bottom: 1.2rem;">
+        <h4 style="font-size: 0.9rem; font-weight: 800; color: var(--accent-cyan, #00f2fe); margin-bottom: 0.6rem; display: flex; justify-content: space-between; align-items: center;">
+          <span>⚔️ Live Player Performance & Economy Telemetry</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted, #aaa); font-weight: normal;">Updated live via 128-tick packet stream</span>
+        </h4>
+        <div style="overflow-x: auto; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 8px; padding: 0.5rem;">
+          <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 0.82rem;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-muted, #888); text-transform: uppercase; font-size: 0.7rem;">
+                <th style="padding: 0.4rem 0.6rem;">Player</th>
+                <th style="padding: 0.4rem 0.6rem;">Team</th>
+                <th style="padding: 0.4rem 0.6rem; text-align: center;">K</th>
+                <th style="padding: 0.4rem 0.6rem; text-align: center;">D</th>
+                <th style="padding: 0.4rem 0.6rem; text-align: center;">A</th>
+                <th style="padding: 0.4rem 0.6rem; text-align: center;">ADR</th>
+                <th style="padding: 0.4rem 0.6rem; text-align: right;">Ping</th>
+              </tr>
+            </thead>
+            <tbody id="telemKdaTableBody">
+              <!-- Dynamically populated telemetry rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Server Connection Diagnostics Footer -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; gap: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <span style="font-size: 1.2rem;">🔌</span>
+          <div>
+            <div style="font-size: 0.82rem; font-weight: 800; color: #fff;">Direct Game Protocol Launch</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted, #aaa);">Connect directly via Steam protocol `steam://connect/127.0.0.1:7777`</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="window.app.launchHelixServerDirect()" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
+          🚀 Launch Match Direct
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE NAVIGATION DRAWER & BACKDROP -->
+  <div class="mobile-nav-backdrop" id="mobileNavBackdrop" onclick="window.app.toggleMobileNavDrawer()"></div>
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.8rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 900; color: var(--accent-cyan);">
+        <img src="assets/logo.jpg" alt="Logo" style="width: 24px; height: 24px; border-radius: 5px;">
+        <span>CustomLobbies Nav</span>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="window.app.toggleMobileNavDrawer()">✕</button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.5rem; overflow-y: auto;">
+      <button class="nav-btn active" data-tab="lobbies-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=lobbies-view]').click();">
+        <span>🎮</span> Lobbies & Queue
+      </button>
+      <button class="nav-btn" data-tab="gamers-hub-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=gamers-hub-view]').click();">
+        <span>🌐</span> Gamers Hub & LFG
+      </button>
+      <button class="nav-btn" data-tab="tournaments-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=tournaments-view]').click();">
+        <span>🏆</span> Tournaments
+      </button>
+      <button class="nav-btn" data-tab="wardogs-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=wardogs-view]').click();">
+        <span>🐕</span> WARDOGS Tactical
+      </button>
+      <button class="nav-btn" data-tab="leaderboard-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=leaderboard-view]').click();">
+        <span>👑</span> Leaderboards
+      </button>
+      <button class="nav-btn" data-tab="debate-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=debate-view]').click();">
+        <span>🗣️</span> Debate Arena
+      </button>
+      <button class="nav-btn" data-tab="community-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=community-view]').click();">
+        <span>💬</span> Community Hub
+      </button>
+      <button class="nav-btn" data-tab="servers-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=servers-view]').click();">
+        <span>🖥️</span> Sponsored Servers
+      </button>
     </div>
   </div>
 

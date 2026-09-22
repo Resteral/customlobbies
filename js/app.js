@@ -1420,6 +1420,121 @@ class CustomLobbiesApp {
     if (modal) modal.classList.remove('active');
   }
 
+  toggleMobileNavDrawer(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const drawer = document.getElementById('mobileNavDrawer');
+    const backdrop = document.getElementById('mobileNavBackdrop');
+    if (drawer && backdrop) {
+      const isOpen = drawer.classList.contains('open');
+      if (isOpen) {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('active');
+      } else {
+        drawer.classList.add('open');
+        backdrop.classList.add('active');
+      }
+    }
+  }
+
+  openMatchTelemetryModal(lobbyId) {
+    const modal = document.getElementById('matchTelemetryModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+
+    const lobby = (this.lobbies || []).find(l => l.id === lobbyId) || {
+      title: 'CS2 128-Tick Premier Scrim #104',
+      game: 'Counter-Strike 2',
+      map: 'de_inferno',
+      region: 'NA-East (Virginia Dedicated Node)',
+      team1: ['S1mple_Pro', 'ZywOo_Clutch', 'Niko_CS', 'Dev1ce_AWP', 'B1t_Headshot'],
+      team2: ['Ropz_Lurk', 'Shroud_God', 'Tarik_King', 'TenZ_Aim', 'Hiko_Inhuman']
+    };
+
+    const modalTitle = document.getElementById('telemetryModalTitle');
+    const modalSubtitle = document.getElementById('telemetryModalSubtitle');
+    if (modalTitle) modalTitle.textContent = `📊 Telemetry: ${lobby.title || '128-Tick Competitive Node'}`;
+    if (modalSubtitle) modalSubtitle.textContent = `Live server metrics • Map: ${lobby.map || 'de_dust2'} • Region: ${lobby.region || 'NA-East'}`;
+
+    const tickrateEl = document.getElementById('telemTickrate');
+    const pingEl = document.getElementById('telemPing');
+    const scoreEl = document.getElementById('telemScore');
+    const roundEl = document.getElementById('telemRound');
+    const tableBody = document.getElementById('telemKdaTableBody');
+
+    if (tickrateEl) tickrateEl.textContent = `${(127.8 + Math.random() * 0.4).toFixed(1)} Hz`;
+    if (pingEl) pingEl.textContent = `${Math.floor(12 + Math.random() * 6)} ms`;
+    if (scoreEl) scoreEl.textContent = `${7 + Math.floor(Math.random() * 4)} - ${5 + Math.floor(Math.random() * 4)}`;
+    if (roundEl) roundEl.textContent = `Round ${12 + Math.floor(Math.random() * 5)} / 24`;
+
+    if (tableBody) {
+      const team1 = lobby.team1 || ['Player_1', 'Player_2', 'Player_3', 'Player_4', 'Player_5'];
+      const team2 = lobby.team2 || ['Rival_1', 'Rival_2', 'Rival_3', 'Rival_4', 'Rival_5'];
+
+      let rowsHtml = '';
+      team1.forEach((p, idx) => {
+        const k = 14 - idx * 2 + Math.floor(Math.random() * 3);
+        const d = 6 + idx + Math.floor(Math.random() * 2);
+        const a = 3 + Math.floor(Math.random() * 4);
+        const adr = Math.floor(110 - idx * 12 + Math.random() * 15);
+        const ping = Math.floor(10 + Math.random() * 12);
+        const pName = typeof p === 'string' ? p : (p.name || `Player_${idx+1}`);
+
+        rowsHtml += `
+          <tr class="telem-kda-row" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td style="padding: 0.4rem 0.6rem; font-weight: 700; color: #00f2fe;">${pName}</td>
+            <td style="padding: 0.4rem 0.6rem; color: #00e676; font-size: 0.75rem;">Team Alpha</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: center; font-weight: 800; color: #ffd700;">${k}</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: center; color: #ff5252;">${d}</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: center; color: #aaa;">${a}</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: center; font-weight: 700; color: #fff;">${adr}</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: right; color: #00e676;">${ping}ms</td>
+          </tr>
+        `;
+      });
+
+      team2.forEach((p, idx) => {
+        const k = 12 - idx * 2 + Math.floor(Math.random() * 3);
+        const d = 7 + idx + Math.floor(Math.random() * 2);
+        const a = 2 + Math.floor(Math.random() * 4);
+        const adr = Math.floor(95 - idx * 10 + Math.random() * 12);
+        const ping = Math.floor(12 + Math.random() * 14);
+        const pName = typeof p === 'string' ? p : (p.name || `Rival_${idx+1}`);
+
+        rowsHtml += `
+          <tr class="telem-kda-row" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td style="padding: 0.4rem 0.6rem; font-weight: 700; color: #ff007f;">${pName}</td>
+            <td style="padding: 0.4rem 0.6rem; color: #ff007f; font-size: 0.75rem;">Team Bravo</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: center; font-weight: 800; color: #ffd700;">${k}</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: center; color: #ff5252;">${d}</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: center; color: #aaa;">${a}</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: center; font-weight: 700; color: #fff;">${adr}</td>
+            <td style="padding: 0.4rem 0.6rem; text-align: right; color: #00e676;">${ping}ms</td>
+          </tr>
+        `;
+      });
+
+      tableBody.innerHTML = rowsHtml;
+    }
+  }
+
+  closeMatchTelemetryModal() {
+    const modal = document.getElementById('matchTelemetryModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  launchHelixServerDirect() {
+    window.location.href = 'steam://connect/127.0.0.1:7777';
+    if (typeof this.showToast === 'function') {
+      this.showToast('Launching Helix Dedicated Server via protocol steam://connect/127.0.0.1:7777', 'success');
+    }
+  }
+
+
   submitWardogsTeam() {
     const squadName = document.getElementById('modalWardogsTeamName').value.trim() || 'WARDOG Alpha';
     const tag = document.getElementById('modalWardogsTeamTag').value.trim() || 'WD-ALPHA';
