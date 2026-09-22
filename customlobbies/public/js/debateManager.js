@@ -266,6 +266,212 @@ class DebateManager {
                 </div>
             </div>
 
+            <!-- Visual Comparison: Revenue vs Spending & Deficit -->
+            <div class="glass-panel p-5 mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-2 border-b border-white/10">
+                    <div>
+                        <h3 class="font-bold text-base text-white flex items-center gap-2">
+                            <span>📊</span> Fiscal Balance Sheet: Revenue vs. Spending Clash
+                        </h3>
+                        <p class="text-xs text-muted">The federal government spends $1.37 for every $1.00 collected in tax receipts.</p>
+                    </div>
+                    <span class="badge badge-danger font-mono font-bold">-$1.83 Trillion Deficit</span>
+                </div>
+
+                <!-- Comparison Bars -->
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <span class="text-neon-cyan flex items-center gap-1.5">
+                                <span>📥</span> Total Federal Revenue (Receipts)
+                            </span>
+                            <span class="font-mono text-neon-cyan">$4.92 Trillion (73% of Outlays)</span>
+                        </div>
+                        <div class="w-full bg-black/60 rounded-full h-4 overflow-hidden border border-white/5 flex">
+                            <div class="h-full bg-gradient-to-r from-neon-cyan to-primary-blue rounded-full transition-all duration-700" style="width: 73%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <span class="text-neon-pink flex items-center gap-1.5">
+                                <span>📤</span> Total Federal Spending (Outlays)
+                            </span>
+                            <span class="font-mono text-neon-pink">$6.75 Trillion (100%)</span>
+                        </div>
+                        <div class="w-full bg-black/60 rounded-full h-4 overflow-hidden border border-white/5 flex">
+                            <div class="h-full bg-gradient-to-r from-primary-cyan to-primary-blue rounded-l-full" style="width: 73%;" title="Funded by Revenue"></div>
+                            <div class="h-full bg-gradient-to-r from-accent-red to-neon-pink rounded-r-full animate-pulse" style="width: 27%;" title="Deficit Borrowing (Treasury Bonds)"></div>
+                        </div>
+                        <div class="flex justify-between text-[11px] text-muted mt-1">
+                            <span>🟢 Funded by Tax Revenue: $4.92T</span>
+                            <span class="text-accent-red font-bold font-mono">🔴 Deficit Borrowing: $1.83T (27%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spending Breakdown by Category & $100 Tax Bill Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Spending Allocation Bar Chart -->
+                <div class="glass-panel p-5">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-white/10">
+                        <h3 class="font-bold text-base text-white flex items-center gap-2">
+                            <span>💸</span> Federal Spending by Program Category
+                        </h3>
+                        <span class="badge badge-dark font-mono text-neon-pink">$6.75T Total</span>
+                    </div>
+
+                    <div class="space-y-3.5">
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white flex items-center gap-1.5">👴 Social Security (OASDI)</span>
+                                <span class="font-mono text-neon-cyan">$1.42T (21.0%)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden border border-white/5">
+                                <div class="h-full bg-primary-cyan rounded-full" style="width: 21%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white flex items-center gap-1.5">🏥 Medicare (Hospital, Outpatient, Rx)</span>
+                                <span class="font-mono text-neon-cyan">$1.05T (15.5%)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden border border-white/5">
+                                <div class="h-full bg-primary-blue rounded-full" style="width: 15.5%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white flex items-center gap-1.5">📈 Net Interest on National Debt</span>
+                                <span class="font-mono text-accent-red font-bold">$890B (13.2%)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden border border-white/5">
+                                <div class="h-full bg-accent-red rounded-full" style="width: 13.2%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white flex items-center gap-1.5">🛡️ National Defense (Pentagon)</span>
+                                <span class="font-mono text-neon-cyan">$880B (13.0%)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden border border-white/5">
+                                <div class="h-full bg-primary-purple rounded-full" style="width: 13%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white flex items-center gap-1.5">🩺 Medicaid & CHIP</span>
+                                <span class="font-mono text-neon-cyan">$610B (9.0%)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden border border-white/5">
+                                <div class="h-full bg-neon-pink rounded-full" style="width: 9%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white flex items-center gap-1.5">🍲 Safety Net (SNAP, SSI, Tax Credits)</span>
+                                <span class="font-mono text-neon-cyan">$400B (5.9%)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden border border-white/5">
+                                <div class="h-full bg-accent-gold rounded-full" style="width: 5.9%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white flex items-center gap-1.5">🎖️ Veterans Benefits & VA Health</span>
+                                <span class="font-mono text-neon-cyan">$320B (4.7%)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden border border-white/5">
+                                <div class="h-full bg-accent-green rounded-full" style="width: 4.7%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white flex items-center gap-1.5">🌐 All Other Discretionary (Transport, Science, Edu, DOJ)</span>
+                                <span class="font-mono text-neon-cyan">$1.18T (17.7%)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden border border-white/5">
+                                <div class="h-full bg-gray-400 rounded-full" style="width: 17.7%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- $100 Tax Dollar Visualizer -->
+                <div class="glass-panel p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4 pb-2 border-b border-white/10">
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <span>💵</span> Where Every $100 in Spending Goes
+                            </h3>
+                            <span class="badge badge-success font-mono">$100 Scale</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                            <div class="p-2.5 rounded bg-primary-cyan/15 border border-primary-cyan/40 text-center">
+                                <div class="text-xl font-black text-primary-cyan">$21.00</div>
+                                <div class="text-[10px] text-gray-300 font-bold mt-0.5">Social Security</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-primary-blue/15 border border-primary-blue/40 text-center">
+                                <div class="text-xl font-black text-primary-blue">$15.50</div>
+                                <div class="text-[10px] text-gray-300 font-bold mt-0.5">Medicare</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-accent-red/15 border border-accent-red/40 text-center">
+                                <div class="text-xl font-black text-accent-red">$13.20</div>
+                                <div class="text-[10px] text-gray-300 font-bold mt-0.5">Debt Interest</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-primary-purple/15 border border-primary-purple/40 text-center">
+                                <div class="text-xl font-black text-primary-purple">$13.00</div>
+                                <div class="text-[10px] text-gray-300 font-bold mt-0.5">Defense / Military</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-neon-pink/15 border border-neon-pink/40 text-center">
+                                <div class="text-xl font-black text-neon-pink">$9.00</div>
+                                <div class="text-[10px] text-gray-300 font-bold mt-0.5">Medicaid</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-accent-gold/15 border border-accent-gold/40 text-center">
+                                <div class="text-xl font-black text-accent-gold">$5.90</div>
+                                <div class="text-[10px] text-gray-300 font-bold mt-0.5">Safety Net / Food</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-accent-green/15 border border-accent-green/40 text-center">
+                                <div class="text-xl font-black text-accent-green">$4.70</div>
+                                <div class="text-[10px] text-gray-300 font-bold mt-0.5">Veterans VA</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-white/10 border border-white/20 text-center">
+                                <div class="text-xl font-black text-white">$17.70</div>
+                                <div class="text-[10px] text-gray-300 font-bold mt-0.5">All Other Gov</div>
+                            </div>
+                        </div>
+
+                        <!-- 100 Block Heatmap Grid -->
+                        <div class="p-3 bg-black/50 rounded-lg border border-white/5">
+                            <div class="text-[11px] text-muted mb-2 font-bold uppercase tracking-wider">100-Block Budget Matrix</div>
+                            <div class="grid grid-cols-10 gap-1">
+                                ${Array(21).fill('<div class="h-3 rounded-sm bg-primary-cyan" title="$21 Social Security"></div>').join('')}
+                                ${Array(15).fill('<div class="h-3 rounded-sm bg-primary-blue" title="$15 Medicare"></div>').join('')}
+                                ${Array(13).fill('<div class="h-3 rounded-sm bg-accent-red animate-pulse" title="$13 Debt Interest"></div>').join('')}
+                                ${Array(13).fill('<div class="h-3 rounded-sm bg-primary-purple" title="$13 Defense"></div>').join('')}
+                                ${Array(9).fill('<div class="h-3 rounded-sm bg-neon-pink" title="$9 Medicaid"></div>').join('')}
+                                ${Array(6).fill('<div class="h-3 rounded-sm bg-accent-gold" title="$6 Safety Net"></div>').join('')}
+                                ${Array(5).fill('<div class="h-3 rounded-sm bg-accent-green" title="$5 Veterans"></div>').join('')}
+                                ${Array(18).fill('<div class="h-3 rounded-sm bg-gray-500" title="$18 All Other"></div>').join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-white/10 text-[11px] text-muted flex items-center justify-between">
+                        <span>⚡ <strong>75% of spending</strong> is locked in Mandatory Entitlements, Defense & Debt Interest.</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Custom Lobby Matchmaker Callout -->
             <div class="glass-panel p-4 mb-6 bg-gradient-to-r from-neon-purple/20 via-black/40 to-neon-cyan/20 border border-neon-cyan/30 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
@@ -389,6 +595,139 @@ class DebateManager {
                             </div>
                         </div>
                     `).join('')}
+                </div>
+            </div>
+
+            <!-- Historical Debt Surge & Taxpayer Contribution Share -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- National Debt Trajectory Timeline -->
+                <div class="glass-panel p-5">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-white/10">
+                        <div>
+                            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                <span>📈</span> National Debt & Net Interest Surge
+                            </h3>
+                            <p class="text-xs text-muted">Debt-to-GDP ratio has reached 124% of the U.S. economy.</p>
+                        </div>
+                        <span class="badge badge-danger font-mono font-bold">$35.4T Total</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-gray-300">Year 2000 (Dot-Com Era)</span>
+                                <span class="font-mono text-neon-cyan">$5.6 Trillion (55% GDP)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2 overflow-hidden">
+                                <div class="h-full bg-green-400 rounded-full" style="width: 16%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-gray-300">Year 2008 (Financial Crisis)</span>
+                                <span class="font-mono text-neon-cyan">$10.0 Trillion (68% GDP)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2 overflow-hidden">
+                                <div class="h-full bg-primary-blue rounded-full" style="width: 28%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-gray-300">Year 2017 (Tax Cuts & Jobs Act)</span>
+                                <span class="font-mono text-neon-cyan">$20.2 Trillion (103% GDP)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2 overflow-hidden">
+                                <div class="h-full bg-accent-gold rounded-full" style="width: 57%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-gray-300">Year 2020 (COVID Stimulus Relief)</span>
+                                <span class="font-mono text-neon-cyan">$27.7 Trillion (128% GDP)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2 overflow-hidden">
+                                <div class="h-full bg-neon-pink rounded-full" style="width: 78%;"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white font-black">Year 2026 (Present Day)</span>
+                                <span class="font-mono text-accent-red font-bold">$35.4 Trillion (124% GDP)</span>
+                            </div>
+                            <div class="w-full bg-black/60 rounded-full h-2 overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-accent-red to-neon-pink rounded-full" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-2.5 rounded bg-accent-red/10 border border-accent-red/20 text-[11px] text-gray-300">
+                        🚨 <strong>Net Interest Alert:</strong> At ~$890B/year, interest payments on the debt now exceed the entire budget of the U.S. Army, Navy, and Air Force.
+                    </div>
+                </div>
+
+                <!-- Who Pays the Income Taxes? -->
+                <div class="glass-panel p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4 pb-2 border-b border-white/10">
+                            <div>
+                                <h3 class="font-bold text-base text-white flex items-center gap-2">
+                                    <span>👥</span> Who Pays Federal Income Taxes?
+                                </h3>
+                                <p class="text-xs text-muted">Distribution of $2.42T in individual income tax collections.</p>
+                            </div>
+                            <span class="badge badge-publicity font-mono">IRS Data</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-primary-cyan font-bold">Top 1% Earners ($680k+ income)</span>
+                                    <span class="font-mono text-primary-cyan">42.3% of Total Taxes</span>
+                                </div>
+                                <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden">
+                                    <div class="h-full bg-primary-cyan rounded-full" style="width: 42.3%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-primary-blue font-bold">Top 2% to 10% Earners ($170k–$680k)</span>
+                                    <span class="font-mono text-primary-blue">31.4% of Total Taxes</span>
+                                </div>
+                                <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden">
+                                    <div class="h-full bg-primary-blue rounded-full" style="width: 31.4%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-accent-gold font-bold">Next 40% (Middle Class $50k–$170k)</span>
+                                    <span class="font-mono text-accent-gold">24.0% of Total Taxes</span>
+                                </div>
+                                <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden">
+                                    <div class="h-full bg-accent-gold rounded-full" style="width: 24.0%;"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-muted font-bold">Bottom 50% Earners (Under $50k)</span>
+                                    <span class="font-mono text-muted">2.3% of Total Taxes</span>
+                                </div>
+                                <div class="w-full bg-black/60 rounded-full h-2.5 overflow-hidden">
+                                    <div class="h-full bg-gray-500 rounded-full" style="width: 2.3%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-white/10 text-[11px] text-muted leading-relaxed">
+                        💡 <strong>Note on FICA:</strong> While the bottom 50% pays 2.3% of income taxes, they pay a much higher proportion of their total wages in <strong>FICA Payroll Taxes (Social Security & Medicare)</strong>.
+                    </div>
                 </div>
             </div>
         `;

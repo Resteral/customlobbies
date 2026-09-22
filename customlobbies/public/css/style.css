@@ -839,4 +839,145 @@ body {
   }
 }
 
+/* CL Pulse Gamer Social Media Feed */
+.pulse-post-card {
+  background: rgba(14, 18, 28, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 242, 254, 0.18);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.pulse-post-card:hover {
+  border-color: rgba(0, 242, 254, 0.45);
+  box-shadow: 0 8px 30px rgba(0, 242, 254, 0.15);
+  transform: translateY(-2px);
+}
+
+.pulse-avatar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+}
+
+.pulse-avatar-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-cyan, #00f2fe);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+}
+
+.pulse-author-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pulse-post-content {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-main, #e2e8f0);
+  margin-bottom: 0.8rem;
+}
+
+.pulse-media-container {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 0.8rem;
+  position: relative;
+  background: #000;
+}
+
+.pulse-media-container img, .pulse-media-container video {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  display: block;
+}
+
+.pulse-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.pulse-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 700;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pulse-action-btn:hover {
+  background: rgba(0, 242, 254, 0.1);
+  color: var(--primary-cyan, #00f2fe);
+}
+
+.pulse-action-btn.active {
+  color: #00f2fe;
+  background: rgba(0, 242, 254, 0.15);
+}
+
+/* CL Live TV Stream Theater */
+.stream-theater-container {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stream-screen-frame {
+  background: #05070c;
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
+  position: relative;
+}
+
+.stream-screen-frame iframe, .stream-screen-frame video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  display: block;
+}
+
+.stream-chat-panel {
+  background: rgba(10, 14, 23, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 520px;
+}
+
+@media (max-width: 1024px) {
+  .stream-theater-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 

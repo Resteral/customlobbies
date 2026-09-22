@@ -16,6 +16,60 @@ class CustomLobbiesApp {
     this.equippedBanner = 'Cyberpunk Neon Matrix';
     this.equippedFrame = 'Gold Crown Ring';
 
+    // CL Pulse Gamer Social Media Feed Posts
+    this.pulsePosts = [
+      {
+        id: 'pulse_1',
+        author: 'S1mple_Pro',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=S1mple',
+        rank: '👑 Master (2650 MMR)',
+        game: 'Counter-Strike 2',
+        gameIcon: '🎯',
+        time: '10m ago',
+        content: 'Insane 1v4 AWP Retake on Mirage A-Site during tonight\'s 128-tick Premier Scrim! GG to Valkyrie Esports for the match.',
+        mediaType: 'video',
+        mediaThumb: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
+        pulseCount: 142,
+        userPulsed: false,
+        comments: [
+          { author: 'ZywOo_Clutch', text: 'That flick onto mid was ridiculous 🔥' },
+          { author: 'NiKo_OneTap', text: 'Clean crosshair placement!' }
+        ]
+      },
+      {
+        id: 'pulse_2',
+        author: 'Valkyrie_CS',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Valkyrie',
+        rank: '💎 Diamond III (1980 MMR)',
+        game: 'Valorant',
+        gameIcon: '🔥',
+        time: '35m ago',
+        content: 'Going live on CL Live TV! Streaming Ascent Radiant Ranked queue & testing the new Phantom skin. Come hang out!',
+        mediaType: 'stream',
+        mediaThumb: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800',
+        pulseCount: 89,
+        userPulsed: true,
+        comments: [
+          { author: 'Shroud_God', text: 'Tuned in! 🎥' }
+        ]
+      },
+      {
+        id: 'pulse_3',
+        author: 'PuckMaster99',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Puck',
+        rank: '🥇 Gold Veteran (1450 MMR)',
+        game: 'Slapshot: Rebound',
+        gameIcon: '🏒',
+        time: '1h ago',
+        content: 'Hosting a 3v3 Puck Arena Tournament on CustomLobbies! Need 1 goalie & 1 wingman for EU-Central node.',
+        mediaType: 'lfg',
+        mediaThumb: null,
+        pulseCount: 56,
+        userPulsed: false,
+        comments: []
+      }
+    ];
+
     // Universal Free-Agent Player Pool Roster
     this.poolFeed = [
       { id: 1, name: 'RadiantReaper', elo: 2540, game: 'Counter-Strike 2', role: 'IGL / Shotcaller', time: 'Just Now', karma: '100% Positive', status: 'Available', acVerified: true },
@@ -5341,6 +5395,152 @@ class CustomLobbiesApp {
     this.renderDebateLobbies();
 
     alert(`🎉 DEBATE TOPIC HOSTED!\n\nDebate "${topic}" created with ${siding} siding! (+50 🪙 CL-Points)`);
+  }
+  // CL PULSE SOCIAL MEDIA FEED METHODS
+  renderPulseFeed() {
+    const container = document.getElementById('pulseSocialFeedContainer');
+    if (!container) return;
+
+    const posts = this.pulsePosts || [];
+    container.innerHTML = posts.map(p => `
+      <div class="pulse-post-card animate-fade-in">
+        <div class="pulse-avatar-header">
+          <img src="${p.avatar}" class="pulse-avatar-img" alt="${p.author}" />
+          <div>
+            <div class="pulse-author-name">
+              <span>${p.author}</span>
+              <span class="mmr-badge" style="font-size: 0.7rem; padding: 1px 6px;">${p.rank}</span>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">${p.time} • ${p.gameIcon} ${p.game}</div>
+          </div>
+        </div>
+
+        <div class="pulse-post-content">${p.content}</div>
+
+        ${p.mediaThumb ? `
+          <div class="pulse-media-container">
+            <img src="${p.mediaThumb}" alt="Media Post" />
+            <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; color: #00f2fe; font-weight: 800;">
+              ${p.mediaType === 'video' ? '🎬 CLIP REPLAY' : p.mediaType === 'stream' ? '🔴 BROADCASTING LIVE' : '📷 MEDIA'}
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="pulse-actions-bar">
+          <button class="pulse-action-btn ${p.userPulsed ? 'active' : ''}" onclick="window.app.likePulsePost('${p.id}')">
+            <span>⚡</span> <span>${p.pulseCount} Pulses</span>
+          </button>
+          <button class="pulse-action-btn" onclick="window.app.promptPulseComment('${p.id}')">
+            <span>💬</span> <span>${p.comments.length} Comments</span>
+          </button>
+          <button class="pulse-action-btn" onclick="window.app.repostPulse('${p.id}')">
+            <span>🔄</span> <span>Repost</span>
+          </button>
+          <button class="btn btn-primary btn-xs" onclick="window.app.openPlayTonightModal()">
+            <span>🎮</span> Join Game / LFG
+          </button>
+        </div>
+
+        ${p.comments.length > 0 ? `
+          <div style="margin-top: 0.8rem; padding-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem;">
+            ${p.comments.map(c => `
+              <div style="margin-bottom: 0.3rem;"><strong style="color: var(--accent-cyan);">${c.author}:</strong> <span style="color: var(--text-main);">${c.text}</span></div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+  }
+
+  createPulsePost() {
+    const input = document.getElementById('pulsePostInput');
+    if (!input || !input.value.trim()) return;
+
+    const content = input.value.trim();
+    const gameSelect = document.getElementById('pulsePostGameSelect');
+    const game = gameSelect ? gameSelect.value : 'Counter-Strike 2';
+
+    const newPost = {
+      id: 'pulse_' + Date.now(),
+      author: this.user ? this.user.displayName : 'Sean (You)',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sean',
+      rank: '💎 Diamond (1840 MMR)',
+      game,
+      gameIcon: '🎮',
+      time: 'Just now',
+      content,
+      mediaType: 'text',
+      mediaThumb: null,
+      pulseCount: 1,
+      userPulsed: true,
+      comments: []
+    };
+
+    if (!this.pulsePosts) this.pulsePosts = [];
+    this.pulsePosts.unshift(newPost);
+    input.value = '';
+
+    if (typeof this.showToast === 'function') {
+      this.showToast('🚀 Post Published to CL Pulse Social Feed!', 'success');
+    }
+    this.renderPulseFeed();
+  }
+
+  likePulsePost(postId) {
+    const post = (this.pulsePosts || []).find(p => p.id === postId);
+    if (!post) return;
+
+    if (post.userPulsed) {
+      post.pulseCount -= 1;
+      post.userPulsed = false;
+    } else {
+      post.pulseCount += 1;
+      post.userPulsed = true;
+    }
+    this.renderPulseFeed();
+  }
+
+  promptPulseComment(postId) {
+    const text = prompt('Enter your comment:');
+    if (!text || !text.trim()) return;
+
+    const post = (this.pulsePosts || []).find(p => p.id === postId);
+    if (!post) return;
+
+    post.comments.push({
+      author: this.user ? this.user.displayName : 'Sean',
+      text: text.trim()
+    });
+    this.renderPulseFeed();
+  }
+
+  repostPulse(postId) {
+    if (typeof this.showToast === 'function') {
+      this.showToast('🔄 Reposted to your Gamer Passport Timeline!', 'info');
+    }
+  }
+
+  openBroadcasterStudioModal() {
+    const modal = document.getElementById('broadcasterStudioModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.add('active');
+    }
+  }
+
+  closeBroadcasterStudioModal() {
+    const modal = document.getElementById('broadcasterStudioModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  startStreamBroadcast() {
+    this.closeBroadcasterStudioModal();
+    if (typeof this.showToast === 'function') {
+      this.showToast('🔴 LIVE BROADCAST STARTED! Streaming to CL Live TV.', 'success');
+    }
   }
 }
 
