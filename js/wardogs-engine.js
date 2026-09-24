@@ -243,12 +243,16 @@ class WardogsEngine {
 
   // Perform Ranked Selection Draft for 33 v 33 v 33 (99 Players)
   generateRankedSelectionMatch(gameName = 'Counter-Strike 2') {
+    // Only allow teams with at least 22 members to be selected as Faction Commanders
+    const eligibleCommanders = [...this.registeredSquads].filter(s => (s.membersCount || 0) >= 22);
+    
     // Sort registered pre-formed squads by highest member count created before entry
-    const sortedSquads = [...this.registeredSquads].sort((a, b) => (b.membersCount || 0) - (a.membersCount || 0));
+    const sortedSquads = eligibleCommanders.sort((a, b) => (b.membersCount || 0) - (a.membersCount || 0));
 
+    // If we don't have enough 22+ player teams, fill with AI placeholders just for the UI
     const squad1 = sortedSquads[0] || { name: 'WARDOG Company Alpha', captain: 'Ghost_Dog_99', membersCount: 33 };
     const squad2 = sortedSquads[1] || { name: 'Iron Claw Battalion Bravo', captain: 'Sargeant_Iron', membersCount: 33 };
-    const squad3 = sortedSquads[2] || { name: 'Phantom Brigade Charlie', captain: 'Shadow_K9', membersCount: 28 };
+    const squad3 = sortedSquads[2] || { name: 'Phantom Brigade Charlie', captain: 'Shadow_K9', membersCount: 22 };
 
     const eligibleSolos = this.soloMercenaries.filter(m => m.game === gameName || m.game === 'Counter-Strike 2');
     const pool = [...eligibleSolos].sort((a, b) => b.elo - a.elo);

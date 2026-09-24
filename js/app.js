@@ -2463,6 +2463,22 @@ class CustomLobbiesApp {
   }
 
   start99PlayerQueue() {
+    // 1. Verify User has a registered WARDOGS Team with >= 22 members
+    let hasEligibleTeam = false;
+    let userTeamName = "";
+    if (window.wardogsEngine && window.wardogsEngine.registeredSquads) {
+        const eligibleSquad = window.wardogsEngine.registeredSquads.find(s => s.membersCount >= 22);
+        if (eligibleSquad) {
+            hasEligibleTeam = true;
+            userTeamName = eligibleSquad.name;
+        }
+    }
+
+    if (!hasEligibleTeam) {
+        alert("❌ INELIGIBLE FOR RANKED DRAFT\n\nYour Team must have at least 22 members online and ready to compete in a Tri-Faction ranked match.\n\nPlease recruit more mercenaries from the Draft Queue to reach the 22-player threshold. The remaining slots will be filled automatically from the Solo Pool.");
+        return;
+    }
+
     const modal = document.getElementById('wardogsPoolQueueModal');
     if (!modal) {
       this.runWardogsRankedDraft();
@@ -2470,7 +2486,7 @@ class CustomLobbiesApp {
     }
 
     modal.style.display = 'flex';
-    let queuedCount = Math.floor(Math.random() * 25) + 20; // Initial lobby pool count
+    let queuedCount = 22; // Start the queue counter at the minimum online team members
     const progressBar = document.getElementById('queue99ProgressBar');
     const counterText = document.getElementById('queue99CounterText');
     const statusText = document.getElementById('queue99StatusText');
