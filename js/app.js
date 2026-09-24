@@ -1923,7 +1923,7 @@ class CustomLobbiesApp {
     if (gameSelect) gameSelect.value = game;
     this.switchWardogsMode('squads');
 
-    alert(`🛡️ SQUAD REGISTERED!\n\n${squadName} [${tag}] is now active in the ${game} League.\nCaptain: ${captain}\nDescription: ${bio ? bio : 'No description provided.'}\n\nYou can now browse the Draft Queue and recruit members freely!`);
+    alert(`🛡️ TEAM REGISTERED!\n\n${squadName} [${tag}] is now active in the ${game} League.\nCaptain: ${captain}\nDescription: ${bio ? bio : 'No description provided.'}\n\nYou can now browse the Draft Queue and recruit members freely!`);
   }
 
   openCreateTeamModal() {

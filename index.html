@@ -1628,7 +1628,7 @@
             <span>🐕</span> Solo Mercenary Registration
           </button>
           <button class="btn btn-secondary" onclick="window.app.openWardogsTeamModal()">
-            <span>🛡️</span> Register Squad Unit
+            <span>🛡️</span> Register Team
           </button>
           <button class="btn btn-primary" onclick="window.app.start99PlayerQueue()">
             <span>⚡</span> Ranked Match Selection Draft
@@ -1657,7 +1657,7 @@
           </div>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="wardogsCategoryTabs">
             <button class="btn btn-purple btn-sm wardogs-tab-btn active" data-mode="solos" onclick="window.app.switchWardogsMode('solos')">🐕 Solo Mercenary Pool</button>
-            <button class="btn btn-secondary btn-sm wardogs-tab-btn" data-mode="squads" onclick="window.app.switchWardogsMode('squads')">🛡️ 33-Man Squad Battalions</button>
+            <button class="btn btn-secondary btn-sm wardogs-tab-btn" data-mode="squads" onclick="window.app.switchWardogsMode('squads')">🛡️ 33-Man Teams</button>
             <button class="btn btn-secondary btn-sm wardogs-tab-btn" data-mode="warroom" onclick="window.app.switchWardogsMode('warroom')">⚡ Tri-Faction War Room (33v33v33)</button>
             <button class="btn btn-secondary btn-sm wardogs-tab-btn" data-mode="circuit" onclick="window.app.switchWardogsMode('circuit')">🏆 Competitive Circuit ($50k)</button>
             <button class="btn btn-secondary btn-sm wardogs-tab-btn" data-mode="bounties" onclick="window.app.switchWardogsMode('bounties')">🎯 Tactical Bounties</button>
@@ -3038,27 +3038,27 @@
     </div>
   </div>
 
-  <!-- WARDOGS SQUAD UNIT REGISTRATION MODAL -->
+  <!-- WARDOGS TEAM REGISTRATION MODAL -->
   <div class="modal-overlay" id="wardogsJoinTeamModal">
     <div class="modal-card" style="max-width: 550px; border-color: #ff6f00;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-        <h3 style="font-size: 1.3rem; font-weight: 900; color: #ffab00;">🛡️ Squad Unit Mercenary Contract Registration</h3>
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: #ffab00;">🛡️ Team Registration</h3>
         <button class="btn btn-secondary btn-sm" onclick="window.app.closeWardogsTeamModal()">✕ Close</button>
       </div>
 
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.8rem;">
         <div class="input-group">
-          <label class="input-label">Squad Name</label>
-          <input type="text" class="input-field" id="modalWardogsTeamName" value="WARDOG Alpha Strike">
+          <label class="input-label">Team Name</label>
+          <input type="text" class="input-field" id="modalWardogsTeamName" value="WARDOG Alpha">
         </div>
         <div class="input-group">
-          <label class="input-label">Squad Tag</label>
+          <label class="input-label">Team Tag</label>
           <input type="text" class="input-field" id="modalWardogsTeamTag" value="WD-ALPHA">
         </div>
       </div>
 
       <div class="input-group">
-        <label class="input-label">Squad Captain Handle</label>
+        <label class="input-label">Team Captain Handle</label>
         <input type="text" class="input-field" id="modalWardogsCaptain" value="Ghost_Dog_99">
       </div>
 
@@ -3074,22 +3074,22 @@
           </select>
         </div>
         <div class="input-group">
-          <label class="input-label">Squad Size</label>
+          <label class="input-label">Team Size</label>
           <select class="input-field" id="modalWardogsTeamSize">
-            <option value="33" selected>33 Operatives (33 v 33 v 33 Mercenary Battalion)</option>
-            <option value="5">5 Operatives (5v5 Tactical Fireteam)</option>
+            <option value="33" selected>33 Players</option>
+            <option value="5">5 Players</option>
           </select>
         </div>
       </div>
 
       <div class="input-group">
-        <label class="input-label">Clan / Group Description & Recruiting Goals</label>
-        <textarea class="input-field" id="modalWardogsTeamBio" rows="3" placeholder="Develop your team freely! Describe your clan, required experience, practice times, and what kind of operatives you want to draft." style="resize: vertical;"></textarea>
+        <label class="input-label">Team Description & Recruiting Goals</label>
+        <textarea class="input-field" id="modalWardogsTeamBio" rows="3" placeholder="Develop your team freely! Describe your team, required experience, practice times, and what kind of players you want to draft." style="resize: vertical;"></textarea>
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
         <button class="btn btn-secondary" onclick="window.app.closeWardogsTeamModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="window.app.submitWardogsTeam()">Register Squad Unit 🛡️</button>
+        <button class="btn btn-primary" onclick="window.app.submitWardogsTeam()">Register Team 🛡️</button>
       </div>
     </div>
   </div>
