@@ -80,7 +80,7 @@ class WardogsEngine {
 
     // Default Solo Mercenaries
     this.soloMercenaries = [
-      { id: 101, name: 'Ghost_Dog_99', callsign: 'VIPER-1', game: 'Counter-Strike 2', role: '🎯 Marksman / Sniper', elo: 2580, kd: '2.35', status: 'Selected for Ranked', contracts: 42, acVerified: true, badge: '🏆 Season 3 Champion', bountyEarned: '6,400 CL-Points' },
+      { id: 101, name: 'Ghost_Dog_99', callsign: 'VIPER-1', game: 'WARDOGS', role: '🎯 Marksman / Sniper', elo: 2580, kd: '2.35', status: 'Selected for Ranked', contracts: 42, acVerified: true, badge: '🏆 Season 3 Champion', bountyEarned: '6,400 CL-Points' },
       { id: 102, name: 'Sargeant_Iron', callsign: 'HAMMER-6', game: 'Empulse', role: '⚡ Breacher / Assault', elo: 2450, kd: '2.10', status: 'Available', contracts: 38, acVerified: true, badge: '⚡ Demolitions Expert', bountyEarned: '4,800 CL-Points' },
       { id: 103, name: 'Valkyrie_Merc', callsign: 'VALKYRIE-3', game: 'Valorant', role: '🧠 Recon / Scout', elo: 2390, kd: '1.95', status: 'Available', contracts: 29, acVerified: true, badge: '🎯 Intel Specialist', bountyEarned: '3,200 CL-Points' },
       { id: 104, name: 'Shadow_K9', callsign: 'SPECTRE-4', game: 'REMATCH', role: '📻 Comms Specialist', elo: 2480, kd: '2.20', status: 'Selected for Ranked', contracts: 35, acVerified: true, badge: '📡 Tactical Commander', bountyEarned: '5,100 CL-Points' }
@@ -88,7 +88,7 @@ class WardogsEngine {
 
     // Default Squad Units
     this.registeredSquads = [
-      { id: 201, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', game: 'Counter-Strike 2', record: '18W - 2L', membersCount: 33, status: 'SELECTED FOR RANKED', bountyEarned: '12,500 CL-Points', faction: '🔵 Vanguard Command' },
+      { id: 201, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', game: 'WARDOGS', record: '18W - 2L', membersCount: 33, status: 'SELECTED FOR RANKED', bountyEarned: '12,500 CL-Points', faction: '🔵 Vanguard Command' },
       { id: 202, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', game: 'Empulse', record: '15W - 3L', membersCount: 33, status: 'ACTIVE CONTRACT', bountyEarned: '8,200 CL-Points', faction: '🔴 Apex Raiders' }
     ];
 
@@ -242,7 +242,7 @@ class WardogsEngine {
   }
 
   // Perform Ranked Selection Draft for 33 v 33 v 33 (99 Players)
-  generateRankedSelectionMatch(gameName = 'Counter-Strike 2') {
+  generateRankedSelectionMatch(gameName = 'WARDOGS') {
     // Only allow teams with at least 22 members to be selected as Faction Commanders
     const eligibleCommanders = [...this.registeredSquads].filter(s => (s.membersCount || 0) >= 22);
     
@@ -254,7 +254,7 @@ class WardogsEngine {
     const squad2 = sortedSquads[1] || { name: 'Iron Claw Battalion Bravo', captain: 'Sargeant_Iron', membersCount: 33 };
     const squad3 = sortedSquads[2] || { name: 'Phantom Brigade Charlie', captain: 'Shadow_K9', membersCount: 22 };
 
-    const eligibleSolos = this.soloMercenaries.filter(m => m.game === gameName || m.game === 'Counter-Strike 2');
+    const eligibleSolos = this.soloMercenaries.filter(m => m.game === gameName || m.game === 'WARDOGS');
     const pool = [...eligibleSolos].sort((a, b) => b.elo - a.elo);
 
     const capacity = 99; // 33 v 33 v 33 Tri-Faction
