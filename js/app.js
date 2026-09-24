@@ -2075,7 +2075,7 @@ class CustomLobbiesApp {
             </div>
 
             <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem; max-height: 55px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;">
-              <strong style="color: var(--text-main);">Roster (${t.members ? t.members.length : t.size}):</strong> ${t.members ? t.members.join(', ') : 'Active Roster'}
+              <strong style="color: var(--text-main);">Roster (${t.members ? t.members.length : 0}):</strong> ${t.members ? t.members.join(', ') : 'Active Roster'}
             </div>
           </div>
 
@@ -2102,7 +2102,6 @@ class CustomLobbiesApp {
     const captain = document.getElementById('modalTeamCaptain').value.trim() || (this.user ? this.user.displayName : 'Sean');
     const focus = document.getElementById('modalTeamFocus') ? document.getElementById('modalTeamFocus').value : 'Competitive Scrims';
     const game = document.getElementById('modalTeamGame').value;
-    const size = parseInt(document.getElementById('modalTeamSize').value) || 5;
     const emblem = this.selectedClanEmblem || '🛡️';
     const membersRaw = document.getElementById('modalTeamMembers').value.trim();
 
@@ -2118,7 +2117,6 @@ class CustomLobbiesApp {
       synergy: '100% (Role-Balanced)',
       captain,
       game,
-      size,
       members,
       applications: [
         { name: 'Valkyrie_Merc', role: '🎯 Sniper', elo: 2150 },
@@ -2136,7 +2134,7 @@ class CustomLobbiesApp {
     localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
 
     if (window.wardogsEngine) {
-      window.wardogsEngine.registerSquadUnit(name, tag, captain, game, size);
+      window.wardogsEngine.registerSquadUnit(name, tag, captain, game);
     }
     if (window.leaguesEngine) {
       window.leaguesEngine.registerLeagueTeam(name, tag, captain, game, 'Premier Division');
@@ -2168,7 +2166,7 @@ class CustomLobbiesApp {
 
     if (emblemEl) emblemEl.innerHTML = this.renderEmblemHTML(team.emblem || '🛡️', '2rem');
     if (title) title.textContent = `${team.name} ${team.tag}`;
-    if (sub) sub.textContent = `${team.game} • ${team.focus || 'Competitive Scrims'} • ${team.members ? team.members.length : team.size} Members`;
+    if (sub) sub.textContent = `${team.game} • ${team.focus || 'Competitive Scrims'} • ${team.members ? team.members.length : 0} Members`;
 
     if (body) {
       const roles = ['👑 IGL / Commander', '🎯 Entry Fragger', '🔭 Marksman / AWPer', '🛡️ Support / Anchor', '⚡ Flex Specialist'];
@@ -2286,11 +2284,6 @@ class CustomLobbiesApp {
 
     const app = team.applications[index];
     if (!team.members) team.members = [team.captain || 'Sean'];
-    
-    if (team.members.length >= team.size && team.size !== 33) {
-      alert(`⚠️ ROSTER FULL!\n\nYour team is already at max capacity (${team.size}).`);
-      return;
-    }
 
     team.members.push(app.name);
     team.applications.splice(index, 1);

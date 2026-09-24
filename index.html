@@ -3228,7 +3228,7 @@
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+      <div style="display: grid; grid-template-columns: 1fr; gap: 0.8rem;">
         <div class="input-group">
           <label class="input-label">Game Title</label>
           <select class="input-field" id="modalTeamGame">
@@ -3242,24 +3242,12 @@
             <option value="Rocket League">Rocket League</option>
           </select>
         </div>
-        <div class="input-group">
-          <label class="input-label">Roster Capacity / Format</label>
-          <select class="input-field" id="modalTeamSize">
-            <option value="5" selected>5 Players (5v5 Competitive)</option>
-            <option value="2">2 Players (2v2 Wingman / Duel)</option>
-            <option value="6">6 Players (6v6 Arena / Finals)</option>
-            <option value="33">33 Operatives (33-Man WARDOG Battalion)</option>
-          </select>
-        </div>
       </div>
 
-      <!-- Teammates / Roster Handles with Free Agent Auto-Recruiter -->
+      <!-- Teammates / Roster Handles -->
       <div class="input-group">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
           <label class="input-label" style="margin: 0;">Teammates / Roster Handles (Comma-separated)</label>
-          <button type="button" class="btn btn-cyan btn-sm" style="padding: 0.15rem 0.5rem; font-size: 0.72rem; gap: 0.3rem;" onclick="window.app.autoRecruitFreeAgents()">
-            <span>➕</span> Auto-Recruit Free Agents
-          </button>
         </div>
         <input type="text" class="input-field" id="modalTeamMembers" value="Ghost_Dog_99, Sargeant_Iron, Valkyrie_Merc, Shadow_K9">
       </div>
