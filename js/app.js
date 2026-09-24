@@ -17,68 +17,10 @@ class CustomLobbiesApp {
     this.equippedFrame = 'Gold Crown Ring';
 
     // CL Pulse Gamer Social Media Feed Posts
-    this.pulsePosts = [
-      {
-        id: 'pulse_1',
-        author: 'S1mple_Pro',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=S1mple',
-        rank: '👑 Master (2650 MMR)',
-        game: 'Counter-Strike 2',
-        gameIcon: '🎯',
-        time: '10m ago',
-        content: 'Insane 1v4 AWP Retake on Mirage A-Site during tonight\'s 128-tick Premier Scrim! GG to Valkyrie Esports for the match.',
-        mediaType: 'video',
-        mediaThumb: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800',
-        pulseCount: 142,
-        userPulsed: false,
-        comments: [
-          { author: 'ZywOo_Clutch', text: 'That flick onto mid was ridiculous 🔥' },
-          { author: 'NiKo_OneTap', text: 'Clean crosshair placement!' }
-        ]
-      },
-      {
-        id: 'pulse_2',
-        author: 'Valkyrie_CS',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Valkyrie',
-        rank: '💎 Diamond III (1980 MMR)',
-        game: 'Valorant',
-        gameIcon: '🔥',
-        time: '35m ago',
-        content: 'Going live on CL Live TV! Streaming Ascent Radiant Ranked queue & testing the new Phantom skin. Come hang out!',
-        mediaType: 'stream',
-        mediaThumb: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800',
-        pulseCount: 89,
-        userPulsed: true,
-        comments: [
-          { author: 'Shroud_God', text: 'Tuned in! 🎥' }
-        ]
-      },
-      {
-        id: 'pulse_3',
-        author: 'PuckMaster99',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Puck',
-        rank: '🥇 Gold Veteran (1450 MMR)',
-        game: 'Slapshot: Rebound',
-        gameIcon: '🏒',
-        time: '1h ago',
-        content: 'Hosting a 3v3 Puck Arena Tournament on CustomLobbies! Need 1 goalie & 1 wingman for EU-Central node.',
-        mediaType: 'lfg',
-        mediaThumb: null,
-        pulseCount: 56,
-        userPulsed: false,
-        comments: []
-      }
-    ];
+    this.pulsePosts = [];
 
     // Universal Free-Agent Player Pool Roster
-    this.poolFeed = [
-      { id: 1, name: 'RadiantReaper', elo: 2540, game: 'Counter-Strike 2', role: 'IGL / Shotcaller', time: 'Just Now', karma: '100% Positive', status: 'Available', acVerified: true },
-      { id: 2, name: 'ApexGod99', elo: 2150, game: 'Counter-Strike 2', role: 'Entry Fragger', time: '1m ago', karma: '98% Positive', status: 'Available', acVerified: true },
-      { id: 3, name: 'Empulse_Overlord', elo: 2450, game: 'Empulse', role: 'AWPer / Sniper', time: '2m ago', karma: '100% Positive', status: 'Available', acVerified: true },
-      { id: 4, name: 'Rematch_God', elo: 2480, game: 'REMATCH', role: 'Entry Fragger', time: '3m ago', karma: '100% Positive', status: 'Available', acVerified: true },
-      { id: 5, name: 'Valkyrie_CS', elo: 1790, game: 'Valorant', role: 'AWPer / Sniper', time: '3m ago', karma: '100% Positive', status: 'Available', acVerified: true },
-      { id: 6, name: 'ShadowNinja', elo: 1920, game: 'Arkheron', role: 'Support / Controller', time: '5m ago', karma: '95% Positive', status: 'Available', acVerified: true }
-    ];
+    this.poolFeed = [];
 
     // Expanded Game Roster
     this.allGames = [
@@ -107,171 +49,16 @@ class CustomLobbiesApp {
     this.isAutoJoinActive = false;
     this.autoJoinInterval = null;
 
-    this.teamLineup = [
-      { slot: 1, name: 'RadiantReaper (You)', role: 'IGL / Shotcaller', elo: 2540, avatar: '👑' },
-      { slot: 2, name: 'ApexGod99', role: 'Entry Fragger', elo: 2150, avatar: '⚡' },
-      { slot: 3, name: 'Empulse_Overlord', role: 'AWPer / Sniper', elo: 2450, avatar: '🎯' },
-      { slot: 4, name: 'Rematch_God', role: 'Support / Anchor', elo: 2480, avatar: '🛡️' },
-      { slot: 5, name: 'Valkyrie_CS', role: 'Lurker / Rifler', elo: 1790, avatar: '🦅' }
-    ];
-    this.teamBench = [
-      { id: 101, name: 'ShadowNinja', role: 'Flex Sub', elo: 1920, avatar: '🥷' },
-      { id: 102, name: 'CyberPuck_Ace', role: 'Puck Striker', elo: 1850, avatar: '🏒' }
-    ];
-
-    this.sponsoredServers = [
-      { id: 319, name: 'Slapshot: Rebound 3v3 Cyber Puck Arena', game: 'Slapshot: Rebound', host: 'PuckMaster99', players: 5, max: 6, connectURL: 'steam://connect/192.168.1.130:27015', sponsoredBadge: '🏒 SLAPSHOT SPONSOR' },
-      { id: 318, name: 'Empulse 5v5 Cyber Arena Server Node #1', game: 'Empulse', host: 'Empulse_Overlord', players: 9, max: 10, connectURL: 'steam://connect/192.168.1.120:27015', sponsoredBadge: '⚡ EMPULSE SPONSOR' },
-      { id: 316, name: 'REMATCH 5v5 Competitive Arena Node #1', game: 'REMATCH', host: 'Rematch_God', players: 8, max: 10, connectURL: 'steam://connect/192.168.1.110:27015', sponsoredBadge: '🔥 REMATCH SPONSOR' },
-      { id: 317, name: 'Arkheron 12-Player Cyber Scrim Spire', game: 'Arkheron', host: 'Archon_Master', players: 10, max: 12, connectURL: 'steam://connect/192.168.1.115:27015', sponsoredBadge: '⚔️ ARKHERON SPONSOR' },
-      { id: 311, name: 'CS2 128-Tick Premier Server Node #1', game: 'Counter-Strike 2', host: 'Retake_Leader', players: 7, max: 10, connectURL: 'steam://connect/192.168.1.85:27015', sponsoredBadge: '🎯 CS2 SPONSOR' }
-    ];
-
+    this.teamLineup = [];
+    this.teamBench = [];
+    this.sponsoredServers = [];
     this.lobbies = [];
-
+    
     this.selectedLeaderboardGame = 'Counter-Strike 2';
     this.selectedLeaderboardRegion = 'all';
     this.leaderboardSearchQuery = '';
 
-    this.leaderboardData = [
-      {
-        rank: 1,
-        name: 'RadiantReaper',
-        region: 'NA',
-        avatar: '👑',
-        acVerified: true,
-        steamId: '76561198099887766',
-        riotId: 'Reaper#NA1',
-        discord: 'RadiantReaper#0001',
-        twitch: 'twitch.tv/RadiantReaper',
-        commendations: { leadership: 24, friendly: 35, clutch: 42, teacher: 18 },
-        badRemarks: { toxic: 1, afk: 0, griefing: 0, suspected: 0 },
-        games: {
-          'Counter-Strike 2': { elo: 2540, wins: 142, losses: 28, winRate: 83.5, kd: '2.14', mvp: 48 },
-          'REMATCH': { elo: 2480, wins: 115, losses: 20, winRate: 85.1, kd: '2.30', mvp: 40 },
-          'Arkheron': { elo: 2200, wins: 95, losses: 18, winRate: 84.0, kd: '2.45', mvp: 35 },
-          'Empulse': { elo: 2450, wins: 105, losses: 15, winRate: 87.5, kd: '2.55', mvp: 38 },
-          'Valorant': { elo: 2350, wins: 110, losses: 22, winRate: 83.3, kd: '1.98', mvp: 35 },
-          'Marvel Rivals': { elo: 2400, wins: 88, losses: 15, winRate: 85.4, kd: '3.10', mvp: 30 },
-          'Slapshot: Rebound': { elo: 2650, wins: 95, losses: 18, winRate: 84.0, kd: '3.45', mvp: 42 },
-          'Rocket League': { elo: 2450, wins: 88, losses: 20, winRate: 81.4, kd: 'N/A', mvp: 30 },
-          'Dota 2': { elo: 4200, wins: 130, losses: 40, winRate: 76.4, kd: '3.10', mvp: 29 },
-          'Rainbow Six Siege': { elo: 3100, wins: 75, losses: 15, winRate: 83.3, kd: '2.05', mvp: 22 }
-        }
-      },
-      {
-        rank: 2,
-        name: 'ApexGod99',
-        region: 'EU',
-        avatar: '⚡',
-        acVerified: true,
-        steamId: '76561198011223344',
-        riotId: 'ApexGod#EUW',
-        discord: 'ApexGod#1337',
-        twitch: 'twitch.tv/ApexGod99',
-        commendations: { leadership: 18, friendly: 20, clutch: 31, teacher: 9 },
-        badRemarks: { toxic: 2, afk: 1, griefing: 0, suspected: 0 },
-        games: {
-          'Counter-Strike 2': { elo: 2150, wins: 98, losses: 31, winRate: 76.0, kd: '1.75', mvp: 32 },
-          'REMATCH': { elo: 1950, wins: 70, losses: 28, winRate: 71.4, kd: '1.85', mvp: 25 },
-          'Arkheron': { elo: 1750, wins: 62, losses: 25, winRate: 71.2, kd: '1.90', mvp: 22 },
-          'Empulse': { elo: 2150, wins: 85, losses: 20, winRate: 81.0, kd: '2.10', mvp: 28 },
-          'Valorant': { elo: 2100, wins: 82, losses: 24, winRate: 77.3, kd: '1.68', mvp: 24 },
-          'Slapshot: Rebound': { elo: 2580, wins: 112, losses: 20, winRate: 84.8, kd: '3.20', mvp: 50 },
-          'Rocket League': { elo: 1850, wins: 64, losses: 30, winRate: 68.1, kd: 'N/A', mvp: 18 },
-          'Dota 2': { elo: 2800, wins: 55, losses: 35, winRate: 61.1, kd: '2.40', mvp: 12 },
-          'Rainbow Six Siege': { elo: 2400, wins: 60, losses: 25, winRate: 70.5, kd: '1.55', mvp: 15 }
-        }
-      },
-      {
-        rank: 3,
-        name: 'Valkyrie_CS',
-        region: 'EU',
-        avatar: '🎯',
-        acVerified: true,
-        steamId: '76561198055443322',
-        riotId: 'Valkyrie#EU1',
-        discord: 'Valkyrie#2026',
-        twitch: 'twitch.tv/Valkyrie_CS',
-        commendations: { leadership: 15, friendly: 40, clutch: 28, teacher: 22 },
-        badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
-        games: {
-          'Counter-Strike 2': { elo: 1920, wins: 85, losses: 42, winRate: 66.9, kd: '1.45', mvp: 28 },
-          'REMATCH': { elo: 1820, wins: 65, losses: 30, winRate: 68.4, kd: '1.60', mvp: 20 },
-          'Arkheron': { elo: 1650, wins: 54, losses: 28, winRate: 65.8, kd: '1.72', mvp: 18 },
-          'Valorant': { elo: 1950, wins: 90, losses: 38, winRate: 70.3, kd: '1.52', mvp: 26 },
-          'Slapshot: Rebound': { elo: 2100, wins: 78, losses: 30, winRate: 72.2, kd: '2.40', mvp: 30 },
-          'Rocket League': { elo: 1950, wins: 72, losses: 25, winRate: 74.2, kd: 'N/A', mvp: 22 },
-          'Dota 2': { elo: 3100, wins: 82, losses: 40, winRate: 67.2, kd: '2.65', mvp: 18 },
-          'Rainbow Six Siege': { elo: 2800, wins: 78, losses: 28, winRate: 73.6, kd: '1.80', mvp: 20 }
-        }
-      },
-      {
-        rank: 4,
-        name: 'You (Host)',
-        region: 'NA',
-        avatar: '👑',
-        acVerified: true,
-        steamId: '76561198012345678',
-        riotId: 'ProGamer#1337',
-        discord: 'GamerHost#0001',
-        twitch: 'twitch.tv/CustomLobbiesHost',
-        commendations: { leadership: 19, friendly: 28, clutch: 34, teacher: 15 },
-        badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
-        games: {
-          'Counter-Strike 2': { elo: 1840, wins: 76, losses: 34, winRate: 69.1, kd: '1.40', mvp: 22 },
-          'REMATCH': { elo: 1900, wins: 72, losses: 28, winRate: 72.0, kd: '1.70', mvp: 24 },
-          'Arkheron': { elo: 1850, wins: 68, losses: 24, winRate: 73.9, kd: '1.80', mvp: 21 },
-          'Valorant': { elo: 1350, wins: 62, losses: 30, winRate: 67.4, kd: '1.38', mvp: 19 },
-          'Slapshot: Rebound': { elo: 2510, wins: 104, losses: 26, winRate: 80.0, kd: '3.10', mvp: 38 },
-          'Rocket League': { elo: 2100, wins: 80, losses: 32, winRate: 71.4, kd: 'N/A', mvp: 21 },
-          'Dota 2': { elo: 2500, wins: 60, losses: 35, winRate: 63.1, kd: '2.25', mvp: 14 },
-          'Rainbow Six Siege': { elo: 2250, wins: 54, losses: 28, winRate: 65.8, kd: '1.42', mvp: 16 }
-        }
-      },
-      {
-        rank: 5,
-        name: 'ShadowNinja',
-        region: 'SA',
-        avatar: '🥷',
-        acVerified: true,
-        steamId: '76561198088776655',
-        riotId: 'ShadowNinja#BR1',
-        discord: 'ShadowNinja#9999',
-        twitch: 'twitch.tv/ShadowNinja',
-        commendations: { leadership: 12, friendly: 18, clutch: 22, teacher: 8 },
-        badRemarks: { toxic: 1, afk: 0, griefing: 1, suspected: 0 },
-        games: {
-          'Counter-Strike 2': { elo: 1790, wins: 64, losses: 40, winRate: 61.5, kd: '1.32', mvp: 18 },
-          'Valorant': { elo: 1750, wins: 72, losses: 45, winRate: 61.5, kd: '1.35', mvp: 17 },
-          'Slapshot: Rebound': { elo: 1800, wins: 65, losses: 42, winRate: 60.7, kd: '1.95', mvp: 15 },
-          'Rocket League': { elo: 1500, wins: 45, losses: 35, winRate: 56.2, kd: 'N/A', mvp: 10 },
-          'Dota 2': { elo: 3100, wins: 70, losses: 50, winRate: 58.3, kd: '2.50', mvp: 16 },
-          'Rainbow Six Siege': { elo: 1950, wins: 48, losses: 38, winRate: 55.8, kd: '1.25', mvp: 11 }
-        }
-      },
-      {
-        rank: 6,
-        name: 'GhostOperator',
-        region: 'APAC',
-        avatar: '👻',
-        acVerified: true,
-        steamId: '76561198033445566',
-        riotId: 'GhostOp#JP1',
-        discord: 'GhostOperator#7777',
-        twitch: 'twitch.tv/GhostOperator',
-        commendations: { leadership: 10, friendly: 15, clutch: 19, teacher: 6 },
-        badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
-        games: {
-          'Counter-Strike 2': { elo: 1680, wins: 52, losses: 38, winRate: 57.8, kd: '1.22', mvp: 14 },
-          'Valorant': { elo: 1820, wins: 80, losses: 39, winRate: 67.2, kd: '1.48', mvp: 21 },
-          'Slapshot: Rebound': { elo: 1650, wins: 50, losses: 38, winRate: 56.8, kd: '1.75', mvp: 12 },
-          'Rocket League': { elo: 1420, wins: 38, losses: 30, winRate: 55.9, kd: 'N/A', mvp: 8 },
-          'Dota 2': { elo: 1900, wins: 42, losses: 38, winRate: 52.5, kd: '2.05', mvp: 9 },
-          'Rainbow Six Siege': { elo: 3050, wins: 95, losses: 22, winRate: 81.2, kd: '2.10', mvp: 28 }
-        }
-      }
-    ];
+    this.leaderboardData = [];
 
     this.loadState();
   }

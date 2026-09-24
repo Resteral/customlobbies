@@ -66,89 +66,24 @@ class ChatVoiceManager {
     this.pinnedStickers = [];
 
     // Per-Channel Match Lobby & Team Pool Engine
-    this.channelLobbies = {
-      'general': {
-        game: 'Counter-Strike 2 5v5',
-        maxPerTeam: 5,
-        team1Name: 'Team Alpha 🔵',
-        team2Name: 'Team Bravo 🔴',
-        team1: [
-          { name: 'ApexGod99', mmr: 2150, role: 'Entry Fragger', isCaptain: true },
-          { name: 'ShadowNinja', mmr: 1920, role: 'Support' }
-        ],
-        team2: [
-          { name: 'Valkyrie_CS', mmr: 1840, role: 'AWPer', isCaptain: true }
-        ],
-        map: 'Mirage & Inferno',
-        status: 'RECRUITING (3/10 Players)'
-      },
-      'lfg-cs2': {
-        game: 'CS2 Premier Scrims',
-        maxPerTeam: 5,
-        team1Name: 'Squad Red 🔴',
-        team2Name: 'Squad Blue 🔵',
-        team1: [
-          { name: 'RadiantReaper', mmr: 2540, role: 'IGL / Commander', isCaptain: true },
-          { name: 'ProSniper_2026', mmr: 1450, role: 'Sniper' }
-        ],
-        team2: [
-          { name: 'Valkyrie_CS', mmr: 1840, role: 'Flex Specialist', isCaptain: true }
-        ],
-        map: 'Dust II & Nuke',
-        status: 'RECRUITING (3/10 Players)'
-      },
-      'tournaments': {
-        game: 'CS2 $1,500 Scrim Tournament',
-        maxPerTeam: 5,
-        team1Name: 'FaZe Clan ⚡',
-        team2Name: 'G2 Esports 🐉',
-        team1: [
-          { name: 'FaZe_Karrigan', mmr: 2600, role: 'IGL', isCaptain: true },
-          { name: 'ApexGod99', mmr: 2150, role: 'Rifler' }
-        ],
-        team2: [
-          { name: 'G2_NiKo', mmr: 2650, role: 'Entry Fragger', isCaptain: true }
-        ],
-        map: 'Anubis & Inferno',
-        status: 'RECRUITING (3/10 Players)'
-      }
-    };
+    this.channelLobbies = {};
 
     this.textMessages = {
-      'general': [
-        { id: 1, author: 'ApexGod99', text: 'Anyone hosting 5v5 CS2 scrims tonight? Type -j or -j 1 / -j 2 to join team pool!', time: '7:42 PM', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80', channelLobbyCard: true },
-        { id: 2, author: 'ShadowNinja', text: 'Queue up on quick queue! Need 2 more high Diamond players.', time: '7:44 PM', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '⚡', name: 'Electro GG' } }
-      ],
+      'general': [],
       'welcome': [
         { id: 3, author: 'CustomLobbiesBot', text: '👋 Welcome to CustomLobbies Community Discord Hub! Read the rules and join voice channels!', time: '12:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
       ],
       'rules': [
         { id: 4, author: 'Admin', text: '📜 1. Be respectful. 2. No cheating or unauthorized exploits. 3. GL HF!', time: '12:01 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
       ],
-      'pics': [
-        { id: 5, author: 'Valkyrie_CS', text: 'Check out this sick AWP 1v4 clutch on Inferno!', time: '6:15 PM', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🔥', name: 'Fire Play' } }
-      ],
-      'commands': [
-        { id: 6, author: 'ApexGod99', text: '!stats BDroplE', time: '5:00 PM', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80' }
-      ],
-      'promo': [
-        { id: 7, author: 'ProStreamer', text: 'Live testing new tournament widgets at twitch.tv/CustomLobbiesHost', time: '4:30 PM', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80' }
-      ],
-      'lfg-cs2': [
-        { id: 8, author: 'Valkyrie_CS', text: 'LFG 5v5 Mirage/Inferno. 1900+ MMR only. Type -j to join team pool!', time: '7:30 PM', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80', channelLobbyCard: true }
-      ],
-      'tournaments': [
-        { id: 9, author: 'CustomLobbiesBot', text: '🏆 Weekly $1,500 CS2 Esports Tournament is LIVE! Use -b for bracket or -j to join tournament team pool.', time: '6:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🏆', name: 'Champion' }, bracketCard: true, channelLobbyCard: true }
-      ]
+      'pics': [],
+      'commands': [],
+      'promo': [],
+      'lfg-cs2': [],
+      'tournaments': []
     };
 
-    this.onlineUsers = [
-      { name: 'ApexGod99', mmr: 2150, status: 'Online', teamTag: 'WD-ALPHA' },
-      { name: 'ShadowNinja', mmr: 1920, status: 'In Game', teamTag: 'CLAW' },
-      { name: 'Valkyrie_CS', mmr: 1840, status: 'Streaming' },
-      { name: 'RadiantReaper', mmr: 2540, status: 'Online', teamTag: 'TSM' },
-      { name: 'ProSniper_2026', mmr: 1450, status: 'In Queue' }
-    ];
+    this.onlineUsers = [];
   }
 
   init() {

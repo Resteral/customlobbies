@@ -79,25 +79,13 @@ class WardogsEngine {
     };
 
     // Default Solo Mercenaries
-    this.soloMercenaries = [
-      { id: 101, name: 'Ghost_Dog_99', callsign: 'VIPER-1', game: 'WARDOGS', role: '🎯 Marksman / Sniper', elo: 2580, kd: '2.35', status: 'Selected for Ranked', contracts: 42, acVerified: true, badge: '🏆 Season 3 Champion', bountyEarned: '6,400 CL-Points' },
-      { id: 102, name: 'Sargeant_Iron', callsign: 'HAMMER-6', game: 'Empulse', role: '⚡ Breacher / Assault', elo: 2450, kd: '2.10', status: 'Available', contracts: 38, acVerified: true, badge: '⚡ Demolitions Expert', bountyEarned: '4,800 CL-Points' },
-      { id: 103, name: 'Valkyrie_Merc', callsign: 'VALKYRIE-3', game: 'Valorant', role: '🧠 Recon / Scout', elo: 2390, kd: '1.95', status: 'Available', contracts: 29, acVerified: true, badge: '🎯 Intel Specialist', bountyEarned: '3,200 CL-Points' },
-      { id: 104, name: 'Shadow_K9', callsign: 'SPECTRE-4', game: 'REMATCH', role: '📻 Comms Specialist', elo: 2480, kd: '2.20', status: 'Selected for Ranked', contracts: 35, acVerified: true, badge: '📡 Tactical Commander', bountyEarned: '5,100 CL-Points' }
-    ];
+    this.soloMercenaries = [];
 
     // Default Squad Units
-    this.registeredSquads = [
-      { id: 201, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', game: 'WARDOGS', record: '18W - 2L', membersCount: 33, status: 'SELECTED FOR RANKED', bountyEarned: '12,500 CL-Points', faction: '🔵 Vanguard Command' },
-      { id: 202, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', game: 'Empulse', record: '15W - 3L', membersCount: 33, status: 'ACTIVE CONTRACT', bountyEarned: '8,200 CL-Points', faction: '🔴 Apex Raiders' }
-    ];
+    this.registeredSquads = [];
 
     // Default Tactical Bounties
-    this.tacticalBounties = [
-      { id: 'BNT-01', title: 'Capture Sector 33 Cyber Core', reward: '+250 🪙 CL-Points', clPoints: '1,500 CL-Points', desc: 'Secure Sector 33-C for 5 consecutive rounds in Tri-Faction Warfare.', completed: false },
-      { id: 'BNT-02', title: 'Orbital Recon Sweep', reward: '+150 🪙 CL-Points', clPoints: '750 CL-Points', desc: 'Tag 25 enemy operatives using Thermal Recon Drones.', completed: false },
-      { id: 'BNT-03', title: 'Battalion Scrim Victory', reward: '+500 🪙 CL-Points', clPoints: '3,000 CL-Points', desc: 'Lead a 33-man Battalion to victory against 2 competing factions.', completed: true }
-    ];
+    this.tacticalBounties = [];
 
     // Match History Rooms
     this.rankedSelectionHistory = [];
