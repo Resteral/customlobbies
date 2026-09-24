@@ -1480,6 +1480,22 @@ class ChatVoiceManager {
     if (voiceRoomElem) voiceRoomElem.textContent = roomKey.replace('-', ' ').toUpperCase();
   }
 
+  syncVoiceToCurrentChannel() {
+    if (!this.currentTextChannel) return;
+    this.selectVoiceRoom(this.currentTextChannel);
+    
+    const badge = document.getElementById('voiceStatusBadge');
+    if (badge && badge.textContent !== 'Connected') {
+      this.toggleVoiceConnection();
+    }
+    
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
+    
+    alert(`🎙️ VOICE SYNCED!\n\nYou have automatically joined the [${this.currentTextChannel.toUpperCase()}] voice channel to match your text chat!`);
+  }
+
   toggleVoiceConnection() {
     const badge = document.getElementById('voiceStatusBadge');
     const roomName = document.getElementById('voiceRoomName');

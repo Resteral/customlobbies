@@ -999,6 +999,9 @@
               <span style="font-size: 0.85rem; color: var(--text-muted);" id="currentChannelTopic">General community chat & CustomLobbies discussion</span>
             </div>
             <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-success btn-sm" onclick="window.chatVoiceManager.syncVoiceToCurrentChannel()" title="Sync and Auto-Join the Voice Channel for this Text Room">
+                <span>🎙️</span> Sync Voice
+              </button>
               <button class="btn btn-cyan btn-sm" id="btnHeaderChannelPool" onclick="window.chatVoiceManager.postChannelLobbyToChat()" title="View / Post Active Channel Team Pool (-j)">
                 <span>👥</span> Team Pool
               </button>
