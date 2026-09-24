@@ -1374,15 +1374,159 @@ class ChatVoiceManager {
     const container = document.getElementById('onlineUsersList');
     if (!container) return;
 
-    container.innerHTML = this.onlineUsers.map(u => `
-      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green);"></span>
-          <span style="font-weight: 600;">${u.name}</span>
-        </div>
-        <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.78rem;">${u.mmr} MMR</span>
+    const rolesMap = JSON.parse(localStorage.getItem('cl_server_roles') || '[]');
+    const userRoleAssignments = JSON.parse(localStorage.getItem('cl_server_user_roles') || '{}');
+
+    // Sort online users into their highest role category
+    const categorized = { 'Online': [] };
+    rolesMap.forEach(r => categorized[r.name] = { color: r.color, users: [] });
+
+    this.onlineUsers.forEach(u => {
+      const roleName = userRoleAssignments[u.name];
+      if (roleName && categorized[roleName]) {
+        categorized[roleName].users.push(u);
+      } else {
+        categorized['Online'].push(u);
+      }
+    });
+
+    let html = '';
+    
+    // Render custom roles first
+    rolesMap.forEach(r => {
+      if (categorized[r.name].users.length > 0) {
+        html += `<div style="font-size: 0.7rem; font-weight: 800; color: ${r.color}; text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.8rem;">${r.name} - ${categorized[r.name].users.length}</div>`;
+        categorized[r.name].users.forEach(u => {
+          html += `
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: ${r.color}; box-shadow: 0 0 5px ${r.color};"></span>
+                <span style="font-weight: 600; color: ${r.color};">${u.name}</span>
+              </div>
+              <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.78rem;">${u.mmr} MMR</span>
+            </div>
+          `;
+        });
+      }
+    });
+
+    // Render default online category
+    if (categorized['Online'].length > 0) {
+      html += `<div style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.8rem;">Online - ${categorized['Online'].length}</div>`;
+      categorized['Online'].forEach(u => {
+        html += `
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green);"></span>
+              <span style="font-weight: 600;">${u.name}</span>
+            </div>
+            <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.78rem;">${u.mmr} MMR</span>
+          </div>
+        `;
+      });
+    }
+
+    container.innerHTML = html;
+  }
+
+  openRolesModal() {
+    const modal = document.getElementById('serverRolesModal');
+    if (modal) modal.classList.add('active');
+    this.renderRolesModal();
+  }
+
+  closeRolesModal() {
+    const modal = document.getElementById('serverRolesModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  renderRolesModal() {
+    const list = document.getElementById('customRolesListContainer');
+    const playerSelect = document.getElementById('assignRolePlayerSelect');
+    const roleSelect = document.getElementById('assignRoleRoleSelect');
+    if (!list || !playerSelect || !roleSelect) return;
+
+    const rolesMap = JSON.parse(localStorage.getItem('cl_server_roles') || '[]');
+    
+    list.innerHTML = rolesMap.map((r, idx) => `
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 0.6rem 0.8rem; border-radius: 6px; border-left: 4px solid ${r.color};">
+        <span style="font-weight: 700; color: ${r.color};">${r.name}</span>
+        <button class="icon-btn-sm" onclick="window.chatVoiceManager.deleteCustomRole(${idx})" title="Delete Role">🗑️</button>
       </div>
     `).join('');
+
+    if (rolesMap.length === 0) {
+      list.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No custom roles created yet.</div>';
+    }
+
+    playerSelect.innerHTML = this.onlineUsers.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
+    roleSelect.innerHTML = `<option value="none">-- Remove Role --</option>` + rolesMap.map(r => `<option value="${r.name}">${r.name}</option>`).join('');
+  }
+
+  createCustomRole() {
+    const nameInput = document.getElementById('newRoleNameInput');
+    const colorInput = document.getElementById('newRoleColorInput');
+    if (!nameInput || !colorInput) return;
+
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    const rolesMap = JSON.parse(localStorage.getItem('cl_server_roles') || '[]');
+    if (rolesMap.find(r => r.name.toLowerCase() === name.toLowerCase())) {
+        alert("A role with this name already exists.");
+        return;
+    }
+
+    rolesMap.push({ name, color: colorInput.value });
+    localStorage.setItem('cl_server_roles', JSON.stringify(rolesMap));
+
+    nameInput.value = '';
+    this.renderRolesModal();
+    this.renderOnlineUsers();
+  }
+
+  deleteCustomRole(index) {
+    const rolesMap = JSON.parse(localStorage.getItem('cl_server_roles') || '[]');
+    const roleToDelete = rolesMap[index];
+    
+    if (roleToDelete) {
+        rolesMap.splice(index, 1);
+        localStorage.setItem('cl_server_roles', JSON.stringify(rolesMap));
+
+        // Remove role from users
+        const userRoleAssignments = JSON.parse(localStorage.getItem('cl_server_user_roles') || '{}');
+        for (let user in userRoleAssignments) {
+            if (userRoleAssignments[user] === roleToDelete.name) {
+                delete userRoleAssignments[user];
+            }
+        }
+        localStorage.setItem('cl_server_user_roles', JSON.stringify(userRoleAssignments));
+
+        this.renderRolesModal();
+        this.renderOnlineUsers();
+    }
+  }
+
+  assignRoleToPlayer() {
+    const playerSelect = document.getElementById('assignRolePlayerSelect');
+    const roleSelect = document.getElementById('assignRoleRoleSelect');
+    if (!playerSelect || !roleSelect) return;
+
+    const playerName = playerSelect.value;
+    const roleName = roleSelect.value;
+
+    const userRoleAssignments = JSON.parse(localStorage.getItem('cl_server_user_roles') || '{}');
+    
+    if (roleName === 'none') {
+        delete userRoleAssignments[playerName];
+    } else {
+        userRoleAssignments[playerName] = roleName;
+    }
+
+    localStorage.setItem('cl_server_user_roles', JSON.stringify(userRoleAssignments));
+    
+    this.renderRolesModal();
+    this.renderOnlineUsers();
   }
 
   selectVoiceRoom(roomKey) {

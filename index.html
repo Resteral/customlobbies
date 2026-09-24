@@ -1013,7 +1013,12 @@
           </div>
 
           <div style="margin-top: 1.5rem;">
-            <h4 style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.8rem;">Online Players (18)</h4>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+              <h4 style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; margin: 0;">Online Roster</h4>
+              <button class="btn btn-secondary btn-sm" style="padding: 0.15rem 0.4rem; font-size: 0.7rem;" onclick="window.chatVoiceManager.openRolesModal()" title="Create and Assign Custom Server Roles">
+                ⚙️ Roles
+              </button>
+            </div>
             <div id="onlineUsersList" style="display: flex; flex-direction: column; gap: 0.6rem;">
               <!-- User rows injected -->
             </div>
@@ -4312,6 +4317,41 @@
 
   <!-- Supabase Backend Import -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- ========================================== -->
+  <!-- SERVER ROLES MODAL                         -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="serverRolesModal">
+    <div class="modal-card" style="max-width: 600px; border-color: var(--accent-cyan);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--accent-cyan);">⚙️ Manage Server Roles</h3>
+        <button class="btn btn-secondary btn-sm" onclick="window.chatVoiceManager.closeRolesModal()">✕ Close</button>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.25rem;">
+        Create and customize roles for this server. You can assign colors and assign them to online players.
+      </p>
+
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <input type="text" id="newRoleNameInput" class="input-field" style="flex: 1; margin: 0;" placeholder="New Role Name (e.g. VIP, Entry Fragger, Coach)">
+        <input type="color" id="newRoleColorInput" class="input-field" style="width: 50px; padding: 0.1rem; height: 38px; margin: 0; cursor: pointer;" value="#ffab00">
+        <button class="btn btn-primary" onclick="window.chatVoiceManager.createCustomRole()">➕ Add Role</button>
+      </div>
+
+      <div id="customRolesListContainer" style="display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; max-height: 200px; overflow-y: auto; padding-right: 0.5rem;">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+        <h4 style="font-size: 0.9rem; margin-bottom: 0.8rem; color: #fff;">Assign Role to Player</h4>
+        <div style="display: flex; gap: 0.5rem;">
+          <select class="input-field" id="assignRolePlayerSelect" style="flex: 1; margin: 0;"></select>
+          <select class="input-field" id="assignRoleRoleSelect" style="flex: 1; margin: 0;"></select>
+          <button class="btn btn-secondary" onclick="window.chatVoiceManager.assignRoleToPlayer()">Assign</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Application Script Imports -->
   <script src="js/elo-engine.js"></script>
