@@ -46,7 +46,7 @@
     </div>
 
     <nav class="nav-links">
-      <button class="nav-btn active" data-tab="lobbies-view">
+      <button class="nav-btn" data-tab="lobbies-view">
         <span>🎮</span> Lobbies & Queue
       </button>
       <button class="nav-btn" data-tab="gamers-hub-view">
@@ -67,7 +67,7 @@
       <button class="nav-btn" data-tab="debate-view">
         <span>🗣️</span> Debate Arena
       </button>
-      <button class="nav-btn" data-tab="community-view">
+      <button class="nav-btn active" data-tab="community-view">
         <span>💬</span> Community Hub
       </button>
       
@@ -275,7 +275,7 @@
       </div>
     </section>
 
-    <section id="lobbies-view" class="view-section active">
+    <section id="lobbies-view" class="view-section">
       <!-- Clean Hero Banner -->
       <div class="lobby-header-banner" style="background: linear-gradient(135deg, rgba(14, 18, 28, 0.92), rgba(6, 8, 14, 0.96)), url('assets/logo.jpg') center/cover no-repeat; border: 1px solid var(--border-color); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15); display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; padding: 2rem; margin-bottom: 0.8rem;">
         <div style="display: flex; align-items: center; gap: 1.25rem; max-width: 650px;">
@@ -889,7 +889,7 @@
     </section>
 
     <!-- 2. COMMUNITY CHAT & VOICE HUB (DISCORD STYLE) -->
-    <section id="community-view" class="view-section">
+    <section id="community-view" class="view-section active">
       <div class="discord-hub-container">
         <!-- 1. Left Vertical Server Rail Bar -->
         <div class="discord-server-rail" id="discordServerRailContainer">
@@ -4239,7 +4239,7 @@
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 0.5rem; overflow-y: auto;">
-      <button class="nav-btn active" data-tab="lobbies-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=lobbies-view]').click();">
+      <button class="nav-btn" data-tab="lobbies-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=lobbies-view]').click();">
         <span>🎮</span> Lobbies & Queue
       </button>
       <button class="nav-btn" data-tab="gamers-hub-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=gamers-hub-view]').click();">
@@ -4260,7 +4260,7 @@
       <button class="nav-btn" data-tab="debate-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=debate-view]').click();">
         <span>🗣️</span> Debate Arena
       </button>
-      <button class="nav-btn" data-tab="community-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=community-view]').click();">
+      <button class="nav-btn active" data-tab="community-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=community-view]').click();">
         <span>💬</span> Community Hub
       </button>
       <button class="nav-btn" data-tab="servers-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=servers-view]').click();">
@@ -4442,6 +4442,19 @@
       </div>
     </div>
   </div>
+
+  <script>
+    if (typeof require !== 'undefined') {
+      const { ipcRenderer } = require('electron');
+      const minBtn = document.getElementById('desktopMinBtn');
+      const maxBtn = document.getElementById('desktopMaxBtn');
+      const closeBtn = document.getElementById('desktopCloseBtn');
+      
+      if (minBtn) minBtn.addEventListener('click', () => ipcRenderer.send('window-minimize'));
+      if (maxBtn) maxBtn.addEventListener('click', () => ipcRenderer.send('window-maximize'));
+      if (closeBtn) closeBtn.addEventListener('click', () => ipcRenderer.send('window-close'));
+    }
+  </script>
 </body>
 
 </html>

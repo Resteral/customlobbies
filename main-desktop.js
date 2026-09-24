@@ -54,7 +54,7 @@ function createWindow() {
     minHeight: 720,
     title: 'CustomLobbies Desktop Program Client v2.5',
     icon: path.join(__dirname, 'assets/logo.jpg'),
-    frame: true,
+    frame: false,
     autoHideMenuBar: true,
     backgroundColor: '#0a0b10',
     webPreferences: {
