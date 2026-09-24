@@ -66,12 +66,19 @@ class WardogsEngine {
       const saved = localStorage.getItem('cl_wardogs_state_v2');
       if (saved) {
         const data = JSON.parse(saved);
-        if (data.soloMercenaries) this.soloMercenaries = data.soloMercenaries;
-        if (data.registeredSquads) this.registeredSquads = data.registeredSquads;
+        if (data.soloMercenaries) {
+            this.soloMercenaries = data.soloMercenaries.map(m => ({...m, game: 'WARDOGS'}));
+        }
+        if (data.registeredSquads) {
+            this.registeredSquads = data.registeredSquads.map(s => ({...s, game: 'WARDOGS'}));
+        }
         if (data.tacticalBounties) this.tacticalBounties = data.tacticalBounties;
         if (data.rankedSelectionHistory) this.rankedSelectionHistory = data.rankedSelectionHistory;
         if (data.circuitDivisions) this.circuitDivisions = data.circuitDivisions;
         if (data.operationsCalendar) this.operationsCalendar = data.operationsCalendar;
+        
+        // Force flush migration to disk
+        this.saveState();
       }
     } catch (e) {
       console.warn('Error loading Wardogs state:', e);
