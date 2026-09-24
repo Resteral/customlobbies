@@ -1528,6 +1528,30 @@ class CustomLobbiesApp {
     const size = document.getElementById('modalWardogsTeamSize').value;
     const bio = document.getElementById('modalWardogsTeamBio') ? document.getElementById('modalWardogsTeamBio').value.trim() : '';
 
+    const newTeam = {
+      id: Date.now() + Math.random().toString(36).substr(2, 9),
+      name: squadName,
+      tag: tag.startsWith('[') ? tag.toUpperCase() : `[${tag.toUpperCase()}]`,
+      emblem: '🛡️',
+      focus: 'Ranked Ladder',
+      synergy: '100% (Role-Balanced)',
+      captain: captain,
+      game: game,
+      members: [
+        { name: captain, role: 'Captain', elo: 2400 }
+      ],
+      applications: [],
+      record: '0W - 0L',
+      elo: 2400,
+      kd: '0.0',
+      bountyEarned: '0 CL-Points',
+      createdDate: new Date().toLocaleDateString()
+    };
+
+    if (!this.myCreatedTeams) this.myCreatedTeams = [];
+    this.myCreatedTeams.unshift(newTeam);
+    localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
+
     if (window.wardogsEngine) {
       window.wardogsEngine.registerSquadUnit(squadName, tag, captain, game, size);
     }
@@ -1947,7 +1971,11 @@ class CustomLobbiesApp {
 
     if (body) {
       const roles = ['👑 IGL / Commander', '🎯 Entry Fragger', '🔭 Marksman / AWPer', '🛡️ Support / Anchor', '⚡ Flex Specialist'];
-      const memberList = team.members || [team.captain || 'Sean', 'Ghost_Dog_99', 'Sargeant_Iron', 'Valkyrie_Merc', 'Shadow_K9'];
+      const memberList = team.members || [
+        { name: team.captain || 'Sean', role: 'Captain', elo: 2400 },
+        { name: 'Ghost_Dog_99', role: 'Operative', elo: 2100 },
+        { name: 'Sargeant_Iron', role: 'Operative', elo: 2150 }
+      ];
 
       body.innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; background: rgba(0,0,0,0.4); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.25rem; text-align: center;">
@@ -1978,7 +2006,7 @@ class CustomLobbiesApp {
           ${memberList.map((m, idx) => `
             <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.04); padding: 0.55rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-color);">
               <div style="display: flex; align-items: center; gap: 0.6rem;">
-                <span style="font-size: 0.85rem; font-weight: 800; color: #fff;">${m}</span>
+                <span style="font-size: 0.85rem; font-weight: 800; color: #fff;">${m.name || m}</span>
                 ${idx === 0 ? '<span style="background: rgba(255,215,0,0.2); color: var(--accent-gold); border: 1px solid var(--accent-gold); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 800;">CAPTAIN</span>' : ''}
               </div>
               <span class="lobby-game-tag" style="background: rgba(0,242,254,0.15); color: var(--accent-cyan); font-size: 0.75rem;">
@@ -2061,9 +2089,15 @@ class CustomLobbiesApp {
     if (!team || !team.applications || !team.applications[index]) return;
 
     const app = team.applications[index];
-    if (!team.members) team.members = [team.captain || 'Sean'];
+    if (!team.members) {
+      team.members = [{ name: team.captain || 'Sean', role: 'Captain', elo: 2400 }];
+    }
 
-    team.members.push(app.name);
+    team.members.push({
+      name: app.name,
+      role: app.role || 'Operative',
+      elo: app.elo || 2150
+    });
     team.applications.splice(index, 1);
 
     localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
