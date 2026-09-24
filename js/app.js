@@ -991,7 +991,7 @@ class CustomLobbiesApp {
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div>
                 <h3 style="font-size: 1.3rem; font-weight: 900; color: #ffab00; margin-bottom: 0.3rem;">📢 Team Recruitment Board</h3>
-                <p style="color: var(--text-muted); font-size: 0.85rem;">Find the perfect 33-man WARDOGS team to join, or post an active recruitment bounty.</p>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Find the perfect WARDOGS team to join, or post an active recruitment bounty.</p>
               </div>
               <button class="btn btn-primary" onclick="window.app.openWardogsTeamModal()">➕ Register Team</button>
             </div>
