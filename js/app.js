@@ -1442,6 +1442,7 @@ class CustomLobbiesApp {
     const callsign = document.getElementById('modalWardogsCallsign').value.trim() || 'VIPER-1';
     const game = document.getElementById('modalWardogsGame').value;
     const role = document.getElementById('modalWardogsRole').value;
+    const bio = document.getElementById('modalWardogsBio') ? document.getElementById('modalWardogsBio').value.trim() : '';
 
     if (window.wardogsEngine) {
       window.wardogsEngine.registerSoloMercenary(handle, callsign, game, role, 2150);
@@ -1461,7 +1462,7 @@ class CustomLobbiesApp {
     if (gameSelect) gameSelect.value = game;
     this.switchWardogsMode('solos');
 
-    alert(`🎉 MERCENARY ENLISTED!\n\nOperative ${handle} (${callsign}) registered into WARDOGS Mercenary Pool!\n\nEarned +100 🪙 CL-Points!`);
+    alert(`🎉 MERCENARY ENLISTED!\n\nOperative ${handle} (${callsign}) registered into WARDOGS Mercenary Pool for ${game}!\nYour Pitch: ${bio ? bio : 'No pitch provided.'}\n\nYou are now in the Draft Queue. Earned +100 🪙 CL-Points!`);
   }
 
   openWardogsTeamModal() {
@@ -1902,6 +1903,7 @@ class CustomLobbiesApp {
     const captain = document.getElementById('modalWardogsCaptain').value.trim() || 'Ghost_Dog_99';
     const game = document.getElementById('modalWardogsTeamGame').value;
     const size = document.getElementById('modalWardogsTeamSize').value;
+    const bio = document.getElementById('modalWardogsTeamBio') ? document.getElementById('modalWardogsTeamBio').value.trim() : '';
 
     if (window.wardogsEngine) {
       window.wardogsEngine.registerSquadUnit(squadName, tag, captain, game, size);
@@ -1916,6 +1918,12 @@ class CustomLobbiesApp {
     }
 
     this.closeWardogsTeamModal();
+
+    const gameSelect = document.getElementById('wardogsGameSelect');
+    if (gameSelect) gameSelect.value = game;
+    this.switchWardogsMode('squads');
+
+    alert(`🛡️ SQUAD REGISTERED!\n\n${squadName} [${tag}] is now active in the ${game} League.\nCaptain: ${captain}\nDescription: ${bio ? bio : 'No description provided.'}\n\nYou can now browse the Draft Queue and recruit members freely!`);
   }
 
   openCreateTeamModal() {
