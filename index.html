@@ -487,6 +487,7 @@
             <span style="font-size: 0.8rem; font-weight: 800; color: var(--accent-gold);">🎮 Filter Game:</span>
             <select class="input-field" style="width: 170px; font-size: 0.8rem; padding: 0.3rem 0.6rem;" id="playerPoolGameFilter" onchange="window.app.renderPoolFeed()">
               <option value="all">🎮 All Games</option>
+              <option value="WARDOGS">WARDOGS</option>
               <option value="Counter-Strike 2">Counter-Strike 2</option>
               <option value="Empulse">Empulse</option>
               <option value="REMATCH">REMATCH</option>
@@ -1486,6 +1487,7 @@
             <div>
               <label class="input-label">Select Game Title</label>
               <select class="input-field" id="mmGameSelect" onchange="window.app.onMatchmakingGameChange(this.value)">
+                <option value="WARDOGS">WARDOGS</option>
                 <option value="Counter-Strike 2" selected>Counter-Strike 2</option>
                 <option value="Valorant">Valorant</option>
                 <option value="Empulse">Empulse</option>
@@ -1601,6 +1603,7 @@
           <div style="display: flex; align-items: center; gap: 0.8rem;">
             <label style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Select Game League:</label>
             <select class="input-field" id="leagueGameSelect" style="margin-bottom: 0; min-width: 220px;" onchange="window.app.renderLeaguesView()">
+              <option value="WARDOGS">WARDOGS</option>
               <option value="Counter-Strike 2" selected>Counter-Strike 2 ($5,000)</option>
               <option value="Valorant">Valorant ($4,000)</option>
               <option value="Empulse">Empulse ($3,500)</option>
@@ -1763,6 +1766,7 @@
 
             <!-- Game Select Filter -->
             <select class="input-field" style="width: 190px; font-size: 0.85rem;" id="leaderboardGameFilter">
+              <option value="WARDOGS">WARDOGS</option>
               <option value="Counter-Strike 2">Counter-Strike 2</option>
               <option value="REMATCH">REMATCH</option>
               <option value="Arkheron">Arkheron</option>
@@ -2076,6 +2080,7 @@
       <div style="margin-bottom: 0.8rem;">
         <label style="font-size: 0.72rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase;">Select Queue Game</label>
         <select class="input-field" style="font-size: 0.8rem; padding: 0.3rem 0.5rem; margin-top: 0.2rem;" id="floatingWidgetGameSelect">
+          <option value="WARDOGS">WARDOGS</option>
           <option value="Counter-Strike 2">🎯 CS2 5v5 Premier</option>
           <option value="Empulse">⚡ Empulse 5v5 Cyber Arena</option>
           <option value="REMATCH">🔥 REMATCH 5v5 Champion</option>
@@ -2267,6 +2272,7 @@
       <div class="input-group">
         <label class="input-label">All Game Titles (Full Roster)</label>
         <select class="input-field" id="queueSelectGame">
+          <option value="WARDOGS">WARDOGS</option>
           <option value="Counter-Strike 2">Counter-Strike 2 (5v5 Premier Scrim)</option>
           <option value="Empulse">Empulse (5v5 Cyber Arena)</option>
           <option value="REMATCH">REMATCH (5v5 Champion Scrims)</option>
@@ -2573,6 +2579,7 @@
         <label class="input-label">Game Title</label>
         <select class="input-field" id="newTourneyGame">
           <option value="Valorant">Valorant</option>
+          <option value="WARDOGS">WARDOGS</option>
           <option value="Counter-Strike 2">Counter-Strike 2</option>
           <option value="Rocket League">Rocket League</option>
           <option value="Slapshot: Rebound">Slapshot: Rebound</option>
@@ -2892,6 +2899,7 @@
         <div>
           <label style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; display: block; margin-bottom: 0.3rem;">Select Competitive Title</label>
           <select class="input-field" id="vetoGameSelect" onchange="window.app.openMapVetoModal(this.value)">
+            <option value="WARDOGS">WARDOGS</option>
             <option value="Counter-Strike 2">Counter-Strike 2 (7 Maps)</option>
             <option value="Valorant">Valorant (6 Maps)</option>
             <option value="Empulse">Empulse (7 Maps)</option>
@@ -2993,6 +3001,7 @@
       <div class="input-group">
         <label class="input-label">Select Game Title</label>
         <select class="input-field" id="modalLeagueGameSelect">
+          <option value="WARDOGS">WARDOGS</option>
           <option value="Counter-Strike 2">Counter-Strike 2 ($5,000)</option>
           <option value="Valorant">Valorant ($4,000)</option>
           <option value="Empulse">Empulse ($3,500)</option>
