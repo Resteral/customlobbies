@@ -1128,7 +1128,7 @@ class CustomLobbiesApp {
               <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; background: rgba(0,0,0,0.4); padding: 0.6rem; border-radius: 6px; font-size: 0.78rem; margin-bottom: 1rem; text-align: center;">
                 <div><div style="color: var(--text-muted);">Rating</div><strong style="color: var(--accent-purple);">${m.elo} MMR</strong></div>
                 <div><div style="color: var(--text-muted);">K/D Ratio</div><strong style="color: var(--accent-green);">${m.kd}</strong></div>
-                <div><div style="color: var(--text-muted);">Bounty Earned</div><strong style="color: #ffab00;">${m.bountyEarned || '$500'}</strong></div>
+                <div><div style="color: var(--text-muted);">Bounty Earned</div><strong style="color: #ffab00;">${m.bountyEarned || '500 CL-Points'}</strong></div>
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1259,7 +1259,7 @@ class CustomLobbiesApp {
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
               <div>
                 <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); font-weight: 900;">🏆 WARDOGS OFFICIAL COMPETITIVE CIRCUIT</span>
-                <h2 style="font-size: 1.5rem; font-weight: 900; color: #fff; margin: 0.3rem 0 0 0;">Season 4: Operation Amber Strike ($50,000 USD Bounties)</h2>
+                <h2 style="font-size: 1.5rem; font-weight: 900; color: #fff; margin: 0.3rem 0 0 0;">Season 4: Operation Amber Strike (50,000 CL-Points USD Bounties)</h2>
               </div>
               <button class="btn btn-primary" onclick="window.app.openWardogsTeamModal()">🛡️ Register Battalion for Circuit</button>
             </div>
@@ -1346,7 +1346,7 @@ class CustomLobbiesApp {
         <div style="display: flex; flex-direction: column; gap: 1rem;">
           <div style="background: rgba(255, 111, 0, 0.1); border: 1px solid #ff6f00; border-radius: 8px; padding: 1rem; margin-bottom: 0.5rem;">
             <div style="font-weight: 900; color: #ffab00; font-size: 1.1rem; margin-bottom: 0.3rem;">🎯 WARDOGS Mercenary Tactical Bounties</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Complete tactical objectives in 33v33v33 Tri-Faction matches to earn CL-Points and Cash Bounties into your balance!</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Complete tactical objectives in 33v33v33 Tri-Faction matches to earn CL-Points and CL-Points Bounties into your balance!</div>
           </div>
 
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
@@ -1356,7 +1356,7 @@ class CustomLobbiesApp {
                   <span class="lobby-game-tag" style="background: rgba(255, 111, 0, 0.2); color: #ffab00;">${b.id}</span>
                   <div style="text-align: right;">
                     <div style="font-size: 0.85rem; color: var(--accent-green); font-weight: 900;">${b.reward}</div>
-                    <div style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">${b.cash}</div>
+                    <div style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">${b.CL-Points}</div>
                   </div>
                 </div>
 
@@ -2068,7 +2068,7 @@ class CustomLobbiesApp {
             record: '12W - 2L',
             elo: 2380,
             kd: '2.35',
-            bountyEarned: '$4,500',
+            bountyEarned: '4,500 CL-Points',
             createdDate: 'Live Active'
           }
         ];
@@ -2117,7 +2117,7 @@ class CustomLobbiesApp {
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; background: rgba(0,0,0,0.4); padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; margin-bottom: 0.8rem; text-align: center;">
               <div><div style="color: var(--text-muted);">Team MMR</div><strong style="color: var(--accent-gold);">${t.elo || 2200} ELO</strong></div>
               <div><div style="color: var(--text-muted);">Team K/D</div><strong style="color: var(--accent-green);">${t.kd || '2.10'}</strong></div>
-              <div><div style="color: var(--text-muted);">Earnings</div><strong style="color: #ffab00;">${t.bountyEarned || '$1k'}</strong></div>
+              <div><div style="color: var(--text-muted);">Earnings</div><strong style="color: #ffab00;">${t.bountyEarned || '1k CL-Points'}</strong></div>
             </div>
 
             <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem; max-height: 55px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;">
@@ -2169,7 +2169,7 @@ class CustomLobbiesApp {
       record: '0W - 0L',
       elo: Math.floor(2150 + Math.random() * 350),
       kd: '2.30',
-      bountyEarned: '$2,500',
+      bountyEarned: '2,500 CL-Points',
       createdDate: new Date().toLocaleDateString()
     };
 
@@ -2220,7 +2220,7 @@ class CustomLobbiesApp {
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; background: rgba(0,0,0,0.4); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.25rem; text-align: center;">
           <div><div style="font-size: 0.75rem; color: var(--text-muted);">Team Rating</div><strong style="color: var(--accent-gold); font-size: 1.1rem;">${team.elo || 2350} ELO</strong></div>
           <div><div style="font-size: 0.75rem; color: var(--text-muted);">Chemistry Synergy</div><strong style="color: var(--accent-green); font-size: 1.1rem;">${team.synergy || '100%'}</strong></div>
-          <div><div style="font-size: 0.75rem; color: var(--text-muted);">Bounty Earned</div><strong style="color: #ffab00; font-size: 1.1rem;">${team.bountyEarned || '$4,500'}</strong></div>
+          <div><div style="font-size: 0.75rem; color: var(--text-muted);">Bounty Earned</div><strong style="color: #ffab00; font-size: 1.1rem;">${team.bountyEarned || '4,500 CL-Points'}</strong></div>
         </div>
 
         <!-- Interactive Emblem Customizer for this Team -->
@@ -2469,10 +2469,10 @@ class CustomLobbiesApp {
     const matchRoom = window.wardogsEngine.generateRankedSelectionMatch(selectedGame);
 
     document.getElementById('wardogsDraftMatchId').textContent = `Match ID: ${matchRoom.id} • Game: ${matchRoom.game} (${matchRoom.capacity} Operatives) — Tri-Faction Auto-Balanced by MMR, K/D & Economy`;
-    document.getElementById('wardogsAlphaElo').textContent = `Commander: ${matchRoom.commanderAlpha?.captain || 'Ghost_Dog_99'} • Avg: ${matchRoom.avgEloAlpha} ELO • K/D: ${matchRoom.kdAlpha} • Pool: ${matchRoom.cashAlpha}`;
-    document.getElementById('wardogsBravoElo').textContent = `Commander: ${matchRoom.commanderBravo?.captain || 'Sargeant_Iron'} • Avg: ${matchRoom.avgEloBravo} ELO • K/D: ${matchRoom.kdBravo} • Pool: ${matchRoom.cashBravo}`;
+    document.getElementById('wardogsAlphaElo').textContent = `Commander: ${matchRoom.commanderAlpha?.captain || 'Ghost_Dog_99'} • Avg: ${matchRoom.avgEloAlpha} ELO • K/D: ${matchRoom.kdAlpha} • Pool: ${matchRoom.clPointsAlpha}`;
+    document.getElementById('wardogsBravoElo').textContent = `Commander: ${matchRoom.commanderBravo?.captain || 'Sargeant_Iron'} • Avg: ${matchRoom.avgEloBravo} ELO • K/D: ${matchRoom.kdBravo} • Pool: ${matchRoom.clPointsBravo}`;
     const charlieEloEl = document.getElementById('wardogsCharlieElo');
-    if (charlieEloEl) charlieEloEl.textContent = `Commander: ${matchRoom.commanderCharlie?.captain || 'Shadow_K9'} • Avg: ${matchRoom.avgEloCharlie} ELO • K/D: ${matchRoom.kdCharlie} • Pool: ${matchRoom.cashCharlie}`;
+    if (charlieEloEl) charlieEloEl.textContent = `Commander: ${matchRoom.commanderCharlie?.captain || 'Shadow_K9'} • Avg: ${matchRoom.avgEloCharlie} ELO • K/D: ${matchRoom.kdCharlie} • Pool: ${matchRoom.clPointsCharlie}`;
 
     document.getElementById('wardogsAlphaRosterList').innerHTML = matchRoom.factionAlpha.map((p, idx) => `
       <div style="display: flex; justify-content: space-between; align-items: center; background: ${idx === 0 ? 'rgba(0,242,254,0.18)' : 'rgba(0,242,254,0.08)'}; padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.8rem; border: ${idx === 0 ? '1px solid var(--accent-cyan)' : 'none'};">
@@ -2483,7 +2483,7 @@ class CustomLobbiesApp {
         <div style="text-align: right;">
           <span style="color: var(--accent-gold); font-weight: 800;">${p.effectiveElo || p.elo} MMR</span>
           <span style="font-size: 0.68rem; color: var(--accent-green); font-weight: 800;"> (${p.mmrAdjustment >= 0 ? '+' + p.mmrAdjustment : p.mmrAdjustment})</span>
-          <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
+          <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '1k CL-Points'}</div>
         </div>
       </div>
     `).join('');
@@ -2497,7 +2497,7 @@ class CustomLobbiesApp {
         <div style="text-align: right;">
           <span style="color: var(--accent-gold); font-weight: 800;">${p.effectiveElo || p.elo} MMR</span>
           <span style="font-size: 0.68rem; color: var(--accent-green); font-weight: 800;"> (${p.mmrAdjustment >= 0 ? '+' + p.mmrAdjustment : p.mmrAdjustment})</span>
-          <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
+          <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '1k CL-Points'}</div>
         </div>
       </div>
     `).join('');
@@ -2513,7 +2513,7 @@ class CustomLobbiesApp {
           <div style="text-align: right;">
             <span style="color: var(--accent-gold); font-weight: 800;">${p.effectiveElo || p.elo} MMR</span>
             <span style="font-size: 0.68rem; color: var(--accent-green); font-weight: 800;"> (${p.mmrAdjustment >= 0 ? '+' + p.mmrAdjustment : p.mmrAdjustment})</span>
-            <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '$1k'}</div>
+            <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700;">K/D: ${p.kd} | ${p.bountyEarned || '1k CL-Points'}</div>
           </div>
         </div>
       `).join('');
@@ -4436,7 +4436,7 @@ class CustomLobbiesApp {
     this.masterDebateTopics = [
       { topic: "Is Controller Aim Assist Overpowered in Competitive Shooters?", category: "Gaming Meta" },
       { topic: "Will AI Companions Replace Human Teammates in Esports by 2030?", category: "Tech & AI" },
-      { topic: "Should In-Game Skins Have Real-Money Cash Tradeability?", category: "Gaming Economy" },
+      { topic: "Should In-Game Skins Have Real-Money CL-Points Tradeability?", category: "Gaming Economy" },
       { topic: "Is PC Superior to Next-Gen Consoles for Professional Esports?", category: "Esports Formats" },
       { topic: "Are 33v33 WARDOG Battles Superior to 5v5 Arena Shooters?", category: "Gaming Meta" },
       { topic: "Should Tactical Shooters Ban Instant Headshot One-Tap Mechanics?", category: "Gaming Meta" },
@@ -4522,7 +4522,7 @@ class CustomLobbiesApp {
       },
       {
         id: 'DEBATE-103',
-        topic: 'Should In-Game Skins Have Real-Money Cash Tradeability?',
+        topic: 'Should In-Game Skins Have Real-Money CL-Points Tradeability?',
         category: 'Gaming Economy',
         format: '1v1 Rapid Duel',
         phase: 'Awaiting CON (Negative) Speaker',

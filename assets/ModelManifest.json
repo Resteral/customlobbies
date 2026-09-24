@@ -1,0 +1,172 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-09-18T06:18:19.178Z",
+  "models": {
+    "bank_vault": {
+      "key": "bank_vault",
+      "filename": "bank_vault.glb",
+      "path": "assets/models/bank_vault.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.113Z"
+    },
+    "blackmarket_dealer": {
+      "key": "blackmarket_dealer",
+      "filename": "blackmarket_dealer.glb",
+      "path": "assets/models/blackmarket_dealer.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.120Z"
+    },
+    "crypto_farm": {
+      "key": "crypto_farm",
+      "filename": "crypto_farm.glb",
+      "path": "assets/models/crypto_farm.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.129Z"
+    },
+    "crypto_usb": {
+      "key": "crypto_usb",
+      "filename": "crypto_usb.glb",
+      "path": "assets/models/crypto_usb.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.135Z"
+    },
+    "drillable_safe": {
+      "key": "drillable_safe",
+      "filename": "drillable_safe.glb",
+      "path": "assets/models/drillable_safe.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.140Z"
+    },
+    "hack_terminal": {
+      "key": "hack_terminal",
+      "filename": "hack_terminal.glb",
+      "path": "assets/models/hack_terminal.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.146Z"
+    },
+    "loot_bag": {
+      "key": "loot_bag",
+      "filename": "loot_bag.glb",
+      "path": "assets/models/loot_bag.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.151Z"
+    },
+    "meth_lab": {
+      "key": "meth_lab",
+      "filename": "meth_lab.glb",
+      "path": "assets/models/meth_lab.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.157Z"
+    },
+    "thermal_drill": {
+      "key": "thermal_drill",
+      "filename": "thermal_drill.glb",
+      "path": "assets/models/thermal_drill.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.162Z"
+    },
+    "weed_box": {
+      "key": "weed_box",
+      "filename": "weed_box.glb",
+      "path": "assets/models/weed_box.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.170Z"
+    },
+    "weed_pot": {
+      "key": "weed_pot",
+      "filename": "weed_pot.glb",
+      "path": "assets/models/weed_pot.glb",
+      "format": "glb",
+      "provider": "meshy",
+      "importedAt": "2026-09-18T06:18:19.178Z"
+    },
+    "compost_bags": {
+      "filename": "polyhaven_compost_bags.gltf",
+      "relativePath": "assets/models/polyhaven_compost_bags.gltf",
+      "source": "polyhaven",
+      "category": "Prop",
+      "description": "Poly Haven CC0 3D Asset: compost_bags",
+      "tags": [],
+      "author": "Poly Haven / ambientCG / Meshy",
+      "license": "CC0",
+      "updatedAt": "2026-09-18T06:18:03.070Z"
+    },
+    "propane_tank": {
+      "filename": "polyhaven_propane_tank.gltf",
+      "relativePath": "assets/models/polyhaven_propane_tank.gltf",
+      "source": "polyhaven",
+      "category": "Prop",
+      "description": "Poly Haven CC0 3D Asset: propane_tank",
+      "tags": [],
+      "author": "Poly Haven / ambientCG / Meshy",
+      "license": "CC0",
+      "updatedAt": "2026-09-18T06:18:09.719Z"
+    },
+    "planter_box_01": {
+      "filename": "polyhaven_planter_box_01.gltf",
+      "relativePath": "assets/models/polyhaven_planter_box_01.gltf",
+      "source": "polyhaven",
+      "category": "Prop",
+      "description": "Poly Haven CC0 3D Asset: planter_box_01",
+      "tags": [],
+      "author": "Poly Haven / ambientCG / Meshy",
+      "license": "CC0",
+      "updatedAt": "2026-09-18T06:18:11.806Z"
+    },
+    "cardboard_box_01": {
+      "filename": "polyhaven_cardboard_box_01.gltf",
+      "relativePath": "assets/models/polyhaven_cardboard_box_01.gltf",
+      "source": "polyhaven",
+      "category": "Prop",
+      "description": "Poly Haven CC0 3D Asset: cardboard_box_01",
+      "tags": [],
+      "author": "Poly Haven / ambientCG / Meshy",
+      "license": "CC0",
+      "updatedAt": "2026-09-18T06:18:12.508Z"
+    },
+    "plastic_crate_01": {
+      "filename": "polyhaven_plastic_crate_01.gltf",
+      "relativePath": "assets/models/polyhaven_plastic_crate_01.gltf",
+      "source": "polyhaven",
+      "category": "Prop",
+      "description": "Poly Haven CC0 3D Asset: plastic_crate_01",
+      "tags": [],
+      "author": "Poly Haven / ambientCG / Meshy",
+      "license": "CC0",
+      "updatedAt": "2026-09-18T06:18:13.198Z"
+    },
+    "Barrel_01": {
+      "filename": "polyhaven_Barrel_01.gltf",
+      "relativePath": "assets/models/polyhaven_Barrel_01.gltf",
+      "source": "polyhaven",
+      "category": "Prop",
+      "description": "Poly Haven CC0 3D Asset: Barrel_01",
+      "tags": [],
+      "author": "Poly Haven / ambientCG / Meshy",
+      "license": "CC0",
+      "updatedAt": "2026-09-18T06:18:13.922Z"
+    },
+    "metal_toolbox": {
+      "filename": "polyhaven_metal_toolbox.gltf",
+      "relativePath": "assets/models/polyhaven_metal_toolbox.gltf",
+      "source": "polyhaven",
+      "category": "Prop",
+      "description": "Poly Haven CC0 3D Asset: metal_toolbox",
+      "tags": [],
+      "author": "Poly Haven / ambientCG / Meshy",
+      "license": "CC0",
+      "updatedAt": "2026-09-18T06:18:14.947Z"
+    }
+  },
+  "totalModels": 18
+}

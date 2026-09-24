@@ -1,12 +1,37 @@
 {
-  "name": "HelixCrimeSystem",
-  "enabled": true,
-  "minPoliceForHeist": 2,
-  "heistCooldown": 600,
-  "weedGrowthMultiplier": 1.0,
-  "database": {
-    "enabled": false,
-    "host": "localhost",
-    "database": "helix_crime"
+  "name": "City Underground",
+  "version": "1.0.0",
+  "gamemode": "city_underground",
+  "district": "New Harbor Metro",
+  "serverAuthoritative": true,
+  "economy": {
+    "startingCash": 500,
+    "startingBank": 2500,
+    "wageIntervalSeconds": 300,
+    "citizenWage": 75,
+    "deliveryBasePayout": 200,
+    "deliveryKmRate": 1.5,
+    "policeWage": 350
+  },
+  "needs": {
+    "enabled": true,
+    "hungerDecayRate": 0.5,
+    "thirstDecayRate": 0.8,
+    "healthRegenRate": 0.1,
+    "starvationDamage": 2.0
+  },
+  "police": {
+    "minPoliceForHeist": 2,
+    "maxJailTimeMinutes": 10,
+    "defaultCitationFine": 250
+  },
+  "contraband": {
+    "synthesisTimeSeconds": 15,
+    "baseCrystalSellPrice": 450,
+    "policeAlertChance": 0.35
+  },
+  "property": {
+    "apartmentRentIntervalMinutes": 60,
+    "apartmentRentCost": 150
   }
 }

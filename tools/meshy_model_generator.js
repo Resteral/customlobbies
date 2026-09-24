@@ -15,57 +15,57 @@ const API_HOST = 'api.meshy.ai';
 
 const ASSETS_TO_GENERATE = {
   weed_pot: {
-    prompt: 'stylized cannabis plant growing inside a terracotta clay pot, game asset, 3d prop',
+    prompt: 'photorealistic mature cannabis plant with dense trichome-covered buds in a weathered clay terracotta pot with moist soil and root details, 8k PBR textures, realistic lighting, game prop',
     art_style: 'realistic',
     output_filename: 'meshy_weed_pot.glb'
   },
   weed_box: {
-    prompt: 'high tech hydroponic cannabis planter box with mounted grow lights and nutrient gauge, game prop',
+    prompt: 'commercial indoor hydroponic grow station with aluminum framing, full-spectrum LED quantum board grow lights, digital nutrient pH meter, irrigation tubing, and ventilation exhaust ducting, hyper-realistic, 8k PBR',
     art_style: 'realistic',
     output_filename: 'meshy_weed_box.glb'
   },
   crypto_farm: {
-    prompt: 'modular server rack crypto GPU mining rig with cooling fans and RGB LED lighting, game prop',
+    prompt: 'heavy enterprise 42U server rack loaded with NVIDIA RTX GPU mining rigs, braided high-gauge power cables, liquid cooling tubes with coolant reservoir, spinning exhaust fans, green and amber status LEDs, realistic industrial server hardware',
     art_style: 'realistic',
     output_filename: 'meshy_crypto_farm.glb'
   },
   crypto_usb: {
-    prompt: 'futuristic cyberpunk USB flash drive stick with glowing blue LED screen and circuit lines, game prop',
+    prompt: 'rugged military-grade encrypted hardware crypto cold storage USB wallet with titanium casing, tiny OLED micro-display, key lanyard ring, subtle scratched metal texture, high realism',
     art_style: 'realistic',
     output_filename: 'meshy_crypto_usb.glb'
   },
   meth_lab: {
-    prompt: 'chemical synthesis laboratory workstation with tubes and gas burner, game asset prop',
+    prompt: 'underground clandestine chemistry workstation, borosilicate glass condenser distillation column, digital magnetic hotplate stirrer with heating mantle, pressure vacuum gauge, amber chemical reagent bottles, realistic glass reflections and grime',
     art_style: 'realistic',
     output_filename: 'meshy_meth_lab.glb'
   },
   bank_vault: {
-    prompt: 'heavy steel bank vault door with circular locking mechanism, game asset prop',
+    prompt: 'massive bank vault security door, brushed steel and polished chrome locking bolts, heavy-duty gear spokes, biometric keypad and mechanical dial combination lock, hydraulic hinges, realistic metallic reflections',
     art_style: 'realistic',
     output_filename: 'meshy_bank_vault.glb'
   },
   drillable_safe: {
-    prompt: 'reinforced industrial floor safe with digital keypad, game asset prop',
+    prompt: 'commercial fireproof steel floor safe with reinforced tungsten alloy door, electronic digital keypad, drill point indicator, industrial powder-coated gunmetal texture, scratch and wear marks',
     art_style: 'realistic',
     output_filename: 'meshy_drillable_safe.glb'
   },
   thermal_drill: {
-    prompt: 'heavy industrial thermal breach drill with battery pack and hoses, game prop',
+    prompt: 'heavy industrial magnetic-clamp thermal breach drill, magnesium lance head with heat discoloration, high-pressure braided fuel hoses, portable oxygen tank backpack, rugged yellow hazard housing',
     art_style: 'realistic',
     output_filename: 'meshy_thermal_drill.glb'
   },
   hack_terminal: {
-    prompt: 'cyberpunk computer security override terminal with green screen display, game prop',
+    prompt: 'rugged field cyber deck terminal in open Pelican hardcase, military LCD screen showing terminal command matrix, mechanical keypad, patch cables, antenna and exposed diagnostic circuit board',
     art_style: 'realistic',
     output_filename: 'meshy_hack_terminal.glb'
   },
   blackmarket_dealer: {
-    prompt: 'mysterious shady black market dealer character standing in leather trenchcoat',
+    prompt: 'tactical contraband arms dealer, dark weather-beaten utility jacket, tactical vest, watchcap, gloves, detailed cloth folds and realistic leather textures',
     art_style: 'realistic',
     output_filename: 'meshy_blackmarket_dealer.glb'
   },
   loot_bag: {
-    prompt: 'heavy duffel bag overflowing with stacks of cash bills, game prop',
+    prompt: 'heavy ballistic nylon tactical duffel bag zipped half-open showing neatly banded stacks of 100 dollar bills and gold bullion bars, realistic canvas fabric weave and metal zippers',
     art_style: 'realistic',
     output_filename: 'meshy_loot_bag.glb'
   }
@@ -200,6 +200,13 @@ async function main() {
         await downloadFile(modelUrl, targetPath);
       }
     }
+  }
+
+  console.log('\n[✓] All 3D models downloaded! Triggering auto-importer to assets/models/...');
+  try {
+    require('./auto_model_importer.js');
+  } catch (err) {
+    console.log('[*] Models ready in models_raw/');
   }
 }
 

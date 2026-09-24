@@ -1,6 +1,6 @@
 /**
  * HELIX Platform - Player Businesses & Money Laundering Server Module
- * Allows players to buy/own businesses, hire staff, launder illegal cash, and collect legal revenue.
+ * Allows players to buy/own businesses, hire staff, launder illegal CL-Points, and collect legal revenue.
  */
 
 Helix.server(async () => {
@@ -21,7 +21,7 @@ Helix.server(async () => {
         const legalRevenue = Math.floor(Math.random() * 150) + 50;
         biz.vaultClean += legalRevenue;
 
-        // Launder dirty cash tick if present
+        // Launder Black Market Rep tick if present
         if (biz.vaultDirty > 0) {
           const launderAmount = Math.min(biz.vaultDirty, 500);
           const fee = Math.floor(launderAmount * biz.launderFee);

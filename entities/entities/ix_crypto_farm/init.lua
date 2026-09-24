@@ -51,8 +51,8 @@ function ENT:Use(activator, caller)
         char:GiveMoney(balance)
         self:SetMinedBalance(0)
         self:EmitSound("mvm/mvm_money_pickup.wav")
-        caller:Notify("Withdrew $" .. balance .. " in Crypto profits into clean cash!")
+        caller:Notify("Withdrew $" .. balance .. " in Crypto profits into clean CL-Points!")
     else
-        caller:Notify("Crypto Mining Rig active. Current uncollected balance: $0")
+        caller:Notify("Crypto Mining Rig active. Current uncollected balance: 0 CL-Points")
     end
 end

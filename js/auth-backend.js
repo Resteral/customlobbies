@@ -22,35 +22,11 @@ class AuthBackendEngine {
   }
 
   initDatabase() {
+    // Supabase will handle user DB, removed mock localStorage seeding.
     try {
-      const existing = localStorage.getItem(this.usersDbKey);
-      if (!existing) {
-        // Seed initial admin/demo accounts with hashed passwords
-        const defaultUsers = [
-          {
-            id: 'USR-1001',
-            username: 'Sean',
-            displayName: 'Sean',
-            email: 'sean@customlobbies.com',
-            salt: '7a9b1c',
-            passwordHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', // 'password123'
-            elo: 1840,
-            level: 8,
-            title: '💎 Diamond Veteran',
-            avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
-            acVerified: true,
-            twoFactorEnabled: true,
-            twoFactorSecret: 'CL2FA-984210',
-            primaryGame: 'Counter-Strike 2',
-            role: 'Captain',
-            createdDate: '2026-01-15'
-          }
-        ];
-        localStorage.setItem(this.usersDbKey, JSON.stringify(defaultUsers));
-      }
-    } catch (e) {
-      console.warn('Auth DB init fallback:', e);
-    }
+        localStorage.removeItem(this.usersDbKey);
+        localStorage.removeItem(this.jwtSessionKey);
+    } catch(e) {}
   }
 
   // --- CRYPTOGRAPHIC PASSWORD HASHING & SALT ---
@@ -197,101 +173,118 @@ class AuthBackendEngine {
   }
 
   // --- USER AUTHENTICATION BACKEND CONTROLLERS ---
+  getSupabaseClient() {
+    let SUPABASE_URL = localStorage.getItem('supabase_url') || 'YOUR_SUPABASE_URL';
+    let SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key') || 'YOUR_SUPABASE_ANON_KEY';
+    
+    if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+        const inputUrl = prompt("Enter your Supabase URL (https://xyz.supabase.co):");
+        const inputKey = prompt("Enter your Supabase Anon Key:");
+        if (inputUrl && inputKey) {
+            SUPABASE_URL = inputUrl.trim();
+            SUPABASE_ANON_KEY = inputKey.trim();
+            localStorage.setItem('supabase_url', SUPABASE_URL);
+            localStorage.setItem('supabase_anon_key', SUPABASE_ANON_KEY);
+        } else {
+            console.warn("Supabase configuration aborted by user.");
+            return null;
+        }
+    }
+    
+    if (!window.supabase) {
+        console.warn("Supabase CDN script is missing from index.html.");
+        return null;
+    }
+    
+    if (!this._supabaseClient) {
+        this._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+    return this._supabaseClient;
+  }
+
   async authenticateUser(usernameOrEmail, password) {
-    const lock = this.isAccountLocked(usernameOrEmail);
-    if (lock && lock.locked) {
-      return {
-        success: false,
-        error: `⛔ ACCOUNT TEMPORARILY LOCKED!\n\nToo many failed login attempts. Please wait ${lock.remainingSec}s before retrying.`
-      };
+    const supabase = this.getSupabaseClient();
+    
+    if (!supabase) {
+        return { success: false, error: '⚠️ Supabase is not configured! Please enter your URL and Anon Key in js/auth-backend.js.' };
     }
 
-    const users = this.getUsersDatabase();
-    const target = users.find(u => 
-      u.username.toLowerCase() === usernameOrEmail.toLowerCase() || 
-      u.email.toLowerCase() === usernameOrEmail.toLowerCase()
-    );
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: usernameOrEmail,
+            password: password,
+        });
 
-    if (!target) {
-      this.recordFailedAttempt(usernameOrEmail);
-      return { success: false, error: '❌ INVALID CREDENTIALS!\n\nUser account not found. Check spelling or create a new account.' };
+        if (error) {
+            return { success: false, error: `❌ LOGIN FAILED!\n\n${error.message}` };
+        }
+
+        const userObj = {
+            id: data.user.id,
+            username: data.user.user_metadata?.username || usernameOrEmail.split('@')[0],
+            displayName: data.user.user_metadata?.username || usernameOrEmail.split('@')[0],
+            email: data.user.email,
+            elo: 1840,
+            level: 1,
+            title: 'Supabase Member',
+            avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
+            acVerified: true
+        };
+
+        return {
+            success: true,
+            requires2FA: false,
+            user: userObj,
+            jwtToken: data.session.access_token
+        };
+    } catch (e) {
+        return { success: false, error: 'Network error connecting to Supabase.' };
     }
-
-    const computedHash = await this.hashPassword(password, target.salt || '7a9b1c');
-    const isPasswordValid = (computedHash === target.passwordHash) || (password === 'password123');
-
-    if (!isPasswordValid) {
-      this.recordFailedAttempt(usernameOrEmail);
-      return { success: false, error: '❌ INVALID CREDENTIALS!\n\nIncorrect password. Security lockout will trigger after 5 failed attempts.' };
-    }
-
-    this.resetFailedAttempts(usernameOrEmail);
-
-    if (target.twoFactorEnabled) {
-      const otpCode = this.generate2FAOTP();
-      return {
-        success: true,
-        requires2FA: true,
-        user: target,
-        tempToken: this.generateJWT(target, 300),
-        otpCodeHint: otpCode
-      };
-    }
-
-    const jwtToken = this.generateJWT(target);
-    this.logAudit(target.username, 'LOGIN_SUCCESS', 'Signed in via Email & Password (JWT issued)');
-
-    return {
-      success: true,
-      requires2FA: false,
-      user: target,
-      jwtToken
-    };
   }
 
   async registerUser({ username, email, password, primaryGame }) {
-    const users = this.getUsersDatabase();
-    const existing = users.find(u => 
-      u.username.toLowerCase() === username.toLowerCase() || 
-      u.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (existing) {
-      return { success: false, error: '⚠️ ACCOUNT EXISTS!\n\nUsername or Email address is already registered.' };
+    const supabase = this.getSupabaseClient();
+    
+    if (!supabase) {
+        return { success: false, error: '⚠️ Supabase is not configured! Please enter your URL and Anon Key in js/auth-backend.js.' };
     }
 
-    const salt = this.generateSalt();
-    const passwordHash = await this.hashPassword(password, salt);
+    try {
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    username: username,
+                    primaryGame: primaryGame
+                }
+            }
+        });
 
-    const newUser = {
-      id: `USR-${Date.now().toString().slice(-4)}`,
-      username,
-      displayName: username,
-      email,
-      salt,
-      passwordHash,
-      elo: 1200,
-      level: 1,
-      title: '🌟 Verified Recruit',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
-      acVerified: true,
-      twoFactorEnabled: false,
-      primaryGame: primaryGame || 'Counter-Strike 2',
-      role: 'Recruit',
-      createdDate: new Date().toISOString().split('T')[0]
-    };
+        if (error) {
+            return { success: false, error: `❌ REGISTRATION FAILED!\n\n${error.message}` };
+        }
 
-    users.unshift(newUser);
-    localStorage.setItem(this.usersDbKey, JSON.stringify(users));
+        const newUser = {
+            id: data.user?.id || `USR-${Date.now()}`,
+            username: username,
+            displayName: username,
+            email: email,
+            elo: 1200,
+            level: 1,
+            title: '🌟 Verified Recruit',
+            avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+            acVerified: true
+        };
 
-    const jwtToken = this.generateJWT(newUser);
-    this.logAudit(username, 'REGISTER_SUCCESS', `Account created for ${primaryGame}`);
-
-    return {
-      success: true,
-      user: newUser,
-      jwtToken
-    };
+        return {
+            success: true,
+            user: newUser,
+            jwtToken: data.session?.access_token || 'pending_verification'
+        };
+    } catch (e) {
+        return { success: false, error: 'Network error connecting to Supabase.' };
+    }
   }
 
   processOAuthLogin(provider) {

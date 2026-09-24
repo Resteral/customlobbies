@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HELIX Studio Companion & AI World Architect</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: transparent;
+      color: #f8fafc;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+    }
+    .studio-modal {
+      background: radial-gradient(circle at 50% 10%, #1e1b4b, #09090b 90%);
+      border: 2px solid #8b5cf6;
+      border-radius: 16px;
+      width: 1100px;
+      height: 700px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(90deg, #6d28d9, #09090b);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(139, 92, 246, 0.4);
+    }
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .title-badge {
+      background: #8b5cf6;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+    .title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #c4b5fd;
+    }
+
+    /* Top AI Prompt Input Bar */
+    .ai-prompt-container {
+      padding: 16px 24px;
+      background: rgba(15, 12, 41, 0.8);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      gap: 12px;
+    }
+    .prompt-input {
+      flex: 1;
+      background: rgba(30, 27, 75, 0.6);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .prompt-input:focus {
+      border-color: #a78bfa;
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    }
+    .btn-ai-generate {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: white;
+      border: none;
+      padding: 0 24px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    .btn-ai-generate:hover {
+      background: #8b5cf6;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+    }
+
+    .main-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Left: Prefabs & Props */
+    .left-panel {
+      flex: 1.4;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ddd6fe;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .prefab-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .prefab-card {
+      background: rgba(30, 27, 75, 0.5);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .prefab-card:hover {
+      border-color: #a78bfa;
+      background: rgba(49, 46, 129, 0.6);
+    }
+    .prefab-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .prefab-icon { font-size: 1.4rem; }
+    .prefab-name { font-size: 0.9rem; font-weight: 700; color: #f5f3ff; }
+    .prefab-desc { font-size: 0.75rem; color: #94a3b8; line-height: 1.35; }
+    .btn-deploy {
+      background: #6d28d9;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .btn-deploy:hover { background: #7c3aed; }
+
+    /* Right: Active Scene Outliner */
+    .right-panel {
+      flex: 1;
+      background: rgba(15, 12, 41, 0.9);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+    }
+    .entity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+      flex: 1;
+      overflow-y: auto;
+      max-height: 400px;
+    }
+    .entity-item {
+      background: rgba(30, 27, 75, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+    .btn-del {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-del:hover { background: #dc2626; }
+
+    .bottom-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn-secondary {
+      flex: 1;
+      background: #334155;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+    .btn-secondary:hover { background: #475569; }
+  </style>
+</head>
+<body>
+  <div class="studio-modal">
+    <div class="header">
+      <div class="title-group">
+        <span class="title-badge">STUDIO AI</span>
+        <div class="title">✨ HELIX IN-GAME WORLD ARCHITECT & STUDIO COMPANION</div>
+      </div>
+      <button onclick="closeUI()" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:bold;cursor:pointer;">✕ Close (F6)</button>
+    </div>
+
+    <!-- AI Prompt Bar -->
+    <div class="ai-prompt-container">
+      <input type="text" id="aiPromptInput" class="prompt-input" placeholder="Type prompt (e.g., 'build a fortified checkpoint with lights and walls', 'spawn a meth lab', 'mining quarry')..." onkeydown="if(event.key==='Enter') generateAI()">
+      <button class="btn-ai-generate" onclick="generateAI()">⚡ Generate & Spawn on Spot</button>
+    </div>
+
+    <div class="main-body">
+      <!-- Left: Prefab & Structure Library -->
+      <div class="left-panel">
+        <div class="section-title">
+          <span>🏗️ Modular World Prefabs & Construction Sets</span>
+          <span style="font-size:0.75rem;color:#a78bfa;">Instant 3D Deployment</span>
+        </div>
+        <div class="prefab-grid" id="prefabGrid">
+          <!-- Populated via JS -->
+        </div>
+
+        <div class="section-title" style="margin-top:10px;">
+          <span>📦 Individual 3D Props & Equipment</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="propsQuickList">
+          <button class="btn-deploy" onclick="spawnSingle('assets/models/Barrel_01.bin', 'Chemical Barrel')">🛢️ Chemical Barrel</button>
+          <button class="btn-deploy" onclick="spawnSingle('assets/models/plastic_crate_01.bin', 'Storage Crate')">📦 Storage Crate</button>
+          <button class="btn-deploy" onclick="spawnSingle('assets/models/hack_terminal.glb', 'Cyber Terminal')">💻 Cyber Terminal</button>
+          <button class="btn-deploy" onclick="spawnSingle('assets/models/propane_tank.bin', 'Propane Tank')">⛽ Gas Tank</button>
+          <button class="btn-deploy" onclick="spawnSingle('assets/models/loot_bag.glb', 'Cash Duffle')">💰 Cash Duffle Bag</button>
+          <button class="btn-deploy" onclick="spawnSingle('assets/models/weed_pot.glb', 'Hydroponic Pot')">🌿 Soil Pot</button>
+        </div>
+      </div>
+
+      <!-- Right: Active Scene Hierarchy -->
+      <div class="right-panel">
+        <div>
+          <div class="section-title">
+            <span>📋 Active Spawned Entities</span>
+            <span style="font-size:0.8rem;color:#a78bfa;" id="entityCountLabel">0 Entities</span>
+          </div>
+          <div class="entity-list" id="entityListContainer">
+            <div style="color:#64748b;font-style:italic;font-size:0.85rem;padding:10px 0;">No entities spawned yet. Use the AI prompt or click a prefab to build!</div>
+          </div>
+        </div>
+
+        <div class="bottom-actions">
+          <button class="btn-secondary" onclick="exportMapJSON()">💾 Export Map JSON</button>
+          <button class="btn-secondary" style="background:#b91c1c;" onclick="clearAll()">🧹 Clear All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let studioState = {
+      prefabs: {},
+      activeEntities: []
+    };
+
+    const FALLBACK_PREFABS = {
+      prefab_fortified_outpost: {
+        id: 'prefab_fortified_outpost',
+        name: 'Fortified Security Checkpoint',
+        icon: '🏰',
+        description: 'Reinforced steel double-walls, security access terminal, and gate.'
+      },
+      prefab_underground_lab: {
+        id: 'prefab_underground_lab',
+        name: 'Clandestine Chemical Synthesis Lab',
+        icon: '🧪',
+        description: 'Dual-flask reaction station with pressure cylinders and storage crates.'
+      },
+      prefab_hydroponic_greenhouse: {
+        id: 'prefab_hydroponic_greenhouse',
+        name: 'Automated Hydroponic Botany Rig',
+        icon: '🌿',
+        description: 'Dual grow pots with nutrient compost bags and reflective tent.'
+      },
+      prefab_mineral_quarry: {
+        id: 'prefab_mineral_quarry',
+        name: 'Geological Mineral Quarry Outcrop',
+        icon: '⛏️',
+        description: 'Heavy tungsten ore rock, pneumatic drill rig, and crucible furnace.'
+      },
+      prefab_smuggler_chopshop: {
+        id: 'prefab_smuggler_chopshop',
+        name: 'Smuggler Chop Shop & Depot',
+        icon: '🚛',
+        description: 'Vehicle recovery tool chests, tow cable drums, and crates.'
+      },
+      prefab_bank_heist_vault: {
+        id: 'prefab_bank_heist_vault',
+        name: 'First National Bank Vault Target',
+        icon: '💰',
+        description: '12-Ton armored vault door, plasma thermal drill, and cash bag.'
+      }
+    };
+
+    function refreshData() {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('studioGetState').then(res => {
+          if (res && res.success) {
+            studioState = res;
+            renderAll();
+          }
+        });
+      } else {
+        studioState.prefabs = FALLBACK_PREFABS;
+        renderAll();
+      }
+    }
+
+    function renderAll() {
+      // Render Prefabs
+      const pContainer = document.getElementById('prefabGrid');
+      pContainer.innerHTML = '';
+      Object.values(studioState.prefabs).forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'prefab-card';
+        card.innerHTML = `
+          <div>
+            <div class="prefab-header">
+              <span class="prefab-icon">${p.icon}</span>
+              <span class="prefab-name">${p.name}</span>
+            </div>
+            <div class="prefab-desc">${p.description}</div>
+          </div>
+          <button class="btn-deploy" onclick="deployPrefab('${p.id}')">⚡ Deploy Prefab in World</button>
+        `;
+        pContainer.appendChild(card);
+      });
+
+      // Render Active Entities
+      const eContainer = document.getElementById('entityListContainer');
+      eContainer.innerHTML = '';
+      const list = studioState.activeEntities || [];
+      document.getElementById('entityCountLabel').textContent = `${list.length} Entities`;
+
+      if (list.length === 0) {
+        eContainer.innerHTML = `<div style="color:#64748b;font-style:italic;font-size:0.85rem;padding:10px 0;">No entities spawned yet. Use the AI prompt or click a prefab to build!</div>`;
+      } else {
+        list.forEach(ent => {
+          const item = document.createElement('div');
+          item.className = 'entity-item';
+          item.innerHTML = `
+            <div>
+              <span style="font-weight:700;color:#e2e8f0;">${ent.name}</span>
+              <div style="font-size:0.7rem;color:#94a3b8;">X: ${ent.position.x}, Y: ${ent.position.y}, Z: ${ent.position.z}</div>
+            </div>
+            <button class="btn-del" onclick="deleteEnt('${ent.id}')">✕</button>
+          `;
+          eContainer.appendChild(item);
+        });
+      }
+    }
+
+    function generateAI() {
+      const prompt = document.getElementById('aiPromptInput').value.trim();
+      if (!prompt) return;
+
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('studioCreateFromPrompt', { prompt }).then(res => {
+          alert(res.message);
+          refreshData();
+        });
+      } else {
+        const mockEnt = {
+          id: `ent_${Date.now()}`,
+          name: `AI Spawned: ${prompt}`,
+          position: { x: 125.4, y: 458.2, z: 15.0 }
+        };
+        studioState.activeEntities.push(mockEnt);
+        alert(`✨ AI Architect: Generated & Spawned [${prompt}] in world!`);
+        renderAll();
+      }
+      document.getElementById('aiPromptInput').value = '';
+    }
+
+    function deployPrefab(prefabId) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('studioSpawnPrefab', { prefabId }).then(res => {
+          alert(res.message);
+          refreshData();
+        });
+      } else {
+        const p = studioState.prefabs[prefabId];
+        studioState.activeEntities.push({
+          id: `ent_${Date.now()}`,
+          name: p.name,
+          position: { x: 120.0, y: 450.0, z: 15.0 }
+        });
+        alert(`🏗️ Deployed [${p.name}]!`);
+        renderAll();
+      }
+    }
+
+    function spawnSingle(model, name) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('studioCreateFromPrompt', { prompt: name }).then(res => {
+          refreshData();
+        });
+      } else {
+        studioState.activeEntities.push({
+          id: `ent_${Date.now()}`,
+          name: name,
+          position: { x: 120.0, y: 450.0, z: 15.0 }
+        });
+        renderAll();
+      }
+    }
+
+    function deleteEnt(entityId) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('studioDeleteEntity', { entityId }).then(res => {
+          refreshData();
+        });
+      } else {
+        studioState.activeEntities = studioState.activeEntities.filter(e => e.id !== entityId);
+        renderAll();
+      }
+    }
+
+    function clearAll() {
+      if (confirm('Clear all spawned dynamic objects in world?')) {
+        if (typeof Helix !== 'undefined' && Helix.call) {
+          Helix.call('studioClearAll').then(res => {
+            refreshData();
+          });
+        } else {
+          studioState.activeEntities = [];
+          renderAll();
+        }
+      }
+    }
+
+    function exportMapJSON() {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('studioExportMapJSON').then(res => {
+          alert(`💾 Exported ${res.mapData.totalEntities} entities to Map JSON!`);
+        });
+      } else {
+        alert(`💾 Exported ${studioState.activeEntities.length} entities to Map JSON!`);
+      }
+    }
+
+    function closeUI() {
+      if (typeof Helix !== 'undefined' && Helix.emit) {
+        Helix.emit('CloseStudioUI');
+      }
+    }
+
+    refreshData();
+  </script>
+</body>
+</html>

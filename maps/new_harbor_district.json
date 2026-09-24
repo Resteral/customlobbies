@@ -1,0 +1,147 @@
+{
+  "mapId": "new_harbor_district",
+  "name": "New Harbor Metro District",
+  "version": "1.0.0",
+  "description": "Dense fictional East Coast American city district featuring downtown commerce, residential apartments, industrial docks, municipal services, and back alleys.",
+  "environment": {
+    "timeOfDay": "19:30",
+    "weather": "OvercastDrizzle",
+    "fogDensity": 0.015,
+    "ambientLighting": "EastCoastMetro",
+    "streetLightsActive": true
+  },
+  "spawns": {
+    "citizenDefault": { "x": 500, "y": 500, "z": 10, "heading": 90, "name": "Apartment Plaza Sidewalk" },
+    "policeHQ": { "x": 180, "y": 820, "z": 10, "heading": 180, "name": "3rd Precinct Station" },
+    "hospital": { "x": 820, "y": 820, "z": 10, "heading": 270, "name": "Mercy General ER" },
+    "deliveryDepot": { "x": 820, "y": 180, "z": 10, "heading": 0, "name": "Harbor Express Logistics Depot" },
+    "criminalSpawn": { "x": 180, "y": 180, "z": 10, "heading": 45, "name": "Back Alley Hideout" }
+  },
+  "zones": [
+    {
+      "id": "downtown_core",
+      "name": "Downtown Harborway",
+      "bounds": { "minX": 300, "maxX": 700, "minY": 300, "maxY": 700 },
+      "type": "commercial",
+      "speedLimit": 35
+    },
+    {
+      "id": "civic_square",
+      "name": "Municipal Plaza & Precinct",
+      "bounds": { "minX": 50, "maxX": 350, "minY": 650, "maxY": 950 },
+      "type": "government",
+      "speedLimit": 25
+    },
+    {
+      "id": "medical_district",
+      "name": "Mercy Medical Hill",
+      "bounds": { "minX": 650, "maxX": 950, "minY": 650, "maxY": 950 },
+      "type": "medical",
+      "speedLimit": 25
+    },
+    {
+      "id": "industrial_yard",
+      "name": "South Harbor Freight & Warehouse",
+      "bounds": { "minX": 650, "maxX": 950, "minY": 50, "maxY": 350 },
+      "type": "industrial",
+      "speedLimit": 30
+    },
+    {
+      "id": "residential_apartments",
+      "name": "Harborview Block",
+      "bounds": { "minX": 50, "maxX": 350, "minY": 50, "maxY": 350 },
+      "type": "residential",
+      "speedLimit": 25
+    }
+  ],
+  "buildings": [
+    {
+      "id": "bank_first_trust",
+      "name": "First Trust City Bank",
+      "type": "bank",
+      "x": 380, "y": 620, "width": 80, "height": 70,
+      "interior": { "tellerX": 395, "tellerY": 645, "vaultX": 435, "vaultY": 665 },
+      "services": ["atm", "teller", "vault_deposit"]
+    },
+    {
+      "id": "convenience_store",
+      "name": "Corner QuickMart",
+      "type": "store",
+      "x": 620, "y": 620, "width": 70, "height": 60,
+      "interior": { "cashierX": 640, "cashierY": 635 },
+      "services": ["general_goods", "food_drink", "atm"]
+    },
+    {
+      "id": "police_precinct",
+      "name": "New Harbor 3rd Precinct",
+      "type": "police_station",
+      "x": 180, "y": 820, "width": 110, "height": 90,
+      "interior": { "dutyDeskX": 160, "dutyDeskY": 800, "jailCellX": 230, "jailCellY": 850, "armoryX": 210, "armoryY": 790 },
+      "services": ["police_duty", "jail", "mdt_terminal", "evidence_locker"]
+    },
+    {
+      "id": "hospital_mercy",
+      "name": "Mercy General Hospital",
+      "type": "hospital",
+      "x": 820, "y": 820, "width": 120, "height": 100,
+      "interior": { "receptionX": 800, "receptionY": 800, "erBedsX": 860, "erBedsY": 850 },
+      "services": ["medical_treatment", "bandage_refill", "respawn_point"]
+    },
+    {
+      "id": "logistics_depot",
+      "name": "Harbor Express Courier Depot",
+      "type": "delivery_depot",
+      "x": 820, "y": 180, "width": 110, "height": 90,
+      "interior": { "dispatchDeskX": 800, "dispatchDeskY": 160, "cargoBayX": 850, "cargoBayY": 210 },
+      "services": ["delivery_job", "package_sorting", "fleet_garage"]
+    },
+    {
+      "id": "city_motors",
+      "name": "Metro Auto Dealership & Garage",
+      "type": "dealership",
+      "x": 620, "y": 380, "width": 90, "height": 80,
+      "interior": { "salesFloorX": 640, "salesFloorY": 360, "garageSpawnX": 600, "garageSpawnY": 340 },
+      "services": ["vehicle_sales", "vehicle_garage", "vehicle_repair"]
+    },
+    {
+      "id": "gas_station",
+      "name": "Sunoco Fuel & Service",
+      "type": "gas_station",
+      "x": 380, "y": 380, "width": 70, "height": 60,
+      "interior": { "pump1X": 370, "pump1Y": 370, "pump2X": 390, "pump2Y": 370 },
+      "services": ["vehicle_fuel", "repair_kits"]
+    },
+    {
+      "id": "apartment_complex",
+      "name": "Harborview Residential Towers",
+      "type": "apartment_building",
+      "x": 180, "y": 380, "width": 100, "height": 100,
+      "interior": { "lobbyX": 160, "lobbyY": 360, "unit101X": 200, "unit101Y": 400, "stashX": 215, "stashY": 410 },
+      "units": [
+        { "unitId": "apt_101", "name": "Apartment 101", "price": 12000, "rentPrice": 150, "interiorX": 200, "interiorY": 400 }
+      ],
+      "services": ["housing", "personal_stash", "furnishing"]
+    },
+    {
+      "id": "warehouse_abandoned",
+      "name": "Old Pier 9 Chemical Warehouse",
+      "type": "warehouse",
+      "x": 180, "y": 180, "width": 100, "height": 80,
+      "interior": { "synthLabX": 200, "synthLabY": 190, "backExitX": 150, "backExitY": 160 },
+      "services": ["contraband_synthesis", "black_market_trading"]
+    }
+  ],
+  "deliveryLocations": [
+    { "id": "deliv_bank", "name": "First Trust Bank Main Lobby", "x": 380, "y": 620 },
+    { "id": "deliv_shop", "name": "Corner QuickMart Loading Dock", "x": 620, "y": 620 },
+    { "id": "deliv_precinct", "name": "3rd Precinct Mail Desk", "x": 180, "y": 820 },
+    { "id": "deliv_hospital", "name": "Mercy General Pharmacy Receiving", "x": 820, "y": 820 },
+    { "id": "deliv_gas", "name": "Sunoco Service Office", "x": 380, "y": 380 },
+    { "id": "deliv_apt", "name": "Harborview Resident Mailboxes", "x": 180, "y": 380 }
+  ],
+  "streetBuyers": [
+    { "id": "npc_buyer_1", "name": "Shady Alley Broker", "x": 260, "y": 260, "preferredItem": "contraband_crystals", "priceMod": 1.15 },
+    { "id": "npc_buyer_2", "name": "Night Club Bouncer Contact", "x": 500, "y": 680, "preferredItem": "contraband_crystals", "priceMod": 0.95 },
+    { "id": "npc_buyer_3", "name": "Docks Fence", "x": 740, "y": 260, "preferredItem": "contraband_crystals", "priceMod": 1.25 }
+  ]
+}

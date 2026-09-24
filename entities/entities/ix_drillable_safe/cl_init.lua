@@ -25,7 +25,7 @@ function ENT:Draw()
                 draw.SimpleText("Drilling: " .. prog .. "%", "DermaDefault", 0, -13, Color(255, 255, 255), TEXT_ALIGN_CENTER)
             end
         elseif self:GetIsOpen() then
-            draw.SimpleText("[E] LOOT SAFE CASH", "DermaDefaultBold", 0, -15, Color(255, 215, 0), TEXT_ALIGN_CENTER)
+            draw.SimpleText("[E] LOOT SAFE CL-Points", "DermaDefaultBold", 0, -15, Color(255, 215, 0), TEXT_ALIGN_CENTER)
         else
             draw.SimpleText("Status: Locked", "DermaDefault", 0, -15, Color(180, 180, 180), TEXT_ALIGN_CENTER)
         end

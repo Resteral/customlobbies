@@ -1,77 +1,88 @@
 /**
  * HELIX Platform - Client HUD & Input Controller
- * Handles WebUI instances, keybindings, camera post-processing, and NUI focus.
+ * Handles WebUI instances with lazy initialization to prevent CEF RHI crashes.
  */
 
 Helix.client(() => {
   console.log('[HELIX CLIENT] Initializing NUI Interfaces & Keybindings...');
 
-  // Initialize WebUI Windows
-  const mainUI = new Helix.WebUI('HelixMainUI', 'file://ui/index.html');
-  const mapUI = new Helix.WebUI('HelixMapUI', 'file://ui/map.html');
+  const uiCache = new Map();
+
+  function getUI(name, path) {
+    if (!uiCache.has(name)) {
+      try {
+        if (typeof Helix.WebUI !== 'undefined') {
+          uiCache.set(name, new Helix.WebUI(name, path));
+        }
+      } catch (e) {
+        console.warn(`[WEBUI WARN] Deferred WebUI creation for ${name}:`, e.message);
+      }
+    }
+    return uiCache.get(name);
+  }
 
   let isUIOpen = false;
 
-  // Toggle NUI Mouse & Input Focus
   function setUIFocus(enable) {
     isUIOpen = enable;
-    if (typeof Helix.Input !== 'undefined' && Helix.Input.SetMouseEnabled) {
-      Helix.Input.SetMouseEnabled(enable);
-      Helix.Input.SetInputEnabled(!enable);
+    if (typeof Helix.Input !== 'undefined') {
+      if (Helix.Input.SetMouseEnabled) Helix.Input.SetMouseEnabled(enable);
+      if (Helix.Input.SetInputEnabled) Helix.Input.SetInputEnabled(!enable);
     }
   }
 
   // Keybind Listeners for HELIX Client
   if (typeof Helix.Input !== 'undefined' && Helix.Input.OnKeyDown) {
-    // Key 'M' -> Toggle Map Radar
+    // Key 'M' or 'F2' -> Toggle Map Radar
     Helix.Input.OnKeyDown('M', () => {
-      if (mapUI) {
+      const mapUI = getUI('HelixMapUI', 'file://ui/map.html');
+      if (mapUI && mapUI.CallEvent) {
         mapUI.CallEvent('toggleMapModal');
         setUIFocus(true);
       }
     });
 
-    // Key 'B' -> Toggle Business Management
-    Helix.Input.OnKeyDown('B', () => {
-      if (mainUI) {
-        mainUI.CallEvent('openBusinessUI');
+    Helix.Input.OnKeyDown('F2', () => {
+      const mapUI = getUI('HelixMapUI', 'file://ui/map.html');
+      if (mapUI && mapUI.CallEvent) {
+        mapUI.CallEvent('toggleMapModal');
+        setUIFocus(true);
+      }
+    });
+
+    // Key 'F3' -> Planter Builder
+    Helix.Input.OnKeyDown('F3', () => {
+      const pUI = getUI('PlanterUI', 'file://ui/planter_builder.html');
+      if (pUI && pUI.CallEvent) {
+        pUI.CallEvent('toggleUI');
+        setUIFocus(true);
+      }
+    });
+
+    // Key 'F4' -> Lab Console
+    Helix.Input.OnKeyDown('F4', () => {
+      const labUI = getUI('LabUI', 'file://ui/lab.html');
+      if (labUI && labUI.CallEvent) {
+        labUI.CallEvent('toggleUI');
+        setUIFocus(true);
+      }
+    });
+
+    // Key 'TAB' -> Inventory HUD
+    Helix.Input.OnKeyDown('Tab', () => {
+      const mainUI = getUI('HelixMainUI', 'file://ui/hud.html');
+      if (mainUI && mainUI.CallEvent) {
+        mainUI.CallEvent('toggleInventoryHUD');
         setUIFocus(true);
       }
     });
   }
 
-  // Event Listeners from Server or WebUI
+  // Server Events
   Helix.on('PoliceAlertBroadcast', (data) => {
-    if (mainUI) {
+    const mainUI = getUI('HelixMainUI', 'file://ui/hud.html');
+    if (mainUI && mainUI.CallEvent) {
       mainUI.CallEvent('showPoliceAlert', data.message || 'SILENT ALARM TRIGGERED!');
-    }
-  });
-
-  Helix.on('OpenBlackMarket', () => {
-    if (mainUI) {
-      mainUI.CallEvent('openBlackMarketUI');
-      setUIFocus(true);
-    }
-  });
-
-  Helix.on('OpenHackingMinigame', (difficulty) => {
-    if (mainUI) {
-      mainUI.CallEvent('openHackingUI', difficulty || 4);
-      setUIFocus(true);
-    }
-  });
-
-  Helix.on('OpenMethLab', (labData) => {
-    if (mainUI) {
-      mainUI.CallEvent('openMethLabUI', labData);
-      setUIFocus(true);
-    }
-  });
-
-  Helix.on('OpenVaultKeypad', (vaultData) => {
-    if (mainUI) {
-      mainUI.CallEvent('openVaultKeypadUI', vaultData);
-      setUIFocus(true);
     }
   });
 

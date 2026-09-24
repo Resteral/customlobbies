@@ -1,47 +1,20 @@
-ITEM.name = "Vehicle Repair Kit"
-ITEM.description = "A heavy-duty toolbox with replacement parts and fluids for repairing damaged vehicle engines and tires."
-ITEM.model = "models/props_c17/tools_wrench01a.mdl"
-ITEM.width = 2
-ITEM.height = 2
-ITEM.category = "Vehicle & Mechanics"
+--[[
+    City Underground Item: Automotive Repair Kit
+--]]
 
-ITEM.functions.Use = {
-    name = "Repair Vehicle",
-    tip = "Fix a smoking or damaged vehicle engine.",
-    icon = "icon16/wrench.png",
-    OnRun = function(itemTable)
-        local client = itemTable.player
-        local trace = client:GetEyeTrace()
-        local veh = trace.Entity
-
-        if not IsValid(veh) or (not veh:IsVehicle() and veh:GetClass() ~= "prop_vehicle_jeep" and veh:GetClass() ~= "prop_vehicle_airboat") then
-            client:Notify("You must be facing a vehicle!")
-            return false
+CityUnderground.Inventory.RegisterItem("repair_kit", {
+    name = "Auto Wrench & Repair Kit",
+    description = "Heavy duty ratchet, spark plugs, and coolant hose. Repairs vehicle engine and chassis damage.",
+    category = "Utility",
+    weight = 2.5,
+    maxStack = 2,
+    icon = "🔧",
+    useText = "Repair Vehicle",
+    OnUse = function(ply, item)
+        if CityUnderground.Vehicles and CityUnderground.Vehicles.RepairNearestVehicle then
+            local success, err = CityUnderground.Vehicles.RepairNearestVehicle(ply)
+            return success
         end
-
-        if client:GetPos():DistToSqr(veh:GetPos()) > 22500 then
-            client:Notify("You are too far from the vehicle!")
-            return false
-        end
-
-        local char = client:GetCharacter()
-        local driveSkill = char and char:GetSkillLevel("driving") or 1
-        local repairAmt = 50 + (driveSkill * 3)
-
-        client:SetAction("Repairing Engine...", 4, function()
-            if IsValid(veh) and IsValid(client) then
-                local curHealth = veh:GetNWInt("ixVehHealth", 100)
-                local newHealth = math.min(100, curHealth + repairAmt)
-                veh:SetNWInt("ixVehHealth", newHealth)
-                veh:EmitSound("ambient/energy/spark1.wav")
-                client:Notify("Vehicle repaired to " .. newHealth .. "% health!")
-                
-                if char then
-                    char:AddSkillXP("driving", 30)
-                end
-            end
-        end)
-
-        return true
+        return false
     end
-}
+})

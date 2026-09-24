@@ -1,0 +1,30 @@
+{
+  "serverName": "Pacifica Crime & Underground Roleplay",
+  "maxPlayers": 64,
+  "map": "/Game/Pacifica/Map/Pacifica",
+  "mapConfig": "maps/pacifica_crime_map.json",
+  "defaultSpawn": "citizenDefault",
+  "gamemode": "city_underground",
+  "packages": [
+    "HelixGame"
+  ],
+  "environment": {
+    "weather": "OvercastDrizzle",
+    "timeOfDay": "19:30",
+    "dayNightCycle": true,
+    "cycleSpeedMultiplier": 1.0
+  },
+  "voice": {
+    "enabled": true,
+    "spatial": true,
+    "proximityDistance": 18.0,
+    "whisperDistance": 4.0,
+    "shoutDistance": 35.0
+  },
+  "networking": {
+    "port": 7777,
+    "tickRate": 60,
+    "antiDupeProtection": true,
+    "rateLimitEventsPerSec": 20
+  }
+}

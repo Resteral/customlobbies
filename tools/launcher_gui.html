@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HELIX Server & Plugin Master Launcher</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090d16;
+      color: #f8fafc;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      padding: 30px;
+      user-select: none;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #0f172a;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 1px;
+    }
+    .badge {
+      background: #0284c7;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .btn-card {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .btn-card:hover {
+      border-color: #38bdf8;
+      background: #24324d;
+      transform: translateY(-2px);
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-desc {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    .plugins-section {
+      background: #090d16;
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid #1e293b;
+    }
+    .plugins-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #34d399;
+      margin-bottom: 10px;
+    }
+    .plugin-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pill {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <div class="title">⚡ HELIX PLUGIN SERVER LAUNCHER</div>
+        <div style="font-size:0.85rem;color:#64748b;">Pacifica Crime, Botany & In-House Chemistry Labs (v1.0.0)</div>
+      </div>
+      <div class="badge">UE5 COMPATIBLE</div>
+    </div>
+
+    <div class="grid">
+      <div class="btn-card" onclick="alert('Run option [1] in Launch_HELIX_Plugin_Server.bat')">
+        <div class="card-title">🖥️ Start Dedicated Server</div>
+        <div class="card-desc">Boots SandboxServer.exe on Pacifica with live console logging & port 7777.</div>
+      </div>
+
+      <div class="btn-card" onclick="alert('Run option [2] in Launch_HELIX_Plugin_Server.bat')">
+        <div class="card-title">🎮 Start HELIX Game Client</div>
+        <div class="card-desc">Launches the game directly into the Pacifica sandbox map with CEF crash guards.</div>
+      </div>
+
+      <div class="btn-card" onclick="alert('Run option [3] in Launch_HELIX_Plugin_Server.bat')">
+        <div class="card-title">🚀 1-Click Master Launch (All)</div>
+        <div class="card-desc">Automatically starts dedicated server then launches game client connected to localhost.</div>
+      </div>
+
+      <div class="btn-card" onclick="window.open('property_tablet.html')">
+        <div class="card-title">🏠 Pacifica Real Estate Tablet</div>
+        <div class="card-desc">Browse Dynasty 8 safehouse rentals, purchase deeds, and manage door locks.</div>
+      </div>
+
+      <div class="btn-card" onclick="window.open('room_designer.html')">
+        <div class="card-title">🧪 In-House Lab Designer</div>
+        <div class="card-desc">Install Mylar grow tents, carbon filters, 50A sub-panels & fume hoods.</div>
+      </div>
+
+      <div class="btn-card" onclick="window.open('security_hub.html')">
+        <div class="card-title">🚨 CCTV & Counter-Raid Hub</div>
+        <div class="card-desc">Live camera feeds, motion alarms, mobile RV controls & thermite burn traps.</div>
+      </div>
+    </div>
+
+    <div class="plugins-section">
+      <div class="plugins-title">✔ 14 Active Server Plugins & Engines:</div>
+      <div class="plugin-pills">
+        <span class="pill">🌿 Botany & Strains</span>
+        <span class="pill">🧪 Meth Synthesis (99.1%)</span>
+        <span class="pill">📦 Hydraulic Coke Stamping</span>
+        <span class="pill">💰 Street Dealing AI</span>
+        <span class="pill">🧲 GMod Physics Snap & Weld</span>
+        <span class="pill">🏠 Pacifica Real Estate</span>
+        <span class="pill">⚡ Power Grid & Breakers</span>
+        <span class="pill">🌬️ Odor & Thermal Heat</span>
+        <span class="pill">🌱 Phenotype Cloning</span>
+        <span class="pill">🏺 Trichome Curing Jars</span>
+        <span class="pill">📹 CCTV & Motion Lasers</span>
+        <span class="pill">🔥 Thermite Burn Traps</span>
+        <span class="pill">🚐 Mobile Cook RV</span>
+        <span class="pill">🏦 Bank Vault Heists</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Modular Weapon Gunsmith & Armory Forge</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: transparent;
+      color: #f8fafc;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+    }
+    .gunsmith-modal {
+      background: radial-gradient(circle at 50% 20%, #151d2f, #070a12 85%);
+      border: 2px solid #3b82f6;
+      border-radius: 16px;
+      width: 1180px;
+      height: 740px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(90deg, #1e3a8a, #0b1329);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.4);
+    }
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .title-badge {
+      background: #2563eb;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+    .title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #93c5fd;
+    }
+    .mineral-res-bar {
+      display: flex;
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.8rem;
+    }
+    .mineral-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #cbd5e1;
+    }
+    .mineral-chip strong { color: #38bdf8; }
+
+    /* Navigation Bar Tabs */
+    .tab-bar {
+      display: flex;
+      background: rgba(10, 15, 29, 0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 0 24px;
+      gap: 8px;
+    }
+    .nav-tab {
+      padding: 10px 20px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #94a3b8;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-tab:hover { color: #f8fafc; }
+    .nav-tab.active {
+      color: #38bdf8;
+      border-bottom-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .main-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Left: Weapon List */
+    .weapons-sidebar {
+      width: 240px;
+      background: rgba(10, 15, 29, 0.8);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+      gap: 10px;
+      overflow-y: auto;
+    }
+    .weapon-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .weapon-card:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+    }
+    .weapon-card.active {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.4), rgba(30, 58, 138, 0.6));
+      border-color: #60a5fa;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+    .weapon-card-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .weapon-card-cat {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* Middle: Weapon Workbench & 6 Sockets */
+    .workbench-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow-y: auto;
+      gap: 16px;
+    }
+
+    .weapon-preview-hero {
+      background: radial-gradient(circle at center, rgba(30, 58, 138, 0.25), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    .weapon-hero-info h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .weapon-hero-info span {
+      font-size: 0.85rem;
+      color: #60a5fa;
+    }
+    .weapon-hero-icon {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.6));
+    }
+
+    /* 6 Modular Sockets Grid */
+    .sockets-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .socket-box {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 90px;
+      transition: all 0.2s;
+    }
+    .socket-box.occupied {
+      border: 1px solid #3b82f6;
+      background: rgba(30, 41, 59, 0.7);
+    }
+    .socket-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .socket-content-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin: 4px 0;
+    }
+    .socket-empty {
+      color: #64748b;
+      font-style: italic;
+      font-size: 0.82rem;
+      margin: 4px 0;
+    }
+    .btn-socket-action {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-socket-action:hover {
+      background: #ef4444;
+      color: white;
+      border-color: #ef4444;
+    }
+
+    /* Real-Time Stats Grid */
+    .stats-panel {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .stats-header {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+    .stat-label {
+      width: 140px;
+      color: #cbd5e1;
+    }
+    .stat-bar-bg {
+      flex: 1;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0 12px;
+    }
+    .stat-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .stat-value {
+      width: 45px;
+      text-align: right;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    /* Right: Attachment Catalog & Forge */
+    .catalog-sidebar {
+      width: 340px;
+      background: rgba(10, 15, 29, 0.95);
+      border-left: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      overflow-y: auto;
+      gap: 12px;
+    }
+    .catalog-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .att-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .att-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .att-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+    .att-slot-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .att-desc {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      line-height: 1.35;
+    }
+    .att-recipe {
+      font-size: 0.72rem;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .btn-forge {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .btn-forge:hover { background: #3b82f6; }
+    .btn-equip {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .btn-equip:hover { background: #059669; }
+
+    /* Ammo Section View */
+    .ammo-view {
+      display: none;
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .ammo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .ammo-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .ammo-card:hover {
+      border-color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+  <div class="gunsmith-modal">
+    <div class="header">
+      <div class="title-group">
+        <span class="title-badge">UE5 MODULAR</span>
+        <div class="title">🔫 PACIFICA WEAPON GUNSMITH & ARMORY WORKBENCH</div>
+      </div>
+      <div class="mineral-res-bar" id="mineralResBar">
+        <div class="mineral-chip">⛏️ Tungsten: <strong id="res_tungsten">2</strong></div>
+        <div class="mineral-chip">🛡️ Titanium: <strong id="res_titanium">3</strong></div>
+        <div class="mineral-chip">⚡ Cobalt: <strong id="res_cobalt">1</strong></div>
+        <div class="mineral-chip">🔮 Lithium: <strong id="res_lithium">2</strong></div>
+        <div class="mineral-chip">✨ Chromium: <strong id="res_chromium">4</strong></div>
+      </div>
+      <button onclick="closeUI()" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:bold;cursor:pointer;">✕ Close (F10)</button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-bar">
+      <div class="nav-tab active" id="tabWorkbench" onclick="switchTab('workbench')">🔧 6-Socket Weapon Gunsmith Workbench</div>
+      <div class="nav-tab" id="tabAmmo" onclick="switchTab('ammo')">📦 Exotic Ammunition Foundry & Press</div>
+    </div>
+
+    <!-- 1. WORKBENCH VIEW -->
+    <div class="main-body" id="workbenchView">
+      <!-- Left: Weapons -->
+      <div class="weapons-sidebar" id="weaponList">
+        <!-- Populated via JS -->
+      </div>
+
+      <!-- Center: Workbench & Sockets -->
+      <div class="workbench-area">
+        <div class="weapon-preview-hero">
+          <div class="weapon-hero-info">
+            <h2 id="activeWeaponName">M4A1 Pacifica Carbine</h2>
+            <span id="activeWeaponCaliber">5.56x45mm NATO • Assault Rifle</span>
+          </div>
+          <div class="weapon-hero-icon" id="activeWeaponIcon">🔫</div>
+        </div>
+
+        <!-- 6 Sockets -->
+        <div class="sockets-grid" id="socketsGrid">
+          <!-- Populated via JS -->
+        </div>
+
+        <!-- Dynamic Stats Panel -->
+        <div class="stats-panel">
+          <div class="stats-header">📊 Dynamic Weapon Ballistics & Handling</div>
+          <div id="statsContainer">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Attachment Forge & Catalog -->
+      <div class="catalog-sidebar">
+        <div class="catalog-title">
+          <span>🔩 Mineral Forge Catalog</span>
+          <span style="font-size:0.75rem;color:#60a5fa;" id="catalogFilterLabel">All Sockets</span>
+        </div>
+        <div id="attachmentCatalogList" style="display:flex;flex-direction:column;gap:10px;">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. EXOTIC AMMUNITION VIEW -->
+    <div class="ammo-view" id="ammoView">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h2 style="font-size:1.3rem;font-weight:800;color:#38bdf8;">📦 High-Penetration & Status Caliber Press</h2>
+          <p style="font-size:0.85rem;color:#94a3b8;margin-top:2px;">Forge specialized armor-piercing, incendiary, and EMP rounds using refined subterranean minerals.</p>
+        </div>
+      </div>
+
+      <div class="ammo-grid" id="ammoGridList">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTab = 'workbench';
+    let activeWeaponId = 'rifle_ar15';
+    let gunsmithState = null;
+    let ammoState = null;
+
+    const FALLBACK_AMMO = {
+      ammo_tungsten_ap_556: {
+        id: 'ammo_tungsten_ap_556',
+        name: 'Tungsten AP 5.56x45mm NATO (30 Rnds)',
+        caliber: '5.56x45mm NATO',
+        roundsPerBox: 30,
+        description: 'Solid tungsten carbide sub-caliber penetrator. Slices through reinforced steel walls and armored SWAT plating.',
+        requiredMinerals: { ingot_tungsten_carbide: 1, bar_chromium_polish: 1 },
+        ballisticEffects: { armorPiercingMultiplier: 2.5, wallPenetrationLayers: 3, extraDamage: +15 }
+      },
+      ammo_tungsten_ap_50bmg: {
+        id: 'ammo_tungsten_ap_50bmg',
+        name: 'Tungsten Sabot .50 BMG Heavy Anti-Materiel (10 Rnds)',
+        caliber: '.338 Lapua Magnum',
+        roundsPerBox: 10,
+        description: 'Massive tungsten penetrator that instant-breaches bank safe doors and destroys vehicle engine blocks.',
+        requiredMinerals: { ingot_tungsten_carbide: 2, ingot_titanium_grade5: 1 },
+        ballisticEffects: { armorPiercingMultiplier: 4.0, wallPenetrationLayers: 5, vehicleEngineBreaker: true, extraDamage: +60 }
+      },
+      ammo_cobalt_emp_45: {
+        id: 'ammo_cobalt_emp_45',
+        name: 'Cobalt Magnetite EMP Shock .45 ACP (25 Rnds)',
+        caliber: '.45 ACP Super-V',
+        roundsPerBox: 25,
+        description: 'Electromagnetic core cartridges that deliver high-voltage EMP arcs, disabling vehicle ignitions and CCTV cameras.',
+        requiredMinerals: { core_cobalt_magnetite: 1, bar_chromium_polish: 1 },
+        ballisticEffects: { empStunDurationSeconds: 8, disablesCCTV: true, disablesVehicleIgnition: true, extraDamage: +10 }
+      },
+      ammo_lithium_incendiary_12g: {
+        id: 'ammo_lithium_incendiary_12g',
+        name: "Lithium Dragon's Breath 12-Gauge (20 Shells)",
+        caliber: '12-Gauge Flechette',
+        roundsPerBox: 20,
+        description: 'Pyrotechnic lithium crystal flechettes that explode into white-hot chemical fire on impact.',
+        requiredMinerals: { prism_lithium_quartz: 1, bar_chromium_polish: 1 },
+        ballisticEffects: { ignitesWoodenStructures: true, fireDamagePerSecond: 12, fireBurnDurationSeconds: 6 }
+      },
+      ammo_chromium_match_9mm: {
+        id: 'ammo_chromium_match_9mm',
+        name: 'Chromium Polished Match 9x19mm (50 Rnds)',
+        caliber: '9x19mm Parabellum',
+        roundsPerBox: 50,
+        description: 'Low-drag precision match rounds with frictionless chromium jacket for pinpoint zero-recoil accuracy.',
+        requiredMinerals: { bar_chromium_polish: 2 },
+        ballisticEffects: { headshotMultiplier: 2.2, recoilReduction: 0.35, extraDamage: +8 }
+      }
+    };
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tabWorkbench').className = `nav-tab ${tab === 'workbench' ? 'active' : ''}`;
+      document.getElementById('tabAmmo').className = `nav-tab ${tab === 'ammo' ? 'active' : ''}`;
+
+      if (tab === 'workbench') {
+        document.getElementById('workbenchView').style.display = 'flex';
+        document.getElementById('ammoView').style.display = 'none';
+      } else {
+        document.getElementById('workbenchView').style.display = 'none';
+        document.getElementById('ammoView').style.display = 'flex';
+        renderAmmoView();
+      }
+    }
+
+    function refreshData() {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('getGunsmithData').then(res => {
+          if (res && res.success) {
+            gunsmithState = res;
+            renderAll();
+          }
+        });
+        Helix.call('getAmmoForgeData').then(res => {
+          if (res && res.success) {
+            ammoState = res;
+          }
+        });
+      } else {
+        gunsmithState = FALLBACK_DATA;
+        ammoState = { ammoCatalog: FALLBACK_AMMO, playerAmmo: { ammo_tungsten_ap_556: 60, ammo_tungsten_ap_50bmg: 20, ammo_cobalt_emp_45: 50, ammo_lithium_incendiary_12g: 40, ammo_chromium_match_9mm: 100 } };
+        renderAll();
+      }
+    }
+
+    function renderAll() {
+      if (!gunsmithState) return;
+
+      // Render Resources
+      const ingots = (gunsmithState.playerMinerals && gunsmithState.playerMinerals.refinedIngots) || {};
+      document.getElementById('res_tungsten').textContent = ingots.ingot_tungsten_carbide || 0;
+      document.getElementById('res_titanium').textContent = ingots.ingot_titanium_grade5 || 0;
+      document.getElementById('res_cobalt').textContent = ingots.core_cobalt_magnetite || 0;
+      document.getElementById('res_lithium').textContent = ingots.prism_lithium_quartz || 0;
+      document.getElementById('res_chromium').textContent = ingots.bar_chromium_polish || 0;
+
+      // Render Weapons Sidebar
+      const wContainer = document.getElementById('weaponList');
+      wContainer.innerHTML = '';
+      Object.values(gunsmithState.weapons).forEach(w => {
+        const card = document.createElement('div');
+        card.className = `weapon-card ${w.id === activeWeaponId ? 'active' : ''}`;
+        card.onclick = () => { activeWeaponId = w.id; renderAll(); };
+        card.innerHTML = `
+          <div class="weapon-card-name">${w.icon} ${w.name}</div>
+          <div class="weapon-card-cat">${w.category} • ${w.caliber}</div>
+        `;
+        wContainer.appendChild(card);
+      });
+
+      // Active Weapon Info
+      const activeW = gunsmithState.weapons[activeWeaponId];
+      if (activeW) {
+        document.getElementById('activeWeaponName').textContent = activeW.name;
+        document.getElementById('activeWeaponCaliber').textContent = `${activeW.caliber} • ${activeW.category}`;
+        document.getElementById('activeWeaponIcon').textContent = activeW.icon;
+
+        renderSockets(activeW);
+        renderStats(activeW.currentStats);
+      }
+
+      renderCatalog();
+    }
+
+    const SOCKET_NAMES = {
+      barrel: 'Muzzle / Barrel Socket',
+      optics: 'Optics / Thermal Sight',
+      receiver: 'Receiver / Frame',
+      magazine: 'Magazine / Ammo Feed',
+      underbarrel: 'Underbarrel Rail',
+      stock: 'Stock / Buffer Tube'
+    };
+
+    function renderSockets(weapon) {
+      const grid = document.getElementById('socketsGrid');
+      grid.innerHTML = '';
+
+      Object.entries(SOCKET_NAMES).forEach(([slotKey, slotName]) => {
+        const equippedId = weapon.equippedAttachments[slotKey];
+        const att = equippedId ? gunsmithState.attachmentCatalog[equippedId] : null;
+
+        const box = document.createElement('div');
+        box.className = `socket-box ${att ? 'occupied' : ''}`;
+        box.innerHTML = `
+          <div>
+            <div class="socket-header">
+              <span>${slotName}</span>
+              <span>${slotKey}</span>
+            </div>
+            ${att ? `<div class="socket-content-name">${att.name}</div>` : `<div class="socket-empty">No attachment mounted</div>`}
+          </div>
+          <div>
+            ${att ? `<button class="btn-socket-action" onclick="unequipAttachment('${slotKey}')">✕ Remove</button>` : `<span style="font-size:0.75rem;color:#475569;">Slot Available</span>`}
+          </div>
+        `;
+        grid.appendChild(box);
+      });
+    }
+
+    function renderStats(stats) {
+      const container = document.getElementById('statsContainer');
+      container.innerHTML = '';
+
+      const statKeys = [
+        { key: 'damage', label: 'Kinetic Damage', max: 150 },
+        { key: 'fireRate', label: 'Cyclic Fire Rate (RPM)', max: 1300 },
+        { key: 'armorPiercing', label: 'Armor Piercing Penetration', max: 100 },
+        { key: 'recoilControl', label: 'Recoil Stabilization', max: 100 },
+        { key: 'range', label: 'Effective Range (Meters)', max: 150 },
+        { key: 'adsSpeed', label: 'Aim-Down-Sight Speed', max: 100 },
+        { key: 'mobility', label: 'Handling & Sprint Mobility', max: 100 }
+      ];
+
+      statKeys.forEach(s => {
+        const val = stats[s.key] || 0;
+        const pct = Math.min(100, Math.max(5, (val / s.max) * 100));
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        row.innerHTML = `
+          <div class="stat-label">${s.label}</div>
+          <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${pct}%;"></div></div>
+          <div class="stat-value">${val}</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderCatalog() {
+      const container = document.getElementById('attachmentCatalogList');
+      container.innerHTML = '';
+
+      const activeW = gunsmithState.weapons[activeWeaponId];
+      const crafted = gunsmithState.craftedAttachments || [];
+
+      Object.values(gunsmithState.attachmentCatalog).forEach(att => {
+        const isCrafted = crafted.includes(att.id);
+        const isEquipped = activeW && activeW.equippedAttachments[att.slot] === att.id;
+
+        const recipeStr = Object.entries(att.requiredMinerals)
+          .map(([min, qty]) => `${qty}x ${min.replace('ingot_','').replace('prism_','').replace('core_','').replace('bar_','').replace(/_/g,' ')}`)
+          .join(', ');
+
+        const card = document.createElement('div');
+        card.className = 'att-card';
+        card.innerHTML = `
+          <div class="att-header">
+            <span class="att-name">${att.name}</span>
+            <span class="att-slot-badge">${att.slot}</span>
+          </div>
+          <div class="att-desc">${att.description}</div>
+          <div class="att-recipe">🔨 Refined Cost: ${recipeStr}</div>
+          ${isEquipped 
+            ? `<button class="btn-socket-action" onclick="unequipAttachment('${att.slot}')">Mounted on ${activeW.name} (Click to Remove)</button>`
+            : isCrafted 
+              ? `<button class="btn-equip" onclick="equipAttachment('${att.id}')">⚙️ Mount to ${activeW.name}</button>`
+              : `<button class="btn-forge" onclick="forgeAttachment('${att.id}')">🔥 Smelt & Forge Attachment</button>`
+          }
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderAmmoView() {
+      const container = document.getElementById('ammoGridList');
+      container.innerHTML = '';
+
+      const catalog = (ammoState && ammoState.ammoCatalog) || FALLBACK_AMMO;
+      const playerAmmo = (ammoState && ammoState.playerAmmo) || {};
+
+      Object.values(catalog).forEach(ammo => {
+        const inReserve = playerAmmo[ammo.id] || 0;
+        const recipeStr = Object.entries(ammo.requiredMinerals)
+          .map(([min, qty]) => `${qty}x ${min.replace('ingot_','').replace('prism_','').replace('core_','').replace('bar_','').replace(/_/g,' ')}`)
+          .join(', ');
+
+        const card = document.createElement('div');
+        card.className = 'ammo-card';
+        card.innerHTML = `
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3 style="font-size:1rem;color:#f8fafc;font-weight:700;">${ammo.name}</h3>
+              <span style="font-size:0.8rem;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 8px;border-radius:4px;font-weight:800;">In Ammo Box: ${inReserve} Rnds</span>
+            </div>
+            <p style="font-size:0.8rem;color:#94a3b8;margin:8px 0;line-height:1.4;">${ammo.description}</p>
+            <div style="font-size:0.75rem;color:#fbbf24;background:rgba(251,191,36,0.1);padding:6px;border-radius:6px;border:1px solid rgba(251,191,36,0.2);">
+              🔥 Press Cost per Box (${ammo.roundsPerBox} Rnds): <strong>${recipeStr}</strong>
+            </div>
+          </div>
+          <button class="btn-forge" onclick="craftAmmo('${ammo.id}')">📦 Press Box of ${ammo.roundsPerBox}x Rounds</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function craftAmmo(ammoId) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('craftSpecialAmmo', { ammoId }).then(res => {
+          alert(res.message);
+          refreshData();
+        });
+      } else {
+        const ammo = FALLBACK_AMMO[ammoId];
+        ammoState.playerAmmo[ammoId] = (ammoState.playerAmmo[ammoId] || 0) + ammo.roundsPerBox;
+        alert(`📦 Pressed ${ammo.roundsPerBox}x ${ammo.name}!`);
+        renderAmmoView();
+      }
+    }
+
+    function forgeAttachment(attId) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('craftGunsmithAttachment', { attachmentId: attId }).then(res => {
+          alert(res.message);
+          refreshData();
+        });
+      } else {
+        gunsmithState.craftedAttachments.push(attId);
+        alert(`Attachment forged! Ready to mount.`);
+        renderAll();
+      }
+    }
+
+    function equipAttachment(attId) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('equipGunsmithAttachment', { weaponId: activeWeaponId, attachmentId: attId }).then(res => {
+          refreshData();
+        });
+      } else {
+        const att = gunsmithState.attachmentCatalog[attId];
+        gunsmithState.weapons[activeWeaponId].equippedAttachments[att.slot] = attId;
+        renderAll();
+      }
+    }
+
+    function unequipAttachment(slot) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('unequipGunsmithAttachment', { weaponId: activeWeaponId, slot }).then(res => {
+          refreshData();
+        });
+      } else {
+        delete gunsmithState.weapons[activeWeaponId].equippedAttachments[slot];
+        renderAll();
+      }
+    }
+
+    function closeUI() {
+      if (typeof Helix !== 'undefined' && Helix.emit) {
+        Helix.emit('CloseGunsmithUI');
+      }
+    }
+
+    refreshData();
+  </script>
+</body>
+</html>

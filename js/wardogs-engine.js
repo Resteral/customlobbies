@@ -3,7 +3,7 @@ class WardogsEngine {
   constructor() {
     this.divisionName = 'WARDOGS 33 v 33 v 33 Tri-Faction Mercenary League';
     this.seasonCode = 'OPERATION: AMBER STRIKE (Season 4)';
-    this.totalBounty = '$50,000 USD Bounties';
+    this.totalBounty = '50,000 CL-Points USD Bounties';
 
     // Scraped Live Telemetry (SteamDB, TwitchTracker & BULKHEAD / Team17 Official Stats)
     this.liveTelemetry = {
@@ -13,7 +13,7 @@ class WardogsEngine {
       activeConcurrentPlayers: 184920,
       twitchConcurrentViewers: 198540,
       steamApprovalRating: '85% Very Positive (14,280 Reviews)',
-      persistentEconomyBalance: '$12,500 Cash Funds',
+      persistentEconomyBalance: '12,500 CL-Points Funds',
       activeMatchFormat: '100-Player Tri-Faction Combined Arms (33v33v33)'
     };
 
@@ -24,12 +24,12 @@ class WardogsEngine {
       charlie: { name: 'Cyber Spectre Unit', code: 'CHARLIE-GOLD', accent: '#ffd700', hex: '#ffd700', perk: '🧠 Orbital EMP & Drone Recon Scan', sector: 'Sector C: Data Core Vault' }
     };
 
-    // Official Competitive Circuit Divisions ($50,000 Prize Pool)
+    // Official Competitive Circuit Divisions (50,000 CL-Points Prize Pool)
     this.circuitDivisions = [
       {
         id: 'apex-master',
         name: '🏆 Apex Master League (ELO 2200+)',
-        prizePool: '$25,000 USD',
+        prizePool: '25,000 CL-Points USD',
         teams: [
           { rank: 1, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', wins: 18, losses: 2, points: 54, sectorControl: '42%', elo: 2680, status: '1st Place • Qualified' },
           { rank: 2, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', wins: 15, losses: 3, points: 45, sectorControl: '36%', elo: 2450, status: '2nd Place • Qualified' },
@@ -40,7 +40,7 @@ class WardogsEngine {
       {
         id: 'dreadnought',
         name: '🥇 Dreadnought Division (ELO 1800+)',
-        prizePool: '$15,000 USD',
+        prizePool: '15,000 CL-Points USD',
         teams: [
           { rank: 1, name: 'Valkyrie Vanguard', tag: '[VALK]', captain: 'Valkyrie_Merc', wins: 11, losses: 2, points: 33, sectorControl: '38%', elo: 2150, status: 'Division Leader' },
           { rank: 2, name: 'Titan Armor Corps', tag: '[TITAN]', captain: 'Arkheron_Vanguard', wins: 9, losses: 4, points: 27, sectorControl: '30%', elo: 1980, status: 'Challenger' }
@@ -49,7 +49,7 @@ class WardogsEngine {
       {
         id: 'vanguard-open',
         name: '🥉 Vanguard Open Division (Free Entry)',
-        prizePool: '$10,000 USD',
+        prizePool: '10,000 CL-Points USD',
         teams: [
           { rank: 1, name: 'Rookie Mercenaries', tag: '[RM]', wins: 7, losses: 1, points: 21, sectorControl: '45%', elo: 1650, status: 'Open Leader' }
         ]
@@ -58,8 +58,8 @@ class WardogsEngine {
 
     // Scheduled Live Operations & Scrim Fixtures
     this.operationsCalendar = [
-      { id: 'OP-401', week: 'WEEK 4 TRI-FACTION SIEGE', title: 'Operation Amber Strike: Citadel Core Siege', teamA: 'WARDOG Company Alpha', teamB: 'Iron Claw Battalion', teamC: 'Phantom Brigade', date: 'Tonight 20:00 EST', map: 'Sector 33 - Quantum Citadel', status: '🔴 LIVE BROADCAST', prize: '$5,000 Bounty Match' },
-      { id: 'OP-402', week: 'WEEK 5 BATTALION SCRIM', title: 'Operation Cobalt Dawn: Sector B Assault', teamA: 'Valkyrie Vanguard', teamB: 'Titan Armor Corps', teamC: 'Slapshot Cyber Hounds', date: 'Tomorrow 21:00 EST', map: 'Sector 33 - Orbital Core', status: 'UPCOMING', prize: '$2,500 Bounty Match' }
+      { id: 'OP-401', week: 'WEEK 4 TRI-FACTION SIEGE', title: 'Operation Amber Strike: Citadel Core Siege', teamA: 'WARDOG Company Alpha', teamB: 'Iron Claw Battalion', teamC: 'Phantom Brigade', date: 'Tonight 20:00 EST', map: 'Sector 33 - Quantum Citadel', status: '🔴 LIVE BROADCAST', prize: '5,000 CL-Points Bounty Match' },
+      { id: 'OP-402', week: 'WEEK 5 BATTALION SCRIM', title: 'Operation Cobalt Dawn: Sector B Assault', teamA: 'Valkyrie Vanguard', teamB: 'Titan Armor Corps', teamC: 'Slapshot Cyber Hounds', date: 'Tomorrow 21:00 EST', map: 'Sector 33 - Orbital Core', status: 'UPCOMING', prize: '2,500 CL-Points Bounty Match' }
     ];
 
     // Tactical Sector Capture Map Telemetry
@@ -80,23 +80,23 @@ class WardogsEngine {
 
     // Default Solo Mercenaries
     this.soloMercenaries = [
-      { id: 101, name: 'Ghost_Dog_99', callsign: 'VIPER-1', game: 'Counter-Strike 2', role: '🎯 Marksman / Sniper', elo: 2580, kd: '2.35', status: 'Selected for Ranked', contracts: 42, acVerified: true, badge: '🏆 Season 3 Champion', bountyEarned: '$6,400' },
-      { id: 102, name: 'Sargeant_Iron', callsign: 'HAMMER-6', game: 'Empulse', role: '⚡ Breacher / Assault', elo: 2450, kd: '2.10', status: 'Available', contracts: 38, acVerified: true, badge: '⚡ Demolitions Expert', bountyEarned: '$4,800' },
-      { id: 103, name: 'Valkyrie_Merc', callsign: 'VALKYRIE-3', game: 'Valorant', role: '🧠 Recon / Scout', elo: 2390, kd: '1.95', status: 'Available', contracts: 29, acVerified: true, badge: '🎯 Intel Specialist', bountyEarned: '$3,200' },
-      { id: 104, name: 'Shadow_K9', callsign: 'SPECTRE-4', game: 'REMATCH', role: '📻 Comms Specialist', elo: 2480, kd: '2.20', status: 'Selected for Ranked', contracts: 35, acVerified: true, badge: '📡 Tactical Commander', bountyEarned: '$5,100' }
+      { id: 101, name: 'Ghost_Dog_99', callsign: 'VIPER-1', game: 'Counter-Strike 2', role: '🎯 Marksman / Sniper', elo: 2580, kd: '2.35', status: 'Selected for Ranked', contracts: 42, acVerified: true, badge: '🏆 Season 3 Champion', bountyEarned: '6,400 CL-Points' },
+      { id: 102, name: 'Sargeant_Iron', callsign: 'HAMMER-6', game: 'Empulse', role: '⚡ Breacher / Assault', elo: 2450, kd: '2.10', status: 'Available', contracts: 38, acVerified: true, badge: '⚡ Demolitions Expert', bountyEarned: '4,800 CL-Points' },
+      { id: 103, name: 'Valkyrie_Merc', callsign: 'VALKYRIE-3', game: 'Valorant', role: '🧠 Recon / Scout', elo: 2390, kd: '1.95', status: 'Available', contracts: 29, acVerified: true, badge: '🎯 Intel Specialist', bountyEarned: '3,200 CL-Points' },
+      { id: 104, name: 'Shadow_K9', callsign: 'SPECTRE-4', game: 'REMATCH', role: '📻 Comms Specialist', elo: 2480, kd: '2.20', status: 'Selected for Ranked', contracts: 35, acVerified: true, badge: '📡 Tactical Commander', bountyEarned: '5,100 CL-Points' }
     ];
 
     // Default Squad Units
     this.registeredSquads = [
-      { id: 201, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', game: 'Counter-Strike 2', record: '18W - 2L', membersCount: 33, status: 'SELECTED FOR RANKED', bountyEarned: '$12,500', faction: '🔵 Vanguard Command' },
-      { id: 202, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', game: 'Empulse', record: '15W - 3L', membersCount: 33, status: 'ACTIVE CONTRACT', bountyEarned: '$8,200', faction: '🔴 Apex Raiders' }
+      { id: 201, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', game: 'Counter-Strike 2', record: '18W - 2L', membersCount: 33, status: 'SELECTED FOR RANKED', bountyEarned: '12,500 CL-Points', faction: '🔵 Vanguard Command' },
+      { id: 202, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', game: 'Empulse', record: '15W - 3L', membersCount: 33, status: 'ACTIVE CONTRACT', bountyEarned: '8,200 CL-Points', faction: '🔴 Apex Raiders' }
     ];
 
     // Default Tactical Bounties
     this.tacticalBounties = [
-      { id: 'BNT-01', title: 'Capture Sector 33 Cyber Core', reward: '+250 🪙 CL-Points', cash: '$1,500 Cash', desc: 'Secure Sector 33-C for 5 consecutive rounds in Tri-Faction Warfare.', completed: false },
-      { id: 'BNT-02', title: 'Orbital Recon Sweep', reward: '+150 🪙 CL-Points', cash: '$750 Cash', desc: 'Tag 25 enemy operatives using Thermal Recon Drones.', completed: false },
-      { id: 'BNT-03', title: 'Battalion Scrim Victory', reward: '+500 🪙 CL-Points', cash: '$3,000 Cash', desc: 'Lead a 33-man Battalion to victory against 2 competing factions.', completed: true }
+      { id: 'BNT-01', title: 'Capture Sector 33 Cyber Core', reward: '+250 🪙 CL-Points', clPoints: '1,500 CL-Points', desc: 'Secure Sector 33-C for 5 consecutive rounds in Tri-Faction Warfare.', completed: false },
+      { id: 'BNT-02', title: 'Orbital Recon Sweep', reward: '+150 🪙 CL-Points', clPoints: '750 CL-Points', desc: 'Tag 25 enemy operatives using Thermal Recon Drones.', completed: false },
+      { id: 'BNT-03', title: 'Battalion Scrim Victory', reward: '+500 🪙 CL-Points', clPoints: '3,000 CL-Points', desc: 'Lead a 33-man Battalion to victory against 2 competing factions.', completed: true }
     ];
 
     // Match History Rooms
@@ -151,7 +151,7 @@ class WardogsEngine {
       contracts: 1,
       acVerified: true,
       badge: '🏅 Enlisted Mercenary',
-      bountyEarned: '$500'
+      bountyEarned: '500 CL-Points'
     };
 
     this.soloMercenaries.unshift(newMerc);
@@ -170,7 +170,7 @@ class WardogsEngine {
       record: '0W - 0L',
       membersCount: parseInt(squadSize) || 33,
       status: 'ACTIVE CONTRACT',
-      bountyEarned: '$0',
+      bountyEarned: '0 CL-Points',
       faction: '🔵 Vanguard Command'
     };
 
@@ -209,7 +209,7 @@ class WardogsEngine {
       date: dateStr,
       map: mapName,
       status: 'SCHEDULED',
-      prize: '$1,000 Scrim Bounty'
+      prize: '1,000 CL-Points Scrim Bounty'
     };
 
     this.operationsCalendar.unshift(newOp);
@@ -314,7 +314,7 @@ class WardogsEngine {
       if (!player) {
         const selectedRole = rolesList[(i - 3) % rolesList.length];
         const randomKd = (2.4 - (i - 3) * 0.01 + Math.random() * 0.2).toFixed(2);
-        const randomCash = Math.floor(6500 - (i - 3) * 50 + Math.random() * 200);
+        const randomClPoints = Math.floor(6500 - (i - 3) * 50 + Math.random() * 200);
         player = {
           id: 1000 + i,
           name: `Operative_DOG_${i + 1}`,
@@ -323,7 +323,7 @@ class WardogsEngine {
           role: selectedRole,
           elo: Math.floor(2550 - (i - 3) * 6 + Math.random() * 35),
           kd: randomKd,
-          bountyEarned: `$${randomCash.toLocaleString()}`,
+          bountyEarned: `$${randomClPoints.toLocaleString()}`,
           status: 'Selected for Ranked',
           badge: i % 5 === 0 ? '🏆 Elite Veteran' : '🛡️ Standard Operative'
         };
@@ -340,7 +340,7 @@ class WardogsEngine {
       p.effectiveElo = rank.effectiveMMR;
       p.mmrAdjustment = rank.mmrAdjustment;
       p.kd = rank.kd;
-      p.bountyEarned = p.bountyEarned || rank.cashFormatted;
+      p.bountyEarned = p.bountyEarned || rank.clPointsFormatted;
       p.rankTitle = rank.rankTitle;
       p.rankBadge = rank.rankBadge;
     });
@@ -371,9 +371,9 @@ class WardogsEngine {
     const kdBravo = (factionBravo.reduce((acc, p) => acc + parseFloat(p.kd), 0) / factionBravo.length).toFixed(2);
     const kdCharlie = (factionCharlie.reduce((acc, p) => acc + parseFloat(p.kd), 0) / factionCharlie.length).toFixed(2);
 
-    const cashAlpha = factionAlpha.reduce((acc, p) => acc + (p.rankInfo ? p.rankInfo.cashVal : 1000), 0);
-    const cashBravo = factionBravo.reduce((acc, p) => acc + (p.rankInfo ? p.rankInfo.cashVal : 1000), 0);
-    const cashCharlie = factionCharlie.reduce((acc, p) => acc + (p.rankInfo ? p.rankInfo.cashVal : 1000), 0);
+    const clPointsAlpha = factionAlpha.reduce((acc, p) => acc + (p.rankInfo ? p.rankInfo.clPointsVal : 1000), 0);
+    const clPointsBravo = factionBravo.reduce((acc, p) => acc + (p.rankInfo ? p.rankInfo.clPointsVal : 1000), 0);
+    const clPointsCharlie = factionCharlie.reduce((acc, p) => acc + (p.rankInfo ? p.rankInfo.clPointsVal : 1000), 0);
 
     const maxAvg = Math.max(avgAlpha, avgBravo, avgCharlie);
     const minAvg = Math.min(avgAlpha, avgBravo, avgCharlie);
@@ -397,9 +397,9 @@ class WardogsEngine {
       kdAlpha,
       kdBravo,
       kdCharlie,
-      cashAlpha: `$${cashAlpha.toLocaleString()}`,
-      cashBravo: `$${cashBravo.toLocaleString()}`,
-      cashCharlie: `$${cashCharlie.toLocaleString()}`,
+      clPointsAlpha: `$${clPointsAlpha.toLocaleString()}`,
+      clPointsBravo: `$${clPointsBravo.toLocaleString()}`,
+      clPointsCharlie: `$${clPointsCharlie.toLocaleString()}`,
       balanceRating: `${balancePct}% Equalized`,
       map: 'Sector 33 - Quantum Citadel (Tri-Zone Fortress)',
       serverNode: `US-EAST-WARNODE-${Math.floor(Math.random() * 90 + 10)} (128-Tick Tickrate)`,
@@ -412,21 +412,21 @@ class WardogsEngine {
     return matchRoom;
   }
 
-  // Compute Player Rank & Effective MMR from Base ELO, K/D Ratio, and Cash Economy Balance
+  // Compute Player Rank & Effective MMR from Base ELO, K/D Ratio, and CL-Points Economy Balance
   computePlayerRankTier(player) {
     const baseElo = player.elo || 1800;
     const kd = parseFloat(player.kd) || 1.85;
-    const cashVal = parseInt((player.bountyEarned || '$1200').replace(/[^0-9]/g, '')) || 1200;
+    const clPointsVal = parseInt((player.bountyEarned || '1200 CL-Points').replace(/[^0-9]/g, '')) || 1200;
 
     // Performance MMR Adjustment based on K/D & Economy
     const kdMMRBonus = Math.round((kd - 1.0) * 120);
-    const cashMMRBonus = Math.round(cashVal / 250);
-    const mmrAdjustment = kdMMRBonus + cashMMRBonus;
+    const clPointsMMRBonus = Math.round(clPointsVal / 250);
+    const mmrAdjustment = kdMMRBonus + clPointsMMRBonus;
 
     // Effective MMR
     const effectiveMMR = Math.max(800, baseElo + mmrAdjustment);
 
-    const compositeScore = (effectiveMMR * 0.5) + (kd * 450) + (cashVal / 8);
+    const compositeScore = (effectiveMMR * 0.5) + (kd * 450) + (clPointsVal / 8);
 
     let rankTitle = '🥉 Vanguard Recruit';
     let rankBadge = '🥉';
@@ -453,8 +453,8 @@ class WardogsEngine {
       rankTitle,
       rankBadge,
       kd: kd.toFixed(2),
-      cashVal,
-      cashFormatted: `$${cashVal.toLocaleString()}`
+      clPointsVal,
+      clPointsFormatted: `$${clPointsVal.toLocaleString()}`
     };
   }
 

@@ -1,18 +1,20 @@
 {
   "mapId": "pacifica_crime_world",
   "name": "Pacifica City & Outskirts",
-  "version": "1.0.0",
-  "description": "High-density open world map designed for HELIX platform features financial districts, industrial docks, commercial nightlife strips, and suburban crime hideouts.",
+  "version": "1.1.0",
+  "description": "High-density open world map designed for HELIX platform features financial districts, industrial docks, commercial nightlife strips, and suburban crime hideouts with photorealistic PBR props.",
   "environment": {
     "timeOfDay": "18:00",
     "weather": "ClearNight",
     "fogDensity": 0.02,
-    "ambientLighting": "CyberpunkNeon"
+    "ambientLighting": "CyberpunkNeon",
+    "windSpeed": 4.5,
+    "rainIntensity": 0.0
   },
   "spawns": {
-    "playerDefault": { "x": 120.0, "y": 450.0, "z": 15.0, "heading": 90 },
-    "policeHQ": { "x": -850.0, "y": 1200.0, "z": 20.0, "heading": 180 },
-    "blackMarketAlley": { "x": 450.0, "y": -920.0, "z": 8.0, "heading": 270 }
+    "playerDefault": { "x": 120, "y": 450, "z": 15, "heading": 90 },
+    "policeHQ": { "x": -850, "y": 1200, "z": 20, "heading": 180 },
+    "blackMarketAlley": { "x": 450, "y": -920, "z": 8, "heading": 270 }
   },
   "districts": [
     {
@@ -21,9 +23,68 @@
       "color": "#00ffc8",
       "bounds": { "minX": -500, "maxX": 500, "minY": 0, "maxY": 1000 },
       "poi": [
-        { "name": "First National Bank Vault", "type": "vault", "x": 0.0, "y": 750.0, "z": 10.0 },
-        { "name": "Security Control Terminal A", "type": "terminal", "x": -120.0, "y": 680.0, "z": 10.0 },
-        { "name": "Security Control Terminal B", "type": "terminal", "x": 150.0, "y": 810.0, "z": 10.0 }
+        {
+          "name": "First National Bank Vault",
+          "type": "vault",
+          "model": "assets/models/bank_vault.glb",
+          "x": 0, "y": 750, "z": 10,
+          "physics": {
+            "mass": 4500.0,
+            "material": "HeavyArmorSteel",
+            "collision": "ComplexPrecise",
+            "destructible": false
+          },
+          "pbr": {
+            "roughness": 0.25,
+            "metallic": 0.95,
+            "emissive": "#00e5ff",
+            "normalDetail": "BrushedSteel_8K"
+          },
+          "audio": {
+            "ambientLoop": "audio/vault_hum.wav",
+            "interactSound": "audio/hydraulic_unlock.wav"
+          }
+        },
+        {
+          "name": "Security Control Terminal A",
+          "type": "terminal",
+          "model": "assets/models/hack_terminal.glb",
+          "x": -120, "y": 680, "z": 10,
+          "physics": {
+            "mass": 35.0,
+            "material": "ReinforcedPolymer",
+            "collision": "Box"
+          },
+          "pbr": {
+            "roughness": 0.4,
+            "metallic": 0.2,
+            "emissive": "#00ff66"
+          },
+          "audio": {
+            "ambientLoop": "audio/terminal_fans.wav",
+            "interactSound": "audio/keystroke_enter.wav"
+          }
+        },
+        {
+          "name": "Security Control Terminal B",
+          "type": "terminal",
+          "model": "assets/models/hack_terminal.glb",
+          "x": 150, "y": 810, "z": 10,
+          "physics": {
+            "mass": 35.0,
+            "material": "ReinforcedPolymer",
+            "collision": "Box"
+          },
+          "pbr": {
+            "roughness": 0.4,
+            "metallic": 0.2,
+            "emissive": "#00ff66"
+          },
+          "audio": {
+            "ambientLoop": "audio/terminal_fans.wav",
+            "interactSound": "audio/keystroke_enter.wav"
+          }
+        }
       ]
     },
     {
@@ -32,9 +93,92 @@
       "color": "#ff6432",
       "bounds": { "minX": 500, "maxX": 1500, "minY": -1000, "maxY": 0 },
       "poi": [
-        { "name": "Underground Meth Laboratory", "type": "meth_lab", "x": 950.0, "y": -450.0, "z": 5.0 },
-        { "name": "Hydroponic Cannabis Warehouse", "type": "weed_farm", "x": 1100.0, "y": -720.0, "z": 5.0 },
-        { "name": "Crypto GPU Mining Facility", "type": "crypto_farm", "x": 800.0, "y": -200.0, "z": 5.0 }
+        {
+          "name": "Underground Meth Laboratory",
+          "type": "meth_lab",
+          "model": "assets/models/meth_lab.glb",
+          "x": 950, "y": -450, "z": 5,
+          "physics": {
+            "mass": 180.0,
+            "material": "BorosilicateGlassAndCastIron",
+            "collision": "ComplexPrecise",
+            "hazardExplosionThreshold": 130
+          },
+          "pbr": {
+            "roughness": 0.15,
+            "metallic": 0.6,
+            "glassRefraction": 1.52,
+            "grimeMask": "IndustrialChemicalSoot_4K"
+          },
+          "audio": {
+            "ambientLoop": "audio/chemical_boil_loop.wav",
+            "interactSound": "audio/burner_ignite.wav"
+          },
+          "vfx": {
+            "heatShimmer": true,
+            "steamParticles": true
+          }
+        },
+        {
+          "name": "Hydroponic Cannabis Warehouse",
+          "type": "weed_farm",
+          "model": "assets/models/weed_box.glb",
+          "x": 1100, "y": -720, "z": 5,
+          "physics": {
+            "mass": 65.0,
+            "material": "ExtrudedAluminumAndSoil",
+            "collision": "Box"
+          },
+          "pbr": {
+            "roughness": 0.7,
+            "metallic": 0.3,
+            "lightEmission": "#ff0077",
+            "lightLumens": 2400
+          },
+          "audio": {
+            "ambientLoop": "audio/grow_ventilation.wav",
+            "interactSound": "audio/water_sprayer.wav"
+          }
+        },
+        {
+          "name": "Crypto GPU Mining Facility",
+          "type": "crypto_farm",
+          "model": "assets/models/crypto_farm.glb",
+          "x": 800, "y": -200, "z": 5,
+          "physics": {
+            "mass": 320.0,
+            "material": "ServerChassisSteel",
+            "collision": "Box"
+          },
+          "pbr": {
+            "roughness": 0.35,
+            "metallic": 0.8,
+            "rgbLEDs": true
+          },
+          "audio": {
+            "ambientLoop": "audio/server_datacenter_hum.wav",
+            "interactSound": "audio/usb_plug.wav"
+          }
+        },
+        {
+          "name": "Docks Arms & Contraband Dealer",
+          "type": "station",
+          "model": "assets/models/blackmarket_dealer.glb",
+          "x": 980, "y": -520, "z": 5,
+          "physics": {
+            "mass": 85.0,
+            "material": "BallisticFabricAndMetal",
+            "collision": "Capsule"
+          },
+          "pbr": {
+            "roughness": 0.8,
+            "metallic": 0.1
+          },
+          "audio": {
+            "ambientLoop": "audio/radio_chatter.wav",
+            "interactSound": "audio/weapon_cock.wav"
+          }
+        }
       ]
     },
     {
@@ -43,9 +187,134 @@
       "color": "#b450f0",
       "bounds": { "minX": -1500, "maxX": -500, "minY": -1000, "maxY": 0 },
       "poi": [
-        { "name": "Velvet Lounge Nightclub", "type": "business", "x": -950.0, "y": -350.0, "z": 12.0 },
-        { "name": "Downtown Pawn & Vault", "type": "business", "x": -1200.0, "y": -600.0, "z": 12.0 },
-        { "name": "Black Market Dealer Alley", "type": "black_market", "x": -750.0, "y": -800.0, "z": 8.0 }
+        {
+          "name": "Velvet Lounge Nightclub",
+          "type": "business",
+          "model": "assets/models/nightclub_counter.glb",
+          "x": -950, "y": -350, "z": 12,
+          "physics": {
+            "mass": 500.0,
+            "material": "PolishedMahoganyAndBrass",
+            "collision": "ComplexPrecise"
+          },
+          "pbr": {
+            "roughness": 0.2,
+            "metallic": 0.4
+          },
+          "audio": {
+            "ambientLoop": "audio/club_bass_muffled.wav",
+            "interactSound": "audio/cash_register.wav"
+          }
+        },
+        {
+          "name": "Downtown Pawn & Vault",
+          "type": "business",
+          "model": "assets/models/drillable_safe.glb",
+          "x": -1200, "y": -600, "z": 12,
+          "physics": {
+            "mass": 850.0,
+            "material": "HardenedTungstenSteel",
+            "collision": "Box"
+          },
+          "pbr": {
+            "roughness": 0.3,
+            "metallic": 0.85
+          },
+          "audio": {
+            "ambientLoop": "audio/security_beep.wav",
+            "interactSound": "audio/keypad_press.wav"
+          }
+        },
+        {
+          "name": "Black Market Dealer Alley",
+          "type": "black_market",
+          "model": "assets/models/blackmarket_dealer.glb",
+          "x": -750, "y": -800, "z": 8,
+          "physics": {
+            "mass": 85.0,
+            "material": "LeatherAndKevlar",
+            "collision": "Capsule"
+          },
+          "pbr": {
+            "roughness": 0.75,
+            "metallic": 0.15
+          },
+          "audio": {
+            "ambientLoop": "audio/alley_wind.wav",
+            "interactSound": "audio/whisper_deal.wav"
+          }
+        }
+      ]
+    },
+    {
+      "id": "outskirts_badlands",
+      "name": "Outskirts Badlands & Mining Quarries",
+      "color": "#f59e0b",
+      "bounds": { "minX": -2500, "maxX": -1500, "minY": 500, "maxY": 2000 },
+      "poi": [
+        {
+          "name": "Tungsten Heavy Open-Pit Quarry",
+          "type": "mining_vein",
+          "oreType": "ore_tungsten",
+          "model": "assets/models/drillable_safe.glb",
+          "x": -1850, "y": 1200, "z": 45,
+          "physics": {
+            "mass": 9500.0,
+            "material": "RawTungstenRock",
+            "collision": "ComplexPrecise"
+          },
+          "pbr": {
+            "roughness": 0.85,
+            "metallic": 0.7,
+            "emissive": "#1e293b"
+          },
+          "audio": {
+            "ambientLoop": "audio/desert_wind_quarry.wav",
+            "interactSound": "audio/pickaxe_strike.wav"
+          }
+        },
+        {
+          "name": "Subterranean Lithium Geode Caverns",
+          "type": "mining_vein",
+          "oreType": "ore_lithium",
+          "model": "assets/models/flask_round_bottom.glb",
+          "x": -2100, "y": 1450, "z": -15,
+          "physics": {
+            "mass": 4200.0,
+            "material": "CrystallineQuartz",
+            "collision": "ComplexPrecise"
+          },
+          "pbr": {
+            "roughness": 0.1,
+            "metallic": 0.1,
+            "emissive": "#c084fc",
+            "glassRefraction": 1.54
+          },
+          "audio": {
+            "ambientLoop": "audio/cave_drip_crystal.wav",
+            "interactSound": "audio/crystal_chime.wav"
+          }
+        },
+        {
+          "name": "Foundry Blast Furnace & Gunsmith Armory",
+          "type": "foundry_workbench",
+          "model": "assets/models/bank_vault.glb",
+          "x": -1720, "y": 1050, "z": 40,
+          "physics": {
+            "mass": 6500.0,
+            "material": "CastIronSmelter",
+            "collision": "Box"
+          },
+          "pbr": {
+            "roughness": 0.45,
+            "metallic": 0.9,
+            "emissive": "#f97316"
+          },
+          "audio": {
+            "ambientLoop": "audio/furnace_blast_loop.wav",
+            "interactSound": "audio/anvil_hammer.wav"
+          }
+        }
       ]
     }
   ]

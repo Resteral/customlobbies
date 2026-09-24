@@ -245,6 +245,27 @@ Helix.client(() => {
     console.log(`\x1b[32m✔ Created HELIX WebUI Overlay:\x1b[0m ui/${id}.html`);
   },
 
+  poi(params, flags) {
+    const name = params[0] || flags.name || 'New POI';
+    const type = flags.type || 'station';
+    const districtId = flags.district || 'downtown_finance';
+    const x = parseFloat(flags.x || 0.0);
+    const y = parseFloat(flags.y || 0.0);
+    const z = parseFloat(flags.z || 10.0);
+
+    const mapConfigPath = path.join(ROOT_DIR, 'maps', 'pacifica_crime_map.json');
+    if (fs.existsSync(mapConfigPath)) {
+      const mapData = JSON.parse(fs.readFileSync(mapConfigPath, 'utf8'));
+      const targetDistrict = mapData.districts.find(d => d.id === districtId) || mapData.districts[0];
+      
+      const newPOI = { name, type, x, y, z };
+      targetDistrict.poi.push(newPOI);
+
+      fs.writeFileSync(mapConfigPath, JSON.stringify(mapData, null, 2), 'utf8');
+      console.log(`\x1b[32m✔ Added Pacifica POI:\x1b[0m "${name}" (${type}) at [X: ${x}, Y: ${y}, Z: ${z}] in ${targetDistrict.name}`);
+    }
+  },
+
   help() {
     console.log(`
 \x1b[35m=== HELIX Platform (helixgame.com UE5 Sandbox) Script & System Generator ===\x1b[0m
@@ -258,6 +279,11 @@ Helix.client(() => {
     Generates data-driven interactive station definition
     --name="Station Name" --time=5 --cash=200 --in="iron:2" --out="gear:1" --append
     Example: node tools/helix-system-builder.js station vehicle_tuner --name="Vehicle Tuning Station" --append
+
+  \x1b[32mpoi <name> [options]\x1b[0m
+    Adds an interactive POI / Station to Pacifica Map
+    --type=vault|meth_lab|crypto_farm|business|station --district=downtown_finance --x=150 --y=400 --z=10
+    Example: node tools/helix-system-builder.js poi "Docks Arms Dealer" --type=station --district=industrial_docks --x=950 --y=-500 --z=5
 
   \x1b[32mclient <name> [options]\x1b[0m
     Generates client controller with WebUI & keybinding

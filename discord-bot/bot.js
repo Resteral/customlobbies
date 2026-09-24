@@ -301,7 +301,7 @@ client.on('messageCreate', async (message) => {
   else if (command === 'bracket' || command === 'b' || command === 'tourney') {
     const embed = new EmbedBuilder()
       .setColor('#ffd700')
-      .setTitle('🏆 CustomLobbies $1,500 CS2 Weekly Championship - Visual Bracket')
+      .setTitle('🏆 CustomLobbies 1,500 CL-Points CS2 Weekly Championship - Visual Bracket')
       .setDescription('Live Tournament Bracket Tree Sync from CustomLobbies.com')
       .addFields(
         {
@@ -316,7 +316,7 @@ client.on('messageCreate', async (message) => {
         },
         {
           name: '👑 Grand Finals Championship',
-          value: '⚡ **FaZe Clan** vs **Natus Vincere**\n*Prize Pool:* **$1,500 Cash + 5,000 CL-Points**\n*Map Veto:* De_Mirage, De_Inferno',
+          value: '⚡ **FaZe Clan** vs **Natus Vincere**\n*Prize Pool:* **1,500 CL-Points + 5,000 CL-Points**\n*Map Veto:* De_Mirage, De_Inferno',
           inline: false
         }
       )

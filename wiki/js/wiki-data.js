@@ -157,7 +157,7 @@ Welcome to **Paradise Coast Roleplay**! Our goal is to provide a premier, immers
         "Primary Radio": "Frequency 1.0 (TAC-1)",
         "Application": "Whitelisted (Discord)",
         "Starting Rank": "Cadet / Officer I",
-        "Starting Pay": "$1,450 / 15-min paycheck"
+        "Starting Pay": "1,450 CL-Points / 15-min paycheck"
       },
       content: `# 🚓 Paradise Coast Police Department (PCPD) Handbook
 
@@ -229,7 +229,7 @@ The **Paradise Coast Police Department** is dedicated to upholding the law, prot
         "Minimum Crew": "1-3 Players",
         "Tools Needed": "Lab Beakers, Hydrochloric Acid, Pseudoephedrine",
         "Sell Mechanics": "Corner Hustle & Bulk NPC Hand-offs",
-        "Average Profit": "$8,000 - $35,000 / Batch"
+        "Average Profit": "8,000 CL-Points - 35,000 CL-Points / Batch"
       },
       content: `# 💀 Underworld Guide: Drug Synthesis & Turfs
 
@@ -262,7 +262,7 @@ Meth labs require mobile RVs or hidden underground industrial basements.
   ➔ Stir for 45s (Maintain Temp between 140°C - 165°C)
   ➔ Liquid Meth Solution
   ➔ Tray Crystallization (Cooling 5 Mins)
-  ➔ 8x Sky Blue Meth Bags ($4,200/ea Street Value)
+  ➔ 8x Sky Blue Meth Bags (4,200 CL-Points/ea Street Value)
 \`\`\`
 
 ---
@@ -288,7 +288,7 @@ Meth labs require mobile RVs or hidden underground industrial basements.
         "Job Type": "Civilian Non-Whitelisted",
         "Location": "Davis Quartz Quarry",
         "Required Gear": "Pickaxe, Drill, Hardhat",
-        "Hourly Income": "$12,000 - $22,000 / Hour",
+        "Hourly Income": "12,000 CL-Points - 22,000 CL-Points / Hour",
         "Skill Progression": "Level 1 (Rock) ➔ Level 10 (Diamonds)"
       },
       content: `# ⛏️ Civilian Career: Mining, Smelting & Jewelry
@@ -302,8 +302,8 @@ Looking for an honest, high-yield living that keeps you away from handcuffs? Min
 ### 1. Equipment & Location
 - Head to any **Hardware Store** (Icon 🔨 on GPS).
 - Purchase:
-  - **1x Steel Pickaxe** ($450) or **Heavy Duty Jackhammer** ($2,200)
-  - **1x Mining Wash Pan** ($150)
+  - **1x Steel Pickaxe** (450 CL-Points) or **Heavy Duty Jackhammer** (2,200 CL-Points)
+  - **1x Mining Wash Pan** (150 CL-Points)
 - Drive to **Davis Quartz Quarry** located in eastern San Chianski.
 
 ---
@@ -312,11 +312,11 @@ Looking for an honest, high-yield living that keeps you away from handcuffs? Min
 
 | Ore Type | Node Rarity | Smelting Output | Value per Ingot |
 | :--- | :--- | :--- | :--- |
-| **Copper Ore** | Common (60%) | 2x Copper Ingots | $180 |
-| **Iron Ore** | Common (50%) | 2x Iron Ingots | $260 |
-| **Silver Ore** | Uncommon (25%) | 1x Silver Ingot | $520 |
-| **Gold Ore** | Rare (10%) | 1x Gold Bar | $1,250 |
-| **Uncut Diamond** | Ultra Rare (3%) | 1x Polished Diamond | $3,800 |
+| **Copper Ore** | Common (60%) | 2x Copper Ingots | 180 CL-Points |
+| **Iron Ore** | Common (50%) | 2x Iron Ingots | 260 CL-Points |
+| **Silver Ore** | Uncommon (25%) | 1x Silver Ingot | 520 CL-Points |
+| **Gold Ore** | Rare (10%) | 1x Gold Bar | 1,250 CL-Points |
+| **Uncut Diamond** | Ultra Rare (3%) | 1x Polished Diamond | 3,800 CL-Points |
 
 ---
 
@@ -324,7 +324,7 @@ Looking for an honest, high-yield living that keeps you away from handcuffs? Min
 
 Take your unrefined ores to the **Industrial Foundry at Cypress Flats**:
 - **Smelt Ingots:** Insert raw ore into the furnace. Requires 1x Coal per smelt.
-- **Jewelry Bench:** Combine \`1x Gold Bar + 1x Polished Diamond\` ➔ **Diamond Ring** ($5,500 at Vangelico Wholesale).`
+- **Jewelry Bench:** Combine \`1x Gold Bar + 1x Polished Diamond\` ➔ **Diamond Ring** (5,500 CL-Points at Vangelico Wholesale).`
     },
     {
       id: "server-keybinds-and-commands",
@@ -436,7 +436,7 @@ When arriving at mass-casualty incidents (such as shootout scenes or highway mul
         "Progression Tier": "Tier 1 (Store) ➔ Tier 4 (Vault)",
         "Minimum Police": "2 to 6 PCPD Officers",
         "Required Gear": "Lockpicks, Laptop, Thermite, Drill",
-        "Reward Range": "$15,000 - $350,000 Dirty Cash",
+        "Reward Range": "15,000 CL-Points - 350,000 CL-Points Black Market Rep",
         "Cooldown": "45 Mins - 2 Hours"
       },
       content: `# 🏦 Bank Robbery & Heist Progression Guide
@@ -458,10 +458,10 @@ Executing heists in Paradise Coast requires careful preparation, the right tools
 
 | Heist Target | Min Police Online | Key Requirements | Typical Payout |
 | :--- | :--- | :--- | :--- |
-| **24/7 & Gas Stations** | 2 PCPD | 1x Standard Lockpick + Threat Weapon | $1,500 - $3,500 Cash + Register Items |
-| **Fleeca Bank** | 3 PCPD | 1x Green Crypto Laptop + 1x Thermite Charge | $25,000 - $45,000 Dirty Cash + Gold Bars |
-| **Paleto Savings Bank** | 4 PCPD | 1x Blue Hacking USB + 2x Thermite + Drill | $75,000 - $130,000 Dirty Cash + Rare Gems |
-| **Central Pacific Vault** | 6 PCPD | 1x Red Military Cryptor + 4x Thermite + Laser | $250,000 - $500,000 Dirty Cash + Crypto Drives |
+| **24/7 & Gas Stations** | 2 PCPD | 1x Standard Lockpick + Threat Weapon | 1,500 CL-Points - 3,500 CL-Points + Register Items |
+| **Fleeca Bank** | 3 PCPD | 1x Green Crypto Laptop + 1x Thermite Charge | 25,000 CL-Points - 45,000 CL-Points Black Market Rep + Gold Bars |
+| **Paleto Savings Bank** | 4 PCPD | 1x Blue Hacking USB + 2x Thermite + Drill | 75,000 CL-Points - 130,000 CL-Points Black Market Rep + Rare Gems |
+| **Central Pacific Vault** | 6 PCPD | 1x Red Military Cryptor + 4x Thermite + Laser | 250,000 CL-Points - 500,000 CL-Points Black Market Rep + Crypto Drives |
 
 ---
 
@@ -555,7 +555,7 @@ Upon landing at the Los Santos International Airport, every new resident receive
     { code: "PC-102", title: "Reckless Driving & Endangerment", category: "Traffic", fine: 750, jailMonths: 5, points: 4, severity: "Misdemeanor" },
     { code: "PC-103", title: "Driving Under the Influence (DUI)", category: "Traffic", fine: 1200, jailMonths: 10, points: 6, severity: "Misdemeanor" },
     { code: "PC-104", title: "Evading Law Enforcement in Motor Vehicle", category: "Traffic", fine: 2500, jailMonths: 15, points: 6, severity: "Felony" },
-    { code: "PC-201", title: "Petty Theft (Under $2,000)", category: "Theft", fine: 500, jailMonths: 5, points: 0, severity: "Misdemeanor" },
+    { code: "PC-201", title: "Petty Theft (Under 2,000 CL-Points)", category: "Theft", fine: 500, jailMonths: 5, points: 0, severity: "Misdemeanor" },
     { code: "PC-202", title: "Grand Theft Auto (Vehicle Theft)", category: "Theft", fine: 2000, jailMonths: 15, points: 0, severity: "Felony" },
     { code: "PC-203", title: "Armed Robbery of Commercial Business (24/7 / Gas Station)", category: "Robbery", fine: 4500, jailMonths: 25, points: 0, severity: "Felony" },
     { code: "PC-204", title: "Armed Robbery of Financial Institution (Fleeca / Bank)", category: "Robbery", fine: 8500, jailMonths: 40, points: 0, severity: "Class A Felony" },
@@ -703,10 +703,10 @@ Upon landing at the Los Santos International Airport, every new resident receive
       hiring: true,
       description: "Premier custom automotive workshop offering engine swaps, turbochargers, widebody kits, and nitro purge.",
       services: [
-        { name: "Full Performance Tune-Up", price: "$4,500" },
-        { name: "Turbo Installation", price: "$12,500" },
-        { name: "Custom Widebody Conversion", price: "$18,000" },
-        { name: "Vehicle Armor Plating (Tier 1)", price: "$8,000" }
+        { name: "Full Performance Tune-Up", price: "4,500 CL-Points" },
+        { name: "Turbo Installation", price: "12,500 CL-Points" },
+        { name: "Custom Widebody Conversion", price: "18,000 CL-Points" },
+        { name: "Vehicle Armor Plating (Tier 1)", price: "8,000 CL-Points" }
       ]
     },
     {
@@ -719,9 +719,9 @@ Upon landing at the Los Santos International Airport, every new resident receive
       hiring: true,
       description: "Fast food diner supplying hunger/thirst replenishment, Bleeder burgers, and Heart Stopper combos with stamina buffs.",
       services: [
-        { name: "The Bleeder Burger Combo", price: "$45" },
-        { name: "Moneyshot Giant Burger", price: "$65" },
-        { name: "Torpedo Sub & Large Cola", price: "$50" }
+        { name: "The Bleeder Burger Combo", price: "45 CL-Points" },
+        { name: "Moneyshot Giant Burger", price: "65 CL-Points" },
+        { name: "Torpedo Sub & Large Cola", price: "50 CL-Points" }
       ]
     },
     {
@@ -734,8 +734,8 @@ Upon landing at the Los Santos International Airport, every new resident receive
       hiring: false,
       description: "High-stakes blackjack, roulette, three-card poker, daily lucky wheel spins, and penthouse suites.",
       services: [
-        { name: "VIP Casino Membership Card", price: "$2,500" },
-        { name: "High-Roller Penthouse Suite", price: "$250,000" },
+        { name: "VIP Casino Membership Card", price: "2,500 CL-Points" },
+        { name: "High-Roller Penthouse Suite", price: "250,000 CL-Points" },
         { name: "Lucky Wheel Spin", price: "Free (1x Daily)" }
       ]
     },
@@ -749,10 +749,10 @@ Upon landing at the Los Santos International Airport, every new resident receive
       hiring: true,
       description: "Licensed property broker for suburban houses, beach villas, luxury penthouses, stashes, and warehouse compounds.",
       services: [
-        { name: "Alta St Starter Apartment (Free)", price: "$0" },
-        { name: "Del Perro Modern Beach Condo", price: "$85,000" },
-        { name: "Vinewood Hills Mansion Compound", price: "$450,000" },
-        { name: "Industrial Stash Warehouse", price: "$120,000" }
+        { name: "Alta St Starter Apartment (Free)", price: "0 CL-Points" },
+        { name: "Del Perro Modern Beach Condo", price: "85,000 CL-Points" },
+        { name: "Vinewood Hills Mansion Compound", price: "450,000 CL-Points" },
+        { name: "Industrial Stash Warehouse", price: "120,000 CL-Points" }
       ]
     },
     {
@@ -765,9 +765,9 @@ Upon landing at the Los Santos International Airport, every new resident receive
       hiring: true,
       description: "Fresh ocean catch restaurant buying high-grade tuna, salmon, and crabs from local civilian deep sea fishermen.",
       services: [
-        { name: "Wholesale Fish Buyback (Per KG)", price: "$120 - $450" },
-        { name: "Lobster Thermidor Platter", price: "$95" },
-        { name: "Deep Sea Fishing Bait & Tackle Box", price: "$150" }
+        { name: "Wholesale Fish Buyback (Per KG)", price: "120 CL-Points - 450 CL-Points" },
+        { name: "Lobster Thermidor Platter", price: "95 CL-Points" },
+        { name: "Deep Sea Fishing Bait & Tackle Box", price: "150 CL-Points" }
       ]
     }
   ],

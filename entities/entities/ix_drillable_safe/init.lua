@@ -84,7 +84,7 @@ function ENT:Use(activator, caller)
             if inventory then
                 inventory:Add("loot_bag", 1, { value = math.random(3000, 7500) }, function(success)
                     if success then
-                        caller:Notify("You looted a Duffel Bag of Cash from the safe!")
+                        caller:Notify("You looted a Duffel Bag of CL-Points from the safe!")
                         self:SetIsOpen(false)
                         self:SetDrillProgress(0)
                     else

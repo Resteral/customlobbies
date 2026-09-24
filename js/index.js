@@ -78,8 +78,9 @@ Helix.server(async () => {
     require('./server/mining_smelting.js');
     require('./server/weapon_gunsmith.js');
     require('./server/special_ammunition.js');
+    require('./server/studio_companion_server.js');
     require('./server/helix_matchmaking_bridge.js');
-    console.log('[HELIX SERVER] ✓ All Server Modules, Tow Truck, Gunsmith, Exotic Ammo, Mining, Housing & Drug Systems Loaded.');
+    console.log('[HELIX SERVER] ✓ All Server Modules, Studio AI Architect (F6), Tow Truck, Gunsmith, Mining Loaded.');
   } catch (err) {
     console.error('[HELIX SERVER] Error loading modules:', err);
   }
@@ -102,7 +103,8 @@ Helix.client(() => {
     require('./client/housing_client.js');
     require('./client/building_toolgun.js');
     require('./client/gunsmith_client.js');
-    console.log('[HELIX CLIENT] ✓ Client HUD, Gunsmith (F10), Mining Foundry (F11), Toolgun (B) Loaded Successfully.');
+    require('./client/studio_companion_client.js');
+    console.log('[HELIX CLIENT] ✓ Client HUD, AI Studio Companion (F6), Gunsmith (F10), Foundry (F11), Toolgun (B) Loaded.');
   } catch (err) {
     console.log('[HELIX CLIENT] Client script active.');
   }
