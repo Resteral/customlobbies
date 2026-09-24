@@ -3032,10 +3032,13 @@ class CustomLobbiesApp {
     const usernameInput = document.getElementById('signInUsername');
     const passwordInput = document.getElementById('signInPassword');
 
-    const username = usernameInput ? usernameInput.value.trim() : 'Sean';
-    const password = passwordInput ? passwordInput.value : 'password123';
+    const username = usernameInput ? usernameInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value : '';
 
-    if (!username) return;
+    if (!username || !password) {
+      alert("Please enter both email and password.");
+      return;
+    }
 
     if (this.user) {
       this.signOutUser();
@@ -3064,25 +3067,9 @@ class CustomLobbiesApp {
         window.firebaseGoogleEngine.speakTextAlert(`Welcome back ${this.user.displayName}`);
       }
 
-      alert(`🎉 SIGN IN SUCCESSFUL (JWT SIGNED & VERIFIED)!\n\nWelcome back, ${this.user.displayName}!\nJWT Token Issued • Ring 0 Guardian Anti-Cheat Active.`);
-    } else {
-      this.user = {
-        username: username,
-        displayName: username,
-        email: `${username.toLowerCase()}@customlobbies.com`,
-        elo: 1840,
-        level: 8,
-        title: '💎 Diamond Veteran',
-        avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
-        acVerified: true,
-        provider: 'email'
-      };
-
-      localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
-      this.updateUserAuthUI();
-      this.closeAuthModal();
-
       alert(`🎉 SIGN IN SUCCESSFUL!\n\nWelcome back, ${this.user.displayName}!`);
+    } else {
+      alert("Auth backend is not initialized.");
     }
   }
 
@@ -3092,12 +3079,15 @@ class CustomLobbiesApp {
     const passwordInput = document.getElementById('regPassword');
     const primaryGameSelect = document.getElementById('regPrimaryGame');
 
-    const username = usernameInput ? usernameInput.value.trim() : 'Recruit';
-    const email = emailInput ? emailInput.value.trim() : 'recruit@customlobbies.com';
-    const password = passwordInput ? passwordInput.value : 'password123';
+    const username = usernameInput ? usernameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value : '';
     const primaryGame = primaryGameSelect ? primaryGameSelect.value : 'Counter-Strike 2';
 
-    if (!username || !email) return;
+    if (!username || !email || !password) {
+      alert("Please fill in all registration fields.");
+      return;
+    }
 
     if (window.authBackend) {
       const res = await window.authBackend.registerUser({ username, email, password, primaryGame });
@@ -3111,21 +3101,22 @@ class CustomLobbiesApp {
       this.updateUserAuthUI();
       this.closeAuthModal();
 
-      alert(`✨ VERIFIED ACCOUNT CREATED!\n\nWelcome to CustomLobbies, ${this.user.displayName}!\nPassword hashed via WebCrypto SHA-256 + Salt • JWT Token Issued.`);
+      alert(`✨ ACCOUNT CREATED!\n\nWelcome to CustomLobbies, ${this.user.displayName}!`);
+    } else {
+      alert("Auth backend is not initialized.");
     }
   }
 
-  handleOAuthSignIn(provider) {
+  async handleOAuthSignIn(provider) {
     if (window.authBackend) {
-      const res = window.authBackend.processOAuthLogin(provider);
-      if (res.success) {
-        this.user = res.user;
-        localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
-        this.updateUserAuthUI();
-        this.closeAuthModal();
-
-        alert(`🎮 LINKED WITH ${provider.toUpperCase()}!\n\nSigned in as ${this.user.displayName}.\nOAuth 2.0 Identity Verified & JWT Token Issued!`);
+      const res = await window.authBackend.processOAuthLogin(provider);
+      if (!res.success) {
+        alert(res.error);
       }
+      // If success, Supabase will redirect the page to the OAuth provider,
+      // so no further UI updates are needed here until they return.
+    } else {
+      alert("Auth backend is not initialized.");
     }
   }
 

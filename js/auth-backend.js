@@ -287,60 +287,28 @@ class AuthBackendEngine {
     }
   }
 
-  processOAuthLogin(provider) {
-    const oauthProfiles = {
-      google: {
-        displayName: 'Sean (Google Verified)',
-        email: 'sean.customlobbies@gmail.com',
-        avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
-        provider: 'Google Cloud Auth'
-      },
-      steam: {
-        displayName: 'Sean_Gamer [Steam]',
-        email: 'sean.steam@customlobbies.com',
-        avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
-        provider: 'Steam Community OpenID'
-      },
-      discord: {
-        displayName: 'Sean#9999 (Discord)',
-        email: 'sean.discord@customlobbies.com',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
-        provider: 'Discord OAuth2'
-      },
-      twitch: {
-        displayName: 'SeanStreamer (Twitch)',
-        email: 'sean.twitch@customlobbies.com',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
-        provider: 'Twitch Streamer Auth'
-      },
-      riot: {
-        displayName: 'Sean#NA1 (Riot ID)',
-        email: 'sean.riot@customlobbies.com',
-        avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
-        provider: 'Riot Games Connect'
-      }
-    };
+  async processOAuthLogin(provider) {
+    const supabase = this.getSupabaseClient();
+    
+    if (!supabase) {
+        return { success: false, error: '⚠️ Supabase is not configured! Please enter your URL and Anon Key in js/auth-backend.js.' };
+    }
 
-    const prof = oauthProfiles[provider] || oauthProfiles.google;
-    const user = {
-      id: `USR-OAUTH-${Date.now().toString().slice(-4)}`,
-      username: prof.displayName,
-      displayName: prof.displayName,
-      email: prof.email,
-      elo: 1840,
-      level: 8,
-      title: '💎 Diamond Veteran',
-      avatar: prof.avatar,
-      acVerified: true,
-      twoFactorEnabled: false,
-      provider: prof.provider,
-      createdDate: new Date().toISOString().split('T')[0]
-    };
+    try {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: provider,
+        });
 
-    const jwtToken = this.generateJWT(user);
-    this.logAudit(user.username, 'OAUTH_LOGIN_SUCCESS', `OAuth handshake via ${prof.provider}`);
+        if (error) {
+            return { success: false, error: `❌ OAUTH FAILED!\n\n${error.message}` };
+        }
 
-    return { success: true, user, jwtToken };
+        // Supabase OAuth redirects the browser, so we won't return data directly here in the traditional way,
+        // but we'll simulate the successful redirect start.
+        return { success: true, redirecting: true };
+    } catch (e) {
+        return { success: false, error: 'Network error connecting to Supabase.' };
+    }
   }
 
   getUsersDatabase() {
