@@ -2692,6 +2692,7 @@ class CustomLobbiesApp {
     this.bannedMaps.clear();
     this.selectedMatchMap = null;
     this.vetoTurn = 'Team Alpha';
+    this.cs2MatchCode = null;
     this.vetoLogs = [`• Map veto session reset.`];
     this.renderMapVetoGrid();
   }
@@ -2708,7 +2709,24 @@ class CustomLobbiesApp {
 
     this.closeMapVetoModal();
     if (finalMap) {
-      this.triggerMatchFoundModal(`${this.currentDraftGame} • Premier Scrim (${finalMap})`);
+      if (this.currentDraftGame === 'Counter-Strike 2') {
+        // Find who lost the faceoff
+        const mapPicker = this.vetoTurn; // Or whoever picked
+        const loser = mapPicker === 'Team Alpha' ? 'Team Bravo' : 'Team Alpha';
+
+        const code = prompt(`🎮 MAP SELECTED: ${finalMap}\n\nThe team that lost the faceoff (${loser}) must generate a Private Matchmaking Code in CS2.\n\nCaptain of ${loser}, please enter the CS2 Matchmaking Code here to host the lobby:`);
+        
+        if (!code) {
+          alert('❌ A CS2 Matchmaking Code is required to host the lobby! Veto phase aborted.');
+          return;
+        }
+
+        this.cs2MatchCode = code;
+        this.triggerMatchFoundModal(`${this.currentDraftGame} • Premier Scrim (${finalMap})`);
+      } else {
+        this.cs2MatchCode = null;
+        this.triggerMatchFoundModal(`${this.currentDraftGame} • Premier Scrim (${finalMap})`);
+      }
     } else {
       alert('⚠️ All maps were banned! Reset the veto session to start over.');
     }
@@ -3946,7 +3964,11 @@ class CustomLobbiesApp {
     const btn = document.getElementById('btnAcceptMatchAction');
     if (btn) {
       btn.classList.add('accepted');
-      btn.innerHTML = '<span>✔ MATCH ACCEPTED! CONNECTING TO SERVER...</span>';
+      if (this.cs2MatchCode) {
+          btn.innerHTML = `<span>✔ ACCEPTED! JOIN CS2 LOBBY CODE: ${this.cs2MatchCode}</span>`;
+      } else {
+          btn.innerHTML = '<span>✔ MATCH ACCEPTED! CONNECTING TO SERVER...</span>';
+      }
     }
 
     if (window.widgetBuilderEngine) {
@@ -3956,11 +3978,16 @@ class CustomLobbiesApp {
     setTimeout(() => {
       const modal = document.getElementById('matchFoundModal');
       if (modal) modal.classList.remove('active');
-      alert('🚀 MATCH READY & CONNECTED!\n\n128-tick server node session started. Guardian Anti-Cheat Active.\n\nPost-match honor assessment will launch automatically upon game completion.');
+      
+      if (this.cs2MatchCode) {
+          alert(`🚀 CS2 MATCH READY!\n\nDirect Connect Code: ${this.cs2MatchCode}\n\n1. Open Counter-Strike 2\n2. Go to Play -> Matchmaking -> Private Matchmaking\n3. Enter the code '${this.cs2MatchCode}' to direct connect to the lobby!\n\nPost-match honor assessment will launch automatically upon game completion.`);
+      } else {
+          alert('🚀 MATCH READY & CONNECTED!\n\n128-tick server node session started. Guardian Anti-Cheat Active.\n\nPost-match honor assessment will launch automatically upon game completion.');
+      }
 
       // Automatically launch post-game honor screen after match concludes
       setTimeout(() => {
-        this.openPostGameHonorModal('CS2 Premier 5v5 Scrim');
+        this.openPostGameHonorModal(this.cs2MatchCode ? 'CS2 Premier 5v5 Scrim' : '5v5 Premier Scrim');
       }, 2500);
     }, 1500);
   }
