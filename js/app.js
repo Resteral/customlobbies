@@ -442,7 +442,26 @@ class CustomLobbiesApp {
       window.widgetBuilderEngine.playSoundEffect('cheer');
     }
 
-    alert(`➕ PLAYER RECRUITED!\n\nYou invited ${player.name} (${player.game} - ${player.role}) to join your Custom Lobby or Tournament Squad! Notification dispatched!`);
+    if (!this.myCreatedTeams || this.myCreatedTeams.length === 0) {
+      alert(`⚠️ NO TEAM FOUND!\n\nYou must Create a Team first before recruiting Free Agents!`);
+      return;
+    }
+
+    const team = this.myCreatedTeams[0];
+    if (!team.applications) team.applications = [];
+    
+    // Add them as a pending request to be managed
+    team.applications.push({
+      name: player.name,
+      role: player.role,
+      elo: player.elo
+    });
+
+    localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
+    
+    alert(`📨 DRAFT POOL REQUEST SENT!\n\n${player.name} has been added to ${team.name}'s incoming recruitment requests for your review.`);
+    
+    this.openManageTeamModal(team.id);
   }
 
   // FACEIT-Style Match Room & Ready Check connected to Helix Server
@@ -1777,23 +1796,42 @@ class CustomLobbiesApp {
       this.showToast(`📥 Invite sent! You offered ${playerName} a spot on your team.`, 'success');
     }
     
-    // Play sound if available
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('fanfare');
     }
     
-    setTimeout(() => {
-        alert(`🤝 RECRUITMENT ACCEPTED!\n\n${playerName} (${callsign}) has accepted your invite and joined your Team Roster!`);
-        
-        // Find and update the solo player status to "Recruited"
-        if (window.wardogsEngine) {
-            const player = window.wardogsEngine.soloMercenaries.find(p => p.id == playerId);
-            if (player) {
-                player.status = 'Drafted to Team';
-                this.renderWardogsView();
-            }
+    if (!this.myCreatedTeams || this.myCreatedTeams.length === 0) {
+      alert(`⚠️ NO TEAM FOUND!\n\nYou must Create a Team first before recruiting Free Agents!`);
+      return;
+    }
+
+    const team = this.myCreatedTeams[0];
+    if (!team.applications) team.applications = [];
+    
+    // Find player role
+    let pRole = 'Flex';
+    let pElo = 2150;
+    if (window.wardogsEngine) {
+        const player = window.wardogsEngine.soloMercenaries.find(p => p.id == playerId);
+        if (player) {
+            pRole = player.role || 'Flex';
+            pElo = player.elo || 2150;
+            player.status = 'Drafted to Team';
+            this.renderWardogsView();
         }
-    }, 1500);
+    }
+
+    team.applications.push({
+      name: `${playerName} (${callsign})`,
+      role: pRole,
+      elo: pElo
+    });
+
+    localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
+    
+    alert(`📨 DRAFT POOL REQUEST SENT!\n\n${playerName} has been added to ${team.name}'s incoming recruitment requests for your review.`);
+    
+    this.openManageTeamModal(team.id);
   }
 
   openCreateTeamModal() {
@@ -2082,6 +2120,10 @@ class CustomLobbiesApp {
       game,
       size,
       members,
+      applications: [
+        { name: 'Valkyrie_Merc', role: '🎯 Sniper', elo: 2150 },
+        { name: 'Shadow_K9', role: '⚡ Entry Fragger', elo: 1980 }
+      ],
       record: '0W - 0L',
       elo: Math.floor(2150 + Math.random() * 350),
       kd: '2.30',
@@ -2171,6 +2213,25 @@ class CustomLobbiesApp {
           `).join('')}
         </div>
 
+        ${(team.applications && team.applications.length > 0) ? `
+          <h4 style="font-size: 0.95rem; font-weight: 800; color: #ffab00; margin-bottom: 0.6rem;">📨 Incoming Recruitment Requests</h4>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+            ${team.applications.map((app, idx) => `
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,111,0,0.1); padding: 0.55rem 0.85rem; border-radius: 6px; border: 1px solid rgba(255,111,0,0.4);">
+                <div>
+                  <div style="font-size: 0.85rem; font-weight: 800; color: #fff;">${app.name}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">${app.role || 'Flex'} • ${app.elo || 2150} ELO</div>
+                </div>
+                <div style="display: flex; gap: 0.4rem;">
+                  <button class="btn btn-primary btn-sm" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;" onclick="window.app.acceptTeamApplication('${team.id}', ${idx})">Accept</button>
+                  <button class="btn btn-secondary btn-sm" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;" onclick="window.app.declineTeamApplication('${team.id}', ${idx})">Decline</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
           <button class="btn btn-purple btn-sm" style="flex: 1;" onclick="window.app.closeManageTeamModal(); window.app.openTeamScrimModal('${team.id}');">
             ⚔️ Queue Team Scrim
@@ -2178,8 +2239,8 @@ class CustomLobbiesApp {
           <button class="btn btn-cyan btn-sm" style="flex: 1;" onclick="alert('🏆 LEAGUE ENTRY CONFIRMED!\\n\\n${team.name} registered into the Active Esports Championship League!')">
             🏆 Register for League
           </button>
-          <button class="btn btn-secondary btn-sm" onclick="window.app.autoRecruitForTeam('${team.id}')">
-            ➕ Recruit Free Agent
+          <button class="btn btn-secondary btn-sm" onclick="window.app.browseDraftPool('${team.id}')">
+            ➕ Browse Draft Pool
           </button>
         </div>
       `;
@@ -2208,18 +2269,49 @@ class CustomLobbiesApp {
     if (modal) modal.classList.remove('active');
   }
 
-  autoRecruitForTeam(teamId) {
-    const team = this.myCreatedTeams.find(t => t.id === teamId);
-    if (!team) return;
+  browseDraftPool(teamId) {
+    this.closeManageTeamModal();
+    this.switchTab('lobbies');
+    setTimeout(() => {
+      const draftPool = document.getElementById('livePoolFeedContainer');
+      if (draftPool) {
+        draftPool.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }
 
-    const newRecruit = `Recruit_${Math.floor(100 + Math.random() * 900)} (Flex)`;
+  acceptTeamApplication(teamId, index) {
+    const team = this.myCreatedTeams.find(t => t.id === teamId);
+    if (!team || !team.applications || !team.applications[index]) return;
+
+    const app = team.applications[index];
     if (!team.members) team.members = [team.captain || 'Sean'];
-    team.members.push(newRecruit);
+    
+    if (team.members.length >= team.size && team.size !== 33) {
+      alert(`⚠️ ROSTER FULL!\n\nYour team is already at max capacity (${team.size}).`);
+      return;
+    }
+
+    team.members.push(app.name);
+    team.applications.splice(index, 1);
 
     localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
     this.openManageTeamModal(teamId);
     this.renderMyCreatedTeams();
-    alert(`🎉 RECRUIT ADDED!\n\n${newRecruit} has joined ${team.name}!`);
+    alert(`✅ APPLICATION ACCEPTED!\n\n${app.name} has joined ${team.name}!`);
+  }
+
+  declineTeamApplication(teamId, index) {
+    const team = this.myCreatedTeams.find(t => t.id === teamId);
+    if (!team || !team.applications || !team.applications[index]) return;
+
+    const app = team.applications[index];
+    team.applications.splice(index, 1);
+
+    localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(this.myCreatedTeams));
+    this.openManageTeamModal(teamId);
+    this.renderMyCreatedTeams();
+    alert(`❌ APPLICATION DECLINED.\n\n${app.name}'s request was rejected.`);
   }
 
   openTeamScrimModal(teamId) {
