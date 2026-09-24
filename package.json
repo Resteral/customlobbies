@@ -18,7 +18,7 @@
     "crypto-mining",
     "pacifica"
   ],
-  "main": "js/index.js",
+  "main": "main-desktop.js",
   "server": "js/index.js",
   "client": "js/index.js",
   "mapConfig": "maps/pacifica_crime_map.json",
@@ -45,7 +45,11 @@
     "helix:client": "node tools/helix-system-builder.js client",
     "helix:ui": "node tools/helix-system-builder.js ui",
     "helix:poi": "node tools/helix-system-builder.js poi",
-    "helix:help": "node tools/helix-system-builder.js help"
+    "helix:help": "node tools/helix-system-builder.js help",
+    "build:exe": "electron-packager . CustomLobbies --platform=win32 --arch=x64 --out=program --overwrite --ignore=\"^/(node_modules|dist|program|models_raw|fivem_.*|gamemode|drug_crafting_minigame|helix_hospitality|munchies_complete|outbreak_game|perkpulse|qbx_.*|salty_ai_arena|standalone_drug_turfs|tools|trackball-tracker|weed_icecream_truck|maps|entities|items|\\.git|discord-bot)\""
   },
-  "dependencies": {}
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-packager": "^17.1.2"
+  }
 }
