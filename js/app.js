@@ -5559,7 +5559,73 @@ class CustomLobbiesApp {
       if(color) color.value = settings.accentColor || '#00f2fe';
       if(ann) ann.value = settings.announcement || '';
       if(gk) gk.checked = settings.requireGatekeeper || false;
+      
+      this.renderAdminServerList();
     }
+  }
+
+  renderAdminServerList() {
+      const container = document.getElementById('adminServerList');
+      if (!container) return;
+      
+      let guilds = {};
+      if (window.chatVoiceManager && window.chatVoiceManager.guilds) {
+          guilds = window.chatVoiceManager.guilds;
+      }
+      
+      container.innerHTML = '';
+      for (const [key, guild] of Object.entries(guilds)) {
+          const row = document.createElement('div');
+          row.style = 'display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid var(--border-color);';
+          row.innerHTML = `
+             <div style="display:flex; align-items:center; gap: 0.8rem;">
+                 <span style="font-size: 1.2rem;">${guild.icon}</span>
+                 <div>
+                    <strong style="color: #fff;">${guild.name}</strong>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">ID: ${key}</div>
+                 </div>
+             </div>
+             <button class="btn btn-secondary btn-sm" onclick="window.app.adminRemoveServer('${key}')">❌</button>
+          `;
+          container.appendChild(row);
+      }
+  }
+
+  adminAddServer() {
+      const idInput = document.getElementById('adminNewServerId');
+      const titleInput = document.getElementById('adminNewServerTitle');
+      const emojiInput = document.getElementById('adminNewServerEmoji');
+      
+      if (!idInput || !titleInput || !emojiInput) return;
+      
+      const key = idInput.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+      const name = titleInput.value.trim();
+      const icon = emojiInput.value.trim() || '💬';
+      
+      if (!key || !name) {
+          alert("ID and Title are required.");
+          return;
+      }
+      
+      if (window.chatVoiceManager) {
+          window.chatVoiceManager.guilds[key] = { name, icon };
+          localStorage.setItem('cl_admin_servers', JSON.stringify(window.chatVoiceManager.guilds));
+          window.chatVoiceManager.renderGuildRail();
+          this.renderAdminServerList();
+          
+          idInput.value = '';
+          titleInput.value = '';
+          emojiInput.value = '';
+      }
+  }
+  
+  adminRemoveServer(key) {
+      if (window.chatVoiceManager && window.chatVoiceManager.guilds[key]) {
+          delete window.chatVoiceManager.guilds[key];
+          localStorage.setItem('cl_admin_servers', JSON.stringify(window.chatVoiceManager.guilds));
+          window.chatVoiceManager.renderGuildRail();
+          this.renderAdminServerList();
+      }
   }
 
   closeAdminDashboard() {

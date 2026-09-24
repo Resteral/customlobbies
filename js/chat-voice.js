@@ -37,12 +37,16 @@ class ChatVoiceManager {
     this.currentTriviaIdx = 0;
     this.triviaScore = 0;
 
-    this.guilds = {
+    const defaultGuilds = {
       'hotgirl': { name: 'Hot Girl Central', icon: '🔥' },
       'cs2scrims': { name: 'CS2 Scrims & LFG', icon: '🎯' },
       'wardogs': { name: 'WARDOG HQ', icon: '🐕' },
       'debate': { name: 'Debate Arena', icon: '🗣️' }
     };
+    
+    // Load from admin settings if present
+    const savedGuilds = localStorage.getItem('cl_admin_servers');
+    this.guilds = savedGuilds ? JSON.parse(savedGuilds) : defaultGuilds;
 
     this.availableStickers = [
       { id: 'fire', emoji: '🔥', name: 'Fire Play' },
@@ -148,6 +152,7 @@ class ChatVoiceManager {
   }
 
   init() {
+    this.renderGuildRail();
     this.loadPinnedStickers();
     this.loadChatTheme();
     this.renderMessages();
@@ -155,6 +160,42 @@ class ChatVoiceManager {
     this.renderStickerPalette();
     this.renderDashboardStickers();
     this.setupEventListeners();
+  }
+
+  renderGuildRail() {
+    const rail = document.getElementById('discordServerRailContainer');
+    if (!rail) return;
+    
+    // Clear existing servers (keep the boost badge container)
+    Array.from(rail.children).forEach(child => {
+        if (child.id !== 'serverBoostBadgeContainer') {
+            child.remove();
+        }
+    });
+
+    const boostBadge = document.getElementById('serverBoostBadgeContainer');
+
+    for (const [key, guild] of Object.entries(this.guilds)) {
+      const el = document.createElement('div');
+      el.className = `server-icon ${this.activeGuild === key ? 'active' : ''}`;
+      el.setAttribute('data-guild', key);
+      el.title = guild.name;
+      el.innerHTML = `<span>${guild.icon}</span>`;
+      
+      if (boostBadge) {
+          rail.insertBefore(el, boostBadge);
+      } else {
+          rail.appendChild(el);
+      }
+    }
+    
+    // Reattach listeners to newly created icons
+    document.querySelectorAll('.server-icon').forEach(icon => {
+      icon.addEventListener('click', (e) => {
+        const guildId = e.currentTarget.getAttribute('data-guild');
+        if (guildId) this.switchGuild(guildId);
+      });
+    });
   }
 
   loadChatTheme() {
