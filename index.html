@@ -61,6 +61,9 @@
       <button class="nav-btn" data-tab="leaderboard-view">
         <span>👑</span> Leaderboards
       </button>
+      <button class="nav-btn" data-tab="guide-view">
+        <span>📖</span> How To Play
+      </button>
       <button class="nav-btn" data-tab="debate-view">
         <span>🗣️</span> Debate Arena
       </button>
@@ -163,6 +166,60 @@
   <main class="app-container">
 
     <!-- 1. LOBBIES & MATCHMAKING QUEUE VIEW -->
+    <!-- ============================================== -->
+    <!-- HOW TO PLAY / GUIDE VIEW (Newly Added)         -->
+    <!-- ============================================== -->
+    <section id="guide-view" class="view-section" style="display: none; padding: 2rem; max-width: 900px; margin: 0 auto;">
+      <div class="glass-panel" style="padding: 2.5rem;">
+        <h2 class="hero-title" style="font-size: 2.2rem; margin-bottom: 1.5rem; text-align: center;">📖 How To Play & Use CustomLobbies</h2>
+        <p style="color: var(--text-dim); text-align: center; margin-bottom: 2.5rem; font-size: 1.1rem;">
+          Welcome to the ultimate hub for private matchmaking, custom tournaments, and squad building. Here is everything you need to know to get started.
+        </p>
+
+        <div style="display: grid; gap: 2rem;">
+          <!-- Step 1 -->
+          <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+            <h3 style="color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>1️⃣</span> Create or Join a Lobby
+            </h3>
+            <p style="color: #e2e8f0; line-height: 1.6;">
+              Head over to the <strong>Lobbies</strong> or <strong>Tournaments</strong> tab. You can browse active lobbies across all supported games (like CS2, FiveM, Rust, and more). If you have a specific rule set, click <strong>Create Custom Lobby</strong> to host your own. Your lobby acts as a virtual waiting room where players gather before the match starts.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+            <h3 style="color: var(--accent-magenta); font-size: 1.3rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>2️⃣</span> The 5-Second Audition (Vibe Check)
+            </h3>
+            <p style="color: #e2e8f0; line-height: 1.6;">
+              To ensure high-quality, non-toxic teammates, premium lobbies use the <strong>Gatekeeper System</strong>. When you apply to join, you'll be prompted to record a quick 5-second webcam/mic intro. The lobby host (and current members) will review this to verify you have a working mic and good vibes before letting you in. 
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+            <h3 style="color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>3️⃣</span> Auto-Join & Play
+            </h3>
+            <p style="color: #e2e8f0; line-height: 1.6;">
+              Once the lobby is full and everyone hits <strong>Ready</strong>, the system will automatically generate a direct-connect protocol link. Clicking it will automatically launch your game (via Steam/Epic) and connect you directly to the private server. No IP typing required.
+            </p>
+          </div>
+
+          <!-- Step 4 -->
+          <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+            <h3 style="color: #facc15; font-size: 1.3rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>4️⃣</span> Earn CL-Points & Reputation
+            </h3>
+            <p style="color: #e2e8f0; line-height: 1.6;">
+              Playing matches, winning tournaments, and being a reliable teammate earns you <strong>CL-Points</strong> and <strong>Reputation</strong>. These virtual points increase your Leaderboard ranking and grant you access to higher-tier, verified-only lobbies. Dropping out early or being toxic lowers your reliability score.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="lobbies-view" class="view-section active">
       <!-- Clean Hero Banner -->
       <div class="lobby-header-banner" style="background: linear-gradient(135deg, rgba(14, 18, 28, 0.92), rgba(6, 8, 14, 0.96)), url('assets/logo.jpg') center/cover no-repeat; border: 1px solid var(--border-color); box-shadow: 0 0 30px rgba(0, 242, 254, 0.15); display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; padding: 2rem; margin-bottom: 0.8rem;">
@@ -4173,6 +4230,9 @@
       </button>
       <button class="nav-btn" data-tab="leaderboard-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=leaderboard-view]').click();">
         <span>👑</span> Leaderboards
+      </button>
+      <button class="nav-btn" data-tab="guide-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=guide-view]').click();">
+        <span>📖</span> How To Play
       </button>
       <button class="nav-btn" data-tab="debate-view" onclick="window.app.toggleMobileNavDrawer(); document.querySelector('[data-tab=debate-view]').click();">
         <span>🗣️</span> Debate Arena
