@@ -25,42 +25,10 @@ class WardogsEngine {
     };
 
     // Official Competitive Circuit Divisions (50,000 CL-Points Prize Pool)
-    this.circuitDivisions = [
-      {
-        id: 'apex-master',
-        name: '🏆 Apex Master League (ELO 2200+)',
-        prizePool: '25,000 CL-Points USD',
-        teams: [
-          { rank: 1, name: 'WARDOG Company Alpha', tag: '[WD-ALPHA]', captain: 'Ghost_Dog_99', wins: 18, losses: 2, points: 54, sectorControl: '42%', elo: 2680, status: '1st Place • Qualified' },
-          { rank: 2, name: 'Iron Claw Battalion Bravo', tag: '[CLAW]', captain: 'Sargeant_Iron', wins: 15, losses: 3, points: 45, sectorControl: '36%', elo: 2450, status: '2nd Place • Qualified' },
-          { rank: 3, name: 'Phantom Brigade Charlie', tag: '[K9-PHANTOM]', captain: 'Shadow_K9', wins: 14, losses: 4, points: 42, sectorControl: '32%', elo: 2380, status: 'Contender' },
-          { rank: 4, name: 'Slapshot Cyber Hounds', tag: '[HOUNDS]', captain: 'Puck_Hunter', wins: 12, losses: 6, points: 36, sectorControl: '28%', elo: 2290, status: 'Contender' }
-        ]
-      },
-      {
-        id: 'dreadnought',
-        name: '🥇 Dreadnought Division (ELO 1800+)',
-        prizePool: '15,000 CL-Points USD',
-        teams: [
-          { rank: 1, name: 'Valkyrie Vanguard', tag: '[VALK]', captain: 'Valkyrie_Merc', wins: 11, losses: 2, points: 33, sectorControl: '38%', elo: 2150, status: 'Division Leader' },
-          { rank: 2, name: 'Titan Armor Corps', tag: '[TITAN]', captain: 'Arkheron_Vanguard', wins: 9, losses: 4, points: 27, sectorControl: '30%', elo: 1980, status: 'Challenger' }
-        ]
-      },
-      {
-        id: 'vanguard-open',
-        name: '🥉 Vanguard Open Division (Free Entry)',
-        prizePool: '10,000 CL-Points USD',
-        teams: [
-          { rank: 1, name: 'Rookie Mercenaries', tag: '[RM]', wins: 7, losses: 1, points: 21, sectorControl: '45%', elo: 1650, status: 'Open Leader' }
-        ]
-      }
-    ];
+    this.circuitDivisions = [];
 
     // Scheduled Live Operations & Scrim Fixtures
-    this.operationsCalendar = [
-      { id: 'OP-401', week: 'WEEK 4 TRI-FACTION SIEGE', title: 'Operation Amber Strike: Citadel Core Siege', teamA: 'WARDOG Company Alpha', teamB: 'Iron Claw Battalion', teamC: 'Phantom Brigade', date: 'Tonight 20:00 EST', map: 'Sector 33 - Quantum Citadel', status: '🔴 LIVE BROADCAST', prize: '5,000 CL-Points Bounty Match' },
-      { id: 'OP-402', week: 'WEEK 5 BATTALION SCRIM', title: 'Operation Cobalt Dawn: Sector B Assault', teamA: 'Valkyrie Vanguard', teamB: 'Titan Armor Corps', teamC: 'Slapshot Cyber Hounds', date: 'Tomorrow 21:00 EST', map: 'Sector 33 - Orbital Core', status: 'UPCOMING', prize: '2,500 CL-Points Bounty Match' }
-    ];
+    this.operationsCalendar = [];
 
     // Tactical Sector Capture Map Telemetry
     this.sectors = [
@@ -238,9 +206,9 @@ class WardogsEngine {
     const sortedSquads = eligibleCommanders.sort((a, b) => (b.membersCount || 0) - (a.membersCount || 0));
 
     // If we don't have enough 22+ player teams, fill with AI placeholders just for the UI
-    const squad1 = sortedSquads[0] || { name: 'WARDOG Company Alpha', captain: 'Ghost_Dog_99', membersCount: 33 };
-    const squad2 = sortedSquads[1] || { name: 'Iron Claw Battalion Bravo', captain: 'Sargeant_Iron', membersCount: 33 };
-    const squad3 = sortedSquads[2] || { name: 'Phantom Brigade Charlie', captain: 'Shadow_K9', membersCount: 22 };
+    const squad1 = sortedSquads[0] || { name: 'Awaiting Team...', captain: 'Searching...', membersCount: 0 };
+    const squad2 = sortedSquads[1] || { name: 'Awaiting Team...', captain: 'Searching...', membersCount: 0 };
+    const squad3 = sortedSquads[2] || { name: 'Awaiting Team...', captain: 'Searching...', membersCount: 0 };
 
     const eligibleSolos = this.soloMercenaries.filter(m => m.game === gameName || m.game === 'WARDOGS');
     const pool = [...eligibleSolos].sort((a, b) => b.elo - a.elo);
