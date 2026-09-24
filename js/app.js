@@ -1175,6 +1175,45 @@ class CustomLobbiesApp {
           `).join('')}
         </div>
       `;
+    } else if (this.activeWardogsMode === 'recruitment') {
+      const squads = window.wardogsEngine.registeredSquads.filter(s => s.game === selectedGame || s.game === 'WARDOGS');
+
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div class="card" style="border-color: #ff6f00; background: linear-gradient(to right, rgba(255, 111, 0, 0.1), transparent);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h3 style="font-size: 1.3rem; font-weight: 900; color: #ffab00; margin-bottom: 0.3rem;">📢 Team Recruitment Board</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Find the perfect 33-man WARDOGS team to join, or post an active recruitment bounty.</p>
+              </div>
+              <button class="btn btn-primary" onclick="window.app.openWardogsTeamModal()">➕ Register Team</button>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.25rem;">
+            ${squads.map(s => `
+              <div class="card" style="border-left: 4px solid var(--accent-cyan); position: relative; background: rgba(0,0,0,0.6);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+                  <div>
+                    <h3 style="font-size: 1.2rem; font-weight: 900; color: #fff; margin-bottom: 0.2rem;">${s.name} <span style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700;">${s.tag}</span></h3>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Commander: <strong style="color: var(--accent-cyan);">${s.captain}</strong></div>
+                  </div>
+                  <span class="lobby-game-tag" style="background: rgba(0, 229, 255, 0.15); color: var(--accent-cyan);">${s.membersCount} / 33 Members</span>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 6px; font-size: 0.85rem; color: #ccc; margin-bottom: 1rem; border: 1px dashed var(--border-color); font-style: italic;">
+                  "${s.bio || 'Looking for active WARDOGS operatives to fill out our Tri-Faction roster. Must have mic, comms, and follow tactical orders.'}"
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div style="font-size: 0.75rem; color: var(--accent-green); font-weight: 800;">Looking For: Recon, Breacher, Support</div>
+                  <button class="btn btn-purple btn-sm" style="width: auto;" onclick="alert('📨 APPLICATION SENT!\\n\\nYour Operative dossier has been sent to ${s.captain} for review.')">✉️ Apply to Join</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
     } else if (this.activeWardogsMode === 'warroom') {
       const sectors = window.wardogsEngine.sectors;
       const history = window.wardogsEngine.rankedSelectionHistory;
