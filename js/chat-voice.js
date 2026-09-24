@@ -143,10 +143,10 @@ class ChatVoiceManager {
     };
 
     this.onlineUsers = [
-      { name: 'ApexGod99', mmr: 2150, status: 'Online' },
-      { name: 'ShadowNinja', mmr: 1920, status: 'In Game' },
+      { name: 'ApexGod99', mmr: 2150, status: 'Online', teamTag: 'WD-ALPHA' },
+      { name: 'ShadowNinja', mmr: 1920, status: 'In Game', teamTag: 'CLAW' },
       { name: 'Valkyrie_CS', mmr: 1840, status: 'Streaming' },
-      { name: 'RadiantReaper', mmr: 2540, status: 'Online' },
+      { name: 'RadiantReaper', mmr: 2540, status: 'Online', teamTag: 'TSM' },
       { name: 'ProSniper_2026', mmr: 1450, status: 'In Queue' }
     ];
   }
@@ -1397,13 +1397,18 @@ class ChatVoiceManager {
       if (categorized[r.name].users.length > 0) {
         html += `<div style="font-size: 0.7rem; font-weight: 800; color: ${r.color}; text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.8rem;">${r.name} - ${categorized[r.name].users.length}</div>`;
         categorized[r.name].users.forEach(u => {
+          const badge = u.teamTag ? `<span style="background: rgba(255, 171, 0, 0.15); border: 1px solid rgba(255,171,0,0.5); color: #ffab00; font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 900;">${u.teamTag}</span>` : '';
           html += `
             <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: ${r.color}; box-shadow: 0 0 5px ${r.color};"></span>
+                ${badge}
                 <span style="font-weight: 600; color: ${r.color};">${u.name}</span>
               </div>
-              <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.78rem;">${u.mmr} MMR</span>
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.75rem;">${u.mmr}</span>
+                <button onclick="alert('📨 TEAM INVITE SENT!\\n\\nInvite sent to ${u.name} from the Community Hub.')" style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite to Team">➕</button>
+              </div>
             </div>
           `;
         });
@@ -1414,13 +1419,18 @@ class ChatVoiceManager {
     if (categorized['Online'].length > 0) {
       html += `<div style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.8rem;">Online - ${categorized['Online'].length}</div>`;
       categorized['Online'].forEach(u => {
+        const badge = u.teamTag ? `<span style="background: rgba(255, 171, 0, 0.15); border: 1px solid rgba(255,171,0,0.5); color: #ffab00; font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 900;">${u.teamTag}</span>` : '';
         html += `
           <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
               <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green);"></span>
+              ${badge}
               <span style="font-weight: 600;">${u.name}</span>
             </div>
-            <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.78rem;">${u.mmr} MMR</span>
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.75rem;">${u.mmr}</span>
+              <button onclick="alert('📨 TEAM INVITE SENT!\\n\\nInvite sent to ${u.name} from the Community Hub.')" style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite to Team">➕</button>
+            </div>
           </div>
         `;
       });
