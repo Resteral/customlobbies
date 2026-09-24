@@ -1002,10 +1002,10 @@
               <button class="btn btn-success btn-sm" onclick="window.chatVoiceManager.syncVoiceToCurrentChannel()" title="Sync and Auto-Join the Voice Channel for this Text Room">
                 <span>🎙️</span> Sync Voice
               </button>
-              <button class="btn btn-cyan btn-sm" id="btnHeaderChannelPool" onclick="window.chatVoiceManager.postChannelLobbyToChat()" title="View / Post Active Channel Team Pool (-j)">
+              <button class="btn btn-cyan btn-sm" id="btnHeaderChannelPool" onclick="const btn = document.querySelector('[data-tab=\'lobbies-view\']'); if(btn) btn.click();" title="Go to Team Pool & Lobbies Hub">
                 <span>👥</span> Team Pool
               </button>
-              <button class="btn btn-secondary btn-sm" id="btnHeaderPostBracket" onclick="window.chatVoiceManager.postTournamentBracketToChat()" title="Post Live Tournament Bracket to Chat">
+              <button class="btn btn-secondary btn-sm" id="btnHeaderPostBracket" onclick="const btn = document.querySelector('[data-tab=\'tournaments-view\']'); if(btn) btn.click();" title="Go to Live Tournament Brackets">
                 <span>🏆</span> Bracket
               </button>
               <button class="btn btn-primary btn-sm" id="btnHeaderOpenConfigurator" onclick="window.tournamentsStoreEngine.openConfiguratorModal()" title="Open 1-Click Tournament Configurator Modal">

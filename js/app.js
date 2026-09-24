@@ -2269,7 +2269,8 @@ class CustomLobbiesApp {
 
   browseDraftPool(teamId) {
     this.closeManageTeamModal();
-    this.switchTab('lobbies');
+    const btn = document.querySelector('[data-tab="lobbies-view"]');
+    if (btn) btn.click();
     setTimeout(() => {
       const draftPool = document.getElementById('livePoolFeedContainer');
       if (draftPool) {
