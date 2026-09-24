@@ -5533,7 +5533,117 @@ class CustomLobbiesApp {
       this.showToast('🔴 LIVE BROADCAST STARTED! Streaming to CL Live TV.', 'success');
     }
   }
+
+  // ==========================================
+  // SERVER ADMIN DASHBOARD
+  // ==========================================
+  openAdminDashboard() {
+    const modal = document.getElementById('adminDashboardModal');
+    if (modal) {
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+      
+      // Load current settings into inputs
+      const settings = JSON.parse(localStorage.getItem('cl_admin_settings')) || {};
+      
+      const title = document.getElementById('adminHeroTitle');
+      const subtitle = document.getElementById('adminHeroSubtitle');
+      const logo = document.getElementById('adminLogoUrl');
+      const color = document.getElementById('adminAccentColor');
+      const ann = document.getElementById('adminAnnouncement');
+      const gk = document.getElementById('adminToggleGatekeeper');
+
+      if(title) title.value = settings.heroTitle || '';
+      if(subtitle) subtitle.value = settings.heroSubtitle || '';
+      if(logo) logo.value = settings.logoUrl || '';
+      if(color) color.value = settings.accentColor || '#00f2fe';
+      if(ann) ann.value = settings.announcement || '';
+      if(gk) gk.checked = settings.requireGatekeeper || false;
+    }
+  }
+
+  closeAdminDashboard() {
+    const modal = document.getElementById('adminDashboardModal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+  }
+
+  saveAdminSettings() {
+    const title = document.getElementById('adminHeroTitle');
+    const subtitle = document.getElementById('adminHeroSubtitle');
+    const logo = document.getElementById('adminLogoUrl');
+    const color = document.getElementById('adminAccentColor');
+    const ann = document.getElementById('adminAnnouncement');
+    const gk = document.getElementById('adminToggleGatekeeper');
+
+    const settings = {
+      heroTitle: title ? title.value.trim() : '',
+      heroSubtitle: subtitle ? subtitle.value.trim() : '',
+      logoUrl: logo ? logo.value.trim() : '',
+      accentColor: color ? color.value : '#00f2fe',
+      announcement: ann ? ann.value.trim() : '',
+      requireGatekeeper: gk ? gk.checked : false
+    };
+
+    localStorage.setItem('cl_admin_settings', JSON.stringify(settings));
+    this.applyAdminSettings(settings);
+    this.closeAdminDashboard();
+    
+    alert('✅ Global Site Settings applied successfully!');
+  }
+
+  applyAdminSettings(settings = null) {
+    if (!settings) {
+      settings = JSON.parse(localStorage.getItem('cl_admin_settings')) || {};
+    }
+
+    if (settings.heroTitle) {
+      const heroTitles = document.querySelectorAll('.hero-title');
+      heroTitles.forEach(el => {
+        // Change the main title if it's not a specific modal title
+        if(el.textContent.includes('CUSTOMLOBBIES HUB') || el.classList.contains('main-header')) {
+            el.innerHTML = `💻 ${settings.heroTitle}`;
+        }
+      });
+    }
+
+    if (settings.logoUrl) {
+      const logos = document.querySelectorAll('.brand-logo-img');
+      logos.forEach(el => el.src = settings.logoUrl);
+    }
+
+    if (settings.accentColor) {
+      document.documentElement.style.setProperty('--accent-cyan', settings.accentColor);
+    }
+    
+    // Announcement Banner
+    let annBanner = document.getElementById('global-admin-announcement');
+    if (settings.announcement) {
+      if (!annBanner) {
+         annBanner = document.createElement('div');
+         annBanner.id = 'global-admin-announcement';
+         annBanner.style.background = 'var(--accent-magenta)';
+         annBanner.style.color = '#fff';
+         annBanner.style.textAlign = 'center';
+         annBanner.style.padding = '0.5rem';
+         annBanner.style.fontWeight = 'bold';
+         annBanner.style.zIndex = '9999';
+         document.body.prepend(annBanner);
+      }
+      annBanner.innerHTML = `📢 ${settings.announcement}`;
+    } else if (annBanner) {
+      annBanner.remove();
+    }
+    
+    // Update global state for other scripts (like Gatekeeper)
+    window.CL_REQUIRE_GATEKEEPER = settings.requireGatekeeper || false;
+  }
 }
 
 window.app = new CustomLobbiesApp();
-document.addEventListener('DOMContentLoaded', () => window.app.init());
+document.addEventListener('DOMContentLoaded', () => {
+    window.app.init();
+    window.app.applyAdminSettings();
+});
