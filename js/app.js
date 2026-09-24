@@ -4483,7 +4483,7 @@ class CustomLobbiesApp {
       { topic: "Will AI Companions Replace Human Teammates in Esports by 2030?", category: "Tech & AI" },
       { topic: "Should In-Game Skins Have Real-Money CL-Points Tradeability?", category: "Gaming Economy" },
       { topic: "Is PC Superior to Next-Gen Consoles for Professional Esports?", category: "Esports Formats" },
-      { topic: "Are 33v33 WARDOG Battles Superior to 5v5 Arena Shooters?", category: "Gaming Meta" },
+      { topic: "Are 33v33v33 WARDOGS Battles Superior to 5v5 Arena Shooters?", category: "Gaming Meta" },
       { topic: "Should Tactical Shooters Ban Instant Headshot One-Tap Mechanics?", category: "Gaming Meta" },
       { topic: "Is Regional Server Locking Necessary to Prevent High Ping Advantages?", category: "Esports Formats" },
       { topic: "Should Pay-to-Win Mechanics in Free-to-Play Games Be Legally Banned?", category: "Gaming Economy" },
@@ -4582,7 +4582,7 @@ class CustomLobbiesApp {
       },
       {
         id: 'DEBATE-104',
-        topic: 'Are 33v33 WARDOG Battles Superior to 5v5 Arena Shooters?',
+        topic: 'Are 33v33v33 WARDOGS Battles Superior to 5v5 Arena Shooters?',
         category: 'Esports Formats',
         format: '2v2 Partner Debate',
         phase: 'Awaiting PRO (Affirmative) Speaker',
