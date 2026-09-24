@@ -24,6 +24,7 @@ class CustomLobbiesApp {
 
     // Expanded Game Roster
     this.allGames = [
+      'WARDOGS',
       'Counter-Strike 2',
       'REMATCH',
       'Arkheron',
@@ -43,7 +44,7 @@ class CustomLobbiesApp {
       'Slapshot: Rebound'
     ];
 
-    this.favoriteGames = new Set(['Counter-Strike 2', 'REMATCH', 'Arkheron', 'Valorant', 'Marvel Rivals', 'Dota 2', 'FiveM GTA RP', 'Slapshot: Rebound']);
+    this.favoriteGames = new Set(['WARDOGS', 'Counter-Strike 2', 'REMATCH', 'Arkheron', 'Valorant', 'Marvel Rivals', 'Dota 2', 'FiveM GTA RP', 'Slapshot: Rebound']);
     this.loadFavorites();
 
     this.isAutoJoinActive = false;
