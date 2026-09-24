@@ -2714,10 +2714,10 @@ class CustomLobbiesApp {
         const mapPicker = this.vetoTurn; // Or whoever picked
         const loser = mapPicker === 'Team Alpha' ? 'Team Bravo' : 'Team Alpha';
 
-        const code = prompt(`🎮 MAP SELECTED: ${finalMap}\n\nThe team that lost the faceoff (${loser}) must generate a Private Matchmaking Code in CS2.\n\nCaptain of ${loser}, please enter the CS2 Matchmaking Code here to host the lobby:`);
+        const code = prompt(`🎮 MAP SELECTED: ${finalMap}\n\nThe team that lost the faceoff (${loser}) must host the lobby.\n\nCaptain of ${loser}, please enter the CS2 Private Matchmaking Code (or Server IP) to allow players to direct connect from the website:`);
         
         if (!code) {
-          alert('❌ A CS2 Matchmaking Code is required to host the lobby! Veto phase aborted.');
+          alert('❌ A CS2 Matchmaking Code or IP is required to host the lobby! Veto phase aborted.');
           return;
         }
 
@@ -3980,7 +3980,17 @@ class CustomLobbiesApp {
       if (modal) modal.classList.remove('active');
       
       if (this.cs2MatchCode) {
-          alert(`🚀 CS2 MATCH READY!\n\nDirect Connect Code: ${this.cs2MatchCode}\n\n1. Open Counter-Strike 2\n2. Go to Play -> Matchmaking -> Private Matchmaking\n3. Enter the code '${this.cs2MatchCode}' to direct connect to the lobby!\n\nPost-match honor assessment will launch automatically upon game completion.`);
+          try {
+              navigator.clipboard.writeText(this.cs2MatchCode);
+          } catch(e) {}
+
+          if (this.cs2MatchCode.includes('.')) {
+              alert(`🚀 LAUNCHING COUNTER-STRIKE 2!\n\nConnecting directly to IP: ${this.cs2MatchCode} from the website...`);
+              window.location.href = `steam://connect/${this.cs2MatchCode}`;
+          } else {
+              alert(`🚀 LAUNCHING COUNTER-STRIKE 2!\n\nDirect Connect Code: ${this.cs2MatchCode} (Copied to Clipboard!)\n\nSteam is launching. Paste this code into the Private Matchmaking tab in-game!`);
+              window.location.href = `steam://run/730`;
+          }
       } else {
           alert('🚀 MATCH READY & CONNECTED!\n\n128-tick server node session started. Guardian Anti-Cheat Active.\n\nPost-match honor assessment will launch automatically upon game completion.');
       }
