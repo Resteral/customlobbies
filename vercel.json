@@ -6,7 +6,8 @@
     { "src": "overlay.html", "use": "@vercel/static" },
     { "src": "js/**", "use": "@vercel/static" },
     { "src": "css/**", "use": "@vercel/static" },
-    { "src": "assets/**", "use": "@vercel/static" }
+    { "src": "assets/**", "use": "@vercel/static" },
+    { "src": "CustomLobbies-Desktop-App.zip", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/overlay", "dest": "/overlay.html" },
