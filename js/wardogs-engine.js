@@ -14,7 +14,7 @@ class WardogsEngine {
       twitchConcurrentViewers: 198540,
       steamApprovalRating: '85% Very Positive (14,280 Reviews)',
       persistentEconomyBalance: '12,500 CL-Points Funds',
-      activeMatchFormat: '100-Player Tri-Faction Combined Arms (33v33v33)'
+      activeMatchFormat: '99-Player Tri-Faction Combined Arms (33v33v33)'
     };
 
     // Tri-Faction War Command Definitions
@@ -99,7 +99,7 @@ class WardogsEngine {
       id: Date.now(),
       name: handle || 'Operative_X',
       callsign: callsign ? callsign.toUpperCase() : `DOG-${Math.floor(Math.random() * 90 + 10)}`,
-      game: game || 'Counter-Strike 2',
+      game: game || 'WARDOGS',
       role: role || '⚡ Breacher / Assault',
       elo: parseInt(elo) || 1840,
       kd: '2.00',
@@ -122,7 +122,7 @@ class WardogsEngine {
       name: squadName || 'Tactical Company',
       tag: tag.startsWith('[') ? tag.toUpperCase() : `[${tag.toUpperCase()}]`,
       captain: captainHandle || 'Ghost_Dog_99',
-      game: game || 'Counter-Strike 2',
+      game: game || 'WARDOGS',
       record: '0W - 0L',
       membersCount: parseInt(squadSize) || 33,
       status: 'ACTIVE CONTRACT',

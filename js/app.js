@@ -910,7 +910,7 @@ class CustomLobbiesApp {
     }
 
     if (this.activeWardogsMode === 'solos') {
-      const solos = window.wardogsEngine.soloMercenaries.filter(m => m.game === selectedGame || m.game === 'Counter-Strike 2');
+      const solos = window.wardogsEngine.soloMercenaries.filter(m => m.game === selectedGame || m.game === 'WARDOGS');
 
       container.innerHTML = `
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
@@ -952,7 +952,7 @@ class CustomLobbiesApp {
         </div>
       `;
     } else if (this.activeWardogsMode === 'squads') {
-      const squads = window.wardogsEngine.registeredSquads.filter(s => s.game === selectedGame || s.game === 'Counter-Strike 2');
+      const squads = window.wardogsEngine.registeredSquads.filter(s => s.game === selectedGame || s.game === 'WARDOGS');
 
       container.innerHTML = `
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
