@@ -1924,6 +1924,25 @@ class CustomLobbiesApp {
     this.switchWardogsMode('squads');
 
     alert(`🛡️ TEAM REGISTERED!\n\n${squadName} [${tag}] is now active in the ${game} League.\nCaptain: ${captain}\nDescription: ${bio ? bio : 'No description provided.'}\n\nYou can now browse the Draft Queue and recruit members freely!`);
+
+    if (this.clPoints >= 500) {
+        const wantsServer = confirm(`Would you like to purchase a dedicated Community Hub Chat Server for your team '${squadName}' for 500 CL-Points?`);
+        if (wantsServer) {
+            this.clPoints -= 500;
+            const clDisplay = document.getElementById('userCLPointsValue');
+            if (clDisplay) clDisplay.textContent = `${this.clPoints.toLocaleString()} Points`;
+
+            const key = squadName.toLowerCase().replace(/[^a-z0-9_]/g, '') + Date.now().toString().slice(-4);
+            
+            if (window.chatVoiceManager) {
+                window.chatVoiceManager.guilds[key] = { name: squadName, icon: '🛡️' };
+                localStorage.setItem('cl_admin_servers', JSON.stringify(window.chatVoiceManager.guilds));
+                window.chatVoiceManager.renderGuildRail();
+            }
+
+            alert(`✅ PURCHASE SUCCESSFUL!\n\nYour dedicated team chat server '${squadName}' has been deployed to the Community Hub!`);
+        }
+    }
   }
 
   recruitPlayerToTeam(playerId, playerName, callsign) {
@@ -1953,6 +1972,44 @@ class CustomLobbiesApp {
   openCreateTeamModal() {
     const modal = document.getElementById('createUniversalTeamModal');
     if (modal) modal.classList.add('active');
+  }
+
+  purchaseTeamServer() {
+      if (this.clPoints < 500) {
+          alert(`❌ INSUFFICIENT FUNDS\n\nYou need 500 CL-Points to purchase a dedicated Community Hub Server. You currently have ${this.clPoints}.`);
+          return;
+      }
+      
+      const serverName = prompt("Enter a name for your new Team Chat Server:");
+      if (!serverName) return;
+      
+      const serverEmoji = prompt("Enter an emoji icon for your server (e.g., 🛡️, 🔥, 💀):") || '💬';
+      
+      const confirmPurchase = confirm(`Are you sure you want to purchase the server "${serverName}" for 500 CL-Points?`);
+      if (confirmPurchase) {
+          this.clPoints -= 500;
+          
+          const clDisplay = document.getElementById('userCLPointsValue');
+          if (clDisplay) clDisplay.textContent = `${this.clPoints.toLocaleString()} Points`;
+
+          const key = serverName.toLowerCase().replace(/[^a-z0-9_]/g, '') + Date.now().toString().slice(-4);
+          
+          if (window.chatVoiceManager) {
+              window.chatVoiceManager.guilds[key] = { name: serverName, icon: serverEmoji };
+              localStorage.setItem('cl_admin_servers', JSON.stringify(window.chatVoiceManager.guilds));
+              window.chatVoiceManager.renderGuildRail();
+          }
+
+          if (window.widgetBuilderEngine) {
+              window.widgetBuilderEngine.playSoundEffect('fanfare');
+          }
+
+          alert(`✅ SERVER PURCHASED!\n\nYour dedicated team chat server '${serverName}' has been deployed to the Community Hub!`);
+          
+          // Switch to community view to see it
+          const tab = document.querySelector('[data-tab=community-view]');
+          if (tab) tab.click();
+      }
   }
 
   closeCreateTeamModal() {

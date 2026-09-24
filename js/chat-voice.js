@@ -166,13 +166,14 @@ class ChatVoiceManager {
     const rail = document.getElementById('discordServerRailContainer');
     if (!rail) return;
     
-    // Clear existing servers (keep the boost badge container)
+    // Clear existing servers (keep the boost badge container and purchase button)
     Array.from(rail.children).forEach(child => {
-        if (child.id !== 'serverBoostBadgeContainer') {
+        if (child.id !== 'serverBoostBadgeContainer' && child.id !== 'serverPurchaseBtnContainer') {
             child.remove();
         }
     });
 
+    const purchaseBtn = document.getElementById('serverPurchaseBtnContainer');
     const boostBadge = document.getElementById('serverBoostBadgeContainer');
 
     for (const [key, guild] of Object.entries(this.guilds)) {
@@ -182,7 +183,9 @@ class ChatVoiceManager {
       el.title = guild.name;
       el.innerHTML = `<span>${guild.icon}</span>`;
       
-      if (boostBadge) {
+      if (purchaseBtn) {
+          rail.insertBefore(el, purchaseBtn);
+      } else if (boostBadge) {
           rail.insertBefore(el, boostBadge);
       } else {
           rail.appendChild(el);
