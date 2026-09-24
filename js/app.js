@@ -1135,8 +1135,8 @@ class CustomLobbiesApp {
                 <span class="lobby-game-tag" style="background: ${m.status.includes('Selected') ? 'rgba(0, 229, 255, 0.2)' : 'rgba(0, 230, 118, 0.2)'}; color: ${m.status.includes('Selected') ? 'var(--accent-cyan)' : 'var(--accent-green)'}; font-size: 0.72rem;">
                   ${m.status}
                 </span>
-                <button class="btn btn-purple btn-sm" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.78rem;" onclick="alert('➕ RECRUIT SENT!\\n\\nRecruitment contract dispatched to ${m.name} (${m.callsign})!')">
-                  ➕ Recruit Mercenary
+                <button class="btn btn-purple btn-sm" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.78rem;" onclick="window.app.recruitPlayerToTeam('${m.id}', '${m.name}', '${m.callsign}')">
+                  ➕ Recruit to Team
                 </button>
               </div>
             </div>
@@ -1924,6 +1924,30 @@ class CustomLobbiesApp {
     this.switchWardogsMode('squads');
 
     alert(`🛡️ TEAM REGISTERED!\n\n${squadName} [${tag}] is now active in the ${game} League.\nCaptain: ${captain}\nDescription: ${bio ? bio : 'No description provided.'}\n\nYou can now browse the Draft Queue and recruit members freely!`);
+  }
+
+  recruitPlayerToTeam(playerId, playerName, callsign) {
+    if (typeof this.showToast === 'function') {
+      this.showToast(`📥 Invite sent! You offered ${playerName} a spot on your team.`, 'success');
+    }
+    
+    // Play sound if available
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+    
+    setTimeout(() => {
+        alert(`🤝 RECRUITMENT ACCEPTED!\n\n${playerName} (${callsign}) has accepted your invite and joined your Team Roster!`);
+        
+        // Find and update the solo player status to "Recruited"
+        if (window.wardogsEngine) {
+            const player = window.wardogsEngine.soloMercenaries.find(p => p.id == playerId);
+            if (player) {
+                player.status = 'Drafted to Team';
+                this.renderWardogsView();
+            }
+        }
+    }, 1500);
   }
 
   openCreateTeamModal() {
