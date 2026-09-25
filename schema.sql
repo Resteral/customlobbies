@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS teams (
     emblem VARCHAR(50) DEFAULT '🛡️',
     game VARCHAR(100) NOT NULL, -- 'WARDOGS', 'Counter-Strike 2', 'Valorant', etc.
     team_size INT NOT NULL DEFAULT 50, -- 50 (Battalion), 7 (Fireteam), 999 (Unlimited)
-    captain_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    captain_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
     captain_handle VARCHAR(50) NOT NULL,
     playstyle_focus VARCHAR(100) DEFAULT 'Ranked Ladder', -- 'Competitive Scrims', '50-Man Battalion', '7-Man Fireteam'
     synergy VARCHAR(50) DEFAULT '100% (Role-Balanced)',
@@ -202,29 +202,42 @@ FROM free_agents
 WHERE target_game = 'WARDOGS' AND status = 'Available for Draft'
 ORDER BY elo_rating DESC, created_at DESC;
 
--- Query 3: Insert New Team & Assign Creator as Captain
--- Step A: Insert Team
-INSERT INTO teams (name, tag, emblem, game, team_size, captain_id, captain_handle, playstyle_focus, team_elo, bio)
-VALUES ('WARDOG Alpha', '[WD-ALPHA]', '🛡️', 'WARDOGS', 50, 1, 'Sean', '50-Man Battalion', 2400, 'Ranked competitive battalion')
-RETURNING id;
-
--- Step B: Insert Captain into Active Team Roster
+-- Query 3: Safely Insert User, Team, and Captain in a Single Atomic Transaction
+WITH new_user AS (
+    INSERT INTO users (username, email, password_hash, gamer_tag, role)
+    VALUES ('Sean', 'sean@customlobbies.com', 'scrypt_hash_example', 'Sean', 'Captain')
+    ON CONFLICT (username) DO UPDATE SET updated_at = CURRENT_TIMESTAMP
+    RETURNING id, username
+),
+new_team AS (
+    INSERT INTO teams (name, tag, emblem, game, team_size, captain_id, captain_handle, playstyle_focus, team_elo, bio)
+    SELECT 'WARDOG Alpha', '[WD-ALPHA]', '🛡️', 'WARDOGS', 50, id, username, '50-Man Battalion', 2400, 'Ranked competitive battalion'
+    FROM new_user
+    RETURNING id, captain_handle
+)
 INSERT INTO team_members (team_id, member_name, role, elo, is_captain)
-VALUES (1, 'Sean', '👑 Commander / Captain', 2400, TRUE);
+SELECT id, captain_handle, '👑 Commander / Captain', 2400, TRUE
+FROM new_team;
 
--- Query 4: Recruit a Free-Agent into Team Applications Queue
+-- Query 4: Safely Recruit a Free-Agent into Team Applications Queue (Dynamic Team ID)
 INSERT INTO team_applications (team_id, applicant_name, applicant_role, applicant_elo, note)
-VALUES (1, 'Valkyrie_Merc', '🎯 Sniper', 2150, 'Drafted from Free Agent Pool');
+SELECT id, 'Valkyrie_Merc', '🎯 Sniper', 2150, 'Drafted from Free Agent Pool'
+FROM teams
+WHERE name = 'WARDOG Alpha'
+LIMIT 1;
 
--- Query 5: Accept Application & Add to Team Roster
-UPDATE team_applications 
-SET status = 'ACCEPTED' 
-WHERE id = 1 AND team_id = 1;
-
+-- Query 5: Safely Accept Application & Move into Active Team Roster
+WITH accepted_app AS (
+    UPDATE team_applications 
+    SET status = 'ACCEPTED' 
+    WHERE applicant_name = 'Valkyrie_Merc' AND status = 'PENDING'
+    RETURNING team_id, applicant_name, applicant_role, applicant_elo
+)
 INSERT INTO team_members (team_id, member_name, role, elo, is_captain)
-VALUES (1, 'Valkyrie_Merc', '🎯 Sniper', 2150, FALSE);
+SELECT team_id, applicant_name, applicant_role, applicant_elo, FALSE
+FROM accepted_app;
 
--- Mark player as drafted in free-agent pool
+-- Update status in free-agent pool
 UPDATE free_agents
 SET status = 'Drafted to Team'
 WHERE gamer_handle = 'Valkyrie_Merc';
