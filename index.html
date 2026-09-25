@@ -1035,12 +1035,23 @@
               <div class="channel-item" data-channel="arkheron" title="Arkheron 5v5 Dark Fantasy Arena"><span>🏰</span> # arkheron</div>
             </div>
 
+            <!-- Category: TEAMS & SQUADS CHANNELS -->
+            <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+              <span>🛡️ TEAM & CLAN CHANNELS</span>
+              <button class="add-channel-btn" id="btnAddTeamChannel" onclick="window.chatVoiceManager.openTeamChannelModal()" title="Create Dedicated Team Channel">+</button>
+            </div>
+            <div id="textChannelsTeams">
+              <!-- Dynamically populated from created teams -->
+            </div>
+
             <!-- Category: VOICE CHANNELS -->
             <div class="channel-section-title" style="margin-top: 0.8rem;">
               <span>🔊 VOICE CHANNELS</span>
               <button class="add-channel-btn" id="btnAddVoiceChannel" title="Create Voice Room">+</button>
             </div>
             <div id="voiceChannelsList">
+              <!-- Team Voice Comms injected here -->
+              <div id="voiceChannelsTeams"></div>
               <div class="channel-item" data-voice="general-lounge">
                 <span>🔊</span> General Lounge
               </div>
@@ -1155,6 +1166,34 @@
               </button>
               <button class="btn btn-cyan btn-sm" id="btnChannelJoinPool" onclick="window.chatVoiceManager.executeInChatJoin(null)" title="Auto-Join In-Chat Match Pool (-j)">
                 <span>⚡</span> Join Pool (-j)
+              </button>
+            </div>
+          </div>
+
+          <!-- In-Channel Team Action Bar (Host Team Lobby, Scrim Dispatch, Lineup, Snake Draft) -->
+          <div id="channelTeamActionBar" class="channel-team-action-bar" style="display: none; background: rgba(14, 10, 26, 0.92); border-bottom: 1px solid rgba(168, 85, 247, 0.35); padding: 0.6rem 1.25rem; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <span id="channelTeamEmblem" style="font-size: 1.4rem;">🛡️</span>
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span id="channelTeamTitle" style="font-weight: 800; font-size: 0.95rem; color: #fff;">[VANGUARD] Vanguard Squad</span>
+                  <span class="lobby-game-tag" id="channelTeamGameTag" style="background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); font-size: 0.68rem; border: 1px solid var(--accent-purple);">Official Squad Channel</span>
+                </div>
+                <div id="channelTeamDetail" style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.1rem;">5 Members • Captain: Sean • Focus: Competitive Scrims</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-sm" id="btnTeamHostLobby" onclick="window.chatVoiceManager.hostLobbyForCurrentTeam()" title="Host Lobby for this Squad">
+                <span>🎮</span> Host Team Lobby
+              </button>
+              <button class="btn btn-purple btn-sm" id="btnTeamChallengeScrim" onclick="window.chatVoiceManager.challengeScrimForCurrentTeam()" title="Dispatch Scrim Challenge to Other Teams">
+                <span>⚔️</span> Scrim Dispatch
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnTeamSnakeDraft" onclick="window.chatVoiceManager.draftForCurrentTeam()" title="Snake Draft with Team Lineup">
+                <span>🐍</span> Snake Draft
+              </button>
+              <button class="btn btn-success btn-sm" id="btnTeamInviteMember" onclick="window.chatVoiceManager.inviteTeammateToChannel()" title="Invite player to team channel">
+                <span>➕</span> Invite Member
               </button>
             </div>
           </div>
@@ -2699,6 +2738,115 @@
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
         <button class="btn btn-secondary" id="btnCloseChannelModal">Cancel</button>
         <button class="btn btn-primary" id="btnSubmitNewChannel">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Dedicated Team Channel Modal -->
+  <div class="modal-overlay" id="createTeamChannelModal">
+    <div class="modal-card" style="max-width: 540px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem; color: #fff;">
+          <span>🛡️</span> Create Dedicated Team Channel
+        </h3>
+        <button class="icon-btn-sm" onclick="window.chatVoiceManager.closeTeamChannelModal()" style="font-size: 1.2rem;">✕</button>
+      </div>
+
+      <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.2rem; font-size: 0.85rem; color: var(--text-dim);">
+        Create dedicated text and voice channels for your esports squad, clan, or scrimmage roster. Coordinate strats, recruit free-agents, and host private team matches!
+      </div>
+
+      <!-- Quick Pick from User's Created Teams -->
+      <div class="input-group">
+        <label class="input-label" style="display: flex; justify-content: space-between;">
+          <span>Select Your Team</span>
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); cursor: pointer; text-decoration: underline;" onclick="window.chatVoiceManager.toggleNewTeamInput()" id="toggleNewTeamBtn">+ Or Type New Team</span>
+        </label>
+        <select class="input-field" id="teamChannelSelectExisting" onchange="window.chatVoiceManager.onTeamSelectChange(this.value)">
+          <!-- Injected dynamically via JS from myCreatedTeams -->
+        </select>
+      </div>
+
+      <div id="newTeamFieldsWrapper" style="display: none;">
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.8rem;">
+          <div class="input-group">
+            <label class="input-label">Team / Clan Name</label>
+            <input type="text" class="input-field" id="newTeamChannelName" placeholder="e.g. Sentinels Radiant">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Clan Tag</label>
+            <input type="text" class="input-field" id="newTeamChannelTag" placeholder="e.g. [SEN]">
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Primary Game</label>
+          <select class="input-field" id="teamChannelGame">
+            <option value="Counter-Strike 2">Counter-Strike 2</option>
+            <option value="Valorant">Valorant</option>
+            <option value="WARDOGS">WARDOGS</option>
+            <option value="Marvel Rivals">Marvel Rivals</option>
+            <option value="Rocket League">Rocket League</option>
+            <option value="Deadlock">Deadlock</option>
+            <option value="The Finals">The Finals</option>
+            <option value="Slapshot: Rebound">Slapshot: Rebound</option>
+            <option value="Empulse">Empulse</option>
+            <option value="REMATCH">REMATCH</option>
+            <option value="Rainbow Six Siege">Rainbow Six Siege</option>
+            <option value="Dota 2">Dota 2</option>
+            <option value="Overwatch 2">Overwatch 2</option>
+            <option value="Arkheron">Arkheron</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Team Emblem / Emoji</label>
+          <select class="input-field" id="teamChannelEmblem">
+            <option value="🛡️">🛡️ Aegis Shield</option>
+            <option value="👑">👑 Royal Crown</option>
+            <option value="⚡">⚡ Lightning Bolt</option>
+            <option value="🎯">🎯 Bullseye Sniper</option>
+            <option value="🔥">🔥 Phoenix Flame</option>
+            <option value="🐺">🐺 Lone Wolf</option>
+            <option value="🐉">🐉 Dragon Fang</option>
+            <option value="💀">💀 Skull Reaper</option>
+            <option value="🚀">🚀 Orbital Rocket</option>
+            <option value="💎">💎 Diamond Elite</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Channels to Create</label>
+          <select class="input-field" id="teamChannelTypeSelect">
+            <option value="both">⚡ Both Text (#) & Voice (🔊) Channels</option>
+            <option value="text">💬 Text Channel Only (# team)</option>
+            <option value="voice">🔊 Voice Channel Only (🔊 Team Comms)</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Access & Privacy</label>
+          <select class="input-field" id="teamChannelPrivacy">
+            <option value="public">🌐 Public (Recruitment & Scrims)</option>
+            <option value="private">🔒 Team Members & Whitelist Only</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Team Motto / Scrim Note</label>
+        <input type="text" class="input-field" id="teamChannelMotto" placeholder="e.g. Daily scrims at 8 PM EST. Looking for cracked entry fraggers!">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" onclick="window.chatVoiceManager.closeTeamChannelModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.chatVoiceManager.submitCreateTeamChannel()" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; font-weight: 800;">
+          <span>🚀</span> Launch Team Channel
+        </button>
       </div>
     </div>
   </div>

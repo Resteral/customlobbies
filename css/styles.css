@@ -607,6 +607,13 @@ div:has(.dropdown-wrapper:focus-within) {
   animation: fadeIn 0.2s ease-in-out;
 }
 
+.channel-team-action-bar {
+  background: linear-gradient(90deg, rgba(22, 14, 38, 0.96), rgba(12, 10, 26, 0.92));
+  border-bottom: 1px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.15);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
 .chat-messages-container {
   flex: 1;
   padding: 1.25rem;

@@ -65,6 +65,10 @@ class ChatVoiceManager {
 
     this.pinnedStickers = [];
 
+    // Dedicated Team & Clan Channels
+    this.teamChannels = [];
+    this.loadTeamChannels();
+
     // Per-Channel Match Lobby & Team Pool Engine
     this.channelLobbies = {};
 
@@ -291,6 +295,7 @@ class ChatVoiceManager {
 
   init() {
     this.renderGuildRail();
+    this.renderTeamChannels();
     this.loadPinnedStickers();
     this.loadChatTheme();
     this.renderMessages();
@@ -902,12 +907,32 @@ class ChatVoiceManager {
     }
 
     const gInfo = this.channelGameMap ? this.channelGameMap[channelName] : null;
+    const teamChan = this.teamChannels ? this.teamChannels.find(t => t.channelName === channelName || t.id === channelName) : null;
     const header = document.getElementById('currentChannelHeader');
     const topic = document.getElementById('currentChannelTopic');
     const input = document.getElementById('chatInputText');
     const actionBar = document.getElementById('channelGameActionBar');
+    const teamActionBar = document.getElementById('channelTeamActionBar');
 
-    if (gInfo) {
+    if (teamChan) {
+      if (actionBar) actionBar.style.display = 'none';
+      if (teamActionBar) {
+        teamActionBar.style.display = 'flex';
+        const teamEmblem = document.getElementById('channelTeamEmblem');
+        const teamTitle = document.getElementById('channelTeamTitle');
+        const teamGameTag = document.getElementById('channelTeamGameTag');
+        const teamDetail = document.getElementById('channelTeamDetail');
+        if (teamEmblem) teamEmblem.textContent = teamChan.emblem || '🛡️';
+        if (teamTitle) teamTitle.textContent = `${teamChan.tag ? teamChan.tag + ' ' : ''}${teamChan.name}`;
+        if (teamGameTag) teamGameTag.textContent = `${teamChan.game} Squad Channel`;
+        const count = teamChan.membersCount || (teamChan.members ? teamChan.members.length : 5);
+        if (teamDetail) teamDetail.textContent = `${count} Members • Captain: ${teamChan.captain || 'Sean'} • ${teamChan.motto || 'Competitive Scrims'}`;
+      }
+      if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">${teamChan.emblem || '🛡️'}</span> #${channelName}`;
+      if (topic) topic.textContent = `${teamChan.name} (${teamChan.tag || ''}) — ${teamChan.game} • ${teamChan.motto || 'Official Team Hub'}`;
+      if (input) input.placeholder = `Message ${teamChan.tag || ''} squad members, type strats, or type -j to queue...`;
+    } else if (gInfo) {
+      if (teamActionBar) teamActionBar.style.display = 'none';
       if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">${gInfo.icon}</span> #${channelName}`;
       if (topic) topic.textContent = gInfo.topic;
       if (input) input.placeholder = `Message #${channelName} or type -j (join match pool), -help...`;
@@ -931,6 +956,7 @@ class ChatVoiceManager {
         if (btnJoin) btnJoin.innerHTML = `<span>⚡</span> Join ${gInfo.game} Pool (-j)`;
       }
     } else {
+      if (teamActionBar) teamActionBar.style.display = 'none';
       if (header) header.textContent = `# ${channelName}`;
       if (topic) topic.textContent = `Discussion and chat for #${channelName}`;
       if (input) input.placeholder = `Send a message to #${channelName}...`;
@@ -1246,6 +1272,450 @@ class ChatVoiceManager {
     if (window.eloDraftEngine) {
       window.eloDraftEngine.startSnakeDraft(gameName);
     }
+  }
+
+  // --- DEDICATED TEAM & CLAN CHANNELS SYSTEM ---
+  loadTeamChannels() {
+    try {
+      const saved = localStorage.getItem('cl_custom_team_channels_v1');
+      if (saved) {
+        this.teamChannels = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Unable to load team channels', e);
+    }
+
+    if (!this.teamChannels || this.teamChannels.length === 0) {
+      this.teamChannels = [
+        {
+          id: 'team-vanguard',
+          teamId: 'TEAM-101',
+          name: 'Vanguard Cyber Squad',
+          tag: '[VANGUARD]',
+          channelName: 'team-vanguard',
+          voiceRoom: 'voice-team-vanguard',
+          game: 'Counter-Strike 2',
+          emblem: '🛡️',
+          captain: 'Sean',
+          membersCount: 5,
+          members: ['Sean (👑 IGL)', 'Ghost_Dog_99 (🎯 Entry)', 'Sargeant_Iron (🛡️ Anchor)', 'Valkyrie_Merc (🔭 AWPer)', 'Shadow_K9 (⚡ Flex)'],
+          motto: 'Official Vanguard scrim roster & tactical coordination comms.',
+          privacy: 'public',
+          hasText: true,
+          hasVoice: true
+        }
+      ];
+      this.saveTeamChannels();
+    }
+
+    // Seed default message for team-vanguard if not present
+    if (!this.textMessages['team-vanguard']) {
+      this.textMessages['team-vanguard'] = [
+        {
+          id: 201,
+          author: 'CustomLobbiesBot',
+          text: '🛡️ Welcome to the dedicated squad channel for <b>[VANGUARD] Vanguard Cyber Squad</b>! Coordinate strats, launch team scrims, or start a snake draft below.',
+          time: '12:00 PM',
+          avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+        },
+        {
+          id: 202,
+          author: 'Sean',
+          text: 'Roster check! Scrim dispatch starts tonight at 8 PM EST on Counter-Strike 2 Mirage.',
+          time: '12:05 PM',
+          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80',
+          sticker: { emoji: '🛡️', name: 'Anti-Cheat' }
+        }
+      ];
+    }
+  }
+
+  saveTeamChannels() {
+    try {
+      localStorage.setItem('cl_custom_team_channels_v1', JSON.stringify(this.teamChannels));
+    } catch (e) {
+      console.warn('Unable to save team channels', e);
+    }
+  }
+
+  renderTeamChannels() {
+    const textContainer = document.getElementById('textChannelsTeams');
+    const voiceContainer = document.getElementById('voiceChannelsTeams');
+
+    if (textContainer) {
+      if (!this.teamChannels || this.teamChannels.length === 0) {
+        textContainer.innerHTML = `
+          <div style="padding: 0.4rem 0.6rem; font-size: 0.72rem; color: var(--text-dim); font-style: italic;">
+            No squad channels yet. Click + to add your team channel!
+          </div>
+        `;
+      } else {
+        textContainer.innerHTML = this.teamChannels
+          .filter(t => t.hasText !== false)
+          .map(t => {
+            const isActive = this.currentTextChannel === t.channelName ? 'active' : '';
+            return `
+              <div class="channel-item ${isActive}" data-channel="${t.channelName}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.6rem;">
+                <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <span style="font-size: 0.95rem;">${t.emblem || '🛡️'}</span>
+                  <span style="font-weight: 600; color: ${isActive ? '#fff' : 'var(--text-normal)'};">#${t.channelName}</span>
+                </div>
+                <span style="font-size: 0.65rem; background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700; border: 1px solid rgba(168, 85, 247, 0.3);">
+                  ${t.tag || 'TEAM'}
+                </span>
+              </div>
+            `;
+          }).join('');
+      }
+    }
+
+    if (voiceContainer) {
+      if (!this.teamChannels || this.teamChannels.length === 0) {
+        voiceContainer.innerHTML = '';
+      } else {
+        voiceContainer.innerHTML = this.teamChannels
+          .filter(t => t.hasVoice !== false)
+          .map(t => {
+            const isActive = this.currentVoiceRoom === t.voiceRoom ? 'active' : '';
+            return `
+              <div class="channel-item ${isActive}" data-voice="${t.voiceRoom}" style="border-left: 2px solid var(--accent-purple); padding: 0.35rem 0.6rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span>🔊</span>
+                    <span style="font-weight: 600;">${t.tag || ''} ${t.name} Comms</span>
+                  </div>
+                  <span style="font-size: 0.62rem; color: var(--accent-cyan); background: rgba(0, 242, 254, 0.1); padding: 0.05rem 0.3rem; border-radius: 3px;">
+                    ${t.game ? t.game.split(' ')[0] : 'Squad'}
+                  </span>
+                </div>
+              </div>
+            `;
+          }).join('');
+      }
+    }
+  }
+
+  openTeamChannelModal() {
+    const select = document.getElementById('teamChannelSelectExisting');
+    if (select) {
+      let teams = [];
+      if (window.app && Array.isArray(window.app.myCreatedTeams) && window.app.myCreatedTeams.length > 0) {
+        teams = window.app.myCreatedTeams;
+      } else {
+        try {
+          const raw = localStorage.getItem('cl_user_custom_teams_v1');
+          if (raw) teams = JSON.parse(raw);
+        } catch (e) {}
+      }
+
+      if (teams.length === 0) {
+        teams = [
+          {
+            id: 'TEAM-101',
+            name: 'Vanguard Cyber Squad',
+            tag: '[VANGUARD]',
+            emblem: '🛡️',
+            game: 'Counter-Strike 2',
+            focus: 'Competitive Scrims'
+          }
+        ];
+      }
+
+      let optionsHtml = '';
+      teams.forEach(t => {
+        optionsHtml += `<option value="${t.id}">${t.emblem || '🛡️'} ${t.tag || ''} ${t.name} (${t.game})</option>`;
+      });
+      optionsHtml += `<option value="new">➕ Type Brand New Squad / Clan Name</option>`;
+      select.innerHTML = optionsHtml;
+
+      if (teams.length > 0) {
+        select.value = teams[0].id;
+        this.onTeamSelectChange(teams[0].id);
+      } else {
+        select.value = 'new';
+        this.onTeamSelectChange('new');
+      }
+    }
+
+    const modal = document.getElementById('createTeamChannelModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeTeamChannelModal() {
+    const modal = document.getElementById('createTeamChannelModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  toggleNewTeamInput() {
+    const newTeamWrapper = document.getElementById('newTeamFieldsWrapper');
+    const select = document.getElementById('teamChannelSelectExisting');
+    if (!newTeamWrapper) return;
+    const isHidden = newTeamWrapper.style.display === 'none';
+    newTeamWrapper.style.display = isHidden ? 'block' : 'none';
+    if (select) {
+      select.value = isHidden ? 'new' : (select.options[0]?.value || 'new');
+    }
+  }
+
+  onTeamSelectChange(selectedId) {
+    const newTeamWrapper = document.getElementById('newTeamFieldsWrapper');
+    const gameSelect = document.getElementById('teamChannelGame');
+    const emblemSelect = document.getElementById('teamChannelEmblem');
+    const mottoInput = document.getElementById('teamChannelMotto');
+
+    if (selectedId === 'new') {
+      if (newTeamWrapper) newTeamWrapper.style.display = 'block';
+      return;
+    }
+
+    if (newTeamWrapper) newTeamWrapper.style.display = 'none';
+
+    let teams = [];
+    if (window.app && Array.isArray(window.app.myCreatedTeams)) {
+      teams = window.app.myCreatedTeams;
+    } else {
+      try {
+        const raw = localStorage.getItem('cl_user_custom_teams_v1');
+        if (raw) teams = JSON.parse(raw);
+      } catch (e) {}
+    }
+
+    const team = teams.find(t => t.id === selectedId);
+    if (team) {
+      if (gameSelect && team.game) gameSelect.value = team.game;
+      if (emblemSelect && team.emblem) emblemSelect.value = team.emblem;
+      if (mottoInput) mottoInput.value = team.focus || `${team.name} Official Scrim Roster`;
+    }
+  }
+
+  submitCreateTeamChannel() {
+    const select = document.getElementById('teamChannelSelectExisting');
+    const selectedId = select ? select.value : 'new';
+    const gameSelect = document.getElementById('teamChannelGame');
+    const emblemSelect = document.getElementById('teamChannelEmblem');
+    const typeSelect = document.getElementById('teamChannelTypeSelect');
+    const privacySelect = document.getElementById('teamChannelPrivacy');
+    const mottoInput = document.getElementById('teamChannelMotto');
+
+    let teamName = '';
+    let teamTag = '';
+    let teamGame = gameSelect ? gameSelect.value : 'Counter-Strike 2';
+    let teamEmblem = emblemSelect ? emblemSelect.value : '🛡️';
+    let motto = mottoInput ? mottoInput.value.trim() : '';
+    let teamId = selectedId;
+    let members = ['Sean (👑 Captain)', 'Roster Member 2', 'Roster Member 3', 'Roster Member 4', 'Roster Member 5'];
+
+    if (selectedId === 'new') {
+      const nameInput = document.getElementById('newTeamChannelName');
+      const tagInput = document.getElementById('newTeamChannelTag');
+      teamName = nameInput && nameInput.value.trim() ? nameInput.value.trim() : 'Alpha Squad';
+      teamTag = tagInput && tagInput.value.trim() ? tagInput.value.trim() : '[ALPHA]';
+      if (!teamTag.startsWith('[')) teamTag = `[${teamTag}]`;
+      teamId = `TEAM-${Date.now()}`;
+
+      // Synchronize with window.app.myCreatedTeams so the new squad appears platform-wide
+      const brandNewTeam = {
+        id: teamId,
+        name: teamName,
+        tag: teamTag,
+        emblem: teamEmblem,
+        focus: motto || 'Competitive Scrims',
+        synergy: '98% (High)',
+        captain: 'Sean',
+        game: teamGame,
+        size: 5,
+        members: members,
+        record: '0W - 0L',
+        elo: 1500,
+        kd: '1.00',
+        bountyEarned: '0 CL-Points',
+        createdDate: 'Just Now'
+      };
+
+      try {
+        let existingTeams = [];
+        const raw = localStorage.getItem('cl_user_custom_teams_v1');
+        if (raw) existingTeams = JSON.parse(raw);
+        existingTeams.unshift(brandNewTeam);
+        localStorage.setItem('cl_user_custom_teams_v1', JSON.stringify(existingTeams));
+        if (window.app) {
+          window.app.myCreatedTeams = existingTeams;
+          if (typeof window.app.renderMyCreatedTeams === 'function') {
+            window.app.renderMyCreatedTeams();
+          }
+        }
+      } catch (e) {}
+    } else {
+      let teams = [];
+      if (window.app && Array.isArray(window.app.myCreatedTeams)) {
+        teams = window.app.myCreatedTeams;
+      } else {
+        try {
+          const raw = localStorage.getItem('cl_user_custom_teams_v1');
+          if (raw) teams = JSON.parse(raw);
+        } catch (e) {}
+      }
+      const existing = teams.find(t => t.id === selectedId);
+      if (existing) {
+        teamName = existing.name;
+        teamTag = existing.tag || `[${existing.name.substring(0, 4).toUpperCase()}]`;
+        teamGame = teamGame || existing.game || 'Counter-Strike 2';
+        teamEmblem = teamEmblem || existing.emblem || '🛡️';
+        if (!motto && existing.focus) motto = existing.focus;
+        if (existing.members && existing.members.length > 0) members = existing.members;
+      } else {
+        teamName = 'Team ' + selectedId;
+        teamTag = '[TEAM]';
+      }
+    }
+
+    const channelType = typeSelect ? typeSelect.value : 'both';
+    const privacy = privacySelect ? privacySelect.value : 'public';
+    const cleanTag = teamTag.replace(/[[\]]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const cleanName = teamName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+    const slug = cleanTag || cleanName || `team-${Date.now().toString().slice(-4)}`;
+    const channelName = `team-${slug}`;
+    const voiceRoom = `voice-team-${slug}`;
+
+    const existingIdx = this.teamChannels.findIndex(t => t.channelName === channelName || t.id === channelName);
+    const teamChanObj = {
+      id: channelName,
+      teamId: teamId,
+      name: teamName,
+      tag: teamTag,
+      channelName: channelName,
+      voiceRoom: voiceRoom,
+      game: teamGame,
+      emblem: teamEmblem,
+      captain: 'Sean',
+      membersCount: members.length,
+      members: members,
+      motto: motto || `Official ${teamName} Scrim & Comms Hub`,
+      privacy: privacy,
+      hasText: channelType === 'both' || channelType === 'text',
+      hasVoice: channelType === 'both' || channelType === 'voice'
+    };
+
+    if (existingIdx >= 0) {
+      this.teamChannels[existingIdx] = teamChanObj;
+    } else {
+      this.teamChannels.unshift(teamChanObj);
+    }
+
+    this.saveTeamChannels();
+
+    if (!this.textMessages[channelName]) {
+      this.textMessages[channelName] = [
+        {
+          id: Date.now(),
+          author: 'CustomLobbiesBot',
+          text: `🛡️ Welcome to the dedicated squad channel for <b>${teamTag} ${teamName}</b>! Dedicated to <b>${teamGame}</b>. Use the Team Action Bar above to host scrims, start a snake draft, or copy invite links for your squad!`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+        }
+      ];
+    }
+
+    this.renderTeamChannels();
+
+    if (teamChanObj.hasText) {
+      this.switchTextChannel(channelName);
+    } else if (teamChanObj.hasVoice) {
+      this.selectVoiceRoom(voiceRoom);
+    }
+
+    this.closeTeamChannelModal();
+    this.notifyToast(`🛡️ Team Channel #${channelName} is live!`, 'success');
+  }
+
+  hostLobbyForCurrentTeam() {
+    const team = this.teamChannels ? this.teamChannels.find(t => t.channelName === this.currentTextChannel || t.id === this.currentTextChannel) : null;
+    const teamName = team ? team.name : 'Squad';
+    const game = team ? team.game : 'Counter-Strike 2';
+    const tag = team && team.tag ? team.tag : '[TEAM]';
+
+    const modal = document.getElementById('createLobbyModal');
+    if (modal) {
+      modal.classList.add('active');
+      const titleInput = document.getElementById('newLobbyTitle');
+      const gameSelect = document.getElementById('newLobbyGame');
+      if (titleInput) titleInput.value = `${tag} 5v5 Scrim Match (${teamName})`;
+      if (gameSelect) {
+        for (let opt of gameSelect.options) {
+          if (opt.value.toLowerCase().includes(game.toLowerCase()) || game.toLowerCase().includes(opt.value.toLowerCase())) {
+            gameSelect.value = opt.value;
+            break;
+          }
+        }
+      }
+      this.notifyToast(`🎮 Pre-filled scrim match lobby for ${teamName} (${game})!`, 'success');
+    } else {
+      this.notifyToast(`🎮 Team Lobby hosted for ${teamName}!`, 'success');
+    }
+
+    this.postBotNotice(`🎮 <b>Squad Match Lobby:</b> ${teamName} is hosting a competitive scrim lobby for <b>${game}</b>! Queue up or check the Lobbies tab.`);
+  }
+
+  challengeScrimForCurrentTeam() {
+    const team = this.teamChannels ? this.teamChannels.find(t => t.channelName === this.currentTextChannel || t.id === this.currentTextChannel) : null;
+    const teamName = team ? team.name : 'Squad';
+    const game = team ? team.game : 'Counter-Strike 2';
+
+    const teamsTabBtn = document.querySelector('.nav-btn[data-tab="teams-view"]');
+    if (teamsTabBtn) {
+      teamsTabBtn.click();
+      this.notifyToast(`⚔️ Scrim Dispatch opened for ${teamName}! Navigating to Teams & Scrims...`, 'info');
+    } else {
+      this.notifyToast(`⚔️ Scrim Dispatch: Squad is searching for opponents in ${game}!`, 'success');
+    }
+
+    this.postBotNotice(`⚔️ <b>Scrim Challenge Dispatched:</b> <b>${team ? team.tag : ''} ${teamName}</b> has issued an open scrim challenge for <b>${game}</b>! Opposing captains can accept via Teams Hub.`);
+  }
+
+  draftForCurrentTeam() {
+    const team = this.teamChannels ? this.teamChannels.find(t => t.channelName === this.currentTextChannel || t.id === this.currentTextChannel) : null;
+    const game = team ? team.game : 'Counter-Strike 2';
+    const teamName = team ? team.name : 'Squad';
+
+    if (window.eloDraftEngine) {
+      window.eloDraftEngine.startSnakeDraft(game);
+      this.notifyToast(`🐍 1-2-2-1 Snake Draft initiated for ${teamName} in ${game}!`, 'success');
+    } else if (window.app && typeof window.app.triggerAutoDraftModal === 'function') {
+      window.app.triggerAutoDraftModal(game);
+      this.notifyToast(`🐍 Snake Draft opened for ${game}!`, 'success');
+    } else {
+      this.notifyToast(`🐍 Starting Snake Draft for ${teamName} (${game})...`, 'info');
+    }
+
+    this.postBotNotice(`🐍 <b>Snake Draft Started:</b> Captains are picking players for ${teamName} lineup in <b>${game}</b>!`);
+  }
+
+  inviteTeammateToChannel() {
+    const team = this.teamChannels ? this.teamChannels.find(t => t.channelName === this.currentTextChannel || t.id === this.currentTextChannel) : null;
+    const teamName = team ? team.name : 'Squad';
+    const chan = team ? team.channelName : this.currentTextChannel;
+    const inviteLink = `https://customlobbies.com/hub/team/${chan}`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(inviteLink).catch(() => {});
+    }
+
+    this.notifyToast(`📋 Squad invite link copied: ${inviteLink}`, 'success');
+    this.postBotNotice(`🔗 <b>Squad Channel Invite:</b> Share this direct invite link with your teammates: <code>${inviteLink}</code>`);
+  }
+
+  postBotNotice(text) {
+    if (!this.textMessages[this.currentTextChannel]) {
+      this.textMessages[this.currentTextChannel] = [];
+    }
+    this.textMessages[this.currentTextChannel].push({
+      id: Date.now(),
+      author: 'CustomLobbiesBot',
+      text: text,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+    });
+    this.renderMessages();
   }
 
   pinStickerToDashboard(stickerEmoji, stickerName) {
@@ -1808,10 +2278,17 @@ class ChatVoiceManager {
     this.renderOnlineUsers();
   }
 
-  selectVoiceRoom(roomKey) {
+  selectVoiceRoom(roomKey, element) {
     this.currentVoiceRoom = roomKey;
+    document.querySelectorAll('[data-voice]').forEach(el => el.classList.remove('active'));
+    if (element) {
+      element.classList.add('active');
+    } else {
+      const el = document.querySelector(`[data-voice="${roomKey}"]`);
+      if (el) el.classList.add('active');
+    }
     const voiceRoomElem = document.getElementById('voiceRoomName');
-    if (voiceRoomElem) voiceRoomElem.textContent = roomKey.replace('-', ' ').toUpperCase();
+    if (voiceRoomElem) voiceRoomElem.textContent = roomKey.replace('voice-', '').replace('-', ' ').toUpperCase();
   }
 
   syncVoiceToCurrentChannel() {
