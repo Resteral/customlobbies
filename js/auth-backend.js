@@ -173,31 +173,101 @@ class AuthBackendEngine {
   }
 
   // --- USER AUTHENTICATION BACKEND CONTROLLERS ---
+  sanitizeSupabaseUrl(rawUrl) {
+    if (!rawUrl) return '';
+    let url = rawUrl.trim().replace(/^["']|["']$/g, '');
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    try {
+      const parsed = new URL(url);
+      // Supabase Project root origin only (e.g. https://xyz.supabase.co)
+      return parsed.origin;
+    } catch(e) {
+      return url.replace(/\/+(rest|auth|v1)?\/?$/i, '').replace(/\/+$/, '');
+    }
+  }
+
+  sanitizeSupabaseKey(rawKey) {
+    if (!rawKey) return '';
+    return rawKey.trim().replace(/^["']|["']$/g, '');
+  }
+
+  promptSupabaseConfig() {
+    const currentUrl = localStorage.getItem('supabase_url') || '';
+    const currentKey = localStorage.getItem('supabase_anon_key') || '';
+    
+    const inputUrl = prompt(
+      "Enter your Supabase Project URL (from Supabase > Project Settings > API > Project URL):\nExample: https://abcdefghijklm.supabase.co",
+      currentUrl && currentUrl !== 'YOUR_SUPABASE_URL' ? currentUrl : 'https://'
+    );
+    if (!inputUrl) return false;
+
+    const inputKey = prompt(
+      "Enter your Supabase Anon Public Key (from Supabase > Project Settings > API > Project API keys > anon/public):",
+      currentKey && currentKey !== 'YOUR_SUPABASE_ANON_KEY' ? currentKey : ''
+    );
+    if (!inputKey) return false;
+
+    const cleanUrl = this.sanitizeSupabaseUrl(inputUrl);
+    const cleanKey = this.sanitizeSupabaseKey(inputKey);
+
+    localStorage.setItem('supabase_url', cleanUrl);
+    localStorage.setItem('supabase_anon_key', cleanKey);
+    this._supabaseClient = null;
+
+    alert(`✅ Supabase Credentials Saved!\n\nProject URL: ${cleanUrl}\nAnon Key: ${cleanKey.slice(0, 10)}...${cleanKey.slice(-6)}`);
+    return true;
+  }
+
+  resetSupabaseConfig() {
+    try {
+      localStorage.removeItem('supabase_url');
+      localStorage.removeItem('supabase_anon_key');
+      this._supabaseClient = null;
+    } catch(e) {}
+  }
+
   getSupabaseClient() {
     let SUPABASE_URL = localStorage.getItem('supabase_url') || 'YOUR_SUPABASE_URL';
     let SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key') || 'YOUR_SUPABASE_ANON_KEY';
     
-    if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
-        const inputUrl = prompt("Enter your Supabase URL (https://xyz.supabase.co):");
-        const inputKey = prompt("Enter your Supabase Anon Key:");
-        if (inputUrl && inputKey) {
-            SUPABASE_URL = inputUrl.trim();
-            SUPABASE_ANON_KEY = inputKey.trim();
-            localStorage.setItem('supabase_url', SUPABASE_URL);
-            localStorage.setItem('supabase_anon_key', SUPABASE_ANON_KEY);
-        } else {
-            console.warn("Supabase configuration aborted by user.");
-            return null;
-        }
+    // Auto-sanitize existing localStorage values if they contain subpaths like /rest/v1
+    if (SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+      const cleanUrl = this.sanitizeSupabaseUrl(SUPABASE_URL);
+      if (cleanUrl && cleanUrl !== SUPABASE_URL) {
+        SUPABASE_URL = cleanUrl;
+        localStorage.setItem('supabase_url', SUPABASE_URL);
+        this._supabaseClient = null; // force re-create client with sanitized URL
+      }
+    }
+
+    if (SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+      const cleanKey = this.sanitizeSupabaseKey(SUPABASE_ANON_KEY);
+      if (cleanKey && cleanKey !== SUPABASE_ANON_KEY) {
+        SUPABASE_ANON_KEY = cleanKey;
+        localStorage.setItem('supabase_anon_key', SUPABASE_ANON_KEY);
+        this._supabaseClient = null;
+      }
+    }
+
+    if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY' || !SUPABASE_URL.includes('.supabase.co')) {
+      const configured = this.promptSupabaseConfig();
+      if (!configured) {
+        console.warn("Supabase configuration aborted by user.");
+        return null;
+      }
+      SUPABASE_URL = localStorage.getItem('supabase_url');
+      SUPABASE_ANON_KEY = localStorage.getItem('supabase_anon_key');
     }
     
     if (!window.supabase) {
-        console.warn("Supabase CDN script is missing from index.html.");
-        return null;
+      console.warn("Supabase CDN script is missing from index.html.");
+      return null;
     }
     
     if (!this._supabaseClient) {
-        this._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      this._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
     return this._supabaseClient;
   }
@@ -206,39 +276,71 @@ class AuthBackendEngine {
     const supabase = this.getSupabaseClient();
     
     if (!supabase) {
-        return { success: false, error: '⚠️ Supabase is not configured! Please enter your URL and Anon Key in js/auth-backend.js.' };
+      return { success: false, error: '⚠️ Supabase is not configured! Please enter your clean Project URL (https://xyz.supabase.co) and Anon Key.' };
     }
 
     try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: usernameOrEmail,
-            password: password,
-        });
+      let emailToUse = (usernameOrEmail || '').trim();
 
-        if (error) {
-            return { success: false, error: `❌ LOGIN FAILED!\n\n${error.message}` };
+      // If user entered a username instead of email, attempt lookup in users table
+      if (!emailToUse.includes('@')) {
+        try {
+          const { data: userRow } = await supabase
+            .from('users')
+            .select('email')
+            .eq('username', emailToUse)
+            .maybeSingle();
+          if (userRow && userRow.email) {
+            emailToUse = userRow.email;
+          }
+        } catch(e) {
+          console.warn('Username to email lookup skipped:', e);
+        }
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailToUse,
+        password: password,
+      });
+
+      if (error) {
+        const isPathError = error.message && (
+          error.message.toLowerCase().includes('invalid path') ||
+          error.message.toLowerCase().includes('not found') ||
+          error.status === 404
+        );
+
+        if (isPathError) {
+          this.resetSupabaseConfig();
+          return {
+            success: false,
+            error: `❌ LOGIN FAILED: Invalid Supabase URL!\n\n${error.message}\n\nYour stored Supabase URL contained an invalid path (e.g. /rest/v1).\n\nYour configuration has been reset. Please click Sign In again to enter your clean Project URL (e.g. https://xyz.supabase.co).`
+          };
         }
 
-        const userObj = {
-            id: data.user.id,
-            username: data.user.user_metadata?.username || usernameOrEmail.split('@')[0],
-            displayName: data.user.user_metadata?.username || usernameOrEmail.split('@')[0],
-            email: data.user.email,
-            elo: 1840,
-            level: 1,
-            title: 'Supabase Member',
-            avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
-            acVerified: true
-        };
+        return { success: false, error: `❌ LOGIN FAILED!\n\n${error.message}` };
+      }
 
-        return {
-            success: true,
-            requires2FA: false,
-            user: userObj,
-            jwtToken: data.session.access_token
-        };
+      const userObj = {
+        id: data.user.id,
+        username: data.user.user_metadata?.username || usernameOrEmail.split('@')[0],
+        displayName: data.user.user_metadata?.username || usernameOrEmail.split('@')[0],
+        email: data.user.email,
+        elo: 1840,
+        level: 1,
+        title: 'Supabase Member',
+        avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
+        acVerified: true
+      };
+
+      return {
+        success: true,
+        requires2FA: false,
+        user: userObj,
+        jwtToken: data.session.access_token
+      };
     } catch (e) {
-        return { success: false, error: 'Network error connecting to Supabase.' };
+      return { success: false, error: `Network error connecting to Supabase: ${e.message || 'Please check your connection.'}` };
     }
   }
 
@@ -262,6 +364,18 @@ class AuthBackendEngine {
         });
 
         if (error) {
+            const isPathError = error.message && (
+                error.message.toLowerCase().includes('invalid path') ||
+                error.message.toLowerCase().includes('not found') ||
+                error.status === 404
+            );
+            if (isPathError) {
+                this.resetSupabaseConfig();
+                return {
+                    success: false,
+                    error: `❌ REGISTRATION FAILED: Invalid Supabase URL!\n\n${error.message}\n\nYour stored Supabase URL contained an invalid path (e.g. /rest/v1).\n\nYour configuration has been reset. Please try registering again to enter your clean Project URL (e.g. https://xyz.supabase.co).`
+                };
+            }
             return { success: false, error: `❌ REGISTRATION FAILED!\n\n${error.message}` };
         }
 
