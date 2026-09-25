@@ -53,6 +53,10 @@ class CustomLobbiesApp {
     this.teamLineup = [];
     this.teamBench = [];
     this.sponsoredServers = [];
+    this.frontpageServers = [];
+    this.unlockedServerIds = new Set();
+    this.serverFilterType = 'all';
+    this.activeInviteTargetServer = null;
     this.lobbyFilterType = 'public_with_players';
     this.lobbies = [];
     
@@ -297,6 +301,7 @@ class CustomLobbiesApp {
         if (parsed.lineup) this.teamLineup = parsed.lineup;
         if (parsed.bench) this.teamBench = parsed.bench;
       }
+      this.loadFrontpageServers();
     } catch (e) {
       console.warn('Error loading app state:', e);
     }
@@ -310,6 +315,7 @@ class CustomLobbiesApp {
       localStorage.setItem('cl_title_v2', this.equippedTitle);
       localStorage.setItem('cl_leaderboard_v2', JSON.stringify(this.leaderboardData));
       localStorage.setItem('cl_lineup_v2', JSON.stringify({ lineup: this.teamLineup, bench: this.teamBench }));
+      this.saveFrontpageServers();
     } catch (e) {
       console.warn('Error saving app state:', e);
     }
@@ -3278,25 +3284,507 @@ class CustomLobbiesApp {
     }, 40);
   }
 
+  getDefaultFrontpageServers() {
+    return [
+      {
+        id: 'srv-cs2-premier-public',
+        name: '🎯 CS2 128-Tick Premier Server Node',
+        game: 'Counter-Strike 2',
+        serverIp: '192.168.1.85:27015',
+        region: 'NA East',
+        isInviteOnly: false,
+        passcode: '',
+        tickrate: '128.0 Hz (Premier)',
+        players: 8,
+        max: 10,
+        host: 'CustomLobbies Official',
+        badge: '⭐ Premier Node',
+        description: '128-tick sub-tick equalized Premier scrim node. Ring 0 Guardian AC active.'
+      },
+      {
+        id: 'srv-cs2-cloud9-invite',
+        name: '🔒 Cloud9 Pro Scrim Academy',
+        game: 'Counter-Strike 2',
+        serverIp: '192.168.1.88:27015',
+        region: 'NA East',
+        isInviteOnly: true,
+        passcode: 'c9scrim',
+        tickrate: '128.0 Hz (Premier)',
+        players: 9,
+        max: 10,
+        host: 'C9_Manager',
+        badge: '🔒 Invite Only',
+        description: 'Private team academy scrim. Requires verified team invite passcode.'
+      },
+      {
+        id: 'srv-wardogs-public',
+        name: '🐕 WARDOGS Tri-Faction 99-Player War Node',
+        game: 'WARDOGS',
+        serverIp: '192.168.1.99:27015',
+        region: 'NA East',
+        isInviteOnly: false,
+        passcode: '',
+        tickrate: '128.0 Hz (Premier)',
+        players: 84,
+        max: 99,
+        host: 'Marshal_Vanguard',
+        badge: '🔥 33v33v33 Conquest',
+        description: 'Sector 33 - Quantum Citadel. High capacity 99-player persistent warfare.'
+      },
+      {
+        id: 'srv-wardogs-vanguard-invite',
+        name: '🔒 Vanguard Special Ops [33v33v33]',
+        game: 'WARDOGS',
+        serverIp: '192.168.1.100:27015',
+        region: 'EU Central',
+        isInviteOnly: true,
+        passcode: 'vanguard99',
+        tickrate: '128.0 Hz (Premier)',
+        players: 62,
+        max: 99,
+        host: 'Vanguard_HighCommand',
+        badge: '🔒 Closed Scrim',
+        description: 'Closed ranked trial for tier-1 battalions. Passcode required for deployment.'
+      },
+      {
+        id: 'srv-helix-pacifica-public',
+        name: '🌀 Pacifica World Sandbox & Clandestine Ops',
+        game: 'Helix Game',
+        serverIp: '127.0.0.1:7777',
+        region: 'Helix Local',
+        isInviteOnly: false,
+        passcode: '',
+        tickrate: '128.0 Hz (Premier)',
+        players: 14,
+        max: 32,
+        host: 'Hypersonic Architect',
+        badge: '🌀 Local Node',
+        description: 'Unreal Engine 5 Pacifica physics, in-house drug synthesis and heist world.'
+      },
+      {
+        id: 'srv-slapshot-public',
+        name: '🏒 Slapshot: Rebound 3v3 Puck Arena',
+        game: 'Slapshot: Rebound',
+        serverIp: '192.168.1.130:27015',
+        region: 'NA West',
+        isInviteOnly: false,
+        passcode: '',
+        tickrate: '128.0 Hz (Premier)',
+        players: 5,
+        max: 6,
+        host: 'PuckMaster99',
+        badge: '🏒 Quick Arena',
+        description: 'Low-latency 3v3 ranked hockey scrim arena.'
+      },
+      {
+        id: 'srv-rematch-titans-invite',
+        name: '🔒 Cyber Titans Elite 5v5 Node',
+        game: 'REMATCH',
+        serverIp: '192.168.1.110:27015',
+        region: 'NA East',
+        isInviteOnly: true,
+        passcode: 'titans',
+        tickrate: '128.0 Hz (Premier)',
+        players: 7,
+        max: 10,
+        host: 'TitanCaptain',
+        badge: '🔒 Invite Only',
+        description: 'Exclusive 5v5 scrim node for Cyber Titans roster and verified scrim partners.'
+      }
+    ];
+  }
+
+  loadFrontpageServers() {
+    try {
+      const saved = localStorage.getItem('cl_frontpage_servers_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const defaults = this.getDefaultFrontpageServers();
+          const existingIds = new Set(parsed.map(s => s.id));
+          const missing = defaults.filter(d => !existingIds.has(d.id));
+          this.frontpageServers = [...parsed, ...missing];
+        } else {
+          this.frontpageServers = this.getDefaultFrontpageServers();
+        }
+      } else {
+        this.frontpageServers = this.getDefaultFrontpageServers();
+      }
+
+      const unlocked = localStorage.getItem('cl_unlocked_servers_v1');
+      if (unlocked) {
+        this.unlockedServerIds = new Set(JSON.parse(unlocked));
+      }
+    } catch(e) {
+      console.warn('Error loading frontpage servers:', e);
+      this.frontpageServers = this.getDefaultFrontpageServers();
+    }
+  }
+
+  saveFrontpageServers() {
+    try {
+      localStorage.setItem('cl_frontpage_servers_v1', JSON.stringify(this.frontpageServers));
+      localStorage.setItem('cl_unlocked_servers_v1', JSON.stringify(Array.from(this.unlockedServerIds)));
+    } catch(e) {
+      console.warn('Error saving frontpage servers:', e);
+    }
+  }
+
+  openApplyServerModal() {
+    const modal = document.getElementById('applyServerModal');
+    if (!modal) return;
+
+    const nameInput = document.getElementById('applyServerNameInput');
+    if (nameInput) nameInput.value = '';
+    const ipInput = document.getElementById('applyServerIpInput');
+    if (ipInput) ipInput.value = '';
+    const passInput = document.getElementById('applyServerPasscodeInput');
+    if (passInput) passInput.value = '';
+    const hostInput = document.getElementById('applyServerHostInput');
+    if (hostInput) hostInput.value = this.user ? this.user.displayName : 'You (Host)';
+    const descInput = document.getElementById('applyServerDescInput');
+    if (descInput) descInput.value = '';
+
+    const publicRadio = document.getElementById('applyServerAccessPublic');
+    if (publicRadio) publicRadio.checked = true;
+    this.toggleApplyServerAccessType('public');
+
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
+
+  closeApplyServerModal() {
+    const modal = document.getElementById('applyServerModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  toggleApplyServerAccessType(mode) {
+    const codeContainer = document.getElementById('applyServerInviteCodeContainer');
+    const passInput = document.getElementById('applyServerPasscodeInput');
+    if (codeContainer) {
+      if (mode === 'invite_only') {
+        codeContainer.style.display = 'block';
+        if (passInput && !passInput.value) {
+          passInput.value = 'CL-' + Math.floor(1000 + Math.random() * 9000);
+        }
+      } else {
+        codeContainer.style.display = 'none';
+      }
+    }
+  }
+
+  handleApplyServerFormSubmit() {
+    const nameInput = document.getElementById('applyServerNameInput');
+    const gameSelect = document.getElementById('applyServerGameSelect');
+    const ipInput = document.getElementById('applyServerIpInput');
+    const regionSelect = document.getElementById('applyServerRegionSelect');
+    const accessInviteRadio = document.getElementById('applyServerAccessInvite');
+    const passInput = document.getElementById('applyServerPasscodeInput');
+    const tickrateSelect = document.getElementById('applyServerTickrateSelect');
+    const maxInput = document.getElementById('applyServerMaxInput');
+    const hostInput = document.getElementById('applyServerHostInput');
+    const descInput = document.getElementById('applyServerDescInput');
+
+    const name = nameInput && nameInput.value.trim() ? nameInput.value.trim() : 'Community Dedicated Node';
+    const game = gameSelect ? gameSelect.value : 'Counter-Strike 2';
+    const ip = ipInput && ipInput.value.trim() ? ipInput.value.trim() : '192.168.1.85:27015';
+    const region = regionSelect ? regionSelect.value : 'NA East';
+    const isInviteOnly = accessInviteRadio ? accessInviteRadio.checked : false;
+    const passcode = passInput && passInput.value.trim() ? passInput.value.trim() : '';
+    const tickrate = tickrateSelect ? tickrateSelect.value : '128.0 Hz (Premier)';
+    const max = maxInput ? parseInt(maxInput.value) || 10 : 10;
+    const host = hostInput && hostInput.value.trim() ? hostInput.value.trim() : (this.user ? this.user.displayName : 'You (Host)');
+    const desc = descInput && descInput.value.trim() ? descInput.value.trim() : (isInviteOnly ? 'Private scrim node with invite-only passcode protection.' : 'Public competitive dedicated server node.');
+
+    if (isInviteOnly && !passcode) {
+      alert('⚠️ Please specify a secret invite passcode or key for your invite-only server!');
+      if (passInput) passInput.focus();
+      return;
+    }
+
+    const serverId = 'srv-custom-' + Date.now();
+    const newServer = {
+      id: serverId,
+      name: name,
+      game: game,
+      serverIp: ip,
+      region: region,
+      isInviteOnly: isInviteOnly,
+      passcode: isInviteOnly ? passcode : '',
+      tickrate: tickrate,
+      players: 1,
+      max: max,
+      host: host,
+      badge: isInviteOnly ? '🔒 Invite Only' : '⭐ Community Featured',
+      description: desc,
+      isUserSubmitted: true
+    };
+
+    if (isInviteOnly) {
+      this.unlockedServerIds.add(serverId);
+    }
+
+    this.frontpageServers.unshift(newServer);
+    this.saveFrontpageServers();
+    this.renderFrontpageServers();
+    this.closeApplyServerModal();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('lobby_start');
+    }
+
+    if (typeof this.showToast === 'function') {
+      this.showToast(`🎉 Server "${name}" successfully listed on the Front Page! (${isInviteOnly ? '🔒 Invite Only: Passcode ' + passcode : '🌐 Public'})`, 'success');
+    }
+  }
+
+  setServerFilterType(type) {
+    this.serverFilterType = type;
+    const btnAll = document.getElementById('btnServerFilterAll');
+    const btnPub = document.getElementById('btnServerFilterPublic');
+    const btnInv = document.getElementById('btnServerFilterInvite');
+
+    if (btnAll) btnAll.className = type === 'all' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+    if (btnPub) btnPub.className = type === 'public' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+    if (btnInv) btnInv.className = type === 'invite_only' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+
+    this.renderFrontpageServers();
+  }
+
+  connectOrUnlockServer(serverId) {
+    const s = this.frontpageServers.find(srv => srv.id === serverId);
+    if (!s) return;
+
+    if (!s.isInviteOnly) {
+      this.launchServerProtocol({
+        serverIp: s.serverIp,
+        game: s.game,
+        title: s.name,
+        map: s.game === 'WARDOGS' ? 'Sector 33 - Quantum Citadel' : 'Competitive'
+      });
+      return;
+    }
+
+    if (this.unlockedServerIds.has(serverId)) {
+      if (typeof this.showToast === 'function') {
+        this.showToast(`🔓 Server unlocked! Connecting to ${s.name}...`, 'success');
+      }
+      this.launchServerProtocol({
+        serverIp: s.serverIp,
+        game: s.game,
+        title: s.name,
+        password: s.passcode,
+        map: s.game === 'WARDOGS' ? 'Sector 33 - Quantum Citadel' : 'Competitive'
+      });
+    } else {
+      this.openServerInvitePromptModal(s);
+    }
+  }
+
+  openServerInvitePromptModal(server) {
+    this.activeInviteTargetServer = server;
+    const modal = document.getElementById('serverInvitePromptModal');
+    if (!modal) return;
+
+    const nameEl = document.getElementById('inviteModalServerName');
+    if (nameEl) nameEl.textContent = server.name;
+
+    const metaEl = document.getElementById('inviteModalServerMeta');
+    if (metaEl) metaEl.textContent = `Game: ${server.game} • Host: ${server.host} • Region: ${server.region || 'NA East'}`;
+
+    const input = document.getElementById('serverInviteCodeInput');
+    if (input) {
+      input.value = '';
+      setTimeout(() => input.focus(), 150);
+    }
+
+    const err = document.getElementById('inviteCodeErrorMsg');
+    if (err) err.style.display = 'none';
+
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
+
+  closeServerInvitePromptModal() {
+    const modal = document.getElementById('serverInvitePromptModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+    this.activeInviteTargetServer = null;
+  }
+
+  verifyServerInviteCode() {
+    if (!this.activeInviteTargetServer) return;
+    const server = this.activeInviteTargetServer;
+    const input = document.getElementById('serverInviteCodeInput');
+    const entered = input ? input.value.trim() : '';
+    const err = document.getElementById('inviteCodeErrorMsg');
+
+    const expected = (server.passcode || '').trim();
+
+    if (entered && entered.toLowerCase() === expected.toLowerCase()) {
+      this.unlockedServerIds.add(server.id);
+      this.saveFrontpageServers();
+      this.closeServerInvitePromptModal();
+      this.renderFrontpageServers();
+
+      if (typeof this.showToast === 'function') {
+        this.showToast(`✔ Invite Verified! Access Granted to ${server.name}`, 'success');
+      }
+
+      this.launchServerProtocol({
+        serverIp: server.serverIp,
+        game: server.game,
+        title: server.name,
+        password: server.passcode,
+        map: server.game === 'WARDOGS' ? 'Sector 33 - Quantum Citadel' : 'Competitive'
+      });
+    } else {
+      if (err) {
+        err.style.display = 'block';
+        err.textContent = `❌ Invalid invite key "${entered}"! Please contact host (${server.host}) for an access key.`;
+      }
+      if (input) {
+        input.style.borderColor = '#ff3366';
+        input.focus();
+        setTimeout(() => { if (input) input.style.borderColor = 'var(--accent-gold)'; }, 2000);
+      }
+    }
+  }
+
+  deleteFrontpageServer(serverId) {
+    const s = this.frontpageServers.find(srv => srv.id === serverId);
+    if (!s) return;
+
+    if (confirm(`Are you sure you want to remove server "${s.name}" from the Front Page?`)) {
+      this.frontpageServers = this.frontpageServers.filter(srv => srv.id !== serverId);
+      this.unlockedServerIds.delete(serverId);
+      this.saveFrontpageServers();
+      this.renderFrontpageServers();
+      if (typeof this.showToast === 'function') {
+        this.showToast(`Server "${s.name}" removed from Front Page.`, 'info');
+      }
+    }
+  }
+
   renderSponsoredServers() {
-    const grid = document.getElementById('sponsoredServersGrid');
-    if (!grid) return;
+    this.renderFrontpageServers();
+  }
 
-    grid.innerHTML = this.sponsoredServers.map(s => `
-      <div class="card" style="border-color: var(--accent-gold); position: relative;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
-          <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold);">${s.sponsoredBadge}</span>
-          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700;">${s.game}</span>
+  renderFrontpageServers() {
+    const frontGrid = document.getElementById('frontpageServersGrid');
+    const sponsoredGrid = document.getElementById('sponsoredServersGrid');
+
+    let list = [...this.frontpageServers];
+    if (this.serverFilterType === 'public') {
+      list = list.filter(s => !s.isInviteOnly);
+    } else if (this.serverFilterType === 'invite_only') {
+      list = list.filter(s => s.isInviteOnly);
+    }
+
+    const renderCard = (s) => {
+      const isUnlocked = !s.isInviteOnly || this.unlockedServerIds.has(s.id);
+      const isInvite = !!s.isInviteOnly;
+      const fillPct = Math.round(((s.players || 1) / (s.max || 10)) * 100);
+
+      const statusBadge = isInvite 
+        ? `<span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 800;">🔒 INVITE ONLY</span>`
+        : `<span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); font-weight: 800;">🌐 PUBLIC</span>`;
+
+      return `
+        <div class="card" style="border-color: ${isInvite ? 'var(--accent-gold)' : 'rgba(0, 242, 254, 0.35)'}; position: relative; background: linear-gradient(135deg, rgba(16, 18, 28, 0.95), rgba(12, 14, 20, 0.98)); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.4rem;">
+              <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+                <span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); font-weight: 800;">
+                  🎮 ${s.game}
+                </span>
+                ${statusBadge}
+                ${isInvite && isUnlocked ? `<span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-weight: 800;">✔ Unlocked</span>` : ''}
+              </div>
+              <span style="font-size: 0.72rem; color: var(--text-dim);">${s.region || 'Global'}</span>
+            </div>
+
+            <h3 style="font-size: 1.15rem; font-weight: 900; margin-bottom: 0.35rem; color: #fff;">
+              ${s.name}
+            </h3>
+
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.7rem; line-height: 1.4;">
+              ${s.description || 'Dedicated 128-tick scrimmage server.'}
+            </p>
+
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.5rem 0.7rem; margin-bottom: 0.8rem; font-size: 0.78rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span style="color: var(--text-dim);">Server Node:</span>
+                <code style="color: var(--accent-cyan); font-weight: 800;">${s.serverIp}</code>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span style="color: var(--text-dim);">Performance:</span>
+                <span style="color: var(--accent-gold); font-weight: 800;">${s.tickrate || '128.0 Hz'}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-dim);">Host / Clan:</span>
+                <strong style="color: #fff;">${s.host}</strong>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0.9rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 800; margin-bottom: 0.25rem;">
+                <span style="color: var(--accent-green);">${s.players || 0} / ${s.max || 10} Players Online</span>
+                <span style="color: var(--text-dim);">${fillPct}% Capacity</span>
+              </div>
+              <div class="lobby-players-bar" style="height: 6px;">
+                <div class="lobby-players-fill" style="width: ${fillPct}%; background: ${isInvite ? 'linear-gradient(90deg, #ffd700, #ff8800)' : 'linear-gradient(90deg, #00f2fe, #00e676)'};"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+            ${isInvite && !isUnlocked ? `
+              <button class="btn btn-warning btn-sm" style="flex: 2; min-width: 140px; background: linear-gradient(135deg, #ffd700, #ff8800); color: #000; font-weight: 900; border: none;" onclick="window.app.connectOrUnlockServer('${s.id}')">
+                <span>🔒</span> Unlock & Connect
+              </button>
+            ` : (isInvite && isUnlocked ? `
+              <button class="btn btn-success btn-sm" style="flex: 2; min-width: 140px; font-weight: 900;" onclick="window.app.connectOrUnlockServer('${s.id}')">
+                <span>🔓</span> Connect (Unlocked)
+              </button>
+            ` : `
+              <button class="btn btn-primary btn-sm" style="flex: 2; min-width: 140px; font-weight: 800;" onclick="window.app.connectOrUnlockServer('${s.id}')">
+                <span>🔌</span> 1-Click Connect
+              </button>
+            `)}
+
+            <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('${s.serverIp}')" title="Copy Connect IP Command">
+              📋 IP
+            </button>
+
+            ${s.isUserSubmitted ? `
+              <button class="btn btn-danger btn-sm" onclick="window.app.deleteFrontpageServer('${s.id}')" title="Remove My Server">
+                🗑️
+              </button>
+            ` : ''}
+          </div>
         </div>
+      `;
+    };
 
-        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.4rem;">${s.name}</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Owner: <strong style="color: var(--text-main);">${s.host}</strong> | Players: <strong style="color: var(--accent-green);">${s.players}/${s.max} Live</strong></p>
-
-        <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="window.app.connectToServer('${s.name}', '${s.connectURL}')">
-          🔌 1-Click Connect Server
-        </button>
+    const emptyHTML = `
+      <div class="card" style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--text-muted); background: rgba(0,0,0,0.3); border: 1px dashed var(--border-color);">
+        <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem;">🖥️</span>
+        <strong style="color: #fff; font-size: 1rem; display: block; margin-bottom: 0.3rem;">No servers found for this filter.</strong>
+        <p style="font-size: 0.85rem; margin-bottom: 1rem;">Be the first to apply your community server or private scrim node to the Front Page!</p>
+        <button class="btn btn-primary btn-sm" onclick="window.app.openApplyServerModal()">➕ Apply Server to Front Page</button>
       </div>
-    `).join('');
+    `;
+
+    const html = list.length > 0 ? list.map(renderCard).join('') : emptyHTML;
+
+    if (frontGrid) frontGrid.innerHTML = html;
+    if (sponsoredGrid) sponsoredGrid.innerHTML = html;
   }
 
   connectToServer(name, url) {
@@ -3688,7 +4176,10 @@ class CustomLobbiesApp {
         if (tabId === 'lobbies-view') {
           this.renderLobbies();
           this.renderMyCreatedTeams();
+          this.renderFrontpageServers();
           if (window.tournamentsStoreEngine) window.tournamentsStoreEngine.renderDashboardBracketWidget();
+        } else if (tabId === 'servers-view') {
+          this.renderFrontpageServers();
         } else if (tabId === 'tournaments-view') {
           if (window.tournamentsStoreEngine) {
             window.tournamentsStoreEngine.renderTournaments();
