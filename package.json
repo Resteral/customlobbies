@@ -50,6 +50,10 @@
   },
   "devDependencies": {
     "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
     "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "archiver": "^8.0.0"
   }
 }

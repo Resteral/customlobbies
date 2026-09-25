@@ -123,7 +123,7 @@ class WardogsEngine {
   }
 
   // Register Squad Unit for Competitive Circuit
-  registerSquadUnit(squadName, tag, captainHandle, game, squadSize = 33) {
+  registerSquadUnit(squadName, tag, captainHandle, game, squadSize = 50) {
     const newSquad = {
       id: Date.now(),
       name: squadName || 'Tactical Company',
@@ -131,7 +131,7 @@ class WardogsEngine {
       captain: captainHandle || 'Ghost_Dog_99',
       game: game || 'WARDOGS',
       record: '0W - 0L',
-      membersCount: parseInt(squadSize) || 33,
+      membersCount: parseInt(squadSize) || 50,
       status: 'ACTIVE CONTRACT',
       bountyEarned: '0 CL-Points',
       faction: '🔵 Vanguard Command'

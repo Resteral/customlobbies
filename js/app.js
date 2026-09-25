@@ -400,14 +400,16 @@ class CustomLobbiesApp {
   }
 
   submitJoinPlayerPool() {
-    const game = document.getElementById('poolRegisterGame')?.value || 'Counter-Strike 2';
+    const handleInput = document.getElementById('poolRegisterName');
+    const name = handleInput?.value.trim() || 'Sean';
+    const game = document.getElementById('poolRegisterGame')?.value || 'WARDOGS';
     const role = document.getElementById('poolRegisterRole')?.value || 'Entry Fragger';
     const note = document.getElementById('poolRegisterNote')?.value.trim() || 'Ready for scrims!';
 
     const newFreeAgent = {
       id: Date.now(),
-      name: 'You (Host)',
-      elo: 1840,
+      name: name,
+      elo: 2150,
       game: game,
       role: role,
       time: 'Just Now',
@@ -417,8 +419,27 @@ class CustomLobbiesApp {
       note: note
     };
 
+    if (!this.poolFeed) this.poolFeed = [];
     this.poolFeed.unshift(newFreeAgent);
+    localStorage.setItem('cl_user_pool_feed_v1', JSON.stringify(this.poolFeed));
     this.renderPoolFeed();
+
+    // Also register into WARDOGS engine so player immediately appears in WARDOGS Free Agent Pool!
+    if (window.wardogsEngine) {
+      if (!window.wardogsEngine.soloMercenaries) window.wardogsEngine.soloMercenaries = [];
+      const callsign = (name.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase() || 'VIPER') + '-1';
+      window.wardogsEngine.soloMercenaries.unshift({
+        id: newFreeAgent.id,
+        name: name,
+        callsign: callsign,
+        game: game,
+        role: role,
+        elo: 2150,
+        status: 'Available for Draft',
+        bio: note
+      });
+      this.renderWardogsView();
+    }
 
     const modal = document.getElementById('joinPlayerPoolModal');
     if (modal) modal.classList.remove('active');
@@ -429,9 +450,12 @@ class CustomLobbiesApp {
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('fanfare');
+      if (typeof window.widgetBuilderEngine.showToast === 'function') {
+        window.widgetBuilderEngine.showToast(`🚀 ${name} listed in Free-Agent Pool (+25 🪙 CL-Points)!`, 'success');
+      }
     }
 
-    alert(`🚀 FREE-AGENT SIGNUP COMPLETE!\n\nYou listed yourself in the Universal Player Pool for ${game} as ${role}!\nEarned +25 🪙 CL-Points signup bonus!`);
+    alert(`🚀 FREE-AGENT SIGNUP COMPLETE!\n\n${name} is now listed in the Free-Agent Draft Pool for ${game} (${role})!\nEarned +25 🪙 CL-Points signup bonus!`);
   }
 
   recruitPoolPlayer(playerId) {
@@ -942,7 +966,7 @@ class CustomLobbiesApp {
                     <span style="color: var(--accent-purple); font-weight: 800;">2400 MMR</span>
                   </div>
                   <div style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; padding: 0.2rem 0.4rem;">
-                    + ${t.membersCount ? t.membersCount - 1 : 32} Other Enlisted Operatives...
+                    + ${(t.membersCount || 50) - 1} Other Enlisted Operatives...
                   </div>
                 `;
               }

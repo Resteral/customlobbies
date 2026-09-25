@@ -2393,23 +2393,23 @@
         <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
           <span>🙋</span> Sign Up as Free-Agent for Tournament & Lobby Draft Pool
         </h3>
-        <button class="btn btn-secondary btn-sm" id="btnClosePlayerPoolModal">✕ Close</button>
+        <button class="btn btn-secondary btn-sm" id="btnClosePlayerPoolModal" onclick="document.getElementById('joinPlayerPoolModal').classList.remove('active')">✕ Close</button>
       </div>
 
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-        List your gamer handle in the Universal Free-Agent Player Pool so Team Captains can recruit you into competitive 5v5 scrims or tournament bracket teams!
+        List your gamer handle in the Universal Free-Agent Player Pool so Team Captains can recruit you into competitive scrims or tournament bracket teams!
       </p>
 
       <div class="input-group">
         <label class="input-label">Gamer Handle / Name</label>
-        <input type="text" class="input-field" id="poolRegisterName" value="You (Host)" readonly>
+        <input type="text" class="input-field" id="poolRegisterName" value="Sean" placeholder="Enter your gamer handle">
       </div>
 
       <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
         <div>
           <label class="input-label">Target Game Title</label>
           <select class="input-field" id="poolRegisterGame">
-            <option value="WARDOGS">WARDOGS</option>
+            <option value="WARDOGS" selected>WARDOGS</option>
             <option value="Counter-Strike 2">Counter-Strike 2</option>
             <option value="Empulse">Empulse</option>
             <option value="REMATCH">REMATCH</option>
@@ -2423,17 +2423,19 @@
         <div>
           <label class="input-label">Primary Role</label>
           <select class="input-field" id="poolRegisterRole">
-            <option value="Entry Fragger">Entry Fragger</option>
+            <option value="Entry Fragger" selected>Entry Fragger</option>
             <option value="AWPer / Sniper">AWPer / Sniper</option>
             <option value="IGL / Shotcaller">IGL / Shotcaller</option>
             <option value="Support / Controller">Support / Controller</option>
+            <option value="⚡ Breacher / Assault">⚡ Breacher / Assault</option>
+            <option value="🛡️ Vanguard Heavy / Tank">🛡️ Vanguard Heavy / Tank</option>
           </select>
         </div>
       </div>
 
       <div class="input-group">
         <label class="input-label">Availability Note / Note for Captains</label>
-        <input type="text" class="input-field" id="poolRegisterNote" placeholder="e.g. Ready for 5v5 Premier scrims tonight! Mic ready on Discord.">
+        <input type="text" class="input-field" id="poolRegisterNote" placeholder="e.g. Ready for scrims tonight! Mic ready on Discord.">
       </div>
 
       <div style="background: rgba(0, 230, 118, 0.08); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.25rem; border: 1px solid rgba(0, 230, 118, 0.25); font-size: 0.82rem;">
@@ -2444,8 +2446,8 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
-        <button class="btn btn-secondary" id="btnCancelPlayerPoolModal">Cancel</button>
-        <button class="btn btn-primary" id="btnConfirmSubmitPlayerPool" style="font-size: 1rem;">
+        <button class="btn btn-secondary" id="btnCancelPlayerPoolModal" onclick="document.getElementById('joinPlayerPoolModal').classList.remove('active')">Cancel</button>
+        <button class="btn btn-primary" id="btnConfirmSubmitPlayerPool" onclick="window.app.submitJoinPlayerPool()" style="font-size: 1rem;">
           <span>🚀</span> Submit Free-Agent Listing
         </button>
       </div>
@@ -3111,9 +3113,9 @@
         <div class="input-group">
           <label class="input-label">Team Size Options</label>
           <select class="input-field" id="modalWardogsTeamSize">
-            <option value="999" selected>Unlimited (Open Roster)</option>
-            <option value="33">33-Player Battalion</option>
-            <option value="5">5-Player Squad</option>
+            <option value="50" selected>50 Players</option>
+            <option value="7">7 Players</option>
+            <option value="999">Unlimited (Open Roster)</option>
           </select>
           <input type="hidden" id="modalWardogsTeamGame" value="WARDOGS">
         </div>
@@ -3219,8 +3221,9 @@
         <div class="input-group">
           <label class="input-label">Team Playstyle Focus</label>
           <select class="input-field" id="modalTeamFocus">
-            <option value="Competitive Scrims" selected>🏆 Competitive 5v5 Scrims</option>
-            <option value="33-Man Battalion">🛡️ WARDOG 33-Man Battalion</option>
+            <option value="Competitive Scrims" selected>🏆 Competitive 7v7 Scrims</option>
+            <option value="50-Man Battalion">🛡️ WARDOG 50-Man Battalion</option>
+            <option value="7-Man Fireteam">⚡ 7-Player Tactical Fireteam</option>
             <option value="Pro Esports League">🥇 Pro League Ladder</option>
             <option value="Casual Clan">🎮 Casual Clan Matches</option>
           </select>
