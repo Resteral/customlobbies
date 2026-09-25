@@ -600,6 +600,13 @@ div:has(.dropdown-wrapper:focus-within) {
   background: rgba(0, 0, 0, 0.2);
 }
 
+.channel-game-action-bar {
+  background: linear-gradient(90deg, rgba(14, 18, 28, 0.95), rgba(8, 12, 20, 0.9));
+  border-bottom: 1px solid rgba(0, 242, 254, 0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
 .chat-messages-container {
   flex: 1;
   padding: 1.25rem;

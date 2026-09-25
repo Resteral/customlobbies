@@ -1007,24 +1007,44 @@
               <button class="add-channel-btn" id="btnAddTextChannel" title="Create Text Channel">+</button>
             </div>
             <div id="textChannelsList">
-              <div class="channel-item active" data-channel="general"># general</div>
-              <div class="channel-item" data-channel="pics"># pics</div>
-              <div class="channel-item" data-channel="commands"># commands</div>
-              <div class="channel-item" data-channel="promo"># promo</div>
-              <div class="channel-item" data-channel="lfg-cs2"># lfg-cs2</div>
-              <div class="channel-item" data-channel="tournaments"># tournaments</div>
+              <div class="channel-item active" data-channel="general"><span>💬</span> # general</div>
+              <div class="channel-item" data-channel="pics"><span>📸</span> # pics</div>
+              <div class="channel-item" data-channel="commands"><span>⚡</span> # commands</div>
+              <div class="channel-item" data-channel="promo"><span>📢</span> # promo</div>
+              <div class="channel-item" data-channel="tournaments"><span>🏆</span> # tournaments</div>
+            </div>
+
+            <!-- Category: GAME HUBS & LOBBIES (Channels for Each Game) -->
+            <div class="channel-section-title" style="margin-top: 0.8rem;">
+              <span>🎮 GAME HUBS & LOBBIES</span>
+            </div>
+            <div id="textChannelsGames">
+              <div class="channel-item" data-channel="wardogs" title="WARDOGS 7v7 Battalion Scrims & Matchmaking"><span>🐕</span> # wardogs</div>
+              <div class="channel-item" data-channel="cs2-scrims" title="Counter-Strike 2 5v5 Premier Scrims & Pools"><span>🎯</span> # cs2-scrims</div>
+              <div class="channel-item" data-channel="valorant" title="Valorant 5v5 Radiant Scrims & LFG"><span>⚡</span> # valorant</div>
+              <div class="channel-item" data-channel="marvel-rivals" title="Marvel Rivals 6v6 Competitive Pools"><span>💥</span> # marvel-rivals</div>
+              <div class="channel-item" data-channel="rocket-league" title="Rocket League 3v3 Aerial Scrims"><span>🏎️</span> # rocket-league</div>
+              <div class="channel-item" data-channel="deadlock" title="Deadlock 6v6 Hero Shooter & Scrims"><span>🔮</span> # deadlock</div>
+              <div class="channel-item" data-channel="the-finals" title="The Finals 3v3 Cashout Arena"><span>🏆</span> # the-finals</div>
+              <div class="channel-item" data-channel="slapshot" title="Slapshot: Rebound 3v3 Ranked Pucks"><span>🏒</span> # slapshot</div>
+              <div class="channel-item" data-channel="empulse" title="Empulse 5v5 Tactical Fast-Paced"><span>🚀</span> # empulse</div>
+              <div class="channel-item" data-channel="rematch" title="REMATCH 5v5 Arcade Ball & Scrims"><span>⚽</span> # rematch</div>
+              <div class="channel-item" data-channel="r6-siege" title="Rainbow Six Siege 5v5 Tactical Defusal"><span>🛡️</span> # r6-siege</div>
+              <div class="channel-item" data-channel="dota2" title="Dota 2 5v5 Ranked Captains Scrims"><span>⚔️</span> # dota2</div>
+              <div class="channel-item" data-channel="overwatch2" title="Overwatch 2 5v5 Role Queue Scrims"><span>🤖</span> # overwatch2</div>
+              <div class="channel-item" data-channel="arkheron" title="Arkheron 5v5 Dark Fantasy Arena"><span>🏰</span> # arkheron</div>
             </div>
 
             <!-- Category: VOICE CHANNELS -->
-            <div class="channel-section-title">
+            <div class="channel-section-title" style="margin-top: 0.8rem;">
               <span>🔊 VOICE CHANNELS</span>
               <button class="add-channel-btn" id="btnAddVoiceChannel" title="Create Voice Room">+</button>
             </div>
             <div id="voiceChannelsList">
-              <div class="channel-item" data-voice="lounge-1">
-                <span>🔊</span> lounge 1
+              <div class="channel-item" data-voice="general-lounge">
+                <span>🔊</span> General Lounge
               </div>
-              <div class="voice-channel-users" id="vusers-lounge-1">
+              <div class="voice-channel-users" id="vusers-general-lounge">
                 <div class="voice-user-row">
                   <div class="speaking-indicator"></div>
                   <span>ApexGod99</span>
@@ -1035,14 +1055,26 @@
                 </div>
               </div>
 
-              <div class="channel-item" data-voice="office" style="margin-top: 0.4rem;">
-                <span>🔊</span> office
+              <div class="channel-item" data-voice="wardogs-7v7" style="margin-top: 0.35rem;" title="WARDOGS 7v7 Squad Comms">
+                <span>🔊🐕</span> WARDOGS 7v7 Comms
               </div>
-              <div class="channel-item" data-voice="lounge-2" style="margin-top: 0.4rem;">
-                <span>🔊</span> lounge 2
+              <div class="channel-item" data-voice="cs2-premier" style="margin-top: 0.35rem;" title="CS2 Premier 5v5 Scrim Comms">
+                <span>🔊🎯</span> CS2 Premier 5v5
               </div>
-              <div class="channel-item" data-voice="mimis" style="margin-top: 0.4rem;">
-                <span>🔊</span> mimis
+              <div class="channel-item" data-voice="valorant-ranked" style="margin-top: 0.35rem;" title="Valorant Ranked Squad Comms">
+                <span>🔊⚡</span> Valorant Comms
+              </div>
+              <div class="channel-item" data-voice="marvel-rivals" style="margin-top: 0.35rem;" title="Marvel Rivals 6v6 Comms">
+                <span>🔊💥</span> Marvel Rivals Comms
+              </div>
+              <div class="channel-item" data-voice="rocket-league" style="margin-top: 0.35rem;" title="Rocket League 3v3 Comms">
+                <span>🔊🏎️</span> Rocket League 3v3
+              </div>
+              <div class="channel-item" data-voice="the-finals" style="margin-top: 0.35rem;" title="The Finals 3v3 Comms">
+                <span>🔊🏆</span> The Finals Squad
+              </div>
+              <div class="channel-item" data-voice="mimis" style="margin-top: 0.35rem;">
+                <span>🔊</span> mimis / chill
               </div>
             </div>
           </div>
@@ -1095,6 +1127,34 @@
               </button>
               <button class="btn btn-secondary btn-sm" id="btnHeaderOpenStickers" onclick="window.chatVoiceManager.toggleStickerDrawer()" title="Stickers & Emotes">
                 <span>✨</span> Stickers
+              </button>
+            </div>
+          </div>
+
+          <!-- In-Channel Game Quick Action Bar (Host Lobby, Browse Queues, Snake Draft, Match Pool) -->
+          <div id="channelGameActionBar" class="channel-game-action-bar" style="display: none; background: rgba(8, 12, 22, 0.85); border-bottom: 1px solid var(--border-color); padding: 0.6rem 1.25rem; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <span id="channelGameIcon" style="font-size: 1.4rem;">🎮</span>
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span id="channelGameTitle" style="font-weight: 800; font-size: 0.95rem; color: #fff;">Counter-Strike 2</span>
+                  <span class="lobby-game-tag" id="channelGameBadge" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-size: 0.68rem;">Dedicated Game Hub</span>
+                </div>
+                <div id="channelGameDetail" style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.1rem;">5v5 Competitive Matchmaking Hub & Scrimmage Chat</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-sm" id="btnChannelHostLobby" onclick="window.chatVoiceManager.hostLobbyForCurrentGame()" title="Host a public lobby for this game">
+                <span>➕</span> Host Lobby
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnChannelBrowseLobbies" onclick="window.chatVoiceManager.browseLobbiesForCurrentGame()" title="Browse and join live queues & lobbies for this game">
+                <span>🔥</span> Browse Lobbies
+              </button>
+              <button class="btn btn-purple btn-sm" id="btnChannelSnakeDraft" onclick="window.chatVoiceManager.launchDraftForCurrentGame()" title="Start 1-2-2-1 Snake Draft for this game">
+                <span>🐍</span> Snake Draft
+              </button>
+              <button class="btn btn-cyan btn-sm" id="btnChannelJoinPool" onclick="window.chatVoiceManager.executeInChatJoin(null)" title="Auto-Join In-Chat Match Pool (-j)">
+                <span>⚡</span> Join Pool (-j)
               </button>
             </div>
           </div>
@@ -2553,16 +2613,21 @@
           <select class="input-field" id="newLobbyGame">
             <option value="Counter-Strike 2">Counter-Strike 2</option>
             <option value="Valorant">Valorant</option>
-            <option value="Pacifica Crime 5v5">Pacifica Crime 5v5</option>
             <option value="WARDOGS">WARDOGS</option>
+            <option value="Marvel Rivals">Marvel Rivals</option>
+            <option value="Rocket League">Rocket League</option>
+            <option value="Deadlock">Deadlock</option>
+            <option value="The Finals">The Finals</option>
+            <option value="Slapshot: Rebound">Slapshot: Rebound</option>
+            <option value="Empulse">Empulse</option>
+            <option value="REMATCH">REMATCH</option>
+            <option value="Rainbow Six Siege">Rainbow Six Siege</option>
             <option value="Dota 2">Dota 2</option>
+            <option value="Overwatch 2">Overwatch 2</option>
+            <option value="Arkheron">Arkheron</option>
+            <option value="Pacifica Crime 5v5">Pacifica Crime 5v5</option>
             <option value="StarCraft II">StarCraft II</option>
             <option value="PUBG">PUBG: Battlegrounds</option>
-            <option value="Arkheron">Arkheron</option>
-            <option value="Empulse">Empulse</option>
-            <option value="Rainbow Six Siege">Rainbow Six Siege</option>
-            <option value="Rocket League">Rocket League</option>
-            <option value="Slapshot: Rebound">Slapshot: Rebound</option>
           </select>
         </div>
 
@@ -2570,7 +2635,9 @@
           <label class="input-label">Max Players & Format</label>
           <select class="input-field" id="newLobbyMax">
             <option value="10">10 Players (5v5 Scrim)</option>
-            <option value="6">6 Players (3v3 Arena)</option>
+            <option value="14">14 Players (7v7 Fireteam / WARDOGS)</option>
+            <option value="12">12 Players (6v6 Rivals / Deadlock)</option>
+            <option value="6">6 Players (3v3 Arena / Rocket / Finals)</option>
             <option value="4">4 Players (2v2 Wingman)</option>
             <option value="2">2 Players (1v1 Duel)</option>
             <option value="99">99 Players (33v33v33 WARDOGS)</option>

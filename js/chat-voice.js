@@ -68,6 +68,107 @@ class ChatVoiceManager {
     // Per-Channel Match Lobby & Team Pool Engine
     this.channelLobbies = {};
 
+    this.channelGameMap = {
+      'wardogs': {
+        game: 'WARDOGS',
+        icon: '🐕',
+        topic: 'WARDOGS 7v7 Frontline Scrims, LFG & Battalion Matchmaking Pool',
+        maxPerTeam: 7,
+        map: 'Amber Strike Frontline'
+      },
+      'cs2-scrims': {
+        game: 'Counter-Strike 2',
+        icon: '🎯',
+        topic: 'Counter-Strike 2 5v5 Premier Scrims, FaceIt Rules & Team Pools',
+        maxPerTeam: 5,
+        map: 'Mirage'
+      },
+      'valorant': {
+        game: 'Valorant',
+        icon: '⚡',
+        topic: 'Valorant 5v5 Competitive, Radiant LFG & Agent Veto Drafts',
+        maxPerTeam: 5,
+        map: 'Ascent'
+      },
+      'marvel-rivals': {
+        game: 'Marvel Rivals',
+        icon: '💥',
+        topic: 'Marvel Rivals 6v6 Vanguard & Duelist Team Pools & Scrims',
+        maxPerTeam: 6,
+        map: 'Tokyo 2099'
+      },
+      'rocket-league': {
+        game: 'Rocket League',
+        icon: '🏎️',
+        topic: 'Rocket League 3v3 High-Octane Aerials & Ranked Scrims',
+        maxPerTeam: 3,
+        map: 'Champions Field'
+      },
+      'deadlock': {
+        game: 'Deadlock',
+        icon: '🔮',
+        topic: 'Deadlock 6v6 Lane Coordination, Hero Picks & Team Scrims',
+        maxPerTeam: 6,
+        map: 'Midtown Lanes'
+      },
+      'the-finals': {
+        game: 'The Finals',
+        icon: '🏆',
+        topic: 'The Finals 3v3 Cashout Arena & Destruction Scrims',
+        maxPerTeam: 3,
+        map: 'Monaco'
+      },
+      'slapshot': {
+        game: 'Slapshot: Rebound',
+        icon: '🏒',
+        topic: 'Slapshot: Rebound 3v3 Ranked Puck Matches & Custom Rinks',
+        maxPerTeam: 3,
+        map: 'Puck Arena Stadium'
+      },
+      'empulse': {
+        game: 'Empulse',
+        icon: '🚀',
+        topic: 'Empulse 5v5 Fast-Paced Arena Scrims & Match Lobbies',
+        maxPerTeam: 5,
+        map: 'Neo District'
+      },
+      'rematch': {
+        game: 'REMATCH',
+        icon: '⚽',
+        topic: 'REMATCH 5v5 Street Ball, Striker Pools & Scrims',
+        maxPerTeam: 5,
+        map: 'San Siro Arena'
+      },
+      'r6-siege': {
+        game: 'Rainbow Six Siege',
+        icon: '🛡️',
+        topic: 'Rainbow Six Siege 5v5 Tactical Bomb Defusal & Scrims',
+        maxPerTeam: 5,
+        map: 'Clubhouse'
+      },
+      'dota2': {
+        game: 'Dota 2',
+        icon: '⚔️',
+        topic: 'Dota 2 5v5 Ranked Captains Mode & Scrim Matchmaking',
+        maxPerTeam: 5,
+        map: 'The Ancient Battlefield'
+      },
+      'overwatch2': {
+        game: 'Overwatch 2',
+        icon: '🤖',
+        topic: 'Overwatch 2 5v5 Competitive Role Queue & Team Scrims',
+        maxPerTeam: 5,
+        map: "King's Row"
+      },
+      'arkheron': {
+        game: 'Arkheron',
+        icon: '🏰',
+        topic: 'Arkheron 5v5 Dark Fantasy Conquest & Match Pools',
+        maxPerTeam: 5,
+        map: 'Eldritch Ruins'
+      }
+    };
+
     this.textMessages = {
       'general': [
         {
@@ -101,7 +202,7 @@ class ChatVoiceManager {
         }
       ],
       'welcome': [
-        { id: 10, author: 'CustomLobbiesBot', text: '👋 Welcome to CustomLobbies Community Hub! Read the rules and join voice channels!', time: '12:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+        { id: 10, author: 'CustomLobbiesBot', text: '👋 Welcome to CustomLobbies Community Hub! Select a game channel from the sidebar to chat and join queues with players!', time: '12:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
       ],
       'rules': [
         { id: 11, author: 'Admin', text: '📜 1. Be respectful to players & captains.\n2. No cheating, scripting, or unauthorized exploits.\n3. GL & HF in all matches!', time: '12:01 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
@@ -115,11 +216,62 @@ class ChatVoiceManager {
       'promo': [
         { id: 14, author: 'TournamentDesk', text: '📢 $2,500 Premier Summer Championship qualifiers start this weekend! Assemble your squads!', time: '10:30 AM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🏆', name: 'Champion' } }
       ],
-      'lfg-cs2': [
-        { id: 15, author: 'ZywOo_Master', text: 'LFG 5v5 Premier Scrims, 2800+ MMR lobby. Looking for aggressive entry rifler.', time: '12:15 PM', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80' }
-      ],
       'tournaments': [
         { id: 16, author: 'CustomLobbiesBot', text: '🏆 Live Tournament Bracket synchronized. Check the #tournaments tab or type <b>-b</b> in chat to inspect live matches.', time: '12:10 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+      ],
+      // --- DEDICATED GAME CHANNELS ---
+      'wardogs': [
+        { id: 101, author: 'CommanderVance', text: '🔥 WARDOG 7v7 squad recruiting! Need 2 assault and 1 heavy anchor for Amber Strike Frontline!', time: '11:40 AM', avatar: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=80&auto=format&fit=crop&q=80' },
+        { id: 102, author: 'IronClad_77', text: 'Signing in with Battalion Alpha. Tank armor buffed on current patch 🐕', time: '11:55 AM', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🔥', name: 'Fire Play' } },
+        { id: 103, author: 'CustomLobbiesBot', text: '🐕 WARDOGS 7v7 lobby match engine ready. Click <b>"Join Pool (-j)"</b> above to queue into the frontline battalion pool!', time: '12:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'cs2-scrims': [
+        { id: 104, author: 'S1mple_Fragger', text: 'Looking for 5v5 Premier scrim on Mirage or Inferno. 2800+ MMR, join pool!', time: '11:50 AM', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80' },
+        { id: 105, author: 'Device_CS', text: 'Ready to AWP. Join Team Bravo! 🎯', time: '12:01 PM', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80' },
+        { id: 106, author: 'CustomLobbiesBot', text: '🎯 Dedicated 128-tick CS2 scrim server is primed. Use <b>-j 1</b> or <b>-j 2</b> to pick a side!', time: '12:05 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'valorant': [
+        { id: 107, author: 'TenZ_Duelist', text: 'Need a Controller and Initiator for Ascent 5v5 scrim. Let\'s run it!', time: '11:48 AM', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '⚡', name: 'Electro GG' } },
+        { id: 108, author: 'Valkyrie_CS', text: 'Omen main locked in. Ready to queue!', time: '12:03 PM', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&auto=format&fit=crop&q=80' },
+        { id: 109, author: 'CustomLobbiesBot', text: '⚡ Valorant 1-2-2-1 Snake Draft available. Click <b>"Snake Draft"</b> above to draft your roster!', time: '12:10 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'marvel-rivals': [
+        { id: 110, author: 'CyberBoss', text: '6v6 Marvel Rivals lobby forming! Need Vanguard tank & support!', time: '11:35 AM', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '👾', name: 'Cyber Boss' } },
+        { id: 111, author: 'StormCaller', text: 'Magneto / Doctor Strange ready to tank. Let\'s go!', time: '11:58 AM', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'rocket-league': [
+        { id: 112, author: 'AerialGod', text: '3v3 Champions Field lobby open! High speed aerials only 🏎️', time: '11:42 AM', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🚀', name: 'To The Moon' } },
+        { id: 113, author: 'BoostMonster', text: 'Need 1 solid third man for ranked scrims. Fast rotations!', time: '12:02 PM', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'deadlock': [
+        { id: 114, author: 'SevenMain', text: '6v6 Deadlock mid-lane draft starting. Type -j to join! 🔮', time: '11:30 AM', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80' },
+        { id: 115, author: 'WraithCarry', text: 'Soul farm speedrun ready. Joining lane 2.', time: '11:52 AM', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'the-finals': [
+        { id: 116, author: 'CashoutKing', text: '3v3 The Finals destruction lobby ready! Running Heavy sledge + Medium heal 🏆', time: '11:25 AM', avatar: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=80&auto=format&fit=crop&q=80' },
+        { id: 117, author: 'LightSniper', text: 'Seoul arena selected. Let\'s get the vault!', time: '11:49 AM', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'slapshot': [
+        { id: 118, author: 'PuckMaster', text: '3v3 Slapshot: Rebound open for scrimmage. Pass-first mentality! 🏒', time: '11:15 AM', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80' },
+        { id: 119, author: 'SlapShotGoalie', text: 'In net and warmed up. Join rink!', time: '11:38 AM', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'empulse': [
+        { id: 120, author: 'NeonDrifter', text: '5v5 Empulse speed arena scrimmage open. High mobility required! 🚀', time: '11:20 AM', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'rematch': [
+        { id: 121, author: 'StrikerPro', text: '5v5 REMATCH street ball tournament qualifier forming! ⚽', time: '11:10 AM', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'r6-siege': [
+        { id: 122, author: 'MiraAnchor', text: '5v5 Clubhouse bomb defense scrim. Need thermite & thatcher on attack! 🛡️', time: '11:32 AM', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'dota2': [
+        { id: 123, author: 'MidOrFeed', text: '5v5 Captains Mode scrim, Ancient 5 / Divine lobby. Drafting now! ⚔️', time: '11:05 AM', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'overwatch2': [
+        { id: 124, author: 'MainTankSigma', text: '5v5 King\'s Row competitive scrim. Looking for hitscan DPS and flex support! 🤖', time: '11:28 AM', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'arkheron': [
+        { id: 125, author: 'VoidKnight', text: '5v5 Eldritch Ruins dark fantasy conquest match recruiting! 🏰', time: '11:18 AM', avatar: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=80&auto=format&fit=crop&q=80' }
       ]
     };
 
@@ -742,16 +894,48 @@ class ChatVoiceManager {
   switchTextChannel(channelName, element) {
     this.currentTextChannel = channelName;
     document.querySelectorAll('[data-channel]').forEach(el => el.classList.remove('active'));
-    if (element) element.classList.add('active');
+    if (element) {
+      element.classList.add('active');
+    } else {
+      const el = document.querySelector(`[data-channel="${channelName}"]`);
+      if (el) el.classList.add('active');
+    }
 
+    const gInfo = this.channelGameMap ? this.channelGameMap[channelName] : null;
     const header = document.getElementById('currentChannelHeader');
-    if (header) header.textContent = `# ${channelName}`;
-    
     const topic = document.getElementById('currentChannelTopic');
-    if (topic) topic.textContent = `Discussion and chat for #${channelName}`;
-    
     const input = document.getElementById('chatInputText');
-    if (input) input.placeholder = `Send a message to #${channelName}...`;
+    const actionBar = document.getElementById('channelGameActionBar');
+
+    if (gInfo) {
+      if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">${gInfo.icon}</span> #${channelName}`;
+      if (topic) topic.textContent = gInfo.topic;
+      if (input) input.placeholder = `Message #${channelName} or type -j (join match pool), -help...`;
+
+      if (actionBar) {
+        actionBar.style.display = 'flex';
+        const gameIcon = document.getElementById('channelGameIcon');
+        const gameTitle = document.getElementById('channelGameTitle');
+        const gameDetail = document.getElementById('channelGameDetail');
+        const btnHost = document.getElementById('btnChannelHostLobby');
+        const btnBrowse = document.getElementById('btnChannelBrowseLobbies');
+        const btnDraft = document.getElementById('btnChannelSnakeDraft');
+        const btnJoin = document.getElementById('btnChannelJoinPool');
+
+        if (gameIcon) gameIcon.textContent = gInfo.icon;
+        if (gameTitle) gameTitle.textContent = gInfo.game;
+        if (gameDetail) gameDetail.textContent = `${gInfo.maxPerTeam * 2}p Matchmaking Hub (${gInfo.maxPerTeam}v${gInfo.maxPerTeam}) • Map: ${gInfo.map}`;
+        if (btnHost) btnHost.innerHTML = `<span>➕</span> Host ${gInfo.game} Lobby`;
+        if (btnBrowse) btnBrowse.innerHTML = `<span>🔥</span> Browse ${gInfo.game} Lobbies`;
+        if (btnDraft) btnDraft.innerHTML = `<span>🐍</span> Snake Draft (${gInfo.game})`;
+        if (btnJoin) btnJoin.innerHTML = `<span>⚡</span> Join ${gInfo.game} Pool (-j)`;
+      }
+    } else {
+      if (header) header.textContent = `# ${channelName}`;
+      if (topic) topic.textContent = `Discussion and chat for #${channelName}`;
+      if (input) input.placeholder = `Send a message to #${channelName}...`;
+      if (actionBar) actionBar.style.display = 'none';
+    }
 
     this.renderMessages();
   }
@@ -823,20 +1007,38 @@ class ChatVoiceManager {
   // --- PER-CHANNEL LOBBY & TEAM POOL ENGINE (-j SYSTEM) ---
   getChannelLobby(channelKey = this.currentTextChannel) {
     if (!this.channelLobbies[channelKey]) {
-      this.channelLobbies[channelKey] = {
-        game: `Channel #${channelKey.toUpperCase()} Match`,
-        maxPerTeam: 5,
-        team1Name: 'Team Alpha 🔵',
-        team2Name: 'Team Bravo 🔴',
-        team1: [
-          { name: 'ApexGod99', mmr: 2150, role: 'Entry Fragger', isCaptain: true }
-        ],
-        team2: [
-          { name: 'Valkyrie_CS', mmr: 1840, role: 'AWPer', isCaptain: true }
-        ],
-        map: 'Mirage',
-        status: 'RECRUITING (2/10 Players)'
-      };
+      const gInfo = this.channelGameMap ? this.channelGameMap[channelKey] : null;
+      if (gInfo) {
+        this.channelLobbies[channelKey] = {
+          game: gInfo.game,
+          maxPerTeam: gInfo.maxPerTeam,
+          team1Name: `${gInfo.game} Alpha 🔵`,
+          team2Name: `${gInfo.game} Bravo 🔴`,
+          team1: [
+            { name: 'ApexGod99', mmr: 2450, role: 'Team Captain', isCaptain: true }
+          ],
+          team2: [
+            { name: 'Valkyrie_CS', mmr: 2380, role: 'Team Captain', isCaptain: true }
+          ],
+          map: gInfo.map,
+          status: `RECRUITING (2/${gInfo.maxPerTeam * 2} Players)`
+        };
+      } else {
+        this.channelLobbies[channelKey] = {
+          game: `Channel #${channelKey.toUpperCase()} Match`,
+          maxPerTeam: 5,
+          team1Name: 'Team Alpha 🔵',
+          team2Name: 'Team Bravo 🔴',
+          team1: [
+            { name: 'ApexGod99', mmr: 2150, role: 'Entry Fragger', isCaptain: true }
+          ],
+          team2: [
+            { name: 'Valkyrie_CS', mmr: 1840, role: 'AWPer', isCaptain: true }
+          ],
+          map: 'Mirage',
+          status: 'RECRUITING (2/10 Players)'
+        };
+      }
     }
     return this.channelLobbies[channelKey];
   }
@@ -1004,6 +1206,46 @@ class ChatVoiceManager {
 
   executeInChatLeave() {
     this.sendMessage('-l');
+  }
+
+  hostLobbyForCurrentGame() {
+    const gInfo = this.channelGameMap ? this.channelGameMap[this.currentTextChannel] : null;
+    const gameName = gInfo ? gInfo.game : 'Counter-Strike 2';
+    const maxPlayers = gInfo ? gInfo.maxPerTeam * 2 : 10;
+    
+    const modal = document.getElementById('createLobbyModal');
+    if (modal) {
+      modal.classList.add('active');
+      const gameSelect = document.getElementById('newLobbyGame');
+      if (gameSelect) {
+        for (let opt of gameSelect.options) {
+          if (opt.value.toLowerCase().includes(gameName.toLowerCase()) || gameName.toLowerCase().includes(opt.value.toLowerCase())) {
+            gameSelect.value = opt.value;
+            break;
+          }
+        }
+      }
+      const titleInput = document.getElementById('newLobbyTitle');
+      if (titleInput) titleInput.value = `Competitive ${gameName} Scrim / Lobby`;
+      const maxInput = document.getElementById('newLobbyMax');
+      if (maxInput) maxInput.value = maxPlayers;
+    }
+  }
+
+  browseLobbiesForCurrentGame() {
+    const gInfo = this.channelGameMap ? this.channelGameMap[this.currentTextChannel] : null;
+    const gameName = gInfo ? gInfo.game : 'all';
+    if (window.app) {
+      window.app.setGameFilter(gameName);
+    }
+  }
+
+  launchDraftForCurrentGame() {
+    const gInfo = this.channelGameMap ? this.channelGameMap[this.currentTextChannel] : null;
+    const gameName = gInfo ? gInfo.game : 'Counter-Strike 2';
+    if (window.eloDraftEngine) {
+      window.eloDraftEngine.startSnakeDraft(gameName);
+    }
   }
 
   pinStickerToDashboard(stickerEmoji, stickerName) {
