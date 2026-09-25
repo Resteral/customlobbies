@@ -1,7 +1,7 @@
 /* CustomLobbies.com - Community Chat & WebRTC Voice Channels Manager */
 class ChatVoiceManager {
   constructor() {
-    this.activeGuild = 'hotgirl';
+    this.activeGuild = 'games';
     this.currentTextChannel = 'general';
     this.currentVoiceRoom = null;
     this.isMicMuted = false;
@@ -38,15 +38,25 @@ class ChatVoiceManager {
     this.triviaScore = 0;
 
     const defaultGuilds = {
-      'hotgirl': { name: 'Hot Girl Central', icon: '🔥' },
-      'cs2scrims': { name: 'CS2 Scrims & LFG', icon: '🎯' },
-      'wardogs': { name: 'WARDOG HQ', icon: '🐕' },
-      'debate': { name: 'Debate Arena', icon: '🗣️' }
+      'games': { name: 'Games', icon: '🎮' }
     };
     
-    // Load from admin settings if present
+    // Load from admin settings if present, cleansing old placeholder servers
     const savedGuilds = localStorage.getItem('cl_admin_servers');
-    this.guilds = savedGuilds ? JSON.parse(savedGuilds) : defaultGuilds;
+    let loadedGuilds = null;
+    try {
+      if (savedGuilds) {
+        loadedGuilds = JSON.parse(savedGuilds);
+      }
+    } catch (e) {}
+
+    if (!loadedGuilds || loadedGuilds['hotgirl'] || loadedGuilds['debate'] || !loadedGuilds['games']) {
+      loadedGuilds = defaultGuilds;
+      try {
+        localStorage.setItem('cl_admin_servers', JSON.stringify(defaultGuilds));
+      } catch (e) {}
+    }
+    this.guilds = loadedGuilds;
 
     this.availableStickers = [
       { id: 'fire', emoji: '🔥', name: 'Fire Play' },
@@ -894,7 +904,7 @@ class ChatVoiceManager {
     document.querySelectorAll('.server-icon').forEach(el => el.classList.remove('active'));
     if (element) element.classList.add('active');
 
-    const guildInfo = this.guilds[guildId] || { name: 'Community Hub', icon: '🌐' };
+    const guildInfo = this.guilds[guildId] || { name: 'Games', icon: '🎮' };
     const header = document.getElementById('guildTitleHeader');
     if (header) {
       header.innerHTML = `<span>${guildInfo.icon}</span> ${guildInfo.name} <span style="font-size: 0.75rem; color: var(--text-muted);">▼</span>`;
