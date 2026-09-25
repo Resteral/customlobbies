@@ -69,21 +69,72 @@ class ChatVoiceManager {
     this.channelLobbies = {};
 
     this.textMessages = {
-      'general': [],
+      'general': [
+        {
+          id: 1,
+          author: 'CustomLobbiesBot',
+          text: '🤖 Welcome to CustomLobbies Community Hub! Type <b>-help</b> to view commands or <b>-j</b> to join matchmaking pools. Ranked 128-tick scrimmage servers are online!',
+          time: '11:58 AM',
+          avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+        },
+        {
+          id: 2,
+          author: 'S1mple_Fragger',
+          text: 'Anyone down for 5v5 Mirage scrim? Need an IGL and support player 🎯',
+          time: '12:02 PM',
+          avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80'
+        },
+        {
+          id: 3,
+          author: 'Valkyrie_CS',
+          text: 'I can AWP or anchor B site! Joining queue now.',
+          time: '12:04 PM',
+          avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&auto=format&fit=crop&q=80',
+          sticker: { emoji: '🔥', name: 'Fire Play' }
+        },
+        {
+          id: 4,
+          author: 'ApexGod99',
+          text: 'Lobby match draft just finished, our squad is ready for the tournament bracket! 🏆',
+          time: '12:08 PM',
+          avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80'
+        }
+      ],
       'welcome': [
-        { id: 3, author: 'CustomLobbiesBot', text: '👋 Welcome to CustomLobbies Community Discord Hub! Read the rules and join voice channels!', time: '12:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+        { id: 10, author: 'CustomLobbiesBot', text: '👋 Welcome to CustomLobbies Community Hub! Read the rules and join voice channels!', time: '12:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
       ],
       'rules': [
-        { id: 4, author: 'Admin', text: '📜 1. Be respectful. 2. No cheating or unauthorized exploits. 3. GL HF!', time: '12:01 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+        { id: 11, author: 'Admin', text: '📜 1. Be respectful to players & captains.\n2. No cheating, scripting, or unauthorized exploits.\n3. GL & HF in all matches!', time: '12:01 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
       ],
-      'pics': [],
-      'commands': [],
-      'promo': [],
-      'lfg-cs2': [],
-      'tournaments': []
+      'pics': [
+        { id: 12, author: 'TenZ_Duelist', text: 'Clean 1v4 clutch on Ascent A site yesterday! GG!', time: '11:45 AM', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🎯', name: 'Bullseye' } }
+      ],
+      'commands': [
+        { id: 13, author: 'CustomLobbiesBot', text: '⚡ Supported Quick Commands: <b>-j</b> (auto-join pool), <b>-l</b> (leave pool), <b>-b</b> (view bracket), <b>-status</b> (view MMR rating), <b>-scrim</b> (launch scrim dispatcher).', time: '12:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'promo': [
+        { id: 14, author: 'TournamentDesk', text: '📢 $2,500 Premier Summer Championship qualifiers start this weekend! Assemble your squads!', time: '10:30 AM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🏆', name: 'Champion' } }
+      ],
+      'lfg-cs2': [
+        { id: 15, author: 'ZywOo_Master', text: 'LFG 5v5 Premier Scrims, 2800+ MMR lobby. Looking for aggressive entry rifler.', time: '12:15 PM', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80' }
+      ],
+      'tournaments': [
+        { id: 16, author: 'CustomLobbiesBot', text: '🏆 Live Tournament Bracket synchronized. Check the #tournaments tab or type <b>-b</b> in chat to inspect live matches.', time: '12:10 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+      ]
     };
 
-    this.onlineUsers = [];
+    this.onlineUsers = [
+      { name: 'S1mple_Fragger', mmr: 2850, teamTag: 'NAVI', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80' },
+      { name: 'ZywOo_Master', mmr: 2810, teamTag: 'VIT', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80' },
+      { name: 'ApexGod99', mmr: 2450, teamTag: 'APEX', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80' },
+      { name: 'Valkyrie_CS', mmr: 2380, teamTag: 'VALK', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&auto=format&fit=crop&q=80' },
+      { name: 'Marshal_Vanguard', mmr: 2320, teamTag: 'VANG', avatar: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=80&auto=format&fit=crop&q=80' },
+      { name: 'TenZ_Duelist', mmr: 2720, teamTag: 'SEN', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80&auto=format&fit=crop&q=80' },
+      { name: 'NiKo_Rifler', mmr: 2690, teamTag: 'FALC', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80' },
+      { name: 'Shroud_Echo', mmr: 2540, teamTag: 'OG', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80' },
+      { name: 'Faker_Mid', mmr: 2900, teamTag: 'T1', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' },
+      { name: 'Device_CS', mmr: 2480, teamTag: 'ASTR', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80' }
+    ];
   }
 
   init() {
@@ -126,14 +177,7 @@ class ChatVoiceManager {
           rail.appendChild(el);
       }
     }
-    
-    // Reattach listeners to newly created icons
-    document.querySelectorAll('.server-icon').forEach(icon => {
-      icon.addEventListener('click', (e) => {
-        const guildId = e.currentTarget.getAttribute('data-guild');
-        if (guildId) this.switchGuild(guildId);
-      });
-    });
+    // Delegated click handler on document handles .server-icon clicks
   }
 
   loadChatTheme() {
@@ -510,7 +554,15 @@ class ChatVoiceManager {
 
     this.textMessages[this.currentTextChannel].push(newMsg);
     this.renderMessages();
-    alert(`📢 High Score Card posted to #${this.currentTextChannel}!`);
+    this.notifyToast(`📢 High Score Card posted to #${this.currentTextChannel}!`, 'success');
+  }
+
+  notifyToast(msg, type = 'info') {
+    if (window.widgetBuilderEngine && typeof window.widgetBuilderEngine.showToast === 'function') {
+      window.widgetBuilderEngine.showToast(msg, type);
+    } else {
+      console.log(`[Toast ${type}]: ${msg}`);
+    }
   }
 
   loadPinnedStickers() {
@@ -542,7 +594,10 @@ class ChatVoiceManager {
   }
 
   setupEventListeners() {
-    // Server Rail Clicks
+    if (this._listenersAttached) return;
+    this._listenersAttached = true;
+
+    // Server Rail Clicks & Channel Selection Clicks
     document.addEventListener('click', (e) => {
       const serverIcon = e.target.closest('.server-icon[data-guild]');
       if (serverIcon) {
@@ -573,30 +628,24 @@ class ChatVoiceManager {
       });
     }
 
-    // User status card mic/deafen buttons
+    // User status card mic/deafen buttons & Voice panel mic/deafen buttons
     const btnUserMic = document.getElementById('btnUserMicToggle');
     const btnUserDeafen = document.getElementById('btnUserDeafenToggle');
+    const btnMic = document.getElementById('btnToggleMic');
+    const btnDeafen = document.getElementById('btnToggleDeafen');
 
     if (btnUserMic) {
-      btnUserMic.addEventListener('click', () => {
-        this.isMicMuted = !this.isMicMuted;
-        btnUserMic.textContent = this.isMicMuted ? '🔇' : '🎙️';
-        const mainMicBtn = document.getElementById('btnToggleMic');
-        if (mainMicBtn) {
-          mainMicBtn.click();
-        }
-      });
+      btnUserMic.addEventListener('click', () => this.toggleMic());
+    }
+    if (btnMic) {
+      btnMic.addEventListener('click', () => this.toggleMic());
     }
 
     if (btnUserDeafen) {
-      btnUserDeafen.addEventListener('click', () => {
-        this.isDeafened = !this.isDeafened;
-        btnUserDeafen.textContent = this.isDeafened ? '🔇' : '🎧';
-        const mainDeafenBtn = document.getElementById('btnToggleDeafen');
-        if (mainDeafenBtn) {
-          mainDeafenBtn.click();
-        }
-      });
+      btnUserDeafen.addEventListener('click', () => this.toggleDeafen());
+    }
+    if (btnDeafen) {
+      btnDeafen.addEventListener('click', () => this.toggleDeafen());
     }
 
     // Chat form submit
@@ -605,6 +654,7 @@ class ChatVoiceManager {
       chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const input = document.getElementById('chatInputText');
+        if (!input) return;
         const text = input.value.trim();
         if (text) {
           this.sendMessage(text);
@@ -650,28 +700,31 @@ class ChatVoiceManager {
 
     // Voice Control Buttons
     const btnConnect = document.getElementById('btnConnectVoice');
-    const btnMic = document.getElementById('btnToggleMic');
-    const btnDeafen = document.getElementById('btnToggleDeafen');
-
     if (btnConnect) {
       btnConnect.addEventListener('click', () => this.toggleVoiceConnection());
     }
+  }
 
-    if (btnMic) {
-      btnMic.addEventListener('click', () => {
-        this.isMicMuted = !this.isMicMuted;
-        document.getElementById('micIcon').textContent = this.isMicMuted ? '🔇' : '🎙️';
-        btnMic.classList.toggle('btn-danger', this.isMicMuted);
-      });
-    }
+  toggleMic() {
+    this.isMicMuted = !this.isMicMuted;
+    const btnUserMic = document.getElementById('btnUserMicToggle');
+    const btnMic = document.getElementById('btnToggleMic');
+    const micIcon = document.getElementById('micIcon');
+    if (btnUserMic) btnUserMic.textContent = this.isMicMuted ? '🔇' : '🎙️';
+    if (micIcon) micIcon.textContent = this.isMicMuted ? '🔇' : '🎙️';
+    if (btnMic) btnMic.classList.toggle('btn-danger', this.isMicMuted);
+    this.notifyToast(this.isMicMuted ? '🔇 Microphone Muted' : '🎙️ Microphone Live', 'info');
+  }
 
-    if (btnDeafen) {
-      btnDeafen.addEventListener('click', () => {
-        this.isDeafened = !this.isDeafened;
-        document.getElementById('deafenIcon').textContent = this.isDeafened ? '🔇' : '🎧';
-        btnDeafen.classList.toggle('btn-danger', this.isDeafened);
-      });
-    }
+  toggleDeafen() {
+    this.isDeafened = !this.isDeafened;
+    const btnUserDeafen = document.getElementById('btnUserDeafenToggle');
+    const btnDeafen = document.getElementById('btnToggleDeafen');
+    const deafenIcon = document.getElementById('deafenIcon');
+    if (btnUserDeafen) btnUserDeafen.textContent = this.isDeafened ? '🔇' : '🎧';
+    if (deafenIcon) deafenIcon.textContent = this.isDeafened ? '🔇' : '🎧';
+    if (btnDeafen) btnDeafen.classList.toggle('btn-danger', this.isDeafened);
+    this.notifyToast(this.isDeafened ? '🔇 Audio Output Deafened' : '🎧 Audio Output Active', 'info');
   }
 
   switchGuild(guildId, element) {
@@ -956,19 +1009,19 @@ class ChatVoiceManager {
   pinStickerToDashboard(stickerEmoji, stickerName) {
     const exists = this.pinnedStickers.some(s => s.emoji === stickerEmoji && s.name === stickerName);
     if (exists) {
-      alert(`"${stickerEmoji} ${stickerName}" is already pinned to your Dashboard Showcase!`);
+      this.notifyToast(`"${stickerEmoji} ${stickerName}" is already pinned to your Dashboard Showcase!`, 'warning');
       return;
     }
 
     if (this.pinnedStickers.length >= 10) {
-      alert('Maximum 10 stickers pinned to Dashboard Showcase. Remove one to add more!');
+      this.notifyToast('Maximum 10 stickers pinned to Dashboard Showcase. Remove one to add more!', 'warning');
       return;
     }
 
     this.pinnedStickers.push({ emoji: stickerEmoji, name: stickerName });
     this.savePinnedStickers();
     this.renderDashboardStickers();
-    alert(`📌 Successfully pinned "${stickerEmoji} ${stickerName}" to your Dashboard Showcase!`);
+    this.notifyToast(`📌 Successfully pinned "${stickerEmoji} ${stickerName}" to your Dashboard Showcase!`, 'success');
   }
 
   removePinnedSticker(index) {
@@ -1181,6 +1234,18 @@ class ChatVoiceManager {
     if (!container) return;
 
     const msgs = this.textMessages[this.currentTextChannel] || [];
+    if (msgs.length === 0) {
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 250px; color: var(--text-dim); text-align: center; padding: 2rem;">
+          <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">💬</div>
+          <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">Welcome to #${this.currentTextChannel}!</div>
+          <div style="font-size: 0.85rem; margin-top: 0.3rem; max-width: 420px; color: var(--text-muted);">This is the start of the #${this.currentTextChannel} channel. Drop a message or type <code>-help</code> for instant match commands!</div>
+        </div>
+      `;
+      container.scrollTop = container.scrollHeight;
+      return;
+    }
+
     container.innerHTML = msgs.map(m => `
       <div class="chat-message-row">
         <img src="${m.avatar}" class="chat-msg-avatar" alt="${m.author}">
@@ -1305,12 +1370,39 @@ class ChatVoiceManager {
     container.scrollTop = container.scrollHeight;
   }
 
+  invitePlayerToTeam(playerName) {
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('queue_join');
+    }
+    this.notifyToast(`📨 Team Invite sent to ${playerName} from the Community Hub!`, 'success');
+  }
+
   renderOnlineUsers() {
     const container = document.getElementById('onlineUsersList');
     if (!container) return;
 
-    const rolesMap = JSON.parse(localStorage.getItem('cl_server_roles') || '[]');
-    const userRoleAssignments = JSON.parse(localStorage.getItem('cl_server_user_roles') || '{}');
+    const defaultRoles = [
+      { name: 'Staff / Admin', color: '#ff5252' },
+      { name: 'Team Captains', color: '#00f2fe' },
+      { name: 'VIP Champions', color: '#ffd700' }
+    ];
+    let rolesMap = JSON.parse(localStorage.getItem('cl_server_roles') || 'null');
+    if (!rolesMap || rolesMap.length === 0) {
+      rolesMap = defaultRoles;
+      localStorage.setItem('cl_server_roles', JSON.stringify(rolesMap));
+    }
+
+    const defaultUserRoles = {
+      'Marshal_Vanguard': 'Staff / Admin',
+      'ApexGod99': 'Team Captains',
+      'S1mple_Fragger': 'VIP Champions',
+      'Faker_Mid': 'VIP Champions'
+    };
+    let userRoleAssignments = JSON.parse(localStorage.getItem('cl_server_user_roles') || 'null');
+    if (!userRoleAssignments || Object.keys(userRoleAssignments).length === 0) {
+      userRoleAssignments = defaultUserRoles;
+      localStorage.setItem('cl_server_user_roles', JSON.stringify(userRoleAssignments));
+    }
 
     // Sort online users into their highest role category
     const categorized = { 'Online': [] };
@@ -1329,7 +1421,7 @@ class ChatVoiceManager {
     
     // Render custom roles first
     rolesMap.forEach(r => {
-      if (categorized[r.name].users.length > 0) {
+      if (categorized[r.name] && categorized[r.name].users.length > 0) {
         html += `<div style="font-size: 0.7rem; font-weight: 800; color: ${r.color}; text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.8rem;">${r.name} - ${categorized[r.name].users.length}</div>`;
         categorized[r.name].users.forEach(u => {
           const badge = u.teamTag ? `<span style="background: rgba(255, 171, 0, 0.15); border: 1px solid rgba(255,171,0,0.5); color: #ffab00; font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 900;">${u.teamTag}</span>` : '';
@@ -1342,7 +1434,7 @@ class ChatVoiceManager {
               </div>
               <div style="display: flex; align-items: center; gap: 0.4rem;">
                 <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.75rem;">${u.mmr}</span>
-                <button onclick="alert('📨 TEAM INVITE SENT!\\n\\nInvite sent to ${u.name} from the Community Hub.')" style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite to Team">➕</button>
+                <button onclick="window.chatVoiceManager.invitePlayerToTeam('${u.name}')" style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite to Team">➕</button>
               </div>
             </div>
           `;
@@ -1364,7 +1456,7 @@ class ChatVoiceManager {
             </div>
             <div style="display: flex; align-items: center; gap: 0.4rem;">
               <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.75rem;">${u.mmr}</span>
-              <button onclick="alert('📨 TEAM INVITE SENT!\\n\\nInvite sent to ${u.name} from the Community Hub.')" style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite to Team">➕</button>
+              <button onclick="window.chatVoiceManager.invitePlayerToTeam('${u.name}')" style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite to Team">➕</button>
             </div>
           </div>
         `;
@@ -1418,7 +1510,7 @@ class ChatVoiceManager {
 
     const rolesMap = JSON.parse(localStorage.getItem('cl_server_roles') || '[]');
     if (rolesMap.find(r => r.name.toLowerCase() === name.toLowerCase())) {
-        alert("A role with this name already exists.");
+        this.notifyToast("A role with this name already exists.", 'warning');
         return;
     }
 
@@ -1493,7 +1585,7 @@ class ChatVoiceManager {
       window.widgetBuilderEngine.playSoundEffect('click');
     }
     
-    alert(`🎙️ VOICE SYNCED!\n\nYou have automatically joined the [${this.currentTextChannel.toUpperCase()}] voice channel to match your text chat!`);
+    this.notifyToast(`🎙️ Voice Synced! Joined [${this.currentTextChannel.toUpperCase()}] voice room.`, 'success');
   }
 
   toggleVoiceConnection() {
