@@ -4882,6 +4882,21 @@ class CustomLobbiesApp {
           matchStatus: '🔥 RECRUITING (1/' + max + ')'
         });
 
+        // Automatically spin up dedicated private lobby channel in Community Hub
+        if (window.chatVoiceManager && typeof window.chatVoiceManager.createPrivateLobbyChannelFromLobby === 'function') {
+          window.chatVoiceManager.createPrivateLobbyChannelFromLobby({
+            title,
+            game,
+            max,
+            region,
+            map,
+            draftType,
+            serverIp: region === 'Helix Local' ? '127.0.0.1:7777' : '192.168.1.85:27015',
+            host: 'You (Host)',
+            players: 1
+          });
+        }
+
         // Host Reward
         this.addCoins(50);
         this.saveState();

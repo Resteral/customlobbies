@@ -614,6 +614,13 @@ div:has(.dropdown-wrapper:focus-within) {
   animation: fadeIn 0.2s ease-in-out;
 }
 
+.channel-private-lobby-action-bar {
+  background: linear-gradient(90deg, rgba(8, 18, 32, 0.96), rgba(12, 24, 42, 0.94));
+  border-bottom: 1px solid rgba(0, 242, 254, 0.35);
+  box-shadow: 0 4px 18px rgba(0, 242, 254, 0.15);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
 .chat-messages-container {
   flex: 1;
   padding: 1.25rem;

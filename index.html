@@ -1044,6 +1044,18 @@
               <!-- Dynamically populated from created teams -->
             </div>
 
+            <!-- Category: PRIVATE LOBBY CHANNELS -->
+            <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+              <span>🔒 PRIVATE LOBBIES</span>
+              <div style="display: flex; gap: 0.25rem;">
+                <button class="add-channel-btn" id="btnJoinPrivateLobbyByCode" onclick="window.chatVoiceManager.openJoinPrivateLobbyModal()" title="Enter Access Code to Join Private Lobby" style="font-size: 0.72rem; padding: 0 0.35rem;">🔑</button>
+                <button class="add-channel-btn" id="btnAddPrivateLobbyChannel" onclick="window.chatVoiceManager.openPrivateLobbyModal()" title="Create Dedicated Private Lobby Channel">+</button>
+              </div>
+            </div>
+            <div id="textChannelsPrivateLobbies">
+              <!-- Dynamically populated from private lobbies -->
+            </div>
+
             <!-- Category: VOICE CHANNELS -->
             <div class="channel-section-title" style="margin-top: 0.8rem;">
               <span>🔊 VOICE CHANNELS</span>
@@ -1052,6 +1064,8 @@
             <div id="voiceChannelsList">
               <!-- Team Voice Comms injected here -->
               <div id="voiceChannelsTeams"></div>
+              <!-- Private Lobby Voice Rooms injected here -->
+              <div id="voiceChannelsPrivateLobbies"></div>
               <div class="channel-item" data-voice="general-lounge">
                 <span>🔊</span> General Lounge
               </div>
@@ -1194,6 +1208,40 @@
               </button>
               <button class="btn btn-success btn-sm" id="btnTeamInviteMember" onclick="window.chatVoiceManager.inviteTeammateToChannel()" title="Invite player to team channel">
                 <span>➕</span> Invite Member
+              </button>
+            </div>
+          </div>
+
+          <!-- In-Channel Private Lobby Action Bar -->
+          <div id="channelPrivateLobbyActionBar" class="channel-private-lobby-action-bar" style="display: none; background: rgba(10, 16, 26, 0.95); border-bottom: 1px solid rgba(0, 242, 254, 0.35); padding: 0.6rem 1.25rem; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <span id="channelPrivateLobbyIcon" style="font-size: 1.4rem;">🔒</span>
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span id="channelPrivateLobbyTitle" style="font-weight: 800; font-size: 0.95rem; color: #fff;">Private Scrim Lobby</span>
+                  <span class="lobby-game-tag" id="channelPrivateLobbyCodeTag" style="background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); font-size: 0.72rem; border: 1px solid var(--accent-cyan); font-family: monospace; font-weight: 800; letter-spacing: 0.5px;">CODE: CL-7701</span>
+                  <span class="lobby-game-tag" id="channelPrivateLobbyGameTag" style="background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); font-size: 0.68rem; border: 1px solid var(--accent-purple);">Counter-Strike 2</span>
+                </div>
+                <div id="channelPrivateLobbyDetail" style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.1rem;">
+                  Map: Mirage • Server: 192.168.1.85:27015 • Host: You • Capacity: 8/10 Players
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-purple btn-sm" id="btnPrivateCopyCode" onclick="window.chatVoiceManager.copyPrivateLobbyCode()" title="Copy Access Code & Password">
+                <span>🔑</span> Copy Code
+              </button>
+              <button class="btn btn-primary btn-sm" id="btnPrivateConnectServer" onclick="window.chatVoiceManager.connectPrivateLobbyServer()" title="Connect to Dedicated Game Server">
+                <span>🎮</span> Connect Server
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnPrivateSnakeDraft" onclick="window.chatVoiceManager.draftForPrivateLobby()" title="Snake Draft for this Private Lobby">
+                <span>🐍</span> Snake Draft
+              </button>
+              <button class="btn btn-success btn-sm" id="btnPrivateReadyCheck" onclick="window.chatVoiceManager.triggerPrivateLobbyReadyCheck()" title="Trigger Ready Check for all players">
+                <span>🏁</span> Ready Check
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnPrivateSplitComms" onclick="window.chatVoiceManager.togglePrivateVoiceSplit()" title="Toggle Split Team 1 / Team 2 Voice Rooms">
+                <span>🔊</span> Split Voice
               </button>
             </div>
           </div>
@@ -2846,6 +2894,127 @@
         <button class="btn btn-secondary" onclick="window.chatVoiceManager.closeTeamChannelModal()">Cancel</button>
         <button class="btn btn-primary" onclick="window.chatVoiceManager.submitCreateTeamChannel()" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; font-weight: 800;">
           <span>🚀</span> Launch Team Channel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Dedicated Private Lobby Channel Modal -->
+  <div class="modal-overlay" id="createPrivateLobbyModal">
+    <div class="modal-card" style="max-width: 540px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem; color: #fff;">
+          <span>🔒</span> Create Private Lobby Channel
+        </h3>
+        <button class="icon-btn-sm" onclick="window.chatVoiceManager.closePrivateLobbyModal()" style="font-size: 1.2rem;">✕</button>
+      </div>
+
+      <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.2rem; font-size: 0.85rem; color: var(--text-dim);">
+        Create an encrypted private room for your custom match or scrimmage. Only invited players with the access code / password can view chat, participate in drafts, or join voice comms!
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Lobby Match Title</label>
+        <input type="text" class="input-field" id="privateLobbyTitleInput" placeholder="e.g. 5v5 Private Mirage Scrim" value="Private 5v5 Scrim Match">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Game</label>
+          <select class="input-field" id="privateLobbyGameInput">
+            <option value="Counter-Strike 2">Counter-Strike 2</option>
+            <option value="Valorant">Valorant</option>
+            <option value="WARDOGS">WARDOGS</option>
+            <option value="Marvel Rivals">Marvel Rivals</option>
+            <option value="Rocket League">Rocket League</option>
+            <option value="Deadlock">Deadlock</option>
+            <option value="The Finals">The Finals</option>
+            <option value="Slapshot: Rebound">Slapshot: Rebound</option>
+            <option value="Empulse">Empulse</option>
+            <option value="REMATCH">REMATCH</option>
+            <option value="Rainbow Six Siege">Rainbow Six Siege</option>
+            <option value="Dota 2">Dota 2</option>
+            <option value="Overwatch 2">Overwatch 2</option>
+            <option value="Arkheron">Arkheron</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Map / Arena</label>
+          <input type="text" class="input-field" id="privateLobbyMapInput" placeholder="e.g. Mirage, Ascent, Frontline" value="Mirage">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Access Passcode / Key</label>
+          <div style="display: flex; gap: 0.4rem;">
+            <input type="text" class="input-field" id="privateLobbyCodeInput" placeholder="CL-XXXX" style="font-family: monospace; font-weight: 700; letter-spacing: 1px;">
+            <button class="btn btn-secondary btn-sm" type="button" onclick="window.chatVoiceManager.generateNewLobbyPasscode()" title="Generate Random Passcode">🎲</button>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Player Capacity</label>
+          <select class="input-field" id="privateLobbyMaxInput">
+            <option value="10">10 Players (5v5)</option>
+            <option value="14">14 Players (7v7)</option>
+            <option value="12">12 Players (6v6)</option>
+            <option value="6">6 Players (3v3)</option>
+            <option value="8">8 Players (4v4)</option>
+            <option value="2">2 Players (1v1 Duel)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Dedicated Server IP</label>
+          <input type="text" class="input-field" id="privateLobbyServerInput" placeholder="192.168.1.85:27015" value="192.168.1.85:27015">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Voice Comms Mode</label>
+          <select class="input-field" id="privateLobbyVoiceModeInput">
+            <option value="split">⚡ Auto-Split (Team 1 & Team 2 Private Comms)</option>
+            <option value="alltalk">🔊 Single All-Talk Room</option>
+            <option value="none">💬 Text Only (No Voice)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" onclick="window.chatVoiceManager.closePrivateLobbyModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.chatVoiceManager.submitCreatePrivateLobby()" style="background: linear-gradient(135deg, var(--accent-cyan), #3b82f6); border: none; font-weight: 800;">
+          <span>🔒</span> Launch Private Lobby Channel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Private Lobby by Code Modal -->
+  <div class="modal-overlay" id="joinPrivateLobbyByCodeModal">
+    <div class="modal-card" style="max-width: 440px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem; color: #fff;">
+          <span>🔑</span> Join Private Lobby Channel
+        </h3>
+        <button class="icon-btn-sm" onclick="window.chatVoiceManager.closeJoinPrivateLobbyModal()" style="font-size: 1.2rem;">✕</button>
+      </div>
+
+      <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.2rem; font-size: 0.85rem; color: var(--text-dim);">
+        Enter the 6-character Lobby Access Code (e.g. <b>CL-7701</b> or <b>WD-9940</b>) or custom match password provided by the host.
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Access Code or Password</label>
+        <input type="text" class="input-field" id="joinPrivateLobbyCodeInput" placeholder="e.g. CL-7701 or secret" style="font-family: monospace; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; text-align: center;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" onclick="window.chatVoiceManager.closeJoinPrivateLobbyModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.chatVoiceManager.submitJoinPrivateLobbyByCode()" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; font-weight: 800;">
+          <span>🚀</span> Enter Lobby Channel
         </button>
       </div>
     </div>

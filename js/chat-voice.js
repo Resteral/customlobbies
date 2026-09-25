@@ -69,6 +69,10 @@ class ChatVoiceManager {
     this.teamChannels = [];
     this.loadTeamChannels();
 
+    // Dedicated Private Lobby Channels
+    this.privateLobbies = [];
+    this.loadPrivateLobbies();
+
     // Per-Channel Match Lobby & Team Pool Engine
     this.channelLobbies = {};
 
@@ -296,6 +300,7 @@ class ChatVoiceManager {
   init() {
     this.renderGuildRail();
     this.renderTeamChannels();
+    this.renderPrivateLobbies();
     this.loadPinnedStickers();
     this.loadChatTheme();
     this.renderMessages();
@@ -908,14 +913,36 @@ class ChatVoiceManager {
 
     const gInfo = this.channelGameMap ? this.channelGameMap[channelName] : null;
     const teamChan = this.teamChannels ? this.teamChannels.find(t => t.channelName === channelName || t.id === channelName) : null;
+    const privateLobby = this.privateLobbies ? this.privateLobbies.find(l => l.channelName === channelName || l.id === channelName) : null;
     const header = document.getElementById('currentChannelHeader');
     const topic = document.getElementById('currentChannelTopic');
     const input = document.getElementById('chatInputText');
     const actionBar = document.getElementById('channelGameActionBar');
     const teamActionBar = document.getElementById('channelTeamActionBar');
+    const privateLobbyActionBar = document.getElementById('channelPrivateLobbyActionBar');
 
-    if (teamChan) {
+    if (privateLobby) {
       if (actionBar) actionBar.style.display = 'none';
+      if (teamActionBar) teamActionBar.style.display = 'none';
+      if (privateLobbyActionBar) {
+        privateLobbyActionBar.style.display = 'flex';
+        const pIcon = document.getElementById('channelPrivateLobbyIcon');
+        const pTitle = document.getElementById('channelPrivateLobbyTitle');
+        const pCodeTag = document.getElementById('channelPrivateLobbyCodeTag');
+        const pGameTag = document.getElementById('channelPrivateLobbyGameTag');
+        const pDetail = document.getElementById('channelPrivateLobbyDetail');
+        if (pIcon) pIcon.textContent = '🔒';
+        if (pTitle) pTitle.textContent = privateLobby.title;
+        if (pCodeTag) pCodeTag.textContent = `CODE: ${privateLobby.code}`;
+        if (pGameTag) pGameTag.textContent = privateLobby.game;
+        if (pDetail) pDetail.textContent = `Map: ${privateLobby.map || 'Competitive'} • Server: ${privateLobby.serverIp || '192.168.1.85:27015'} • Host: ${privateLobby.host} • ${privateLobby.players || 1}/${privateLobby.max || 10} Players`;
+      }
+      if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">🔒</span> #${channelName}`;
+      if (topic) topic.textContent = `🔒 ${privateLobby.title} — ${privateLobby.game} [Code: ${privateLobby.code}]. Private match room & squad comms.`;
+      if (input) input.placeholder = `Message private lobby members, share strats or type -j...`;
+    } else if (teamChan) {
+      if (actionBar) actionBar.style.display = 'none';
+      if (privateLobbyActionBar) privateLobbyActionBar.style.display = 'none';
       if (teamActionBar) {
         teamActionBar.style.display = 'flex';
         const teamEmblem = document.getElementById('channelTeamEmblem');
@@ -933,6 +960,7 @@ class ChatVoiceManager {
       if (input) input.placeholder = `Message ${teamChan.tag || ''} squad members, type strats, or type -j to queue...`;
     } else if (gInfo) {
       if (teamActionBar) teamActionBar.style.display = 'none';
+      if (privateLobbyActionBar) privateLobbyActionBar.style.display = 'none';
       if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">${gInfo.icon}</span> #${channelName}`;
       if (topic) topic.textContent = gInfo.topic;
       if (input) input.placeholder = `Message #${channelName} or type -j (join match pool), -help...`;
@@ -957,6 +985,7 @@ class ChatVoiceManager {
       }
     } else {
       if (teamActionBar) teamActionBar.style.display = 'none';
+      if (privateLobbyActionBar) privateLobbyActionBar.style.display = 'none';
       if (header) header.textContent = `# ${channelName}`;
       if (topic) topic.textContent = `Discussion and chat for #${channelName}`;
       if (input) input.placeholder = `Send a message to #${channelName}...`;
@@ -1716,6 +1745,447 @@ class ChatVoiceManager {
       avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
     });
     this.renderMessages();
+  }
+
+  // --- DEDICATED PRIVATE LOBBY CHANNELS SYSTEM ---
+  loadPrivateLobbies() {
+    try {
+      const saved = localStorage.getItem('cl_custom_private_lobbies_v1');
+      if (saved) {
+        this.privateLobbies = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Unable to load private lobbies', e);
+    }
+
+    if (!this.privateLobbies || this.privateLobbies.length === 0) {
+      this.privateLobbies = [
+        {
+          id: 'lobby-cs2-mirage-scrim',
+          title: 'CS2 5v5 High-MMR Scrim (Private)',
+          code: 'CL-7701',
+          passcode: 'scrim',
+          channelName: 'lobby-cs2-mirage-scrim',
+          voiceRoom: 'voice-lobby-cs2-alltalk',
+          voiceRoomTeam1: 'voice-lobby-cs2-alpha',
+          voiceRoomTeam2: 'voice-lobby-cs2-bravo',
+          game: 'Counter-Strike 2',
+          map: 'Mirage',
+          serverIp: '192.168.1.85:27015',
+          host: 'ApexGod99',
+          players: 8,
+          max: 10,
+          voiceMode: 'split',
+          unlocked: true
+        },
+        {
+          id: 'lobby-wardogs-tactical-squad',
+          title: 'WARDOGS 7v7 Heavy Armor Raid (Private)',
+          code: 'WD-9940',
+          passcode: 'alpha',
+          channelName: 'lobby-wardogs-tactical-squad',
+          voiceRoom: 'voice-lobby-wardogs-alltalk',
+          voiceRoomTeam1: 'voice-lobby-wd-alpha',
+          voiceRoomTeam2: 'voice-lobby-wd-bravo',
+          game: 'WARDOGS',
+          map: 'Amber Strike Frontline',
+          serverIp: '127.0.0.1:7777',
+          host: 'CommanderVance',
+          players: 12,
+          max: 14,
+          voiceMode: 'split',
+          unlocked: true
+        }
+      ];
+      this.savePrivateLobbies();
+    }
+
+    if (!this.textMessages['lobby-cs2-mirage-scrim']) {
+      this.textMessages['lobby-cs2-mirage-scrim'] = [
+        {
+          id: 301,
+          author: 'CustomLobbiesBot',
+          text: '🔒 Welcome to <b>CS2 5v5 High-MMR Scrim (Private)</b>! Access Code: <code>CL-7701</code> (Pass: <code>scrim</code>). Voice comms are currently set to Split (Alpha & Bravo). Use the action bar above to copy credentials or start a snake draft.',
+          time: '12:00 PM',
+          avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+        },
+        {
+          id: 302,
+          author: 'ApexGod99',
+          text: 'Server tickrate 128 is verified. Need 2 more players then we ready check!',
+          time: '12:04 PM',
+          avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80',
+          sticker: { emoji: '🎯', name: 'Bullseye' }
+        }
+      ];
+    }
+
+    if (!this.textMessages['lobby-wardogs-tactical-squad']) {
+      this.textMessages['lobby-wardogs-tactical-squad'] = [
+        {
+          id: 303,
+          author: 'CustomLobbiesBot',
+          text: '🔒 Welcome to <b>WARDOGS 7v7 Heavy Armor Raid (Private)</b>! Access Code: <code>WD-9940</code>. Server IP: <code>127.0.0.1:7777</code>. Have fun and coordinate your strikes!',
+          time: '11:50 AM',
+          avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+        }
+      ];
+    }
+  }
+
+  savePrivateLobbies() {
+    try {
+      localStorage.setItem('cl_custom_private_lobbies_v1', JSON.stringify(this.privateLobbies));
+    } catch (e) {
+      console.warn('Unable to save private lobbies', e);
+    }
+  }
+
+  renderPrivateLobbies() {
+    const textContainer = document.getElementById('textChannelsPrivateLobbies');
+    const voiceContainer = document.getElementById('voiceChannelsPrivateLobbies');
+
+    if (textContainer) {
+      if (!this.privateLobbies || this.privateLobbies.length === 0) {
+        textContainer.innerHTML = `
+          <div style="padding: 0.4rem 0.6rem; font-size: 0.72rem; color: var(--text-dim); font-style: italic;">
+            No private lobbies yet. Click + to host one or 🔑 to join!
+          </div>
+        `;
+      } else {
+        textContainer.innerHTML = this.privateLobbies.map(l => {
+          const isActive = this.currentTextChannel === l.channelName ? 'active' : '';
+          return `
+            <div class="channel-item ${isActive}" data-channel="${l.channelName}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.6rem;">
+              <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span style="font-size: 0.85rem;">🔒</span>
+                <span style="font-weight: 600; color: ${isActive ? '#fff' : 'var(--text-normal)'};">#${l.channelName}</span>
+              </div>
+              <span style="font-size: 0.62rem; background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); padding: 0.08rem 0.3rem; border-radius: 4px; font-weight: 800; font-family: monospace; border: 1px solid rgba(0, 242, 254, 0.3);">
+                ${l.code}
+              </span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    if (voiceContainer) {
+      if (!this.privateLobbies || this.privateLobbies.length === 0) {
+        voiceContainer.innerHTML = '';
+      } else {
+        voiceContainer.innerHTML = this.privateLobbies.map(l => {
+          if (l.voiceMode === 'none') return '';
+          const isSplit = l.voiceMode === 'split';
+          const isMainActive = this.currentVoiceRoom === l.voiceRoom ? 'active' : '';
+          const isAlphaActive = this.currentVoiceRoom === l.voiceRoomTeam1 ? 'active' : '';
+          const isBravoActive = this.currentVoiceRoom === l.voiceRoomTeam2 ? 'active' : '';
+
+          if (isSplit) {
+            return `
+              <div style="margin-bottom: 0.35rem;">
+                <div class="channel-item ${isMainActive}" data-voice="${l.voiceRoom}" style="border-left: 2px solid var(--accent-cyan); padding: 0.3rem 0.6rem;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      <span>🔒🔊</span>
+                      <span style="font-weight: 600;">[${l.code}] Match All-Talk</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="padding-left: 1rem; display: flex; flex-direction: column; gap: 0.2rem; margin-top: 0.15rem;">
+                  <div class="channel-item ${isAlphaActive}" data-voice="${l.voiceRoomTeam1}" style="padding: 0.22rem 0.5rem; font-size: 0.78rem;">
+                    <span>🔵 Alpha Comms</span>
+                  </div>
+                  <div class="channel-item ${isBravoActive}" data-voice="${l.voiceRoomTeam2}" style="padding: 0.22rem 0.5rem; font-size: 0.78rem;">
+                    <span>🔴 Bravo Comms</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          } else {
+            return `
+              <div class="channel-item ${isMainActive}" data-voice="${l.voiceRoom}" style="border-left: 2px solid var(--accent-cyan); padding: 0.35rem 0.6rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span>🔒🔊</span>
+                    <span style="font-weight: 600;">[${l.code}] Private Comms</span>
+                  </div>
+                  <span style="font-size: 0.62rem; color: var(--accent-cyan);">
+                    ${l.game ? l.game.split(' ')[0] : 'Match'}
+                  </span>
+                </div>
+              </div>
+            `;
+          }
+        }).join('');
+      }
+    }
+  }
+
+  openPrivateLobbyModal() {
+    this.generateNewLobbyPasscode();
+    const modal = document.getElementById('createPrivateLobbyModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closePrivateLobbyModal() {
+    const modal = document.getElementById('createPrivateLobbyModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  generateNewLobbyPasscode() {
+    const input = document.getElementById('privateLobbyCodeInput');
+    const randomCode = 'CL-' + Math.floor(1000 + Math.random() * 9000);
+    if (input) input.value = randomCode;
+    return randomCode;
+  }
+
+  openJoinPrivateLobbyModal() {
+    const input = document.getElementById('joinPrivateLobbyCodeInput');
+    if (input) input.value = '';
+    const modal = document.getElementById('joinPrivateLobbyByCodeModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeJoinPrivateLobbyModal() {
+    const modal = document.getElementById('joinPrivateLobbyByCodeModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  submitJoinPrivateLobbyByCode() {
+    const input = document.getElementById('joinPrivateLobbyCodeInput');
+    if (!input) return;
+    const query = input.value.trim().toUpperCase();
+    if (!query) {
+      this.notifyToast('Please enter an Access Code or Password to join.', 'warning');
+      return;
+    }
+
+    const matched = this.privateLobbies.find(l => 
+      l.code.toUpperCase() === query || 
+      (l.passcode && l.passcode.toUpperCase() === query) ||
+      l.channelName.toUpperCase() === query ||
+      l.channelName.toUpperCase() === `LOBBY-${query}`
+    );
+
+    if (matched) {
+      matched.unlocked = true;
+      this.savePrivateLobbies();
+      this.closeJoinPrivateLobbyModal();
+      this.switchTextChannel(matched.channelName);
+      this.notifyToast(`🔓 Unlocked & Joined Private Lobby Channel #${matched.channelName}!`, 'success');
+      this.postBotNotice(`👋 <b>Player Joined Room:</b> You have unlocked access to <b>${matched.title}</b>!`);
+    } else {
+      this.notifyToast(`❌ No private lobby found matching "${query}". Check code and try again!`, 'danger');
+    }
+  }
+
+  submitCreatePrivateLobby() {
+    const titleInput = document.getElementById('privateLobbyTitleInput');
+    const gameInput = document.getElementById('privateLobbyGameInput');
+    const mapInput = document.getElementById('privateLobbyMapInput');
+    const codeInput = document.getElementById('privateLobbyCodeInput');
+    const maxInput = document.getElementById('privateLobbyMaxInput');
+    const serverInput = document.getElementById('privateLobbyServerInput');
+    const voiceModeInput = document.getElementById('privateLobbyVoiceModeInput');
+
+    const title = titleInput && titleInput.value.trim() ? titleInput.value.trim() : 'Private Scrim Lobby';
+    const game = gameInput ? gameInput.value : 'Counter-Strike 2';
+    const map = mapInput && mapInput.value.trim() ? mapInput.value.trim() : 'Mirage';
+    const code = codeInput && codeInput.value.trim() ? codeInput.value.trim().toUpperCase() : ('CL-' + Math.floor(1000 + Math.random() * 9000));
+    const max = maxInput ? parseInt(maxInput.value) : 10;
+    const serverIp = serverInput && serverInput.value.trim() ? serverInput.value.trim() : '192.168.1.85:27015';
+    const voiceMode = voiceModeInput ? voiceModeInput.value : 'split';
+
+    const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    const cleanCode = code.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const slug = `lobby-${cleanCode || cleanTitle || Date.now().toString().slice(-4)}`;
+
+    const newLobby = {
+      id: slug,
+      title: title,
+      code: code,
+      passcode: code.toLowerCase(),
+      channelName: slug,
+      voiceRoom: `voice-${slug}-alltalk`,
+      voiceRoomTeam1: `voice-${slug}-alpha`,
+      voiceRoomTeam2: `voice-${slug}-bravo`,
+      game: game,
+      map: map,
+      serverIp: serverIp,
+      host: 'You (Host)',
+      players: 1,
+      max: max,
+      voiceMode: voiceMode,
+      unlocked: true
+    };
+
+    const existingIdx = this.privateLobbies.findIndex(l => l.channelName === slug || l.id === slug);
+    if (existingIdx >= 0) {
+      this.privateLobbies[existingIdx] = newLobby;
+    } else {
+      this.privateLobbies.unshift(newLobby);
+    }
+
+    this.savePrivateLobbies();
+
+    if (window.app && Array.isArray(window.app.lobbies)) {
+      window.app.lobbies.unshift({
+        id: Date.now(),
+        title: `🔒 [Private] ${title}`,
+        game: game,
+        host: 'You (Host)',
+        players: 1,
+        max: max,
+        region: 'NA East (Private)',
+        map: map,
+        draftType: 'Private Scrim Draft',
+        serverIp: serverIp,
+        matchStatus: `🔒 PRIVATE (${code})`,
+        isPrivate: true,
+        privateCode: code
+      });
+      if (typeof window.app.renderLobbies === 'function') {
+        window.app.renderLobbies();
+      }
+    }
+
+    if (!this.textMessages[slug]) {
+      this.textMessages[slug] = [
+        {
+          id: Date.now(),
+          author: 'CustomLobbiesBot',
+          text: `🔒 Welcome to private lobby channel <b>${title}</b>! Game: <b>${game}</b> • Map: <b>${map}</b>.<br>Lobby Access Code: <code>${code}</code> • Server: <code>${serverIp}</code>.<br>Share the code with players to invite them into this room!`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+        }
+      ];
+    }
+
+    this.renderPrivateLobbies();
+    this.switchTextChannel(slug);
+    this.closePrivateLobbyModal();
+    this.notifyToast(`🔒 Private Lobby Channel #${slug} created! Code: ${code}`, 'success');
+  }
+
+  createPrivateLobbyChannelFromLobby(lobbyData) {
+    if (!lobbyData) return;
+    const title = lobbyData.title || 'Custom Scrim';
+    const game = lobbyData.game || 'Counter-Strike 2';
+    const code = 'CL-' + Math.floor(1000 + Math.random() * 9000);
+    const cleanCode = code.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const slug = `lobby-${cleanCode}`;
+
+    const newLobby = {
+      id: slug,
+      title: title,
+      code: code,
+      passcode: code.toLowerCase(),
+      channelName: slug,
+      voiceRoom: `voice-${slug}-alltalk`,
+      voiceRoomTeam1: `voice-${slug}-alpha`,
+      voiceRoomTeam2: `voice-${slug}-bravo`,
+      game: game,
+      map: lobbyData.map || 'Competitive',
+      serverIp: lobbyData.serverIp || '192.168.1.85:27015',
+      host: lobbyData.host || 'You (Host)',
+      players: lobbyData.players || 1,
+      max: lobbyData.max || 10,
+      voiceMode: 'split',
+      unlocked: true
+    };
+
+    this.privateLobbies.unshift(newLobby);
+    this.savePrivateLobbies();
+
+    if (!this.textMessages[slug]) {
+      this.textMessages[slug] = [
+        {
+          id: Date.now(),
+          author: 'CustomLobbiesBot',
+          text: `🔒 Dedicated Private Channel linked to lobby <b>${title}</b>! Access Code: <code>${code}</code>. Coordinate match lineups, voice comms, and snake drafts here!`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+        }
+      ];
+    }
+
+    this.renderPrivateLobbies();
+    return newLobby;
+  }
+
+  copyPrivateLobbyCode() {
+    const lobby = this.privateLobbies ? this.privateLobbies.find(l => l.channelName === this.currentTextChannel || l.id === this.currentTextChannel) : null;
+    const code = lobby ? lobby.code : 'CL-7701';
+    const pass = lobby && lobby.passcode ? lobby.passcode : 'scrim';
+    const srv = lobby && lobby.serverIp ? lobby.serverIp : '192.168.1.85:27015';
+
+    const textToCopy = `Access Code: ${code} | Password: ${pass} | Server: ${srv}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy).catch(() => {});
+    }
+
+    this.notifyToast(`📋 Credentials copied: Code ${code} (Pass: ${pass})`, 'success');
+    this.postBotNotice(`🔑 <b>Lobby Credentials:</b> Access Code: <code>${code}</code> | Pass: <code>${pass}</code> | Server: <code>${srv}</code>`);
+  }
+
+  connectPrivateLobbyServer() {
+    const lobby = this.privateLobbies ? this.privateLobbies.find(l => l.channelName === this.currentTextChannel || l.id === this.currentTextChannel) : null;
+    const srv = lobby && lobby.serverIp ? lobby.serverIp : '192.168.1.85:27015';
+    const connectCmd = `connect ${srv}`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(connectCmd).catch(() => {});
+    }
+
+    this.notifyToast(`🎮 Copied connect command to clipboard: "${connectCmd}"`, 'success');
+    this.postBotNotice(`🎮 <b>Server Connect Command:</b> In console type: <code>connect ${srv}</code>`);
+  }
+
+  draftForPrivateLobby() {
+    const lobby = this.privateLobbies ? this.privateLobbies.find(l => l.channelName === this.currentTextChannel || l.id === this.currentTextChannel) : null;
+    const game = lobby ? lobby.game : 'Counter-Strike 2';
+    const title = lobby ? lobby.title : 'Private Scrim';
+
+    if (window.eloDraftEngine) {
+      window.eloDraftEngine.startSnakeDraft(game);
+      this.notifyToast(`🐍 1-2-2-1 Snake Draft initiated for ${title} (${game})!`, 'success');
+    } else if (window.app && typeof window.app.triggerAutoDraftModal === 'function') {
+      window.app.triggerAutoDraftModal(game);
+      this.notifyToast(`🐍 Snake Draft opened for ${game}!`, 'success');
+    } else {
+      this.notifyToast(`🐍 Starting Snake Draft for ${title}...`, 'info');
+    }
+
+    this.postBotNotice(`🐍 <b>Snake Draft Started:</b> Captains are picking players for <b>${title}</b> in <b>${game}</b>!`);
+  }
+
+  triggerPrivateLobbyReadyCheck() {
+    const lobby = this.privateLobbies ? this.privateLobbies.find(l => l.channelName === this.currentTextChannel || l.id === this.currentTextChannel) : null;
+    const title = lobby ? lobby.title : 'Private Lobby';
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('lobby_start');
+    }
+
+    this.notifyToast(`🏁 Ready check broadcasted to all players in ${title}!`, 'success');
+    this.postBotNotice(`🏁 <b>READY CHECK INITIATED:</b> Host requested all players in <b>${title}</b> to confirm ready! Type <b>-ready</b> or click Ready below to confirm. (All 10/10 Players Ready ✅)`);
+  }
+
+  togglePrivateVoiceSplit() {
+    const lobby = this.privateLobbies ? this.privateLobbies.find(l => l.channelName === this.currentTextChannel || l.id === this.currentTextChannel) : null;
+    if (!lobby) return;
+
+    lobby.voiceMode = lobby.voiceMode === 'split' ? 'alltalk' : 'split';
+    this.savePrivateLobbies();
+    this.renderPrivateLobbies();
+
+    const modeMsg = lobby.voiceMode === 'split' 
+      ? '🔊 Voice Comms Split into separate Team Alpha and Team Bravo channels!'
+      : '🔊 Voice Comms Merged into a single All-Talk room!';
+
+    this.notifyToast(modeMsg, 'info');
+    this.postBotNotice(`🔊 <b>Voice Mode Changed:</b> ${modeMsg}`);
   }
 
   pinStickerToDashboard(stickerEmoji, stickerName) {
