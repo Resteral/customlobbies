@@ -3333,6 +3333,28 @@ class CustomLobbiesApp {
 
   setupTabNavigation() {
     const btns = document.querySelectorAll('.nav-btn');
+    const moreMenu = document.getElementById('navMoreDropdownMenu');
+    const moreBtn = document.getElementById('navMoreDropdownBtn');
+    const moreLabel = document.getElementById('navMoreBtnLabel');
+
+    // Close More dropdown helper
+    const closeMoreDropdown = () => {
+      if (document.activeElement) document.activeElement.blur();
+      if (moreMenu) {
+        moreMenu.style.display = 'none';
+        setTimeout(() => { if (moreMenu) moreMenu.style.display = ''; }, 250);
+      }
+    };
+
+    // Close when clicking dropdown items that trigger modals/actions without data-tab
+    if (moreMenu) {
+      moreMenu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          closeMoreDropdown();
+        });
+      });
+    }
+
     btns.forEach(btn => {
       btn.addEventListener('click', () => {
         const tabId = btn.getAttribute('data-tab');
@@ -3341,12 +3363,29 @@ class CustomLobbiesApp {
         btns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
+        // Check if this button is inside the More dropdown
+        const isInsideMore = btn.closest('#navMoreDropdownMenu');
+        if (isInsideMore && moreBtn) {
+          moreBtn.classList.add('active');
+          if (moreLabel) {
+            const icon = btn.querySelector('span')?.textContent || '✨';
+            const labelText = btn.textContent.replace(icon, '').trim();
+            moreLabel.textContent = labelText || 'More';
+          }
+          closeMoreDropdown();
+        } else if (moreBtn && !isInsideMore && btn !== moreBtn) {
+          if (moreLabel) moreLabel.textContent = 'More';
+        }
+
         document.querySelectorAll('.view-section').forEach(sec => {
           sec.classList.remove('active');
         });
 
         const targetSection = document.getElementById(tabId);
-        if (targetSection) targetSection.classList.add('active');
+        if (targetSection) {
+          targetSection.classList.add('active');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         // Dynamically re-render target view components so user never needs a manual page refresh!
         if (tabId === 'lobbies-view') {
@@ -3370,6 +3409,8 @@ class CustomLobbiesApp {
           this.renderLeaderboard();
         } else if (tabId === 'wardogs-view') {
           this.renderWardogsView();
+        } else if (tabId === 'matchmaking-view') {
+          if (window.matchmakingHubEngine) window.matchmakingHubEngine.updateRadarUI();
         }
       });
     });
