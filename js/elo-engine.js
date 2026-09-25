@@ -21,6 +21,7 @@ class EloEngine {
 
     // Max player capacity per game mode
     this.gameCapacities = {
+      'WARDOGS': 14,
       'Counter-Strike 2': 10,
       'CS2 Retake (Bomb Defusal)': 8,
       'CS2 Execute (Tactical Scrims)': 10,
@@ -33,7 +34,7 @@ class EloEngine {
       'CS2 Zombie Escape': 20,
       'Valorant': 10,
       'REMATCH': 10,
-      'Arkheron': 12,
+      'Arkheron': 10,
       'Empulse': 10,
       'Empulse 5v5 Cyber Arena': 10,
       'Empulse Overcharge Control': 12,
@@ -148,16 +149,22 @@ class EloEngine {
 
     // Competitive Map Pools
     this.mapPools = {
+      'WARDOGS': ['Amber Strike Frontline', 'Sector 4 Outpost', 'Iron Border Citadel', 'Titan Canyon Trench', 'Vanguard Airfield', 'Black Sands Refinery'],
       'Counter-Strike 2': ['Mirage', 'Inferno', 'Nuke', 'Anubis', 'Ancient', 'Dust II', 'Vertigo'],
-      'Valorant': ['Ascent', 'Bind', 'Haven', 'Split', 'Lotus', 'Sunset'],
-      'REMATCH': ['Nexus Arena', 'Cyber City', 'Sub-Zero Station', 'Viper Base'],
-      'Arkheron': ['Arkheron Spire', 'Quantum Ruins', 'Oblivion Core'],
+      'Valorant': ['Ascent', 'Bind', 'Haven', 'Split', 'Lotus', 'Sunset', 'Abyss'],
+      'REMATCH': ['Nexus Arena', 'Cyber City', 'Sub-Zero Station', 'Viper Base', 'Orbital Skyway'],
+      'Arkheron': ['Arkheron Spire', 'Quantum Ruins', 'Oblivion Core', 'Astral Nexus'],
       'Empulse': ['Empulse Facility', 'Neon Skyline', 'Pulse Station', 'Cyber Core', 'Overcharge Dome', 'Vector Sector', 'Hyperion Matrix'],
-      'Marvel Rivals': ['Tokyo 2099', 'Yggsgard', 'Wakanda Imperial'],
-      'Deadlock': ['Cursed City Canyons', 'Midtown Lanes'],
-      'The Finals': ['Monaco', 'Seoul', 'Las Vegas', 'Skyway Stadium'],
-      'Rainbow Six Siege': ['Clubhouse', 'Oregon', 'Bank', 'Kafe', 'Chalet', 'Consulate'],
+      'Marvel Rivals': ['Tokyo 2099', 'Yggsgard', 'Wakanda Imperial', 'Hydra Base Alpha', 'Midgard Crossing'],
+      'Deadlock': ['Cursed City Canyons', 'Midtown Lanes', 'Amber District', 'Rooftop Traverse'],
+      'The Finals': ['Monaco', 'Seoul', 'Las Vegas', 'Skyway Stadium', 'Kyoto 1568'],
+      'Rainbow Six Siege': ['Clubhouse', 'Oregon', 'Bank', 'Kafe', 'Chalet', 'Consulate', 'Border'],
       'Dota 2': ['Radiant Side', 'Dire Side', 'Captains Mode Draft'],
+      'Overwatch 2': ['King\'s Row', 'Circuit Royal', 'Midtown', 'Esperança', 'Colosseo', 'Lijiang Tower'],
+      'League of Legends': ['Summoner\'s Rift (Blue Side)', 'Summoner\'s Rift (Red Side)', 'Howling Abyss (ARAM)'],
+      'Fortnite': ['Mega City Battleground', 'Tilted Towers Classic', 'Loot Lake Scrims', 'Zero Build Arena'],
+      'PUBG': ['Erangel Military Base', 'Miramar Pecado', 'Taego Terminal', 'Vikendi Podvosto'],
+      'Rocket League': ['DFH Stadium', 'Mannfield', 'Champions Field', 'Urban Central', 'Utopia Coliseum', 'Beckwith Park'],
       'Slapshot: Rebound': ['Puck Arena Stadium', 'Cyber Ice Rink', 'Frozen Coliseum', 'Neon Rink', 'Metro Ice Center']
     };
   }
@@ -176,7 +183,25 @@ class EloEngine {
   }
 
   getGameCapacity(gameName) {
-    return this.gameCapacities[gameName] || 10;
+    if (!gameName) return 10;
+    if (this.gameCapacities[gameName]) return this.gameCapacities[gameName];
+    for (const [k, v] of Object.entries(this.gameCapacities)) {
+      if (gameName.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(gameName.toLowerCase())) {
+        return v;
+      }
+    }
+    return 10;
+  }
+
+  getGameMapPool(gameName) {
+    if (!gameName) return this.mapPools['Counter-Strike 2'];
+    if (this.mapPools[gameName]) return this.mapPools[gameName];
+    for (const [k, v] of Object.entries(this.mapPools)) {
+      if (gameName.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(gameName.toLowerCase())) {
+        return v;
+      }
+    }
+    return this.mapPools['Counter-Strike 2'];
   }
 
   // Calculate ELO Rating Change
@@ -297,25 +322,33 @@ class EloEngine {
       sorted.sort((a, b) => (b.elo || 1800) - (a.elo || 1800));
     }
 
-    const cap1 = sorted[0] || { name: 'Captain #1', elo: 2540 };
-    const cap2 = sorted[1] || { name: 'Captain #2', elo: 2150 };
+    const cap1 = sorted[0] || { name: 'Captain Alpha', elo: 2540, role: 'Team Captain' };
+    const cap2 = sorted[1] || { name: 'Captain Bravo', elo: 2480, role: 'Team Captain' };
 
     const unpicked = sorted.slice(2);
-    const team1 = [cap1];
-    const team2 = [cap2];
+    const team1 = [{ ...cap1, isCaptain: true, pickNumber: 0, pickLabel: 'Captain #1' }];
+    const team2 = [{ ...cap2, isCaptain: true, pickNumber: 0, pickLabel: 'Captain #2' }];
 
     let turnOwner = passFirstPick ? 1 : 2;
     let picksRemainingForTurn = (turnOwner === 2 && !passFirstPick) ? 1 : 2;
+    let globalPick = 1;
 
     while (unpicked.length > 0) {
       const pickedPlayer = unpicked.shift();
+      const pWithPick = {
+        ...pickedPlayer,
+        isCaptain: false,
+        pickNumber: globalPick,
+        pickLabel: `Pick #${globalPick} (Round ${Math.ceil(globalPick / 2)})`
+      };
 
       if (turnOwner === 2) {
-        team2.push(pickedPlayer);
+        team2.push(pWithPick);
       } else {
-        team1.push(pickedPlayer);
+        team1.push(pWithPick);
       }
 
+      globalPick++;
       picksRemainingForTurn--;
 
       if (picksRemainingForTurn <= 0) {

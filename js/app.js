@@ -2723,7 +2723,7 @@ class CustomLobbiesApp {
         : `${this.vetoTurn === 'Team Alpha' ? '🔵' : '🔴'} TURN: ${this.vetoTurn} Ban Phase`;
     }
 
-    const maps = window.eloEngine.mapPools[this.currentDraftGame] || window.eloEngine.mapPools['Counter-Strike 2'];
+    const maps = window.eloEngine.getGameMapPool(this.currentDraftGame);
 
     const renderHTML = (m) => {
       const isBanned = this.bannedMaps.has(m);
@@ -3517,10 +3517,10 @@ class CustomLobbiesApp {
       }
     }
 
-    // Auto-launch match if lobby becomes full
+    // Auto-launch snake draft for lobby match when filled
     if (lobby.players >= lobby.max) {
       setTimeout(() => {
-        this.launchFaceitMatchRoom(lobby.title, lobby.game);
+        this.triggerLobbySnakeDraft(lobby.title, lobby.game);
       }, 500);
     }
   }
@@ -3629,19 +3629,215 @@ class CustomLobbiesApp {
     }).join('');
   }
 
+  getDraftPoolForGame(gameTitle = 'Counter-Strike 2', targetCapacity = 10) {
+    const defaultRosters = {
+      'WARDOGS': [
+        { name: 'Marshal_Vanguard', elo: 2680, role: 'Fireteam Commander', commendations: { leadership: 28, friendly: 19, clutch: 24, teacher: 15 } },
+        { name: 'IronClad_Gunner', elo: 2590, role: 'Heavy Weapons', commendations: { leadership: 22, friendly: 18, clutch: 26, teacher: 12 } },
+        { name: 'Ghost_Scout', elo: 2540, role: 'Forward Recon', commendations: { leadership: 18, friendly: 20, clutch: 25, teacher: 10 } },
+        { name: 'Valkyrie_Medic', elo: 2490, role: 'Combat Support', commendations: { leadership: 15, friendly: 32, clutch: 20, teacher: 18 } },
+        { name: 'Apex_Striker', elo: 2450, role: 'Assault Lead', commendations: { leadership: 20, friendly: 15, clutch: 27, teacher: 11 } },
+        { name: 'Bravo_Breacher', elo: 2410, role: 'Demolitions', commendations: { leadership: 16, friendly: 14, clutch: 22, teacher: 9 } },
+        { name: 'Phantom_Sniper', elo: 2380, role: 'Marksman', commendations: { leadership: 14, friendly: 12, clutch: 28, teacher: 8 } },
+        { name: 'Shadow_Operative', elo: 2340, role: 'Infiltrator', commendations: { leadership: 17, friendly: 16, clutch: 21, teacher: 10 } },
+        { name: 'Titan_Shield', elo: 2310, role: 'Juggernaut Frontline', commendations: { leadership: 19, friendly: 22, clutch: 19, teacher: 14 } },
+        { name: 'Cobalt_Ranger', elo: 2280, role: 'Flank Specialist', commendations: { leadership: 13, friendly: 17, clutch: 18, teacher: 7 } },
+        { name: 'Vector_Gunner', elo: 2240, role: 'Auto-Cannonner', commendations: { leadership: 12, friendly: 15, clutch: 17, teacher: 6 } },
+        { name: 'Storm_Raider', elo: 2210, role: 'CQB Operative', commendations: { leadership: 14, friendly: 13, clutch: 16, teacher: 8 } },
+        { name: 'Sentinel_Guard', elo: 2180, role: 'Defensive Tactician', commendations: { leadership: 16, friendly: 24, clutch: 15, teacher: 13 } },
+        { name: 'Phoenix_Slayer', elo: 2140, role: 'Assault Wing', commendations: { leadership: 11, friendly: 14, clutch: 19, teacher: 5 } }
+      ],
+      'Counter-Strike 2': [
+        { name: 'S1mple_Fragger', elo: 2650, role: 'AWPer / Sniper', commendations: { leadership: 26, friendly: 18, clutch: 35, teacher: 12 } },
+        { name: 'ZywOo_Master', elo: 2620, role: 'Entry Fragger', commendations: { leadership: 24, friendly: 28, clutch: 31, teacher: 15 } },
+        { name: 'NiKo_OneTap', elo: 2590, role: 'Rifler', commendations: { leadership: 21, friendly: 16, clutch: 29, teacher: 10 } },
+        { name: 'm0NESY_God', elo: 2640, role: 'AWPer / Sniper', commendations: { leadership: 19, friendly: 22, clutch: 33, teacher: 8 } },
+        { name: 'Ropz_Lurker', elo: 2590, role: 'Lurker / Anchor', commendations: { leadership: 20, friendly: 25, clutch: 30, teacher: 14 } },
+        { name: 'B1t_Headshot', elo: 2480, role: 'Flex Specialist', commendations: { leadership: 15, friendly: 19, clutch: 24, teacher: 9 } },
+        { name: 'Dev1ce_Tactician', elo: 2510, role: 'Support', commendations: { leadership: 25, friendly: 27, clutch: 26, teacher: 20 } },
+        { name: 'Rain_EntryGod', elo: 2420, role: 'Entry Fragger', commendations: { leadership: 17, friendly: 21, clutch: 23, teacher: 11 } },
+        { name: 'Broky_Clutcher', elo: 2550, role: 'AWPer', commendations: { leadership: 18, friendly: 20, clutch: 32, teacher: 10 } },
+        { name: 'Karrigan_IGL', elo: 2450, role: 'In-Game Leader', commendations: { leadership: 35, friendly: 30, clutch: 20, teacher: 25 } }
+      ],
+      'Valorant': [
+        { name: 'TenZ_Duelist', elo: 2680, role: 'Duelist / Jett', commendations: { leadership: 22, friendly: 28, clutch: 34, teacher: 16 } },
+        { name: 'Boaster_IGL', elo: 2520, role: 'Controller / IGL', commendations: { leadership: 36, friendly: 35, clutch: 20, teacher: 28 } },
+        { name: 'Chronicle_Flex', elo: 2590, role: 'Initiator', commendations: { leadership: 24, friendly: 21, clutch: 28, teacher: 14 } },
+        { name: 'Aspas_Entry', elo: 2660, role: 'Duelist', commendations: { leadership: 20, friendly: 18, clutch: 32, teacher: 10 } },
+        { name: 'Derke_Op', elo: 2580, role: 'Sentinel / Op', commendations: { leadership: 19, friendly: 22, clutch: 27, teacher: 12 } },
+        { name: 'Boostio_Vanguard', elo: 2470, role: 'In-Game Leader', commendations: { leadership: 30, friendly: 25, clutch: 22, teacher: 20 } },
+        { name: 'Less_Anchor', elo: 2540, role: 'Sentinel Anchor', commendations: { leadership: 18, friendly: 19, clutch: 29, teacher: 11 } },
+        { name: 'demon1_Precision', elo: 2610, role: 'Duelist / Op', commendations: { leadership: 17, friendly: 16, clutch: 31, teacher: 8 } },
+        { name: 'cauanzin_Initiator', elo: 2460, role: 'Initiator', commendations: { leadership: 16, friendly: 24, clutch: 21, teacher: 13 } },
+        { name: 'Alfajer_Clutch', elo: 2550, role: 'Sentinel / Flex', commendations: { leadership: 18, friendly: 23, clutch: 30, teacher: 12 } }
+      ],
+      'Marvel Rivals': [
+        { name: 'IronMan_Overclock', elo: 2610, role: 'Vanguard Specialist', commendations: { leadership: 27, friendly: 22, clutch: 26, teacher: 18 } },
+        { name: 'Magneto_Shield', elo: 2580, role: 'Vanguard Anchor', commendations: { leadership: 25, friendly: 19, clutch: 24, teacher: 16 } },
+        { name: 'SpiderMan_Web', elo: 2550, role: 'Duelist Dive', commendations: { leadership: 19, friendly: 30, clutch: 30, teacher: 14 } },
+        { name: 'LunaSnow_Freeze', elo: 2530, role: 'Strategist Support', commendations: { leadership: 21, friendly: 33, clutch: 22, teacher: 20 } },
+        { name: 'Hela_Executioner', elo: 2500, role: 'Duelist Marksman', commendations: { leadership: 16, friendly: 15, clutch: 28, teacher: 9 } },
+        { name: 'Venom_Symbiote', elo: 2480, role: 'Vanguard Dive', commendations: { leadership: 18, friendly: 21, clutch: 25, teacher: 11 } },
+        { name: 'Rocket_Blaster', elo: 2460, role: 'Strategist Tactician', commendations: { leadership: 24, friendly: 20, clutch: 23, teacher: 17 } },
+        { name: 'Punisher_Gunfire', elo: 2430, role: 'Duelist Hitscan', commendations: { leadership: 15, friendly: 17, clutch: 26, teacher: 8 } },
+        { name: 'Storm_Tempest', elo: 2410, role: 'Duelist Controller', commendations: { leadership: 22, friendly: 25, clutch: 21, teacher: 15 } },
+        { name: 'Jeff_Landshark', elo: 2390, role: 'Strategist Flex', commendations: { leadership: 14, friendly: 35, clutch: 19, teacher: 12 } },
+        { name: 'Loki_Trickster', elo: 2370, role: 'Strategist', commendations: { leadership: 20, friendly: 18, clutch: 24, teacher: 13 } },
+        { name: 'Hulk_Smash', elo: 2350, role: 'Vanguard Brawler', commendations: { leadership: 17, friendly: 22, clutch: 22, teacher: 10 } }
+      ],
+      'Rocket League': [
+        { name: 'Zen_Aerial', elo: 2650, role: 'Striker / First Man', commendations: { leadership: 25, friendly: 24, clutch: 35, teacher: 16 } },
+        { name: 'Vatira_Goalie', elo: 2610, role: 'Third Man / Goalie', commendations: { leadership: 28, friendly: 20, clutch: 31, teacher: 15 } },
+        { name: 'Monkey_M00n', elo: 2590, role: 'Midfield Maestro', commendations: { leadership: 31, friendly: 22, clutch: 29, teacher: 18 } },
+        { name: 'BeastMode_AirDribble', elo: 2560, role: 'Striker', commendations: { leadership: 19, friendly: 23, clutch: 28, teacher: 12 } },
+        { name: 'Firstkiller_Speed', elo: 2540, role: 'Disruptor / Flank', commendations: { leadership: 18, friendly: 19, clutch: 27, teacher: 10 } },
+        { name: 'Daniel_Shadow', elo: 2520, role: 'Defensive Anchor', commendations: { leadership: 20, friendly: 26, clutch: 26, teacher: 14 } }
+      ],
+      'Slapshot: Rebound': [
+        { name: 'Puck_Wizard', elo: 2580, role: 'Center Playmaker', commendations: { leadership: 26, friendly: 25, clutch: 32, teacher: 16 } },
+        { name: 'Ice_Baron', elo: 2540, role: 'Defense Anchor', commendations: { leadership: 24, friendly: 21, clutch: 28, teacher: 14 } },
+        { name: 'Snipe_Master', elo: 2510, role: 'Right Wing Fragger', commendations: { leadership: 18, friendly: 22, clutch: 29, teacher: 11 } },
+        { name: 'Stick_Handler', elo: 2480, role: 'Left Wing Agility', commendations: { leadership: 19, friendly: 26, clutch: 25, teacher: 13 } },
+        { name: 'Goalie_Wall', elo: 2460, role: 'Goaltender', commendations: { leadership: 22, friendly: 30, clutch: 27, teacher: 18 } },
+        { name: 'Rebound_King', elo: 2420, role: 'Enforcer / Defense', commendations: { leadership: 17, friendly: 20, clutch: 24, teacher: 10 } }
+      ],
+      'Deadlock': [
+        { name: 'Abrams_Brawler', elo: 2590, role: 'Frontline Bruiser', commendations: { leadership: 25, friendly: 22, clutch: 28, teacher: 14 } },
+        { name: 'Vindicta_Sniper', elo: 2560, role: 'Long Range Carry', commendations: { leadership: 18, friendly: 19, clutch: 31, teacher: 11 } },
+        { name: 'Infernus_Ignite', elo: 2530, role: 'Burn Specialist', commendations: { leadership: 20, friendly: 21, clutch: 26, teacher: 12 } },
+        { name: 'LadyGeist_Vamp', elo: 2510, role: 'Midlane Control', commendations: { leadership: 22, friendly: 20, clutch: 27, teacher: 15 } },
+        { name: 'Seven_Volt', elo: 2480, role: 'Lightning Hypercarry', commendations: { leadership: 19, friendly: 24, clutch: 25, teacher: 13 } },
+        { name: 'Dynamo_BlackHole', elo: 2450, role: 'Support Initiator', commendations: { leadership: 27, friendly: 31, clutch: 23, teacher: 21 } },
+        { name: 'Shiv_Dagger', elo: 2430, role: 'Assassin Executioner', commendations: { leadership: 16, friendly: 18, clutch: 29, teacher: 9 } },
+        { name: 'Wraith_Cards', elo: 2400, role: 'DPS Carry', commendations: { leadership: 17, friendly: 22, clutch: 24, teacher: 10 } },
+        { name: 'Warden_Enforcer', elo: 2380, role: 'Crowd Control Tank', commendations: { leadership: 24, friendly: 23, clutch: 22, teacher: 16 } },
+        { name: 'Paradox_Carbine', elo: 2360, role: 'Swap Specialist', commendations: { leadership: 21, friendly: 20, clutch: 21, teacher: 14 } },
+        { name: 'Pocket_Suitcase', elo: 2340, role: 'Elusive Flex', commendations: { leadership: 15, friendly: 25, clutch: 20, teacher: 12 } },
+        { name: 'McGinnis_Turrets', elo: 2320, role: 'Lane Pusher / Siege', commendations: { leadership: 18, friendly: 27, clutch: 19, teacher: 15 } }
+      ],
+      'The Finals': [
+        { name: 'Heavy_Sledge', elo: 2540, role: 'Heavy Demolition', commendations: { leadership: 24, friendly: 21, clutch: 28, teacher: 14 } },
+        { name: 'Light_Dash', elo: 2510, role: 'Light Assassin', commendations: { leadership: 19, friendly: 22, clutch: 31, teacher: 11 } },
+        { name: 'Medium_HealBeam', elo: 2480, role: 'Medium Support', commendations: { leadership: 28, friendly: 34, clutch: 24, teacher: 22 } },
+        { name: 'Heavy_MeshShield', elo: 2450, role: 'Heavy Anchor', commendations: { leadership: 22, friendly: 25, clutch: 23, teacher: 16 } },
+        { name: 'Medium_Turret', elo: 2420, role: 'Medium Tactician', commendations: { leadership: 21, friendly: 24, clutch: 22, teacher: 15 } },
+        { name: 'Light_Cloak', elo: 2390, role: 'Light Flanker', commendations: { leadership: 17, friendly: 18, clutch: 27, teacher: 9 } }
+      ],
+      'Empulse': [
+        { name: 'Neon_Glitch', elo: 2580, role: 'Railgun Striker', commendations: { leadership: 25, friendly: 22, clutch: 30, teacher: 15 } },
+        { name: 'Cyber_Viper', elo: 2540, role: 'EMP Infiltrator', commendations: { leadership: 22, friendly: 20, clutch: 27, teacher: 13 } },
+        { name: 'Pulse_Titan', elo: 2510, role: 'Heavy Overcharge', commendations: { leadership: 24, friendly: 23, clutch: 25, teacher: 16 } },
+        { name: 'Zero_Latency', elo: 2470, role: 'Speedrun Flex', commendations: { leadership: 18, friendly: 25, clutch: 26, teacher: 12 } },
+        { name: 'Matrix_Ghost', elo: 2440, role: 'Tactical Hacker', commendations: { leadership: 20, friendly: 21, clutch: 23, teacher: 14 } },
+        { name: 'Kinetic_Volt', elo: 2410, role: 'Railgun Specialist', commendations: { leadership: 17, friendly: 19, clutch: 24, teacher: 10 } },
+        { name: 'Overclock_Unit', elo: 2380, role: 'Defense Core', commendations: { leadership: 19, friendly: 24, clutch: 21, teacher: 15 } },
+        { name: 'Hyper_Striker', elo: 2350, role: 'Rapid Assault', commendations: { leadership: 16, friendly: 20, clutch: 22, teacher: 9 } },
+        { name: 'Echo_Phase', elo: 2320, role: 'Recon Anchor', commendations: { leadership: 18, friendly: 22, clutch: 20, teacher: 11 } },
+        { name: 'Nexus_Prime', elo: 2290, role: 'Vanguard Leader', commendations: { leadership: 29, friendly: 28, clutch: 19, teacher: 22 } }
+      ],
+      'Arkheron': [
+        { name: 'Archon_Prime', elo: 2610, role: 'Oblivion Vanguard', commendations: { leadership: 28, friendly: 22, clutch: 31, teacher: 18 } },
+        { name: 'Void_Gladiator', elo: 2560, role: 'Core Breacher', commendations: { leadership: 23, friendly: 20, clutch: 28, teacher: 14 } },
+        { name: 'Quantum_Spectre', elo: 2520, role: 'Phase Assassin', commendations: { leadership: 19, friendly: 19, clutch: 30, teacher: 11 } },
+        { name: 'Chrono_Sentinel', elo: 2480, role: 'Time Controller', commendations: { leadership: 26, friendly: 25, clutch: 24, teacher: 19 } },
+        { name: 'Nebula_Warrior', elo: 2440, role: 'Heavy Enforcer', commendations: { leadership: 21, friendly: 22, clutch: 25, teacher: 13 } },
+        { name: 'Eclipse_Marksman', elo: 2410, role: 'Quantum Sniper', commendations: { leadership: 18, friendly: 18, clutch: 27, teacher: 10 } },
+        { name: 'Celestial_Shield', elo: 2380, role: 'Defensive Bulwark', commendations: { leadership: 24, friendly: 29, clutch: 22, teacher: 17 } },
+        { name: 'Astral_Striker', elo: 2350, role: 'Melee Berserker', commendations: { leadership: 17, friendly: 21, clutch: 23, teacher: 9 } },
+        { name: 'Solaris_Paladin', elo: 2310, role: 'Core Support', commendations: { leadership: 22, friendly: 32, clutch: 20, teacher: 20 } },
+        { name: 'Abyssal_Hunter', elo: 2280, role: 'Void Hunter', commendations: { leadership: 16, friendly: 19, clutch: 24, teacher: 8 } }
+      ],
+      'REMATCH': [
+        { name: 'Rematch_King', elo: 2620, role: 'Flex Champion', commendations: { leadership: 27, friendly: 24, clutch: 32, teacher: 17 } },
+        { name: 'Nitro_Drifter', elo: 2570, role: 'Speed Fragger', commendations: { leadership: 21, friendly: 22, clutch: 29, teacher: 13 } },
+        { name: 'Apex_Viper', elo: 2530, role: 'Lurker / Anchor', commendations: { leadership: 23, friendly: 20, clutch: 27, teacher: 15 } },
+        { name: 'SubZero_Clutch', elo: 2490, role: 'Tactical Support', commendations: { leadership: 19, friendly: 26, clutch: 30, teacher: 14 } },
+        { name: 'Cyber_Knight', elo: 2450, role: 'Frontline Assault', commendations: { leadership: 25, friendly: 25, clutch: 23, teacher: 18 } },
+        { name: 'Pulse_Cannon', elo: 2410, role: 'Heavy Gunner', commendations: { leadership: 17, friendly: 18, clutch: 24, teacher: 10 } },
+        { name: 'Shadow_Strike', elo: 2380, role: 'Flank Breacher', commendations: { leadership: 18, friendly: 21, clutch: 25, teacher: 11 } },
+        { name: 'Laser_Vision', elo: 2340, role: 'Sniper Marksman', commendations: { leadership: 16, friendly: 17, clutch: 28, teacher: 8 } },
+        { name: 'Quantum_Leap', elo: 2310, role: 'Mobility Flex', commendations: { leadership: 20, friendly: 23, clutch: 21, teacher: 12 } },
+        { name: 'Iron_Core', elo: 2270, role: 'Defensive Anchor', commendations: { leadership: 22, friendly: 27, clutch: 20, teacher: 16 } }
+      ]
+    };
+
+    let matchedKey = Object.keys(defaultRosters).find(k => 
+      gameTitle.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(gameTitle.toLowerCase())
+    );
+    let baseList = matchedKey ? defaultRosters[matchedKey].map(p => ({ ...p })) : defaultRosters['Counter-Strike 2'].map(p => ({ ...p }));
+
+    // If active lobby has members, incorporate them
+    const activeLobby = Array.isArray(this.lobbies) ? this.lobbies.find(l => l.title === this.currentDraftLobby) : null;
+    if (activeLobby && Array.isArray(activeLobby.members) && activeLobby.members.length > 0) {
+      const lobbyMembers = activeLobby.members.map(m => ({
+        name: m.name,
+        elo: m.elo || 2150,
+        role: m.role || 'Competitor',
+        commendations: { leadership: 20, friendly: 22, clutch: 24, teacher: 15 }
+      }));
+      baseList = [...lobbyMembers, ...baseList.filter(p => !lobbyMembers.some(lm => lm.name === p.name))];
+    }
+
+    // Ensure pool size satisfies targetCapacity
+    let counter = 1;
+    while (baseList.length < targetCapacity) {
+      baseList.push({
+        name: `Operative_${counter}_${gameTitle.replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase()}`,
+        elo: 2050 + Math.floor(Math.random() * 450),
+        role: counter % 3 === 0 ? 'Assault / Fragger' : counter % 3 === 1 ? 'Tactical Support' : 'Anchor / Defense',
+        commendations: {
+          leadership: Math.floor(Math.random() * 20) + 5,
+          friendly: Math.floor(Math.random() * 25) + 10,
+          clutch: Math.floor(Math.random() * 30) + 10,
+          teacher: Math.floor(Math.random() * 15) + 5
+        }
+      });
+      counter++;
+    }
+
+    return baseList.slice(0, targetCapacity);
+  }
+
   triggerLobbySnakeDraft(lobbyTitle, gameTitle) {
     this.currentDraftLobby = lobbyTitle;
-    this.currentDraftGame = gameTitle;
+    this.currentDraftGame = gameTitle || 'Counter-Strike 2';
     this.bannedMaps.clear();
     this.selectedMatchMap = null;
     this.passedFirstPick = false;
 
+    // Sync in-modal game select dropdown
+    const gameSelect = document.getElementById('draftGameSelect');
+    if (gameSelect) {
+      const matchedOpt = Array.from(gameSelect.options).find(opt => 
+        opt.value.toLowerCase() === this.currentDraftGame.toLowerCase() ||
+        this.currentDraftGame.toLowerCase().includes(opt.value.toLowerCase()) ||
+        opt.value.toLowerCase().includes(this.currentDraftGame.toLowerCase())
+      );
+      if (matchedOpt) {
+        gameSelect.value = matchedOpt.value;
+        this.currentDraftGame = matchedOpt.value;
+      }
+    }
+
     const modal = document.getElementById('autoDraftModal');
     const titleEl = document.getElementById('draftGameTitle');
     if (titleEl) {
-      titleEl.textContent = `🐍 ${lobbyTitle || gameTitle} — FACEIT Snake Draft Board`;
+      titleEl.textContent = `🐍 ${lobbyTitle || this.currentDraftGame} — FACEIT Snake Draft Board`;
     }
     if (modal) modal.classList.add('active');
+    this.runDraftSimulation();
+    this.renderMapVetoGrid();
+  }
+
+  onDraftGameSelectChange(gameTitle) {
+    this.currentDraftGame = gameTitle;
+    const titleEl = document.getElementById('draftGameTitle');
+    if (titleEl) {
+      titleEl.textContent = `🐍 ${gameTitle} — FACEIT Snake Draft Board`;
+    }
+    this.bannedMaps.clear();
+    this.selectedMatchMap = null;
+    this.passedFirstPick = false;
     this.runDraftSimulation();
     this.renderMapVetoGrid();
   }
@@ -3659,32 +3855,69 @@ class CustomLobbiesApp {
   runDraftSimulation() {
     const maxCap = window.eloEngine.getGameCapacity(this.currentDraftGame);
     const mode = this.captainSelectionMode || 'highest_mmr';
-    const result = window.eloEngine.performCustomSnakeDraft(this.leaderboardData, this.passedFirstPick, mode);
+    
+    // Get dedicated, filled roster pool specifically for this game
+    const draftPool = this.getDraftPoolForGame(this.currentDraftGame, maxCap);
+    const result = window.eloEngine.performCustomSnakeDraft(draftPool, this.passedFirstPick, mode);
 
     const cap1Commends = result.captain1.commendations ? result.captain1.commendations.leadership || 0 : 0;
     const cap2Commends = result.captain2.commendations ? result.captain2.commendations.leadership || 0 : 0;
 
-    const label1 = mode === 'captain_commends' ? `🧠 Captain Commends: +${cap1Commends}` : `${result.captain1.elo} MMR`;
-    const label2 = mode === 'captain_commends' ? `🧠 Captain Commends: +${cap2Commends}` : `${result.captain2.elo} MMR`;
+    const label1 = mode === 'captain_commends' ? `🧠 Commends: +${cap1Commends}` : `${result.captain1.elo} MMR`;
+    const label2 = mode === 'captain_commends' ? `🧠 Commends: +${cap2Commends}` : `${result.captain2.elo} MMR`;
 
-    document.getElementById('captainAName').textContent = `👑 Captain #1 (${result.criteriaLabel}): ${result.captain1.name} (${label1})`;
-    document.getElementById('captainBName').textContent = `👑 Captain #2 (${result.criteriaLabel}): ${result.captain2.name} (${label2})`;
+    const capAEl = document.getElementById('captainAName');
+    const capBEl = document.getElementById('captainBName');
+    if (capAEl) capAEl.textContent = `👑 Captain Alpha (${result.criteriaLabel}): ${result.captain1.name} (${label1})`;
+    if (capBEl) capBEl.textContent = `👑 Captain Bravo (${result.criteriaLabel}): ${result.captain2.name} (${label2})`;
 
-    document.getElementById('teamAList').innerHTML = result.team1.map((p, idx) => `
-      <div style="display: flex; justify-content: space-between; background: rgba(0,242,254,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem; border: 1px solid rgba(0,242,254,0.2);">
-        <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
-        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR (🧠 +${p.commendations ? p.commendations.leadership || 0 : 0})</span>
-      </div>
-    `).join('');
+    const tagCap = document.getElementById('draftRosterCapTag');
+    if (tagCap) {
+      tagCap.innerHTML = `Game: <strong style="color: var(--accent-gold);">${this.currentDraftGame}</strong> • Capacity: <strong style="color: var(--accent-cyan);">${maxCap} Players (${Math.floor(maxCap/2)}v${Math.floor(maxCap/2)})</strong>`;
+    }
 
-    document.getElementById('teamBList').innerHTML = result.team2.map((p, idx) => `
-      <div style="display: flex; justify-content: space-between; background: rgba(157,78,221,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.88rem; border: 1px solid rgba(157,78,221,0.2);">
-        <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
-        <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR (🧠 +${p.commendations ? p.commendations.leadership || 0 : 0})</span>
-      </div>
-    `).join('');
+    const tagA = document.getElementById('teamACountTag');
+    const tagB = document.getElementById('teamBCountTag');
+    if (tagA) tagA.textContent = `${result.team1.length} Players`;
+    if (tagB) tagB.textContent = `${result.team2.length} Players`;
 
-    document.getElementById('draftMMRSummary').textContent = `🐍 Snake Order (1-2-2-1) | Criteria: ${result.criteriaLabel} | Capacity: ${maxCap} | First Pick: ${result.firstPickOwner} | Team 1 Avg: ${result.avgMMR1} MMR | Team 2 Avg: ${result.avgMMR2} MMR`;
+    const teamAContainer = document.getElementById('teamAList');
+    const teamBContainer = document.getElementById('teamBList');
+
+    if (teamAContainer) {
+      teamAContainer.innerHTML = result.team1.map((p, idx) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,242,254,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.85rem; border: 1px solid rgba(0,242,254,0.2);">
+          <div>
+            <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
+            ${p.role ? `<span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 0.35rem;">[${p.role}]</span>` : ''}
+          </div>
+          <div style="text-align: right;">
+            <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
+            <span style="font-size: 0.72rem; color: var(--accent-cyan); margin-left: 0.35rem;">${p.pickLabel || (idx === 0 ? 'Cap #1' : `Pick #${idx*2}`)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    if (teamBContainer) {
+      teamBContainer.innerHTML = result.team2.map((p, idx) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(157,78,221,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.85rem; border: 1px solid rgba(157,78,221,0.2);">
+          <div>
+            <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
+            ${p.role ? `<span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 0.35rem;">[${p.role}]</span>` : ''}
+          </div>
+          <div style="text-align: right;">
+            <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
+            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-left: 0.35rem;">${p.pickLabel || (idx === 0 ? 'Cap #2' : `Pick #${idx*2-1}`)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    const summaryEl = document.getElementById('draftMMRSummary');
+    if (summaryEl) {
+      summaryEl.innerHTML = `🐍 <strong>Snake Pick Order (1-2-2-1)</strong> | Game: <strong style="color: var(--accent-cyan);">${this.currentDraftGame}</strong> (${maxCap} Players) | Criteria: ${result.criteriaLabel} | First Pick: <strong>${result.firstPickOwner}</strong><br>🔵 Team Alpha Avg: <strong>${result.avgMMR1} MMR</strong> | 🔴 Team Bravo Avg: <strong>${result.avgMMR2} MMR</strong> | MMR Delta: <strong>${result.mmrDelta} MMR (Fair Match)</strong>`;
+    }
   }
 
   setupAutoDraftHandlers() {
@@ -3699,7 +3932,7 @@ class CustomLobbiesApp {
     if (btnConfirmDraft) {
       btnConfirmDraft.addEventListener('click', () => {
         modal.classList.remove('active');
-        this.launchFaceitMatchRoom(this.currentDraftGame, this.currentDraftGame);
+        this.launchFaceitMatchRoom(this.currentDraftLobby || this.currentDraftGame, this.currentDraftGame);
       });
     }
   }
@@ -3739,8 +3972,8 @@ class CustomLobbiesApp {
             statusCard.style.display = 'none';
             btnJoin.disabled = false;
 
-            const balanced = window.eloEngine.autoBalanceTeams(this.leaderboardData);
-            alert(`🎉 MATCH POPPED!\n\nTeam 1 Captain: ${balanced.team1[0].name} (${balanced.team1[0].elo} MMR)\nTeam 2 Captain: ${balanced.team2[0].name} (${balanced.team2[0].elo} MMR)\nMMR Delta: ${balanced.mmrDiff} (Fair Match)`);
+            const queueGame = this.selectedLeaderboardGame || 'Counter-Strike 2';
+            this.triggerLobbySnakeDraft(`Matchmaking Scrim (${queueGame})`, queueGame);
           }
         }, 1000);
       });

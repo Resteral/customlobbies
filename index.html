@@ -341,10 +341,20 @@
               <span>⚡</span> Auto-Draft Rooms <span style="font-size: 0.7rem;">▼</span>
             </button>
             <div class="dropdown-menu">
-              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Counter-Strike 2')">🎮 Counter-Strike 2 Draft</button>
-              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Valorant')">🎯 Valorant Draft</button>
-              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Rocket League')">🚗 Rocket League Draft</button>
-              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Slapshot: Rebound')">🏒 Slapshot Draft</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('WARDOGS')">🛡️ WARDOGS Draft (7v7 Fireteam)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Counter-Strike 2')">🎮 Counter-Strike 2 Draft (5v5)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Valorant')">🎯 Valorant Draft (5v5)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Marvel Rivals')">⚡ Marvel Rivals Draft (6v6)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Empulse')">⚡ Empulse Draft (5v5)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('REMATCH')">🔥 REMATCH Draft (5v5)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Slapshot: Rebound')">🏒 Slapshot: Rebound Draft (3v3)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Rocket League')">🚗 Rocket League Draft (3v3)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Deadlock')">🔮 Deadlock Draft (6v6)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('The Finals')">💥 The Finals Draft (3v3)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Arkheron')">⚔️ Arkheron Draft (5v5)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Rainbow Six Siege')">🛡️ Rainbow Six Siege Draft (5v5)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Dota 2')">🧙 Dota 2 Draft (5v5)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Overwatch 2')">🦸 Overwatch 2 Draft (5v5)</button>
             </div>
           </div>
 
@@ -2667,27 +2677,61 @@
 
   <!-- Auto-Draft Teams Modal -->
   <div class="modal-overlay" id="autoDraftModal">
-    <div class="modal-card" style="max-width: 650px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <div class="modal-card" style="max-width: 780px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
         <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan);" id="draftGameTitle">Captain Auto-Draft Engine</h3>
-        <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">Auto-Balanced</span>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-weight: 800;">🐍 Snake Pick (1-2-2-1)</span>
+          <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-weight: 800;">Auto-Balanced MMR</span>
+        </div>
       </div>
 
-      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">The top 2 ELO players in the pool are assigned as Captains, followed by a balanced Snake Draft algorithm.</p>
+      <!-- In-Modal Game Draft Switcher -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem; background: rgba(255,255,255,0.04); padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <label for="draftGameSelect" style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); white-space: nowrap;">🎯 Select Game Draft:</label>
+          <select id="draftGameSelect" class="form-control" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem; background: rgba(18, 24, 38, 0.95); color: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 700;" onchange="window.app.onDraftGameSelectChange(this.value)">
+            <option value="WARDOGS">🛡️ WARDOGS (7v7 Fireteam)</option>
+            <option value="Counter-Strike 2" selected>🎮 Counter-Strike 2 (5v5)</option>
+            <option value="Valorant">🎯 Valorant (5v5)</option>
+            <option value="Marvel Rivals">⚡ Marvel Rivals (6v6)</option>
+            <option value="Empulse">⚡ Empulse (5v5)</option>
+            <option value="REMATCH">🔥 REMATCH (5v5)</option>
+            <option value="Slapshot: Rebound">🏒 Slapshot: Rebound (3v3)</option>
+            <option value="Rocket League">🚗 Rocket League (3v3)</option>
+            <option value="Deadlock">🔮 Deadlock (6v6)</option>
+            <option value="The Finals">💥 The Finals (3v3)</option>
+            <option value="Arkheron">⚔️ Arkheron (5v5)</option>
+            <option value="Rainbow Six Siege">🛡️ Rainbow Six Siege (5v5)</option>
+            <option value="Dota 2">🧙 Dota 2 (5v5)</option>
+            <option value="Overwatch 2">🦸 Overwatch 2 (5v5)</option>
+            <option value="League of Legends">⚔️ League of Legends (5v5)</option>
+          </select>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);" id="draftRosterCapTag">
+          Drafting: <strong style="color: var(--accent-cyan);">10 Players (5v5)</strong>
+        </div>
+      </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
         <!-- Team Alpha -->
         <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--accent-cyan);">
-          <div style="font-size: 0.8rem; color: var(--accent-cyan); text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔵 Team Alpha</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <div style="font-size: 0.8rem; color: var(--accent-cyan); text-transform: uppercase; font-weight: 800;">🔵 Team Alpha</div>
+            <span class="lobby-game-tag" style="background: rgba(0,242,254,0.15); color: var(--accent-cyan); font-size: 0.72rem; font-weight: 800;" id="teamACountTag">5 Players</span>
+          </div>
           <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainAName">Captain Alpha</div>
-          <div id="teamAList"></div>
+          <div id="teamAList" style="max-height: 280px; overflow-y: auto; padding-right: 0.3rem;"></div>
         </div>
 
         <!-- Team Bravo -->
         <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--accent-purple);">
-          <div style="font-size: 0.8rem; color: var(--accent-purple); text-transform: uppercase; font-weight: 800; margin-bottom: 0.4rem;">🔴 Team Bravo</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <div style="font-size: 0.8rem; color: var(--accent-purple); text-transform: uppercase; font-weight: 800;">🔴 Team Bravo</div>
+            <span class="lobby-game-tag" style="background: rgba(157,78,221,0.15); color: var(--accent-purple); font-size: 0.72rem; font-weight: 800;" id="teamBCountTag">5 Players</span>
+          </div>
           <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainBName">Captain Bravo</div>
-          <div id="teamBList"></div>
+          <div id="teamBList" style="max-height: 280px; overflow-y: auto; padding-right: 0.3rem;"></div>
         </div>
       </div>
 
