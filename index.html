@@ -4325,7 +4325,7 @@
 
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <button class="btn btn-secondary" onclick="window.app.runWardogsRankedDraft()">🔄 Re-Select Players</button>
-        <button class="btn btn-primary" onclick="alert('🚀 DEPLOYED TO 33v33v33 TRI-FACTION MATCH!\n\nConnecting all 99 selected WARDOG combatants to Dedicated 128-tick Server Node...')">🚀 Deploy to Ranked Match</button>
+        <button class="btn btn-primary" onclick="window.app.launchWardogsServerMatch()">🚀 Deploy to Ranked Match</button>
       </div>
     </div>
   </div>
@@ -4377,6 +4377,78 @@
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span class="mmr-badge">Verified Kernel Checksum: 0x8F9A-RING0</span>
         <button class="btn btn-primary" onclick="window.app.runAntiCheatScan()">🔍 Run Manual System Scan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEDICATED SERVER LAUNCH & PROTOCOL DISPATCH HUD MODAL -->
+  <div class="modal-overlay" id="serverLaunchModal" style="display: none; z-index: 10000;">
+    <div class="modal-card" style="max-width: 680px; width: 94%; border: 1.5px solid var(--accent-cyan); box-shadow: 0 0 35px rgba(0, 242, 254, 0.35); background: linear-gradient(135deg, rgba(14, 16, 26, 0.98), rgba(20, 24, 38, 0.98));">
+      <!-- Modal Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid rgba(0, 242, 254, 0.2); padding-bottom: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="font-size: 2rem; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--accent-cyan); border-radius: 10px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;" id="srvLaunchGameIcon">🚀</div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <h3 style="font-size: 1.35rem; font-weight: 900; color: #fff; margin: 0;" id="srvLaunchTitle">Server Launching</h3>
+              <span class="badge badge-success" id="srvLaunchStatusBadge">🟢 PROTOCOL ACTIVE</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;" id="srvLaunchSubtitle">128-Tick Dedicated Server Match Node • Ring 0 AC Active</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeServerLaunchModal()">✕ Close</button>
+      </div>
+
+      <!-- Live Connection Stats Banner -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin-bottom: 1.2rem;">
+        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.7rem; text-align: center;">
+          <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Game</div>
+          <div style="font-size: 0.95rem; font-weight: 800; color: var(--accent-cyan);" id="srvLaunchGameName">Counter-Strike 2</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.7rem; text-align: center;">
+          <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Server Address</div>
+          <div style="font-size: 0.95rem; font-weight: 900; color: var(--accent-green); font-family: monospace;" id="srvLaunchIpPort">192.168.1.85:27015</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.7rem; text-align: center;">
+          <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Map / Mode</div>
+          <div style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold);" id="srvLaunchMapName">de_mirage</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.7rem; text-align: center;">
+          <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Tickrate / Ping</div>
+          <div style="font-size: 0.95rem; font-weight: 800; color: var(--accent-purple);" id="srvLaunchTickrate">128.0 Hz (14ms)</div>
+        </div>
+      </div>
+
+      <!-- Quick Connect Command Box -->
+      <div style="background: rgba(0, 242, 254, 0.05); border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 1rem; margin-bottom: 1.2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+          <span style="font-size: 0.8rem; font-weight: 800; color: var(--accent-cyan);">⚡ DIRECT CONSOLE CONNECT COMMAND</span>
+          <span style="font-size: 0.72rem; color: var(--accent-green);" id="srvCopyNotice">Copied to Clipboard!</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="text" id="srvConsoleCmdInput" readonly value="connect 192.168.1.85:27015" style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 6px; padding: 0.6rem 0.8rem; font-family: monospace; font-size: 0.9rem; color: #00f2fe; outline: none;">
+          <button class="btn btn-cyan btn-sm" onclick="window.app.copyServerConsoleCmd()" style="white-space: nowrap; padding: 0.6rem 1rem;">
+            📋 Copy Command
+          </button>
+        </div>
+      </div>
+
+      <!-- Protocol Actions -->
+      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem;">
+        <button class="btn btn-primary" id="btnLaunchSteamProtocol" onclick="window.app.triggerCurrentServerProtocol()" style="flex: 1; min-width: 180px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);">
+          <span>🚀</span> Re-Launch Steam Client
+        </button>
+        <button class="btn btn-purple" id="btnLocalServerToggle" onclick="window.app.toggleLocalDedicatedServerNode()" style="flex: 1; min-width: 180px;">
+          <span>🖥️</span> Start Local Server Node
+        </button>
+      </div>
+
+      <!-- Connect Instructions & Tips -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.8rem; font-size: 0.8rem; color: var(--text-dim); line-height: 1.5;">
+        <div style="font-weight: 800; color: #fff; margin-bottom: 0.3rem;">💡 How to Connect:</div>
+        <div>1. If Steam is running, the protocol prompt will launch or connect your game automatically.</div>
+        <div>2. Alternatively, open your in-game console (press <code>~</code> key) and paste the copied command above.</div>
+        <div>3. For local LAN scrims or Pacifica testing, click <b>Start Local Server Node</b> to host on <code>127.0.0.1:7777</code>.</div>
       </div>
     </div>
   </div>
@@ -4918,10 +4990,10 @@
       <div>
         <h5 style="color: var(--accent-cyan); font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;">🔌 Server Connect & Protocols</h5>
         <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-          <li><a href="steam://connect/192.168.1.85:27015" style="color: var(--text-main); text-decoration: none;" onclick="window.app.copyServerIP('192.168.1.85:27015')">🎯 CS2 128-Tick Premier Server Node</a></li>
-          <li><a href="steam://connect/192.168.1.130:27015" style="color: var(--text-main); text-decoration: none;" onclick="window.app.copyServerIP('192.168.1.130:27015')">🏒 Slapshot: Rebound 3v3 Puck Arena</a></li>
-          <li><a href="steam://connect/192.168.1.110:27015" style="color: var(--text-main); text-decoration: none;" onclick="window.app.copyServerIP('192.168.1.110:27015')">🔥 REMATCH 5v5 Competitive Node</a></li>
-          <li><a href="steam://connect/192.168.1.115:27015" style="color: var(--text-main); text-decoration: none;" onclick="window.app.copyServerIP('192.168.1.115:27015')">⚔️ Arkheron 12-Player Cyber Spire</a></li>
+          <li><a href="javascript:void(0)" style="color: var(--text-main); text-decoration: none;" onclick="window.app.launchServerProtocol({ serverIp: '192.168.1.85:27015', game: 'Counter-Strike 2', title: 'CS2 128-Tick Premier Server Node' })">🎯 CS2 128-Tick Premier Server Node</a></li>
+          <li><a href="javascript:void(0)" style="color: var(--text-main); text-decoration: none;" onclick="window.app.launchServerProtocol({ serverIp: '192.168.1.130:27015', game: 'Slapshot: Rebound', title: 'Slapshot: Rebound 3v3 Puck Arena' })">🏒 Slapshot: Rebound 3v3 Puck Arena</a></li>
+          <li><a href="javascript:void(0)" style="color: var(--text-main); text-decoration: none;" onclick="window.app.launchServerProtocol({ serverIp: '192.168.1.110:27015', game: 'REMATCH', title: 'REMATCH 5v5 Competitive Node' })">🔥 REMATCH 5v5 Competitive Node</a></li>
+          <li><a href="javascript:void(0)" style="color: var(--text-main); text-decoration: none;" onclick="window.app.launchServerProtocol({ serverIp: '192.168.1.115:27015', game: 'Arkheron', title: 'Arkheron 12-Player Cyber Spire' })">⚔️ Arkheron 12-Player Cyber Spire</a></li>
         </ul>
       </div>
 

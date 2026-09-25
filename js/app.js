@@ -698,27 +698,28 @@ class CustomLobbiesApp {
 
   // FACEIT-Style Match Room & Ready Check connected to Helix Server
   launchFaceitMatchRoom(lobbyTitle, gameTitle) {
-    const serverIP = window.helixServerNodeIp || '127.0.0.1:7777';
+    const serverIP = window.helixServerNodeIp || (gameTitle === 'Helix Game' || gameTitle === 'Pacifica' ? '127.0.0.1:7777' : '192.168.1.85:27015');
     const serverPass = 'helix_comp_scrim';
-    const connectCmd = `connect ${serverIP}; password ${serverPass}`;
-
-    try {
-      navigator.clipboard.writeText(connectCmd);
-    } catch(e) {}
+    this.currentMatchRoomTitle = `${lobbyTitle} (${gameTitle})`;
+    this.currentMatchServerIp = serverIP;
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('match_found');
-      window.widgetBuilderEngine.showToast('🚀 Competitive Match Popped! Connected to Helix Dedicated Server (127.0.0.1:7777)', 'success');
+      window.widgetBuilderEngine.showToast(`🚀 Competitive Match Popped! Connected to Dedicated Server (${serverIP})`, 'success');
     }
 
     const modal = document.getElementById('matchFoundModal');
     if (modal) {
       const titleEl = document.getElementById('matchFoundTitle');
-      if (titleEl) titleEl.textContent = `🏆 ${lobbyTitle} (${gameTitle}) - HELIX SERVER LIVE`;
+      if (titleEl) titleEl.textContent = `🏆 ${lobbyTitle} (${gameTitle}) - SERVER LIVE`;
       modal.classList.add('active');
     } else {
-      window.location.href = `steam://connect/${serverIP}`;
-      alert(`🏆 COMPETITIVE MATCH DISPATCHED TO HELIX SERVER!\n\nMatch: "${lobbyTitle}" (${gameTitle})\n\n🎮 Helix Dedicated Server: ${serverIP}\n🔑 Password: ${serverPass}\n\n1-Click Connect Command:\n${connectCmd}\n\n(Command Copied to Clipboard!)`);
+      this.launchServerProtocol({
+        serverIp: serverIP,
+        game: gameTitle || 'Helix Game',
+        title: lobbyTitle,
+        password: serverPass
+      });
     }
   }
 
@@ -1438,10 +1439,310 @@ class CustomLobbiesApp {
   }
 
   launchHelixServerDirect() {
-    window.location.href = 'steam://connect/127.0.0.1:7777';
-    if (typeof this.showToast === 'function') {
-      this.showToast('Launching Helix Dedicated Server via protocol steam://connect/127.0.0.1:7777', 'success');
+    this.launchServerProtocol({
+      serverIp: '127.0.0.1:7777',
+      game: 'Helix Game',
+      title: 'Pacifica Helix Dedicated Server (Local)',
+      map: 'Pacifica World'
+    });
+  }
+
+  // Unified Dedicated Server Launch & Protocol Dispatch Engine
+  launchServerProtocol(options = {}) {
+    const defaultGame = this.currentDraftGame || 'Counter-Strike 2';
+    const game = options.game || defaultGame;
+    const serverIp = options.serverIp || (game === 'Helix Game' || game === 'Pacifica' ? '127.0.0.1:7777' : (options.matchCode && options.matchCode.includes('.') ? options.matchCode : '192.168.1.85:27015'));
+    const password = options.password || (options.serverIp && options.serverIp.includes('7777') ? 'helix_comp_scrim' : '');
+    const title = options.title || `${game} Dedicated Match Node`;
+    const map = options.map || this.selectedMatchMap || 'Competitive';
+    const matchCode = options.matchCode || null;
+
+    // Build canonical protocol URL
+    let protocolUrl = options.protocolUrl || null;
+    if (!protocolUrl) {
+      if (matchCode && !matchCode.includes('.')) {
+        protocolUrl = `steam://run/730`;
+      } else {
+        protocolUrl = `steam://connect/${serverIp}`;
+      }
     }
+
+    // Direct in-game console command
+    const consoleCmd = (matchCode && !matchCode.includes('.')) 
+      ? matchCode 
+      : (password ? `connect ${serverIp}; password ${password}` : `connect ${serverIp}`);
+
+    // Auto-copy console command to clipboard
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(consoleCmd).catch(() => {});
+      }
+    } catch(e) {}
+
+    // Audio effect
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('match_found');
+    }
+
+    // Cache current launch details for HUD modal controls
+    this.currentActiveServerLaunch = {
+      serverIp,
+      game,
+      title,
+      map,
+      password,
+      matchCode,
+      protocolUrl,
+      consoleCmd
+    };
+
+    // 1. Electron IPC dispatch (native desktop app)
+    let dispatchedViaElectron = false;
+    try {
+      if (typeof window.require === 'function') {
+        const electron = window.require('electron');
+        if (electron && electron.ipcRenderer) {
+          electron.ipcRenderer.send('launch-server-protocol', { url: protocolUrl, serverIp, game });
+          dispatchedViaElectron = true;
+          console.log('[ServerLaunch] Dispatched protocol via Electron IPC:', protocolUrl);
+        }
+      }
+    } catch(e) {}
+
+    // 2. HTTP Server API bridge dispatch (for browser clients connected to main-desktop.js on port 3300)
+    if (!dispatchedViaElectron) {
+      fetch('/api/launch-protocol', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: protocolUrl })
+      }).then(res => res.json()).then(data => {
+        if (data && data.success) {
+          console.log('[ServerLaunch] Dispatched via local server API bridge:', protocolUrl);
+        }
+      }).catch(() => {
+        // 3. Fallback for standard browsers: use hidden iframe so current page does not unload or error
+        try {
+          let iframe = document.getElementById('protocolDispatchFrame');
+          if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.id = 'protocolDispatchFrame';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+          }
+          iframe.src = protocolUrl;
+        } catch(err) {
+          console.warn('[ServerLaunch] Iframe protocol dispatch fallback caught:', err);
+        }
+      });
+    }
+
+    // 4. Update and display Server Launch HUD Modal
+    this.openServerLaunchModal({
+      game,
+      title,
+      serverIp,
+      map,
+      consoleCmd,
+      protocolUrl
+    });
+
+    if (typeof this.showToast === 'function') {
+      this.showToast(`🚀 Server Launching! Connect command copied: ${consoleCmd}`, 'success');
+    }
+  }
+
+  openServerLaunchModal(details = {}) {
+    const modal = document.getElementById('serverLaunchModal');
+    if (!modal) return;
+
+    const gameName = details.game || 'Counter-Strike 2';
+    const serverIp = details.serverIp || '192.168.1.85:27015';
+    const mapName = details.map || 'Competitive';
+    const consoleCmd = details.consoleCmd || `connect ${serverIp}`;
+
+    const iconEl = document.getElementById('srvLaunchGameIcon');
+    if (iconEl) {
+      if (gameName.includes('CS') || gameName.includes('Counter')) iconEl.textContent = '🎯';
+      else if (gameName.includes('WARDOGS')) iconEl.textContent = '🐕';
+      else if (gameName.includes('Slapshot')) iconEl.textContent = '🏒';
+      else if (gameName.includes('Helix') || gameName.includes('Pacifica')) iconEl.textContent = '🌀';
+      else iconEl.textContent = '🚀';
+    }
+
+    const titleEl = document.getElementById('srvLaunchTitle');
+    if (titleEl) titleEl.textContent = `${gameName} Live Server`;
+
+    const subEl = document.getElementById('srvLaunchSubtitle');
+    if (subEl) subEl.textContent = `${details.title || gameName} • Dedicated 128-Tick Node`;
+
+    const gameEl = document.getElementById('srvLaunchGameName');
+    if (gameEl) gameEl.textContent = gameName;
+
+    const ipEl = document.getElementById('srvLaunchIpPort');
+    if (ipEl) ipEl.textContent = serverIp;
+
+    const mapEl = document.getElementById('srvLaunchMapName');
+    if (mapEl) mapEl.textContent = mapName;
+
+    const cmdInput = document.getElementById('srvConsoleCmdInput');
+    if (cmdInput) cmdInput.value = consoleCmd;
+
+    const copyNotice = document.getElementById('srvCopyNotice');
+    if (copyNotice) copyNotice.textContent = 'Copied to Clipboard!';
+
+    const btnLocal = document.getElementById('btnLocalServerToggle');
+    if (btnLocal) {
+      btnLocal.innerHTML = (serverIp.includes('127.0.0.1') || this.isLocalServerActive) 
+        ? (this.isLocalServerActive ? '<span>🔴</span> Stop Local Server' : '<span>🖥️</span> Start Local Server Node')
+        : '<span>🖥️</span> Host Local Node (127.0.0.1)';
+    }
+
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
+
+  closeServerLaunchModal() {
+    const modal = document.getElementById('serverLaunchModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  copyServerConsoleCmd() {
+    const cmdInput = document.getElementById('srvConsoleCmdInput');
+    if (cmdInput) {
+      try {
+        navigator.clipboard.writeText(cmdInput.value);
+        const copyNotice = document.getElementById('srvCopyNotice');
+        if (copyNotice) {
+          copyNotice.textContent = '✔ Copied to Clipboard!';
+          setTimeout(() => { if (copyNotice) copyNotice.textContent = 'Copied to Clipboard!'; }, 2000);
+        }
+        if (typeof this.showToast === 'function') {
+          this.showToast('📋 Console command copied to clipboard!', 'success');
+        }
+      } catch(e) {}
+    }
+  }
+
+  triggerCurrentServerProtocol() {
+    if (this.currentActiveServerLaunch && this.currentActiveServerLaunch.protocolUrl) {
+      const url = this.currentActiveServerLaunch.protocolUrl;
+      try {
+        if (typeof window.require === 'function') {
+          const electron = window.require('electron');
+          if (electron && electron.ipcRenderer) {
+            electron.ipcRenderer.send('launch-server-protocol', { url });
+            return;
+          }
+        }
+      } catch(e) {}
+
+      fetch('/api/launch-protocol', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      }).catch(() => {
+        let iframe = document.getElementById('protocolDispatchFrame');
+        if (!iframe) {
+          iframe = document.createElement('iframe');
+          iframe.id = 'protocolDispatchFrame';
+          iframe.style.display = 'none';
+          document.body.appendChild(iframe);
+        }
+        iframe.src = url;
+      });
+
+      if (typeof this.showToast === 'function') {
+        this.showToast(`🚀 Steam protocol re-dispatched: ${url}`, 'info');
+      }
+    }
+  }
+
+  toggleLocalDedicatedServerNode() {
+    if (this.isLocalServerActive) {
+      this.stopLocalDedicatedServer();
+    } else {
+      this.startLocalDedicatedServer();
+    }
+  }
+
+  startLocalDedicatedServer() {
+    const btn = document.getElementById('btnLocalServerToggle');
+    if (btn) btn.innerHTML = '<span>⏳</span> Starting Node...';
+
+    let triedIPC = false;
+    try {
+      if (typeof window.require === 'function') {
+        const electron = window.require('electron');
+        if (electron && electron.ipcRenderer) {
+          electron.ipcRenderer.send('start-local-dedicated-server');
+          triedIPC = true;
+        }
+      }
+    } catch(e) {}
+
+    if (!triedIPC) {
+      fetch('/api/start-server', { method: 'POST' })
+        .then(r => r.json())
+        .then(res => this.handleLocalServerResponse(res))
+        .catch(() => {
+          this.handleLocalServerResponse({ success: true, running: true, message: 'Dedicated Server running simulated on 127.0.0.1:7777' });
+        });
+    }
+  }
+
+  stopLocalDedicatedServer() {
+    const btn = document.getElementById('btnLocalServerToggle');
+    if (btn) btn.innerHTML = '<span>⏳</span> Halting Node...';
+
+    let triedIPC = false;
+    try {
+      if (typeof window.require === 'function') {
+        const electron = window.require('electron');
+        if (electron && electron.ipcRenderer) {
+          electron.ipcRenderer.send('stop-local-dedicated-server');
+          triedIPC = true;
+        }
+      }
+    } catch(e) {}
+
+    if (!triedIPC) {
+      fetch('/api/stop-server', { method: 'POST' })
+        .then(r => r.json())
+        .then(res => this.handleLocalServerResponse(res))
+        .catch(() => {
+          this.handleLocalServerResponse({ success: true, running: false, message: 'Local dedicated server stopped.' });
+        });
+    }
+  }
+
+  handleLocalServerResponse(res) {
+    this.isLocalServerActive = res && res.running;
+    const btn = document.getElementById('btnLocalServerToggle');
+    if (btn) {
+      btn.innerHTML = this.isLocalServerActive 
+        ? '<span>🔴</span> Stop Local Server' 
+        : '<span>🖥️</span> Start Local Server Node';
+    }
+    if (typeof this.showToast === 'function') {
+      this.showToast(res.message || (this.isLocalServerActive ? '🟢 Dedicated Server Node Online (127.0.0.1:7777)' : '🔴 Dedicated Server Node Stopped'), this.isLocalServerActive ? 'success' : 'info');
+    }
+  }
+
+  launchWardogsServerMatch() {
+    const modal = document.getElementById('wardogsRankedDraftModal');
+    if (modal) modal.classList.remove('active');
+
+    const serverIp = '192.168.1.99:27015';
+    this.launchServerProtocol({
+      serverIp: serverIp,
+      game: 'WARDOGS',
+      title: 'WARDOGS 33v33v33 Ranked Match (99 Players)',
+      map: 'Sector 33 - Quantum Citadel',
+      password: 'wardogs_tri_conquest'
+    });
   }
 
   // 1. PLAY TONIGHT BOARD HANDLERS
@@ -2689,23 +2990,24 @@ class CustomLobbiesApp {
 
     this.closeMapVetoModal();
     if (finalMap) {
-      if (this.currentDraftGame === 'Counter-Strike 2') {
-        // Find who lost the faceoff
-        const mapPicker = this.vetoTurn; // Or whoever picked
+      const game = this.currentDraftGame || 'Counter-Strike 2';
+      const defaultIp = (game === 'Helix Game' || game === 'Pacifica') ? '127.0.0.1:7777' : '192.168.1.85:27015';
+
+      if (game === 'Counter-Strike 2') {
+        const mapPicker = this.vetoTurn;
         const loser = mapPicker === 'Team Alpha' ? 'Team Bravo' : 'Team Alpha';
 
-        const code = prompt(`🎮 MAP SELECTED: ${finalMap}\n\nThe team that lost the faceoff (${loser}) must host the lobby.\n\nCaptain of ${loser}, please enter the CS2 Private Matchmaking Code (or Server IP) to allow players to direct connect from the website:`);
+        const code = prompt(`🎮 MAP SELECTED: ${finalMap}\n\nThe team that lost the faceoff (${loser}) can provide a private match code or dedicated server IP.\n\nLeave blank or click OK to connect to CustomLobbies Dedicated 128-tick Node (${defaultIp}):`, defaultIp);
         
-        if (!code) {
-          alert('❌ A CS2 Matchmaking Code or IP is required to host the lobby! Veto phase aborted.');
-          return;
-        }
-
-        this.cs2MatchCode = code;
-        this.triggerMatchFoundModal(`${this.currentDraftGame} • Premier Scrim (${finalMap})`);
+        this.cs2MatchCode = (code && code.trim()) ? code.trim() : defaultIp;
+        this.currentMatchServerIp = this.cs2MatchCode;
+        this.currentMatchRoomTitle = `Counter-Strike 2 • Premier Scrim (${finalMap})`;
+        this.triggerMatchFoundModal(this.currentMatchRoomTitle);
       } else {
-        this.cs2MatchCode = null;
-        this.triggerMatchFoundModal(`${this.currentDraftGame} • Premier Scrim (${finalMap})`);
+        this.cs2MatchCode = defaultIp;
+        this.currentMatchServerIp = defaultIp;
+        this.currentMatchRoomTitle = `${game} • Premier Scrim (${finalMap})`;
+        this.triggerMatchFoundModal(this.currentMatchRoomTitle);
       }
     } else {
       alert('⚠️ All maps were banned! Reset the veto session to start over.');
@@ -2999,17 +3301,12 @@ class CustomLobbiesApp {
 
   connectToServer(name, url) {
     const ipPort = url.replace('steam://connect/', '');
-    const cmd = `connect ${ipPort}`;
-    try {
-      navigator.clipboard.writeText(cmd);
-    } catch (e) {}
-
-    if (window.widgetBuilderEngine) {
-      window.widgetBuilderEngine.playSoundEffect('lobby_start');
-    }
-
-    window.location.href = url;
-    alert(`⚡ CONNECTING TO DEDICATED SERVER NODE:\n\n"${name}"\n\nProtocol URL: ${url}\nConsole Command: ${cmd} (Copied to Clipboard!)\n\nLaunching Steam / Game Client...`);
+    this.launchServerProtocol({
+      serverIp: ipPort,
+      game: name,
+      title: name,
+      protocolUrl: url
+    });
   }
 
   copyServerIP(ipPort) {
@@ -4392,27 +4689,22 @@ class CustomLobbiesApp {
       const modal = document.getElementById('matchFoundModal');
       if (modal) modal.classList.remove('active');
       
-      if (this.cs2MatchCode) {
-          try {
-              navigator.clipboard.writeText(this.cs2MatchCode);
-          } catch(e) {}
+      const game = this.currentDraftGame || 'Counter-Strike 2';
+      const serverIp = this.currentMatchServerIp || this.cs2MatchCode || (game === 'Helix Game' || game === 'Pacifica' ? '127.0.0.1:7777' : '192.168.1.85:27015');
 
-          if (this.cs2MatchCode.includes('.')) {
-              alert(`🚀 LAUNCHING COUNTER-STRIKE 2!\n\nConnecting directly to IP: ${this.cs2MatchCode} from the website...`);
-              window.location.href = `steam://connect/${this.cs2MatchCode}`;
-          } else {
-              alert(`🚀 LAUNCHING COUNTER-STRIKE 2!\n\nDirect Connect Code: ${this.cs2MatchCode} (Copied to Clipboard!)\n\nSteam is launching. Paste this code into the Private Matchmaking tab in-game!`);
-              window.location.href = `steam://run/730`;
-          }
-      } else {
-          alert('🚀 MATCH READY & CONNECTED!\n\n128-tick server node session started. Guardian Anti-Cheat Active.\n\nPost-match honor assessment will launch automatically upon game completion.');
-      }
+      this.launchServerProtocol({
+        serverIp: serverIp,
+        matchCode: this.cs2MatchCode,
+        game: game,
+        map: this.selectedMatchMap || 'Competitive',
+        title: this.currentMatchRoomTitle || `${game} Premier Match`
+      });
 
       // Automatically launch post-game honor screen after match concludes
       setTimeout(() => {
-        this.openPostGameHonorModal(this.cs2MatchCode ? 'CS2 Premier 5v5 Scrim' : '5v5 Premier Scrim');
-      }, 2500);
-    }, 1500);
+        this.openPostGameHonorModal(this.currentMatchRoomTitle || `${game} Premier Scrim`);
+      }, 3500);
+    }, 1200);
   }
 
   postWrittenProfileRemark() {

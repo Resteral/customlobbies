@@ -106,9 +106,26 @@ class ProgramClientSuite {
   }
 
   launchDirectGameProtocol(serverIp = '127.0.0.1:7777', gameName = 'Pacifica Helix Dedicated Server') {
-    const protocol = `steam://connect/${serverIp}`;
-    alert(`🚀 LAUNCHING HELIX DEDICATED SERVER PROTOCOL!\n\nGame / Map: ${gameName}\nHelix Server IP: ${serverIp}\nProtocol: ${protocol}\n\nConnecting to Pacifica Helix Competitive Server Engine...`);
-    window.location.href = protocol;
+    if (window.app && typeof window.app.launchServerProtocol === 'function') {
+      window.app.launchServerProtocol({
+        serverIp: serverIp,
+        game: 'Helix Game',
+        title: gameName,
+        map: 'Pacifica World'
+      });
+    } else {
+      const protocol = `steam://connect/${serverIp}`;
+      try {
+        let iframe = document.getElementById('protocolDispatchFrame');
+        if (!iframe) {
+          iframe = document.createElement('iframe');
+          iframe.id = 'protocolDispatchFrame';
+          iframe.style.display = 'none';
+          document.body.appendChild(iframe);
+        }
+        iframe.src = protocol;
+      } catch(e) {}
+    }
   }
 }
 

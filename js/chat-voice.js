@@ -2202,14 +2202,28 @@ class ChatVoiceManager {
   connectPrivateLobbyServer() {
     const lobby = this.privateLobbies ? this.privateLobbies.find(l => l.channelName === this.currentTextChannel || l.id === this.currentTextChannel) : null;
     const srv = lobby && lobby.serverIp ? lobby.serverIp : '192.168.1.85:27015';
-    const connectCmd = `connect ${srv}`;
+    const game = lobby ? lobby.game : 'Counter-Strike 2';
+    const title = lobby ? lobby.title : 'Private Scrim Lobby';
+    const map = lobby ? lobby.map : 'Competitive';
+    const pass = lobby && lobby.passcode ? lobby.passcode : '';
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(connectCmd).catch(() => {});
+    if (window.app && typeof window.app.launchServerProtocol === 'function') {
+      window.app.launchServerProtocol({
+        serverIp: srv,
+        game: game,
+        title: title,
+        map: map,
+        password: pass
+      });
+    } else {
+      const connectCmd = pass ? `connect ${srv}; password ${pass}` : `connect ${srv}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(connectCmd).catch(() => {});
+      }
+      this.notifyToast(`🎮 Copied connect command to clipboard: "${connectCmd}"`, 'success');
     }
 
-    this.notifyToast(`🎮 Copied connect command to clipboard: "${connectCmd}"`, 'success');
-    this.postBotNotice(`🎮 <b>Server Connect Command:</b> In console type: <code>connect ${srv}</code>`);
+    this.postBotNotice(`🎮 <b>Server Dispatched:</b> Connecting to <b>${srv}</b> (Game: <b>${game}</b> • Map: <b>${map}</b>). In console type: <code>connect ${srv}${pass ? '; password ' + pass : ''}</code>`);
   }
 
   draftForPrivateLobby() {
