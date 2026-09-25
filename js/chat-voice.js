@@ -90,8 +90,8 @@ class ChatVoiceManager {
       'wardogs': {
         game: 'WARDOGS',
         icon: '🐕',
-        topic: 'WARDOGS 7v7 Frontline Scrims, LFG & Battalion Matchmaking Pool',
-        maxPerTeam: 7,
+        topic: 'WARDOGS 33v33v33 Tri-Faction Conquest, LFG & Battalion Matchmaking Pool (99 Players)',
+        maxPerTeam: 33,
         map: 'Amber Strike Frontline'
       },
       'cs2-scrims': {
@@ -239,9 +239,9 @@ class ChatVoiceManager {
       ],
       // --- DEDICATED GAME CHANNELS ---
       'wardogs': [
-        { id: 101, author: 'CommanderVance', text: '🔥 WARDOG 7v7 squad recruiting! Need 2 assault and 1 heavy anchor for Amber Strike Frontline!', time: '11:40 AM', avatar: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=80&auto=format&fit=crop&q=80' },
-        { id: 102, author: 'IronClad_77', text: 'Signing in with Battalion Alpha. Tank armor buffed on current patch 🐕', time: '11:55 AM', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🔥', name: 'Fire Play' } },
-        { id: 103, author: 'CustomLobbiesBot', text: '🐕 WARDOGS 7v7 lobby match engine ready. Click <b>"Join Pool (-j)"</b> above to queue into the frontline battalion pool!', time: '12:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
+        { id: 101, author: 'CommanderVance', text: '🔥 WARDOG 33v33v33 Tri-Faction squad recruiting! Alpha, Bravo, Charlie battalions forming for Amber Strike Frontline!', time: '11:40 AM', avatar: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=80&auto=format&fit=crop&q=80' },
+        { id: 102, author: 'IronClad_77', text: 'Signing in with Battalion Alpha. 33 frontliners ready to breach sector 4 🐕', time: '11:55 AM', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80', sticker: { emoji: '🔥', name: 'Fire Play' } },
+        { id: 103, author: 'CustomLobbiesBot', text: '🐕 WARDOGS 33v33v33 Tri-Faction lobby match engine ready (99 players max). Click <b>"Join Pool (-j)"</b> above to queue into the frontline battalion pool!', time: '12:00 PM', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
       ],
       'cs2-scrims': [
         { id: 104, author: 'S1mple_Fragger', text: 'Looking for 5v5 Premier scrim on Mirage or Inferno. 2800+ MMR, join pool!', time: '11:50 AM', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80' },
@@ -311,6 +311,7 @@ class ChatVoiceManager {
     this.renderGuildRail();
     this.renderTeamChannels();
     this.renderPrivateLobbies();
+    this.applyDeletedChannels();
     this.loadPinnedStickers();
     this.loadChatTheme();
     this.renderMessages();
@@ -780,12 +781,14 @@ class ChatVoiceManager {
       // Channel Selection Clicks
       const textItem = e.target.closest('[data-channel]');
       if (textItem) {
+        if (e.target.closest('.channel-delete-btn')) return;
         const chan = textItem.getAttribute('data-channel');
         this.switchTextChannel(chan, textItem);
       }
 
       const voiceItem = e.target.closest('[data-voice]');
       if (voiceItem) {
+        if (e.target.closest('.channel-delete-btn')) return;
         const vroom = voiceItem.getAttribute('data-voice');
         this.selectVoiceRoom(vroom);
       }
@@ -987,7 +990,13 @@ class ChatVoiceManager {
 
         if (gameIcon) gameIcon.textContent = gInfo.icon;
         if (gameTitle) gameTitle.textContent = gInfo.game;
-        if (gameDetail) gameDetail.textContent = `${gInfo.maxPerTeam * 2}p Matchmaking Hub (${gInfo.maxPerTeam}v${gInfo.maxPerTeam}) • Map: ${gInfo.map}`;
+        if (gameDetail) {
+          if (channelName === 'wardogs' || gInfo.game === 'WARDOGS') {
+            gameDetail.textContent = `99p Tri-Faction Conquest (33v33v33) • Map: ${gInfo.map}`;
+          } else {
+            gameDetail.textContent = `${gInfo.maxPerTeam * 2}p Matchmaking Hub (${gInfo.maxPerTeam}v${gInfo.maxPerTeam}) • Map: ${gInfo.map}`;
+          }
+        }
         if (btnHost) btnHost.innerHTML = `<span>➕</span> Host ${gInfo.game} Lobby`;
         if (btnBrowse) btnBrowse.innerHTML = `<span>🔥</span> Browse ${gInfo.game} Lobbies`;
         if (btnDraft) btnDraft.innerHTML = `<span>🐍</span> Snake Draft (${gInfo.game})`;
@@ -1000,6 +1009,13 @@ class ChatVoiceManager {
       if (topic) topic.textContent = `Discussion and chat for #${channelName}`;
       if (input) input.placeholder = `Send a message to #${channelName}...`;
       if (actionBar) actionBar.style.display = 'none';
+    }
+
+    const protectedChannels = ['general', 'welcome', 'rules'];
+    const isProtected = protectedChannels.includes(channelName);
+    const btnHeaderDelete = document.getElementById('btnHeaderDeleteChannel');
+    if (btnHeaderDelete) {
+      btnHeaderDelete.style.display = isProtected ? 'none' : 'inline-flex';
     }
 
     this.renderMessages();
@@ -1276,7 +1292,8 @@ class ChatVoiceManager {
   hostLobbyForCurrentGame() {
     const gInfo = this.channelGameMap ? this.channelGameMap[this.currentTextChannel] : null;
     const gameName = gInfo ? gInfo.game : 'Counter-Strike 2';
-    const maxPlayers = gInfo ? gInfo.maxPerTeam * 2 : 10;
+    const isWardogs = this.currentTextChannel === 'wardogs' || gameName === 'WARDOGS';
+    const maxPlayers = isWardogs ? 99 : (gInfo ? gInfo.maxPerTeam * 2 : 10);
     
     const modal = document.getElementById('createLobbyModal');
     if (modal) {
@@ -1291,7 +1308,7 @@ class ChatVoiceManager {
         }
       }
       const titleInput = document.getElementById('newLobbyTitle');
-      if (titleInput) titleInput.value = `Competitive ${gameName} Scrim / Lobby`;
+      if (titleInput) titleInput.value = isWardogs ? '🐕 WARDOGS 33v33v33 Tri-Faction Conquest' : `Competitive ${gameName} Scrim / Lobby`;
       const maxInput = document.getElementById('newLobbyMax');
       if (maxInput) maxInput.value = maxPlayers;
     }
@@ -1395,13 +1412,16 @@ class ChatVoiceManager {
             const isActive = this.currentTextChannel === t.channelName ? 'active' : '';
             return `
               <div class="channel-item ${isActive}" data-channel="${t.channelName}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.6rem;">
-                <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <div class="channel-item-left" style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   <span style="font-size: 0.95rem;">${t.emblem || '🛡️'}</span>
                   <span style="font-weight: 600; color: ${isActive ? '#fff' : 'var(--text-normal)'};">#${t.channelName}</span>
                 </div>
-                <span style="font-size: 0.65rem; background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700; border: 1px solid rgba(168, 85, 247, 0.3);">
-                  ${t.tag || 'TEAM'}
-                </span>
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <span style="font-size: 0.65rem; background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700; border: 1px solid rgba(168, 85, 247, 0.3);">
+                    ${t.tag || 'TEAM'}
+                  </span>
+                  <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${t.channelName}')" title="Delete Squad Channel">🗑️</button>
+                </div>
               </div>
             `;
           }).join('');
@@ -1419,13 +1439,16 @@ class ChatVoiceManager {
             return `
               <div class="channel-item ${isActive}" data-voice="${t.voiceRoom}" style="border-left: 2px solid var(--accent-purple); padding: 0.35rem 0.6rem;">
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                  <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <div class="channel-item-left" style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     <span>🔊</span>
                     <span style="font-weight: 600;">${t.tag || ''} ${t.name} Comms</span>
                   </div>
-                  <span style="font-size: 0.62rem; color: var(--accent-cyan); background: rgba(0, 242, 254, 0.1); padding: 0.05rem 0.3rem; border-radius: 3px;">
-                    ${t.game ? t.game.split(' ')[0] : 'Squad'}
-                  </span>
+                  <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span style="font-size: 0.62rem; color: var(--accent-cyan); background: rgba(0, 242, 254, 0.1); padding: 0.05rem 0.3rem; border-radius: 3px;">
+                      ${t.game ? t.game.split(' ')[0] : 'Squad'}
+                    </span>
+                    <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${t.voiceRoom}', 'voice')" title="Delete Squad Voice Room">🗑️</button>
+                  </div>
                 </div>
               </div>
             `;
@@ -1757,12 +1780,20 @@ class ChatVoiceManager {
     this.renderMessages();
   }
 
-  // --- DEDICATED PRIVATE LOBBY CHANNELS SYSTEM ---
   loadPrivateLobbies() {
     try {
       const saved = localStorage.getItem('cl_custom_private_lobbies_v1');
       if (saved) {
         this.privateLobbies = JSON.parse(saved);
+        // Automatically upgrade any legacy WARDOGS private lobbies to 33v33v33 Tri-Faction format
+        if (Array.isArray(this.privateLobbies)) {
+          this.privateLobbies.forEach(l => {
+            if (l.game === 'WARDOGS' && (l.max === 14 || l.max === 10)) {
+              l.max = 99;
+              l.title = (l.title || 'WARDOGS Scrim').replace('7v7', '33v33v33 Tri-Faction');
+            }
+          });
+        }
       }
     } catch (e) {
       console.warn('Unable to load private lobbies', e);
@@ -1790,7 +1821,7 @@ class ChatVoiceManager {
         },
         {
           id: 'lobby-wardogs-tactical-squad',
-          title: 'WARDOGS 7v7 Heavy Armor Raid (Private)',
+          title: 'WARDOGS 33v33v33 Tri-Faction Raid (Private)',
           code: 'WD-9940',
           passcode: 'alpha',
           channelName: 'lobby-wardogs-tactical-squad',
@@ -1801,8 +1832,8 @@ class ChatVoiceManager {
           map: 'Amber Strike Frontline',
           serverIp: '127.0.0.1:7777',
           host: 'CommanderVance',
-          players: 12,
-          max: 14,
+          players: 64,
+          max: 99,
           voiceMode: 'split',
           unlocked: true
         }
@@ -1835,7 +1866,7 @@ class ChatVoiceManager {
         {
           id: 303,
           author: 'CustomLobbiesBot',
-          text: '🔒 Welcome to <b>WARDOGS 7v7 Heavy Armor Raid (Private)</b>! Access Code: <code>WD-9940</code>. Server IP: <code>127.0.0.1:7777</code>. Have fun and coordinate your strikes!',
+          text: '🔒 Welcome to <b>WARDOGS 33v33v33 Tri-Faction Raid (Private)</b>! Access Code: <code>WD-9940</code>. Server IP: <code>127.0.0.1:7777</code>. Max 99 Players. Have fun and coordinate your strikes across Alpha, Bravo, and Charlie battalions!',
           time: '11:50 AM',
           avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
         }
@@ -1867,13 +1898,16 @@ class ChatVoiceManager {
           const isActive = this.currentTextChannel === l.channelName ? 'active' : '';
           return `
             <div class="channel-item ${isActive}" data-channel="${l.channelName}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.6rem;">
-              <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <div class="channel-item-left" style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 <span style="font-size: 0.85rem;">🔒</span>
                 <span style="font-weight: 600; color: ${isActive ? '#fff' : 'var(--text-normal)'};">#${l.channelName}</span>
               </div>
-              <span style="font-size: 0.62rem; background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); padding: 0.08rem 0.3rem; border-radius: 4px; font-weight: 800; font-family: monospace; border: 1px solid rgba(0, 242, 254, 0.3);">
-                ${l.code}
-              </span>
+              <div style="display: flex; align-items: center; gap: 0.35rem;">
+                <span style="font-size: 0.62rem; background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); padding: 0.08rem 0.3rem; border-radius: 4px; font-weight: 800; font-family: monospace; border: 1px solid rgba(0, 242, 254, 0.3);">
+                  ${l.code}
+                </span>
+                <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${l.channelName}')" title="Delete Private Lobby Channel">🗑️</button>
+              </div>
             </div>
           `;
         }).join('');
@@ -1896,10 +1930,11 @@ class ChatVoiceManager {
               <div style="margin-bottom: 0.35rem;">
                 <div class="channel-item ${isMainActive}" data-voice="${l.voiceRoom}" style="border-left: 2px solid var(--accent-cyan); padding: 0.3rem 0.6rem;">
                   <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <div class="channel-item-left" style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                       <span>🔒🔊</span>
                       <span style="font-weight: 600;">[${l.code}] Match All-Talk</span>
                     </div>
+                    <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${l.voiceRoom}', 'voice')" title="Delete Private Lobby Voice">🗑️</button>
                   </div>
                 </div>
                 <div style="padding-left: 1rem; display: flex; flex-direction: column; gap: 0.2rem; margin-top: 0.15rem;">
@@ -1916,13 +1951,16 @@ class ChatVoiceManager {
             return `
               <div class="channel-item ${isMainActive}" data-voice="${l.voiceRoom}" style="border-left: 2px solid var(--accent-cyan); padding: 0.35rem 0.6rem;">
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                  <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <div class="channel-item-left" style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     <span>🔒🔊</span>
                     <span style="font-weight: 600;">[${l.code}] Private Comms</span>
                   </div>
-                  <span style="font-size: 0.62rem; color: var(--accent-cyan);">
-                    ${l.game ? l.game.split(' ')[0] : 'Match'}
-                  </span>
+                  <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span style="font-size: 0.62rem; color: var(--accent-cyan);">
+                      ${l.game ? l.game.split(' ')[0] : 'Match'}
+                    </span>
+                    <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${l.voiceRoom}', 'voice')" title="Delete Private Lobby Voice">🗑️</button>
+                  </div>
                 </div>
               </div>
             `;
@@ -2829,13 +2867,23 @@ class ChatVoiceManager {
     const name = input.value.trim().toLowerCase().replace(/\s+/g, '-');
     if (!name) return;
 
+    // Un-delete if this channel name was previously deleted
+    try {
+      let deleted = JSON.parse(localStorage.getItem('cl_deleted_channels_v1') || '[]');
+      deleted = deleted.filter(n => n !== name);
+      localStorage.setItem('cl_deleted_channels_v1', JSON.stringify(deleted));
+    } catch (e) {}
+
     if (this.creatingChannelType === 'text') {
       const list = document.getElementById('textChannelsList');
       if (list) {
         const div = document.createElement('div');
         div.className = 'channel-item';
         div.setAttribute('data-channel', name);
-        div.textContent = `# ${name}`;
+        div.innerHTML = `
+          <div class="channel-item-left"><span>💬</span> #${name}</div>
+          <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${name}')" title="Delete Channel">🗑️</button>
+        `;
         list.appendChild(div);
       }
       this.textMessages[name] = [
@@ -2848,7 +2896,10 @@ class ChatVoiceManager {
         const div = document.createElement('div');
         div.className = 'channel-item';
         div.setAttribute('data-voice', name);
-        div.innerHTML = `<span>🔊</span> ${name.replace('-', ' ')}`;
+        div.innerHTML = `
+          <div class="channel-item-left"><span>🔊</span> ${name.replace('-', ' ')}</div>
+          <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${name}', 'voice')" title="Delete Voice Channel">🗑️</button>
+        `;
         list.appendChild(div);
       }
       this.selectVoiceRoom(name);
@@ -2857,6 +2908,178 @@ class ChatVoiceManager {
     input.value = '';
     const modal = document.getElementById('createChannelModal');
     if (modal) modal.classList.remove('active');
+  }
+
+  confirmDeleteCurrentChannel() {
+    this.confirmDeleteChannel(this.currentTextChannel, 'text');
+  }
+
+  confirmDeleteChannel(channelName, type = 'text') {
+    if (!channelName) return;
+
+    const protectedChannels = ['general', 'welcome', 'rules'];
+    if (protectedChannels.includes(channelName)) {
+      this.notifyToast(`System channel #${channelName} is protected and cannot be deleted.`, 'warning');
+      return;
+    }
+
+    const isVoice = type === 'voice';
+    const label = isVoice ? `Voice Channel "${channelName}"` : `#${channelName}`;
+    const confirmed = confirm(`Are you sure you want to permanently delete ${label}?\nThis action will remove the channel and all associated messages.`);
+    if (!confirmed) return;
+
+    this.deleteChannel(channelName, type);
+  }
+
+  deleteChannel(channelName, type = 'text') {
+    if (!channelName) return;
+
+    const isVoice = type === 'voice';
+
+    // 1. Record in persistent deleted channels list
+    try {
+      let deleted = JSON.parse(localStorage.getItem('cl_deleted_channels_v1') || '[]');
+      if (!deleted.includes(channelName)) {
+        deleted.push(channelName);
+        localStorage.setItem('cl_deleted_channels_v1', JSON.stringify(deleted));
+      }
+    } catch (e) {
+      console.warn('Could not record deleted channel in localStorage', e);
+    }
+
+    if (!isVoice) {
+      // 2. Remove from Team Channels if present
+      if (this.teamChannels && this.teamChannels.length > 0) {
+        const initialCount = this.teamChannels.length;
+        this.teamChannels = this.teamChannels.filter(t => t.channelName !== channelName && t.id !== channelName);
+        if (this.teamChannels.length !== initialCount) {
+          this.saveTeamChannels();
+          this.renderTeamChannels();
+        }
+      }
+
+      // 3. Remove from Private Lobbies if present
+      if (this.privateLobbies && this.privateLobbies.length > 0) {
+        const initialCount = this.privateLobbies.length;
+        this.privateLobbies = this.privateLobbies.filter(l => l.channelName !== channelName && l.id !== channelName);
+        if (this.privateLobbies.length !== initialCount) {
+          this.savePrivateLobbies();
+          this.renderPrivateLobbies();
+        }
+      }
+
+      // 4. Remove from channelGameMap if present
+      if (this.channelGameMap && this.channelGameMap[channelName]) {
+        delete this.channelGameMap[channelName];
+      }
+
+      // 5. Remove chat messages
+      if (this.textMessages && this.textMessages[channelName]) {
+        delete this.textMessages[channelName];
+      }
+
+      // 6. Remove DOM element
+      const el = document.querySelector(`[data-channel="${channelName}"]`);
+      if (el) el.remove();
+
+      // 7. If currently on this channel, navigate back to general
+      if (this.currentTextChannel === channelName) {
+        this.switchTextChannel('general');
+      }
+
+      this.notifyToast(`🗑️ Channel #${channelName} has been deleted.`, 'info');
+    } else {
+      // Voice channel deletion
+      // Check team channels with this voice room
+      if (this.teamChannels) {
+        let changed = false;
+        this.teamChannels.forEach(t => {
+          if (t.voiceRoom === channelName) {
+            t.hasVoice = false;
+            changed = true;
+          }
+        });
+        if (changed) {
+          this.saveTeamChannels();
+          this.renderTeamChannels();
+        }
+      }
+
+      // Check private lobbies with this voice room
+      if (this.privateLobbies) {
+        let changed = false;
+        this.privateLobbies.forEach(l => {
+          if (l.voiceRoom === channelName || l.voiceRoomTeam1 === channelName || l.voiceRoomTeam2 === channelName) {
+            l.voiceMode = 'none';
+            changed = true;
+          }
+        });
+        if (changed) {
+          this.savePrivateLobbies();
+          this.renderPrivateLobbies();
+        }
+      }
+
+      // Remove DOM element
+      const vel = document.querySelector(`[data-voice="${channelName}"]`);
+      if (vel) {
+        const nextElem = vel.nextElementSibling;
+        if (nextElem && nextElem.classList.contains('voice-channel-users')) {
+          nextElem.remove();
+        }
+        vel.remove();
+      }
+
+      // If active voice room, disconnect
+      if (this.currentVoiceRoom === channelName) {
+        this.currentVoiceRoom = null;
+        const badge = document.getElementById('voiceStatusBadge');
+        if (badge && badge.textContent === 'Connected') {
+          this.toggleVoiceConnection();
+        }
+      }
+
+      this.notifyToast(`🗑️ Voice room "${channelName}" has been deleted.`, 'info');
+    }
+  }
+
+  applyDeletedChannels() {
+    try {
+      const deleted = JSON.parse(localStorage.getItem('cl_deleted_channels_v1') || '[]');
+      if (Array.isArray(deleted) && deleted.length > 0) {
+        deleted.forEach(name => {
+          // Remove text channel elements from DOM
+          const textEl = document.querySelector(`[data-channel="${name}"]`);
+          if (textEl) textEl.remove();
+
+          // Remove voice channel elements from DOM
+          const voiceEl = document.querySelector(`[data-voice="${name}"]`);
+          if (voiceEl) {
+            const nextElem = voiceEl.nextElementSibling;
+            if (nextElem && nextElem.classList.contains('voice-channel-users')) {
+              nextElem.remove();
+            }
+            voiceEl.remove();
+          }
+
+          // Clean memory state
+          if (this.teamChannels) {
+            this.teamChannels = this.teamChannels.filter(t => t.channelName !== name && t.voiceRoom !== name);
+          }
+          if (this.privateLobbies) {
+            this.privateLobbies = this.privateLobbies.filter(l => l.channelName !== name && l.voiceRoom !== name && l.voiceRoomTeam1 !== name && l.voiceRoomTeam2 !== name);
+          }
+          if (this.channelGameMap && this.channelGameMap[name]) {
+            delete this.channelGameMap[name];
+          }
+          if (this.textMessages && this.textMessages[name]) {
+            delete this.textMessages[name];
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Could not apply deleted channels', e);
+    }
   }
 }
 

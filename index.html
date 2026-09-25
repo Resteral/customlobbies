@@ -299,7 +299,7 @@
             </label>
             <select id="quickJoinGameSelect" class="input-field" style="padding: 0.5rem 0.8rem; font-size: 0.88rem; min-width: 230px; font-weight: 800; border-color: var(--accent-cyan); background: rgba(14, 18, 28, 0.95); color: #fff;">
               <option value="random" selected>🎲 Random Game (Surprise Me / Any)</option>
-              <option value="WARDOGS">🐕 WARDOGS (50v50 / 7v7)</option>
+              <option value="WARDOGS">🐕 WARDOGS (33v33v33 Tri-Faction)</option>
               <option value="Counter-Strike 2">🎮 Counter-Strike 2 (128-Tick)</option>
               <option value="Valorant">🎯 Valorant</option>
               <option value="Marvel Rivals">💥 Marvel Rivals</option>
@@ -341,7 +341,7 @@
               <span>⚡</span> Auto-Draft Rooms <span style="font-size: 0.7rem;">▼</span>
             </button>
             <div class="dropdown-menu">
-              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('WARDOGS')">🛡️ WARDOGS Draft (7v7 Fireteam)</button>
+              <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('WARDOGS')">🐕 WARDOGS Draft (33v33v33 Tri-Faction)</button>
               <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Counter-Strike 2')">🎮 Counter-Strike 2 Draft (5v5)</button>
               <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Valorant')">🎯 Valorant Draft (5v5)</button>
               <button class="dropdown-item" onclick="window.app.triggerAutoDraftModal('Marvel Rivals')">⚡ Marvel Rivals Draft (6v6)</button>
@@ -1007,11 +1007,11 @@
               <button class="add-channel-btn" id="btnAddTextChannel" title="Create Text Channel">+</button>
             </div>
             <div id="textChannelsList">
-              <div class="channel-item active" data-channel="general"><span>💬</span> # general</div>
-              <div class="channel-item" data-channel="pics"><span>📸</span> # pics</div>
-              <div class="channel-item" data-channel="commands"><span>⚡</span> # commands</div>
-              <div class="channel-item" data-channel="promo"><span>📢</span> # promo</div>
-              <div class="channel-item" data-channel="tournaments"><span>🏆</span> # tournaments</div>
+              <div class="channel-item active" data-channel="general"><div class="channel-item-left"><span>💬</span> # general</div></div>
+              <div class="channel-item" data-channel="pics"><div class="channel-item-left"><span>📸</span> # pics</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('pics')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="commands"><div class="channel-item-left"><span>⚡</span> # commands</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('commands')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="promo"><div class="channel-item-left"><span>📢</span> # promo</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('promo')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="tournaments"><div class="channel-item-left"><span>🏆</span> # tournaments</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('tournaments')" title="Delete Channel">🗑️</button></div>
             </div>
 
             <!-- Category: GAME HUBS & LOBBIES (Channels for Each Game) -->
@@ -1019,20 +1019,20 @@
               <span>🎮 GAME HUBS & LOBBIES</span>
             </div>
             <div id="textChannelsGames">
-              <div class="channel-item" data-channel="wardogs" title="WARDOGS 7v7 Battalion Scrims & Matchmaking"><span>🐕</span> # wardogs</div>
-              <div class="channel-item" data-channel="cs2-scrims" title="Counter-Strike 2 5v5 Premier Scrims & Pools"><span>🎯</span> # cs2-scrims</div>
-              <div class="channel-item" data-channel="valorant" title="Valorant 5v5 Radiant Scrims & LFG"><span>⚡</span> # valorant</div>
-              <div class="channel-item" data-channel="marvel-rivals" title="Marvel Rivals 6v6 Competitive Pools"><span>💥</span> # marvel-rivals</div>
-              <div class="channel-item" data-channel="rocket-league" title="Rocket League 3v3 Aerial Scrims"><span>🏎️</span> # rocket-league</div>
-              <div class="channel-item" data-channel="deadlock" title="Deadlock 6v6 Hero Shooter & Scrims"><span>🔮</span> # deadlock</div>
-              <div class="channel-item" data-channel="the-finals" title="The Finals 3v3 Cashout Arena"><span>🏆</span> # the-finals</div>
-              <div class="channel-item" data-channel="slapshot" title="Slapshot: Rebound 3v3 Ranked Pucks"><span>🏒</span> # slapshot</div>
-              <div class="channel-item" data-channel="empulse" title="Empulse 5v5 Tactical Fast-Paced"><span>🚀</span> # empulse</div>
-              <div class="channel-item" data-channel="rematch" title="REMATCH 5v5 Arcade Ball & Scrims"><span>⚽</span> # rematch</div>
-              <div class="channel-item" data-channel="r6-siege" title="Rainbow Six Siege 5v5 Tactical Defusal"><span>🛡️</span> # r6-siege</div>
-              <div class="channel-item" data-channel="dota2" title="Dota 2 5v5 Ranked Captains Scrims"><span>⚔️</span> # dota2</div>
-              <div class="channel-item" data-channel="overwatch2" title="Overwatch 2 5v5 Role Queue Scrims"><span>🤖</span> # overwatch2</div>
-              <div class="channel-item" data-channel="arkheron" title="Arkheron 5v5 Dark Fantasy Arena"><span>🏰</span> # arkheron</div>
+              <div class="channel-item" data-channel="wardogs" title="WARDOGS 33v33v33 Tri-Faction Conquest & Matchmaking (99 Players)"><div class="channel-item-left"><span>🐕</span> # wardogs</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('wardogs')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="cs2-scrims" title="Counter-Strike 2 5v5 Premier Scrims & Pools"><div class="channel-item-left"><span>🎯</span> # cs2-scrims</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('cs2-scrims')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="valorant" title="Valorant 5v5 Radiant Scrims & LFG"><div class="channel-item-left"><span>⚡</span> # valorant</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('valorant')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="marvel-rivals" title="Marvel Rivals 6v6 Competitive Pools"><div class="channel-item-left"><span>💥</span> # marvel-rivals</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('marvel-rivals')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="rocket-league" title="Rocket League 3v3 Aerial Scrims"><div class="channel-item-left"><span>🏎️</span> # rocket-league</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('rocket-league')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="deadlock" title="Deadlock 6v6 Hero Shooter & Scrims"><div class="channel-item-left"><span>🔮</span> # deadlock</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('deadlock')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="the-finals" title="The Finals 3v3 Cashout Arena"><div class="channel-item-left"><span>🏆</span> # the-finals</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('the-finals')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="slapshot" title="Slapshot: Rebound 3v3 Ranked Pucks"><div class="channel-item-left"><span>🏒</span> # slapshot</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('slapshot')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="empulse" title="Empulse 5v5 Tactical Fast-Paced"><div class="channel-item-left"><span>🚀</span> # empulse</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('empulse')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="rematch" title="REMATCH 5v5 Arcade Ball & Scrims"><div class="channel-item-left"><span>⚽</span> # rematch</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('rematch')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="r6-siege" title="Rainbow Six Siege 5v5 Tactical Defusal"><div class="channel-item-left"><span>🛡️</span> # r6-siege</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('r6-siege')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="dota2" title="Dota 2 5v5 Ranked Captains Scrims"><div class="channel-item-left"><span>⚔️</span> # dota2</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('dota2')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="overwatch2" title="Overwatch 2 5v5 Role Queue Scrims"><div class="channel-item-left"><span>🤖</span> # overwatch2</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('overwatch2')" title="Delete Channel">🗑️</button></div>
+              <div class="channel-item" data-channel="arkheron" title="Arkheron 5v5 Dark Fantasy Arena"><div class="channel-item-left"><span>🏰</span> # arkheron</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('arkheron')" title="Delete Channel">🗑️</button></div>
             </div>
 
             <!-- Category: TEAMS & SQUADS CHANNELS -->
@@ -1067,7 +1067,7 @@
               <!-- Private Lobby Voice Rooms injected here -->
               <div id="voiceChannelsPrivateLobbies"></div>
               <div class="channel-item" data-voice="general-lounge">
-                <span>🔊</span> General Lounge
+                <div class="channel-item-left"><span>🔊</span> General Lounge</div>
               </div>
               <div class="voice-channel-users" id="vusers-general-lounge">
                 <div class="voice-user-row">
@@ -1080,26 +1080,33 @@
                 </div>
               </div>
 
-              <div class="channel-item" data-voice="wardogs-7v7" style="margin-top: 0.35rem;" title="WARDOGS 7v7 Squad Comms">
-                <span>🔊🐕</span> WARDOGS 7v7 Comms
+              <div class="channel-item" data-voice="wardogs-33v33v33" style="margin-top: 0.35rem;" title="WARDOGS 33v33v33 Tri-Faction Comms">
+                <div class="channel-item-left"><span>🔊🐕</span> WARDOGS 33v33v33 Comms</div>
+                <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('wardogs-33v33v33', 'voice')" title="Delete Voice Channel">🗑️</button>
               </div>
               <div class="channel-item" data-voice="cs2-premier" style="margin-top: 0.35rem;" title="CS2 Premier 5v5 Scrim Comms">
-                <span>🔊🎯</span> CS2 Premier 5v5
+                <div class="channel-item-left"><span>🔊🎯</span> CS2 Premier 5v5</div>
+                <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('cs2-premier', 'voice')" title="Delete Voice Channel">🗑️</button>
               </div>
               <div class="channel-item" data-voice="valorant-ranked" style="margin-top: 0.35rem;" title="Valorant Ranked Squad Comms">
-                <span>🔊⚡</span> Valorant Comms
+                <div class="channel-item-left"><span>🔊⚡</span> Valorant Comms</div>
+                <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('valorant-ranked', 'voice')" title="Delete Voice Channel">🗑️</button>
               </div>
               <div class="channel-item" data-voice="marvel-rivals" style="margin-top: 0.35rem;" title="Marvel Rivals 6v6 Comms">
-                <span>🔊💥</span> Marvel Rivals Comms
+                <div class="channel-item-left"><span>🔊💥</span> Marvel Rivals Comms</div>
+                <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('marvel-rivals', 'voice')" title="Delete Voice Channel">🗑️</button>
               </div>
               <div class="channel-item" data-voice="rocket-league" style="margin-top: 0.35rem;" title="Rocket League 3v3 Comms">
-                <span>🔊🏎️</span> Rocket League 3v3
+                <div class="channel-item-left"><span>🔊🏎️</span> Rocket League 3v3</div>
+                <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('rocket-league', 'voice')" title="Delete Voice Channel">🗑️</button>
               </div>
               <div class="channel-item" data-voice="the-finals" style="margin-top: 0.35rem;" title="The Finals 3v3 Comms">
-                <span>🔊🏆</span> The Finals Squad
+                <div class="channel-item-left"><span>🔊🏆</span> The Finals Squad</div>
+                <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('the-finals', 'voice')" title="Delete Voice Channel">🗑️</button>
               </div>
-              <div class="channel-item" data-voice="mimis" style="margin-top: 0.35rem;">
-                <span>🔊</span> mimis / chill
+              <div class="channel-item" data-voice="mimis" style="margin-top: 0.35rem;" title="Mimis / Chill Lounge">
+                <div class="channel-item-left"><span>🔊</span> mimis / chill</div>
+                <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('mimis', 'voice')" title="Delete Voice Channel">🗑️</button>
               </div>
             </div>
           </div>
@@ -1153,6 +1160,9 @@
               <button class="btn btn-secondary btn-sm" id="btnHeaderOpenStickers" onclick="window.chatVoiceManager.toggleStickerDrawer()" title="Stickers & Emotes">
                 <span>✨</span> Stickers
               </button>
+              <button class="btn btn-danger btn-sm" id="btnHeaderDeleteChannel" onclick="window.chatVoiceManager.confirmDeleteCurrentChannel()" title="Delete This Channel" style="display: none;">
+                <span>🗑️</span> Delete Channel
+              </button>
             </div>
           </div>
 
@@ -1181,6 +1191,9 @@
               <button class="btn btn-cyan btn-sm" id="btnChannelJoinPool" onclick="window.chatVoiceManager.executeInChatJoin(null)" title="Auto-Join In-Chat Match Pool (-j)">
                 <span>⚡</span> Join Pool (-j)
               </button>
+              <button class="btn btn-danger btn-sm" id="btnGameDeleteChannel" onclick="window.chatVoiceManager.confirmDeleteCurrentChannel()" title="Delete this Game Channel">
+                <span>🗑️</span> Delete
+              </button>
             </div>
           </div>
 
@@ -1208,6 +1221,9 @@
               </button>
               <button class="btn btn-success btn-sm" id="btnTeamInviteMember" onclick="window.chatVoiceManager.inviteTeammateToChannel()" title="Invite player to team channel">
                 <span>➕</span> Invite Member
+              </button>
+              <button class="btn btn-danger btn-sm" id="btnTeamDeleteChannel" onclick="window.chatVoiceManager.confirmDeleteCurrentChannel()" title="Delete this Squad Channel">
+                <span>🗑️</span> Delete Squad
               </button>
             </div>
           </div>
@@ -1242,6 +1258,9 @@
               </button>
               <button class="btn btn-secondary btn-sm" id="btnPrivateSplitComms" onclick="window.chatVoiceManager.togglePrivateVoiceSplit()" title="Toggle Split Team 1 / Team 2 Voice Rooms">
                 <span>🔊</span> Split Voice
+              </button>
+              <button class="btn btn-danger btn-sm" id="btnPrivateDeleteChannel" onclick="window.chatVoiceManager.confirmDeleteCurrentChannel()" title="Delete this Private Lobby">
+                <span>🗑️</span> Delete Lobby
               </button>
             </div>
           </div>
@@ -2722,7 +2741,7 @@
           <label class="input-label">Max Players & Format</label>
           <select class="input-field" id="newLobbyMax">
             <option value="10">10 Players (5v5 Scrim)</option>
-            <option value="14">14 Players (7v7 Fireteam / WARDOGS)</option>
+            <option value="14">14 Players (7v7 Tactical Fireteam)</option>
             <option value="12">12 Players (6v6 Rivals / Deadlock)</option>
             <option value="6">6 Players (3v3 Arena / Rocket / Finals)</option>
             <option value="4">4 Players (2v2 Wingman)</option>
@@ -3078,7 +3097,7 @@
         <div style="display: flex; align-items: center; gap: 0.6rem;">
           <label for="draftGameSelect" style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); white-space: nowrap;">🎯 Select Game Draft:</label>
           <select id="draftGameSelect" class="form-control" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem; background: rgba(18, 24, 38, 0.95); color: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 700;" onchange="window.app.onDraftGameSelectChange(this.value)">
-            <option value="WARDOGS">🛡️ WARDOGS (7v7 Fireteam)</option>
+            <option value="WARDOGS">🐕 WARDOGS (33v33v33 Tri-Faction)</option>
             <option value="Counter-Strike 2" selected>🎮 Counter-Strike 2 (5v5)</option>
             <option value="Valorant">🎯 Valorant (5v5)</option>
             <option value="Marvel Rivals">⚡ Marvel Rivals (6v6)</option>

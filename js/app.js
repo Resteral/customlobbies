@@ -140,18 +140,18 @@ class CustomLobbiesApp {
         isPublic: true
       },
       {
-        id: 'lobby_wd_7',
-        title: '🐕 WARDOGS 7v7 Tactical Fireteam Scrim',
+        id: 'lobby_wd_33v33v33',
+        title: '🐕 WARDOGS 33v33v33 Tri-Faction Conquest',
         game: 'WARDOGS',
         host: 'Ghost_Dog_99',
-        players: 5,
-        max: 7,
+        players: 68,
+        max: 99,
         region: 'NA-East (Virginia)',
         map: 'Sector 4 Outpost',
-        draftType: '7-Man Fireteam',
+        draftType: '33v33v33 Tri-Faction',
         serverIp: '192.168.1.85:7778',
         tickrate: 128,
-        matchStatus: '⚡ DRAFTING (5/7)',
+        matchStatus: '⚡ QUEUED (68/99)',
         isPublic: true
       },
       {

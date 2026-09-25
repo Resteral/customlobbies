@@ -530,8 +530,10 @@ div:has(.dropdown-wrapper:focus-within) {
 }
 
 .channel-item {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.6rem;
   padding: 0.55rem 0.8rem;
   border-radius: var(--radius-md);
@@ -540,6 +542,42 @@ div:has(.dropdown-wrapper:focus-within) {
   font-weight: 600;
   font-size: 0.9rem;
   transition: var(--transition-fast);
+}
+
+.channel-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.channel-delete-btn {
+  opacity: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.channel-item:hover .channel-delete-btn {
+  opacity: 0.7;
+}
+
+.channel-delete-btn:hover {
+  opacity: 1 !important;
+  color: #ff5252;
+  background: rgba(255, 82, 82, 0.25);
 }
 
 .channel-item:hover {
