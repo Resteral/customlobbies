@@ -291,17 +291,42 @@
           </div>
         </div>
 
-        <!-- Prominent Primary Call-To-Actions -->
-        <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
-          <button class="btn btn-primary" id="btnJoinQueue" onclick="window.matchmakingHubEngine.startMatchmakingQueue()" style="padding: 0.85rem 1.6rem; font-size: 1.05rem; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);">
-            <span>⚡</span> Quick Queue (-join)
-          </button>
-          <button class="btn btn-secondary" id="btnCreateLobby" onclick="document.querySelector('[data-tab=tournaments-view]').click()" style="padding: 0.85rem 1.6rem; font-size: 1.05rem;">
-            <span>➕</span> Host Custom Lobby
-          </button>
-          <button class="btn btn-purple" id="btnGatekeeper" onclick="window.customEnhancements.openGatekeeper('Pro Squad Alpha')" style="padding: 0.85rem 1.6rem; font-size: 1.05rem; border-color: #ff3366;">
-            <span>🛡️</span> Squad Audition (5s Intro)
-          </button>
+        <!-- Prominent Primary Call-To-Actions & Game Quick Join Selector -->
+        <div style="display: flex; gap: 0.8rem; align-items: flex-end; flex-wrap: wrap; background: rgba(0, 0, 0, 0.45); padding: 0.85rem 1.15rem; border-radius: 12px; border: 1px solid rgba(0, 242, 254, 0.35); box-shadow: 0 0 25px rgba(0, 242, 254, 0.15);">
+          <div>
+            <label style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.35rem;">
+              🎮 Choose Game To Quick Join:
+            </label>
+            <select id="quickJoinGameSelect" class="input-field" style="padding: 0.5rem 0.8rem; font-size: 0.88rem; min-width: 230px; font-weight: 800; border-color: var(--accent-cyan); background: rgba(14, 18, 28, 0.95); color: #fff;">
+              <option value="random" selected>🎲 Random Game (Surprise Me / Any)</option>
+              <option value="WARDOGS">🐕 WARDOGS (50v50 / 7v7)</option>
+              <option value="Counter-Strike 2">🎮 Counter-Strike 2 (128-Tick)</option>
+              <option value="Valorant">🎯 Valorant</option>
+              <option value="Marvel Rivals">💥 Marvel Rivals</option>
+              <option value="Empulse">⚡ Empulse</option>
+              <option value="REMATCH">🔥 REMATCH</option>
+              <option value="Slapshot: Rebound">🏒 Slapshot: Rebound</option>
+              <option value="Rocket League">🚗 Rocket League</option>
+              <option value="Deadlock">💀 Deadlock</option>
+              <option value="The Finals">🏆 The Finals</option>
+              <option value="Arkheron">⚔️ Arkheron</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-primary" id="btnJoinQueue" onclick="window.app.quickJoinGame()" style="padding: 0.6rem 1.3rem; font-size: 0.98rem; font-weight: 800; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);">
+              <span>⚡</span> Quick Join Queue
+            </button>
+            <button class="btn btn-purple" id="btnRandomGameQuick" onclick="window.app.quickJoinRandomGame()" style="padding: 0.6rem 1.15rem; font-size: 0.98rem; font-weight: 800; border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);">
+              <span>🎲</span> Random Game
+            </button>
+            <button class="btn btn-secondary" id="btnCreateLobby" onclick="document.querySelector('[data-tab=tournaments-view]').click()" style="padding: 0.6rem 1rem; font-size: 0.9rem;">
+              <span>➕</span> Host Lobby
+            </button>
+            <button class="btn btn-secondary" id="btnGatekeeper" onclick="window.customEnhancements.openGatekeeper('Pro Squad Alpha')" style="padding: 0.6rem 1rem; font-size: 0.9rem; border-color: #ff3366;">
+              <span>🛡️</span> 5s Audition
+            </button>
+          </div>
         </div>
       </div>
 
@@ -532,10 +557,46 @@
         </div>
       </div>
 
-      <!-- Active Custom Lobbies Grid -->
-      <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-        <span>🔥</span> Active Custom Lobbies (Prioritized by Favorites & Live Activity)
-      </h2>
+      <!-- Active Custom Lobbies Header & Public Lobbies Filter Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.8rem;">
+        <div>
+          <h2 style="font-size: 1.35rem; font-weight: 900; margin: 0; display: flex; align-items: center; gap: 0.5rem; color: #fff;">
+            <span>🔥</span> Public Lobbies & Active Matchmaking Rooms
+          </h2>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">
+            Browse open public lobbies with active players waiting to queue up or join with friends!
+          </p>
+        </div>
+
+        <!-- Filter Pills & Game Dropdown -->
+        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; gap: 0.3rem; background: rgba(0,0,0,0.4); padding: 0.3rem; border-radius: 20px; border: 1px solid var(--border-color);">
+            <button class="btn btn-primary btn-sm" id="btnFilterPublicWithPlayers" onclick="window.app.setLobbyFilterType('public_with_players')" style="font-size: 0.78rem; font-weight: 800;">
+              🟢 Open Lobbies with Players
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnFilterAllLobbies" onclick="window.app.setLobbyFilterType('all')" style="font-size: 0.78rem;">
+              🔥 All Lobbies
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnFilterFavLobbies" onclick="window.app.setLobbyFilterType('favorites')" style="font-size: 0.78rem;">
+              ⭐ Favorites
+            </button>
+          </div>
+
+          <select class="input-field" id="lobbyGameDropdownFilter" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; min-width: 160px; font-weight: 800;" onchange="window.app.setGameFilter(this.value)">
+            <option value="all">🎮 All Games</option>
+            <option value="WARDOGS">🐕 WARDOGS</option>
+            <option value="Counter-Strike 2">🎮 Counter-Strike 2</option>
+            <option value="Valorant">🎯 Valorant</option>
+            <option value="Marvel Rivals">💥 Marvel Rivals</option>
+            <option value="Empulse">⚡ Empulse</option>
+            <option value="REMATCH">🔥 REMATCH</option>
+            <option value="Slapshot: Rebound">🏒 Slapshot: Rebound</option>
+            <option value="Rocket League">🚗 Rocket League</option>
+            <option value="Deadlock">💀 Deadlock</option>
+            <option value="The Finals">🏆 The Finals</option>
+          </select>
+        </div>
+      </div>
       
       <div class="lobby-grid" id="lobbiesGrid">
         <!-- Injected via app.js -->
@@ -1483,6 +1544,7 @@
             <div>
               <label class="input-label">Select Game Title</label>
               <select class="input-field" id="mmGameSelect" onchange="window.app.onMatchmakingGameChange(this.value)">
+                <option value="random">🎲 Random Game (Surprise Me / Any)</option>
                 <option value="WARDOGS">WARDOGS</option>
                 <option value="Counter-Strike 2" selected>Counter-Strike 2</option>
                 <option value="Valorant">Valorant</option>
@@ -1528,10 +1590,15 @@
           </div>
 
           <!-- Large Neon Queue Action Buttons -->
-          <button class="btn btn-primary btn-block" style="font-size: 1.1rem; padding: 1rem;" id="btnStartMatchmakingAction" onclick="window.app.startMatchmakingQueue()">
-            <span>⚡</span> FIND RANKED MATCH (QUEUE NOW)
-          </button>
-          <button class="btn btn-danger btn-block" style="font-size: 1.1rem; padding: 1rem; display: none;" id="btnCancelMatchmakingAction" onclick="window.app.cancelMatchmakingQueue()">
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.8rem;">
+            <button class="btn btn-primary" style="font-size: 1.05rem; padding: 1rem; font-weight: 800;" id="btnStartMatchmakingAction" onclick="window.app.startMatchmakingQueue()">
+              <span>⚡</span> FIND RANKED MATCH (QUEUE NOW)
+            </button>
+            <button class="btn btn-purple" style="font-size: 1.05rem; padding: 1rem; font-weight: 800; border-color: var(--accent-purple);" onclick="window.app.quickJoinRandomGame()">
+              <span>🎲</span> RANDOM GAME
+            </button>
+          </div>
+          <button class="btn btn-danger btn-block" style="font-size: 1.1rem; padding: 1rem; display: none; margin-top: 0.8rem;" id="btnCancelMatchmakingAction" onclick="window.app.cancelMatchmakingQueue()">
             <span>❌</span> CANCEL MATCHMAKING QUEUE
           </button>
         </div>

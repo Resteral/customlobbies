@@ -53,6 +53,7 @@ class CustomLobbiesApp {
     this.teamLineup = [];
     this.teamBench = [];
     this.sponsoredServers = [];
+    this.lobbyFilterType = 'public_with_players';
     this.lobbies = [];
     
     this.selectedLeaderboardGame = 'Counter-Strike 2';
@@ -64,18 +65,225 @@ class CustomLobbiesApp {
     this.loadState();
   }
 
+  getActiveLobbyCounts() {
+    const counts = {};
+    if (Array.isArray(this.lobbies)) {
+      this.lobbies.forEach(l => {
+        if (l.game) {
+          counts[l.game] = (counts[l.game] || 0) + 1;
+        }
+      });
+    }
+    return counts;
+  }
+
+  getDefaultLobbies() {
+    return [
+      {
+        id: 'lobby_wd_50',
+        title: '🐕 WARDOGS 50v50 Frontline (Amber Strike Sector)',
+        game: 'WARDOGS',
+        host: 'Vanguard_Marshal',
+        players: 42,
+        max: 50,
+        region: 'NA-East Dedicated Node',
+        map: 'Amber Strike Frontline',
+        draftType: '50v50 Battalion Draft',
+        serverIp: '192.168.1.85:7777',
+        tickrate: 128,
+        matchStatus: '🔥 RECRUITING (42/50)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_cs2_prem',
+        title: 'CS2 128-Tick Premier Scrim #104',
+        game: 'Counter-Strike 2',
+        host: 'S1mple_Pro',
+        players: 8,
+        max: 10,
+        region: 'NA-East (Virginia)',
+        map: 'de_mirage & de_inferno',
+        draftType: 'FACEIT 5v5 Premier',
+        serverIp: '192.168.1.85:27015',
+        tickrate: 128,
+        matchStatus: '🔥 WARMUP (8/10)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_val_rad',
+        title: 'Valorant Radiant / Ascendant 5v5 Scrim',
+        game: 'Valorant',
+        host: 'TenZ_Aim',
+        players: 7,
+        max: 10,
+        region: 'US East (N. Virginia)',
+        map: 'Ascent & Bind',
+        draftType: 'Competitive Custom',
+        serverIp: '192.168.1.85:28015',
+        tickrate: 128,
+        matchStatus: '🔥 RECRUITING (7/10)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_mr_6v6',
+        title: 'Marvel Rivals 6v6 High-MMR Scrim',
+        game: 'Marvel Rivals',
+        host: 'IronFist_Leader',
+        players: 9,
+        max: 12,
+        region: 'NA-East',
+        map: 'Tokyo 2099: Shin-Shibuya',
+        draftType: '6v6 Ranked Draft',
+        serverIp: '192.168.1.85:29015',
+        tickrate: 128,
+        matchStatus: '🔥 RECRUITING (9/12)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_wd_7',
+        title: '🐕 WARDOGS 7v7 Tactical Fireteam Scrim',
+        game: 'WARDOGS',
+        host: 'Ghost_Dog_99',
+        players: 5,
+        max: 7,
+        region: 'NA-East (Virginia)',
+        map: 'Sector 4 Outpost',
+        draftType: '7-Man Fireteam',
+        serverIp: '192.168.1.85:7778',
+        tickrate: 128,
+        matchStatus: '⚡ DRAFTING (5/7)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_rematch_5v5',
+        title: 'REMATCH 5v5 High-Stakes Circuit Match',
+        game: 'REMATCH',
+        host: 'Rematch_God',
+        players: 6,
+        max: 10,
+        region: 'US East (12ms)',
+        map: 'Nexus Arena',
+        draftType: '5v5 Premier BO3',
+        serverIp: '192.168.1.85:7780',
+        tickrate: 128,
+        matchStatus: '⚡ DRAFTING (6/10)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_empulse_5v5',
+        title: 'Empulse 5v5 Arena Championship',
+        game: 'Empulse',
+        host: 'Empulse_Overlord',
+        players: 8,
+        max: 10,
+        region: 'US Central',
+        map: 'Empulse Facility Core',
+        draftType: '5v5 Ranked',
+        serverIp: '192.168.1.85:7782',
+        tickrate: 128,
+        matchStatus: '🟢 IN-GAME (8/10)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_slapshot_3v3',
+        title: 'Slapshot 3v3 Arcade Hockey Scrim',
+        game: 'Slapshot: Rebound',
+        host: 'PuckMaster99',
+        players: 5,
+        max: 6,
+        region: 'US East',
+        map: 'Puck Arena Stadium',
+        draftType: '3v3 Ranked Scrim',
+        serverIp: '192.168.1.85:7785',
+        tickrate: 128,
+        matchStatus: '🔥 RECRUITING (5/6)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_cs2_wingman',
+        title: 'CS2 2v2 Wingman Aim Ladder',
+        game: 'Counter-Strike 2',
+        host: 'NiKo_OneTap',
+        players: 3,
+        max: 4,
+        region: 'US Central (Chicago)',
+        map: 'de_vertigo',
+        draftType: '2v2 Wingman',
+        serverIp: '192.168.1.85:27016',
+        tickrate: 128,
+        matchStatus: '⚡ DRAFTING (3/4)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_rl_3v3',
+        title: 'Rocket League 3v3 Grand Champ Scrim',
+        game: 'Rocket League',
+        host: 'AerialKing_RL',
+        players: 4,
+        max: 6,
+        region: 'US East',
+        map: 'DFH Stadium',
+        draftType: '3v3 Competitive',
+        serverIp: '192.168.1.85:7790',
+        tickrate: 128,
+        matchStatus: '🔥 RECRUITING (4/6)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_deadlock_6v6',
+        title: 'Deadlock 6v6 Early Access Playtest Scrim',
+        game: 'Deadlock',
+        host: 'Seven_Main',
+        players: 8,
+        max: 12,
+        region: 'NA-East',
+        map: 'The Cursed City',
+        draftType: '6v6 Lane Draft',
+        serverIp: '192.168.1.85:7795',
+        tickrate: 128,
+        matchStatus: '🔥 RECRUITING (8/12)',
+        isPublic: true
+      },
+      {
+        id: 'lobby_finals_3v3',
+        title: 'The Finals 3v3v3 Ranked Cashout Scrim',
+        game: 'The Finals',
+        host: 'HeavySledge',
+        players: 6,
+        max: 9,
+        region: 'US East',
+        map: 'Monaco 2023',
+        draftType: 'Cashout 3v3v3',
+        serverIp: '192.168.1.85:7800',
+        tickrate: 128,
+        matchStatus: '⚡ DRAFTING (6/9)',
+        isPublic: true
+      }
+    ];
+  }
+
   loadState() {
     try {
       const savedPoints = localStorage.getItem('cl_points_v2');
       if (savedPoints) this.clPoints = parseInt(savedPoints);
+      
+      const defaultLobbies = this.getDefaultLobbies();
       const savedLobbies = localStorage.getItem('cl_lobbies_v2');
       if (savedLobbies) {
-        const parsed = JSON.parse(savedLobbies);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const existingGames = new Set(parsed.map(l => l.game));
-          const missingLobbies = this.lobbies.filter(l => !existingGames.has(l.game));
-          this.lobbies = [...parsed, ...missingLobbies];
+        try {
+          const parsed = JSON.parse(savedLobbies);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const existingIds = new Set(parsed.map(l => l.id));
+            const missing = defaultLobbies.filter(l => !existingIds.has(l.id));
+            this.lobbies = [...parsed, ...missing];
+          } else {
+            this.lobbies = defaultLobbies;
+          }
+        } catch(e) {
+          this.lobbies = defaultLobbies;
         }
+      } else {
+        this.lobbies = defaultLobbies;
       }
       const savedPool = localStorage.getItem('cl_pool_v2');
       if (savedPool) this.poolFeed = JSON.parse(savedPool);
@@ -2414,9 +2622,17 @@ class CustomLobbiesApp {
   }
 
   startMatchmakingQueue() {
-    const game = document.getElementById('mmGameSelect').value;
-    const mode = document.getElementById('mmModeSelect').value;
-    const region = document.getElementById('mmRegionSelect').value;
+    const gameSelect = document.getElementById('mmGameSelect');
+    const game = gameSelect ? gameSelect.value : 'Counter-Strike 2';
+    const modeSelect = document.getElementById('mmModeSelect');
+    const mode = modeSelect ? modeSelect.value : '5v5 Premier Scrim';
+    const regionSelect = document.getElementById('mmRegionSelect');
+    const region = regionSelect ? regionSelect.value : 'US East (12ms)';
+
+    if (game === 'random') {
+      this.quickJoinRandomGame();
+      return;
+    }
 
     if (window.matchmakingHubEngine) {
       window.matchmakingHubEngine.startMatchmakingQueue(game, mode, region);
@@ -2739,6 +2955,8 @@ class CustomLobbiesApp {
     }
 
     // 3. Re-render all bars & lobbies list
+    const dd = document.getElementById('lobbyGameDropdownFilter');
+    if (dd) dd.value = this.activeFilter;
     this.renderFavoriteStarTags();
     this.renderActiveGamesBar();
     this.renderLobbies();
@@ -3157,6 +3375,160 @@ class CustomLobbiesApp {
     });
   }
 
+  setLobbyFilterType(type) {
+    this.lobbyFilterType = type;
+
+    const btnPublic = document.getElementById('btnFilterPublicWithPlayers');
+    const btnAll = document.getElementById('btnFilterAllLobbies');
+    const btnFav = document.getElementById('btnFilterFavLobbies');
+
+    [btnPublic, btnAll, btnFav].forEach(b => {
+      if (b) {
+        b.classList.remove('btn-primary');
+        b.classList.add('btn-secondary');
+      }
+    });
+
+    if (type === 'public_with_players' && btnPublic) {
+      btnPublic.classList.remove('btn-secondary');
+      btnPublic.classList.add('btn-primary');
+    } else if (type === 'all' && btnAll) {
+      btnAll.classList.remove('btn-secondary');
+      btnAll.classList.add('btn-primary');
+    } else if (type === 'favorites' && btnFav) {
+      btnFav.classList.remove('btn-secondary');
+      btnFav.classList.add('btn-primary');
+    }
+
+    this.renderLobbies();
+  }
+
+  quickJoinGame(gameOverride) {
+    let targetGame = gameOverride;
+    if (!targetGame) {
+      const selectEl = document.getElementById('quickJoinGameSelect');
+      targetGame = selectEl ? selectEl.value : 'random';
+    }
+
+    if (targetGame === 'random') {
+      this.quickJoinRandomGame();
+      return;
+    }
+
+    // Look for active public lobbies with players in them for this game
+    const openLobbies = (this.lobbies || []).filter(l => 
+      l.game === targetGame && l.players > 0 && l.players < l.max && l.isPublic !== false
+    );
+
+    if (openLobbies.length > 0) {
+      // Pick the lobby closest to full for fastest queue fill
+      openLobbies.sort((a, b) => b.players - a.players);
+      const chosen = openLobbies[0];
+      this.joinAndQueueLobby(chosen.id);
+
+      const grid = document.getElementById('lobbiesGrid');
+      if (grid) {
+        grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else {
+      // Fallback: Start matchmaking queue for this specific game
+      if (window.matchmakingHubEngine) {
+        window.matchmakingHubEngine.startMatchmakingQueue(targetGame, '5v5 Premier Scrim', 'US East (12ms)');
+      }
+      if (window.widgetBuilderEngine?.showToast) {
+        window.widgetBuilderEngine.showToast(`⚡ Entered Ranked Matchmaking Queue for ${targetGame}!`, 'success');
+      } else {
+        alert(`⚡ Entered Ranked Matchmaking Queue for ${targetGame}! Searching for opponents...`);
+      }
+    }
+  }
+
+  quickJoinRandomGame() {
+    // Collect all games with open public lobbies having players
+    const activePublicLobbies = (this.lobbies || []).filter(l => 
+      l.players > 0 && l.players < l.max && l.isPublic !== false
+    );
+
+    let chosenLobby = null;
+    let chosenGame = 'Counter-Strike 2';
+
+    if (activePublicLobbies.length > 0) {
+      const randIdx = Math.floor(Math.random() * activePublicLobbies.length);
+      chosenLobby = activePublicLobbies[randIdx];
+      chosenGame = chosenLobby.game;
+    } else {
+      const pool = ['WARDOGS', 'Counter-Strike 2', 'Valorant', 'Marvel Rivals', 'Empulse', 'REMATCH', 'Slapshot: Rebound', 'Rocket League', 'Deadlock', 'The Finals'];
+      chosenGame = pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    // Update quickJoinGameSelect dropdown to reflect the chosen game
+    const selectEl = document.getElementById('quickJoinGameSelect');
+    if (selectEl) {
+      const optionExists = Array.from(selectEl.options).some(o => o.value === chosenGame);
+      if (optionExists) selectEl.value = chosenGame;
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+      if (typeof window.widgetBuilderEngine.showToast === 'function') {
+        window.widgetBuilderEngine.showToast(`🎲 Random Game Drawn: ${chosenGame}! Joining active queue...`, 'success');
+      }
+    }
+
+    if (chosenLobby) {
+      this.joinAndQueueLobby(chosenLobby.id);
+      const grid = document.getElementById('lobbiesGrid');
+      if (grid) {
+        grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else {
+      if (window.matchmakingHubEngine) {
+        window.matchmakingHubEngine.startMatchmakingQueue(chosenGame, '5v5 Premier Scrim', 'US East (12ms)');
+      }
+      alert(`🎲 RANDOM GAME DRAWN: ${chosenGame}!\n\nEntered active matchmaking queue. Searching for players...`);
+    }
+  }
+
+  joinAndQueueLobby(id) {
+    const lobby = this.lobbies.find(l => l.id == id);
+    if (!lobby) return;
+
+    if (lobby.players >= lobby.max) {
+      if (window.widgetBuilderEngine?.showToast) {
+        window.widgetBuilderEngine.showToast(`⚠️ Lobby "${lobby.title}" is full!`, 'error');
+      } else {
+        alert(`⚠️ Lobby "${lobby.title}" is currently full!`);
+      }
+      return;
+    }
+
+    lobby.players++;
+    if (!lobby.members) lobby.members = [];
+    lobby.members.push({ name: 'You (Host)', role: 'Queue Member', elo: 2150 });
+    
+    this.saveState();
+    this.renderActiveGamesBar();
+    this.renderLobbies();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+      if (typeof window.widgetBuilderEngine.showToast === 'function') {
+        window.widgetBuilderEngine.showToast(`⚡ Joined & Queued in "${lobby.title}" (${lobby.players}/${lobby.max} Players)!`, 'success');
+      }
+    }
+
+    // Auto-launch match if lobby becomes full
+    if (lobby.players >= lobby.max) {
+      setTimeout(() => {
+        this.launchFaceitMatchRoom(lobby.title, lobby.game);
+      }, 500);
+    }
+  }
+
+  joinLobby(id) {
+    this.joinAndQueueLobby(id);
+  }
+
   renderLobbies() {
     const grid = document.getElementById('lobbiesGrid');
     if (!grid) return;
@@ -3164,38 +3536,48 @@ class CustomLobbiesApp {
     const counts = this.getActiveLobbyCounts();
 
     let list = [...this.lobbies];
-    if (this.activeFilter === 'favorites') {
+
+    // Filter by Lobby Type (defaults to open public lobbies with players!)
+    if (this.lobbyFilterType === 'public_with_players') {
+      list = list.filter(l => (l.players || 0) > 0 && (l.players < l.max) && (l.isPublic !== false));
+    } else if (this.lobbyFilterType === 'favorites') {
       list = list.filter(l => this.favoriteGames.has(l.game));
-    } else if (this.activeFilter !== 'all') {
+    }
+
+    // Filter by Game if selected
+    if (this.activeFilter && this.activeFilter !== 'all' && this.activeFilter !== 'favorites') {
       list = list.filter(l => l.game === this.activeFilter);
     }
 
+    // Sort: open public lobbies with players closest to full first
     list.sort((a, b) => {
-      const favA = this.favoriteGames.has(a.game) ? 100 : 0;
-      const favB = this.favoriteGames.has(b.game) ? 100 : 0;
-
-      const activeCntA = counts[a.game] || 0;
-      const activeCntB = counts[b.game] || 0;
-
-      const scoreA = favA + (activeCntA * 10) + a.players;
-      const scoreB = favB + (activeCntB * 10) + b.players;
-
-      return scoreB - scoreA;
+      const openA = (a.players > 0 && a.players < a.max) ? 100 : 0;
+      const openB = (b.players > 0 && b.players < b.max) ? 100 : 0;
+      const favA = this.favoriteGames.has(a.game) ? 20 : 0;
+      const favB = this.favoriteGames.has(b.game) ? 20 : 0;
+      return (openB + favB + b.players) - (openA + favA + a.players);
     });
 
     if (list.length === 0) {
-      grid.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--text-muted);">No active lobbies match your current filter. Host a custom lobby above!</div>`;
+      grid.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align: center; padding: 2.5rem; color: var(--text-muted); background: rgba(0,0,0,0.4); border: 1px dashed var(--border-color); border-radius: 12px;">
+        <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem;">🎮</span>
+        <strong style="color: #fff; font-size: 1.1rem; display: block; margin-bottom: 0.3rem;">No active lobbies found matching this filter.</strong>
+        <p style="margin-bottom: 1rem; font-size: 0.85rem;">Switch filter to "All Lobbies" or host a custom room above!</p>
+        <button class="btn btn-primary btn-sm" onclick="window.app.setLobbyFilterType('all')">Show All Lobbies</button>
+      </div>`;
       return;
     }
 
     grid.innerHTML = list.map(l => {
       const fillPct = Math.round((l.players / l.max) * 100);
       const isFav = this.favoriteGames.has(l.game);
-      const statusBadge = l.matchStatus || (fillPct >= 90 ? '🟢 IN-GAME (Live)' : (fillPct >= 70 ? '⚡ DRAFTING' : '🔥 WARMUP'));
+      const isPublic = l.isPublic !== false;
+      const spotsLeft = l.max - l.players;
+      const statusBadge = l.matchStatus || (fillPct >= 90 ? '🟢 IN-GAME (Live)' : (fillPct >= 70 ? '⚡ DRAFTING' : '🔥 RECRUITING'));
       const statusColor = statusBadge.includes('IN-GAME') || statusBadge.includes('LIVE') ? 'var(--accent-green)' : (statusBadge.includes('DRAFT') ? 'var(--accent-cyan)' : 'var(--accent-gold)');
 
       return `
-        <div class="lobby-card" style="${isFav ? 'border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);' : ''}">
+        <div class="lobby-card" style="${isFav ? 'border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);' : (isPublic ? 'border-color: rgba(0, 242, 254, 0.35);' : '')}">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
             <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
               <span class="lobby-game-tag" style="${isFav ? 'background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); font-weight: 800;' : ''}">
@@ -3204,6 +3586,7 @@ class CustomLobbiesApp {
               <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: ${statusColor}; font-weight: 800; border: 1px solid ${statusColor};">
                 ${statusBadge}
               </span>
+              ${isPublic ? '<span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-weight: 800; border: 1px solid rgba(0, 242, 254, 0.4);">🟢 Public Lobby</span>' : ''}
               ${l.map ? `<span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">🗺️ ${l.map}</span>` : ''}
             </div>
             <button style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: ${isFav ? 'var(--accent-gold)' : 'var(--text-dim)'};" onclick="window.app.toggleFavorite('${l.game}')" title="Pin / Favorite Game">
@@ -3211,47 +3594,39 @@ class CustomLobbiesApp {
             </button>
           </div>
 
-          <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0.5rem 0;">${l.title}</h3>
+          <h3 style="font-size: 1.15rem; font-weight: 900; margin: 0.5rem 0; color: #fff;">${l.title}</h3>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">Host: <strong style="color: var(--accent-cyan);">${l.host}</strong> | Type: <strong style="color: var(--accent-gold);">${l.draftType}</strong> | Region: <strong style="color: var(--text-main);">${l.region || 'NA East'}</strong></p>
 
           <div class="lobby-players-bar">
-            <div class="lobby-players-fill" style="width: ${fillPct}%;"></div>
+            <div class="lobby-players-fill" style="width: ${fillPct}%; background: ${spotsLeft <= 2 ? 'linear-gradient(90deg, #ffab00, #00e676)' : 'linear-gradient(90deg, #00f2fe, #4facfe)'};"></div>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; flex-wrap: wrap; gap: 0.6rem;">
-            <span style="font-size: 0.85rem; font-weight: 700; color: ${fillPct >= 90 ? 'var(--accent-green)' : 'var(--accent-cyan)'};">${l.players} / ${l.max} Players (${l.max - l.players > 0 ? `${l.max - l.players} Spots Left` : 'Full Lobby'})</span>
+            <div>
+              <span style="font-size: 0.88rem; font-weight: 800; color: ${spotsLeft <= 0 ? 'var(--accent-red)' : (spotsLeft <= 3 ? 'var(--accent-green)' : 'var(--accent-cyan)')};">
+                ${l.players} / ${l.max} Players
+              </span>
+              <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.4rem;">
+                (${spotsLeft > 0 ? `${spotsLeft} Spots Left • Open to Join` : 'Full Match'})
+              </span>
+            </div>
             <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-              <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('${l.serverIp || '192.168.1.85:27015'}')" title="Copy Console Connect Command">📋 Copy IP</button>
-              <button class="btn btn-secondary btn-sm" onclick="window.app.connectLobbyVoice('${l.title}')" title="Connect WebRTC Voice Room">🎙️ Voice</button>
-              <button class="btn btn-secondary btn-sm" style="border-color: var(--accent-gold); color: var(--accent-gold);" onclick="window.app.openPostGameHonorModal('${l.title}')" title="After Game Honor & Misconduct Flags">🏁 Post-Game Honor</button>
-              <button class="btn btn-purple btn-sm" onclick="window.app.triggerLobbySnakeDraft('${l.title}', '${l.game}')" title="Launch FACEIT 1-2-2-1 Snake Draft Board for this lobby">🐍 Snake Draft</button>
-              <button class="btn btn-primary btn-sm" onclick="window.app.launchFaceitMatchRoom('${l.title}', '${l.game}')">🏆 Direct Join</button>
+              ${spotsLeft > 0 ? `
+                <button class="btn btn-primary btn-sm" onclick="window.app.joinAndQueueLobby('${l.id}')" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); font-weight: 800; padding: 0.35rem 0.75rem;">
+                  <span>⚡</span> Queue Up / Join (${l.players}/${l.max})
+                </button>
+              ` : `
+                <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.6;">Full</button>
+              `}
+              <button class="btn btn-cyan btn-sm" onclick="window.app.launchFaceitMatchRoom('${l.title}', '${l.game}')">🏆 Direct Join</button>
+              <button class="btn btn-purple btn-sm" onclick="window.app.triggerLobbySnakeDraft('${l.title}', '${l.game}')" title="Launch Snake Draft Board">🐍 Draft</button>
+              <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('${l.serverIp || '192.168.1.85:27015'}')" title="Copy IP">📋 IP</button>
+              <button class="btn btn-secondary btn-sm" onclick="window.app.connectLobbyVoice('${l.title}')" title="Voice">🎙️</button>
             </div>
           </div>
         </div>
       `;
     }).join('');
-  }
-
-  joinLobby(id) {
-    const lobby = this.lobbies.find(l => l.id === id);
-    if (lobby && lobby.players < lobby.max) {
-      lobby.players++;
-
-      this.poolFeed.unshift({
-        id: Date.now(),
-        name: 'You (Host)',
-        elo: 1840,
-        time: 'Just Now',
-        isCaptain: false,
-        votes: 1
-      });
-
-      this.renderPoolFeed();
-      this.renderActiveGamesBar();
-      this.renderLobbies();
-      alert(`✅ Joined custom lobby "${lobby.title}"! Pushed into Live Matchmaking Pool Feed.`);
-    }
   }
 
   triggerLobbySnakeDraft(lobbyTitle, gameTitle) {
