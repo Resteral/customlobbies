@@ -1032,26 +1032,28 @@
         <!-- 2. Channels List & Tree Sidebar -->
         <div class="chat-channels-panel">
           <!-- Guild Header -->
-          <div style="padding: 0.8rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); border-radius: 8px 8px 0 0; margin-bottom: 0.5rem;">
-            <h3 style="font-size: 1.02rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem; color: #fff;" id="guildTitleHeader">
-              <span>🎮</span> Games <span style="font-size: 0.75rem; color: var(--text-muted);">▼</span>
+          <div id="guildHeaderContainer" style="padding: 0.8rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); border-radius: 8px 8px 0 0; margin-bottom: 0.5rem; cursor: pointer; user-select: none;" title="Server Actions & Options">
+            <h3 style="font-size: 1.02rem; font-weight: 800; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; color: #fff; width: 100%; margin: 0;" id="guildTitleHeader">
+              <span style="display: flex; align-items: center; gap: 0.4rem;"><span>🎮</span> Games</span>
+              <span id="guildHeaderChevron" style="font-size: 0.75rem; color: var(--text-muted); transition: transform 0.2s ease;">▼</span>
             </h3>
           </div>
 
           <div style="flex: 1; overflow-y: auto; padding-right: 0.2rem;">
             <!-- Category: IMPORTANT -->
-            <div class="channel-section-title">
+            <div class="channel-section-title" style="display: flex; justify-content: space-between; align-items: center;">
               <span>📌 IMPORTANT</span>
+              <button class="add-channel-btn" id="btnAddImportantChannel" onclick="event.stopPropagation(); window.chatVoiceManager.openCreateChannelModal('important')" title="Create Channel in Important">+</button>
             </div>
             <div id="textChannelsImportant">
-              <div class="channel-item" data-channel="welcome"># welcome</div>
-              <div class="channel-item" data-channel="rules"># rules</div>
+              <div class="channel-item" data-channel="welcome"><div class="channel-item-left"><span>📌</span> # welcome</div></div>
+              <div class="channel-item" data-channel="rules"><div class="channel-item-left"><span>📜</span> # rules</div></div>
             </div>
 
             <!-- Category: LOUNGE -->
             <div class="channel-section-title">
               <span>💬 LOUNGE</span>
-              <button class="add-channel-btn" id="btnAddTextChannel" onclick="window.chatVoiceManager.openCreateChannelModal('lounge')" title="Create Text Channel">+</button>
+              <button class="add-channel-btn" id="btnAddTextChannel" onclick="event.stopPropagation(); window.chatVoiceManager.openCreateChannelModal('lounge')" title="Create Text Channel">+</button>
             </div>
             <div id="textChannelsList">
               <div class="channel-item active" data-channel="general"><div class="channel-item-left"><span>💬</span> # general</div></div>
@@ -1064,7 +1066,7 @@
             <!-- Category: GAME HUBS & LOBBIES (Channels for Each Game) -->
             <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
               <span>🎮 GAME HUBS & LOBBIES</span>
-              <button class="add-channel-btn" id="btnAddGameChannel" onclick="window.chatVoiceManager.openCreateChannelModal('games')" title="Create Game Channel">+</button>
+              <button class="add-channel-btn" id="btnAddGameChannel" onclick="event.stopPropagation(); window.chatVoiceManager.openCreateChannelModal('games')" title="Create Game Channel">+</button>
             </div>
             <div id="textChannelsGames">
               <div class="channel-item" data-channel="wardogs" title="WARDOGS 33v33v33 Tri-Faction Conquest & Matchmaking (99 Players)"><div class="channel-item-left"><span>🐕</span> # wardogs</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('wardogs')" title="Delete Channel">🗑️</button></div>
@@ -1086,7 +1088,7 @@
             <!-- Category: TEAMS & SQUADS CHANNELS -->
             <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
               <span>🛡️ TEAM & CLAN CHANNELS</span>
-              <button class="add-channel-btn" id="btnAddTeamChannel" onclick="window.chatVoiceManager.openTeamChannelModal()" title="Create Dedicated Team Channel">+</button>
+              <button class="add-channel-btn" id="btnAddTeamChannel" onclick="event.stopPropagation(); window.chatVoiceManager.openTeamChannelModal()" title="Create Dedicated Team Channel">+</button>
             </div>
             <div id="textChannelsTeams">
               <!-- Dynamically populated from created teams -->
@@ -1096,8 +1098,8 @@
             <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
               <span>🔒 PRIVATE LOBBIES</span>
               <div style="display: flex; gap: 0.25rem;">
-                <button class="add-channel-btn" id="btnJoinPrivateLobbyByCode" onclick="window.chatVoiceManager.openJoinPrivateLobbyModal()" title="Enter Access Code to Join Private Lobby" style="font-size: 0.72rem; padding: 0 0.35rem;">🔑</button>
-                <button class="add-channel-btn" id="btnAddPrivateLobbyChannel" onclick="window.chatVoiceManager.openPrivateLobbyModal()" title="Create Dedicated Private Lobby Channel">+</button>
+                <button class="add-channel-btn" id="btnJoinPrivateLobbyByCode" onclick="event.stopPropagation(); window.chatVoiceManager.openJoinPrivateLobbyModal()" title="Enter Access Code to Join Private Lobby" style="font-size: 0.72rem; padding: 0 0.35rem;">🔑</button>
+                <button class="add-channel-btn" id="btnAddPrivateLobbyChannel" onclick="event.stopPropagation(); window.chatVoiceManager.openPrivateLobbyModal()" title="Create Dedicated Private Lobby Channel">+</button>
               </div>
             </div>
             <div id="textChannelsPrivateLobbies">
@@ -1112,7 +1114,7 @@
             <!-- Category: VOICE CHANNELS -->
             <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
               <span>🔊 VOICE CHANNELS</span>
-              <button class="add-channel-btn" id="btnAddVoiceChannel" onclick="window.chatVoiceManager.openCreateChannelModal('voice')" title="Create Voice Room">+</button>
+              <button class="add-channel-btn" id="btnAddVoiceChannel" onclick="event.stopPropagation(); window.chatVoiceManager.openCreateChannelModal('voice')" title="Create Voice Room">+</button>
             </div>
             <div id="voiceChannelsList">
               <!-- Team Voice Comms injected here -->
@@ -2844,6 +2846,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Discord-Style Floating Context Menu -->
+  <div id="discordContextMenu" class="discord-context-menu"></div>
 
   <!-- Create Channel Modal -->
   <div class="modal-overlay" id="createChannelModal">

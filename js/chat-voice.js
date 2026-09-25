@@ -803,7 +803,20 @@ class ChatVoiceManager {
         const vroom = voiceItem.getAttribute('data-voice');
         this.selectVoiceRoom(vroom);
       }
+
+      // Dismiss context menu if clicking outside
+      if (!e.target.closest('#discordContextMenu') && !e.target.closest('#guildHeaderContainer')) {
+        this.closeContextMenu();
+      }
     });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closeContextMenu();
+      }
+    });
+
+    this.initContextMenu();
 
     // Sticker drawer modal close button
     const btnCloseStickers = document.getElementById('btnCloseStickerDrawer');
@@ -2989,8 +3002,8 @@ class ChatVoiceManager {
           <div class="channel-section-title" style="display: flex; justify-content: space-between; align-items: center; margin: 0.5rem 0 0.4rem 0.5rem;">
             <span>${cat.icon || '📁'} ${cat.name}</span>
             <div class="category-action-group">
-              <button class="add-channel-btn" onclick="window.chatVoiceManager.openCreateChannelModal('${cat.id}')" title="Add Channel to ${cat.name}">+</button>
-              <button class="category-delete-btn" onclick="window.chatVoiceManager.confirmDeleteCategory('${cat.id}')" title="Delete Category ${cat.name}">🗑️</button>
+              <button class="add-channel-btn" onclick="event.stopPropagation(); window.chatVoiceManager.openCreateChannelModal('${cat.id}')" title="Add Channel to ${cat.name}">+</button>
+              <button class="category-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteCategory('${cat.id}')" title="Delete Category ${cat.name}">🗑️</button>
             </div>
           </div>
           <div class="category-channels-list" id="categoryChannels_${cat.id}">
@@ -3024,14 +3037,14 @@ class ChatVoiceManager {
       } else {
         const existing = document.querySelector(`[data-channel="${ch.name}"]`);
         if (!existing) {
-          const containerId = ch.category === 'games' ? 'textChannelsGames' : 'textChannelsList';
+          const containerId = ch.category === 'games' ? 'textChannelsGames' : (ch.category === 'important' ? 'textChannelsImportant' : 'textChannelsList');
           const list = document.getElementById(containerId);
           if (list) {
             const div = document.createElement('div');
             div.className = 'channel-item';
             div.setAttribute('data-channel', ch.name);
             div.innerHTML = `
-              <div class="channel-item-left"><span>${ch.icon || '💬'}</span> #${ch.name}</div>
+              <div class="channel-item-left"><span>${ch.icon || (ch.category === 'important' ? '📌' : '💬')}</span> #${ch.name}</div>
               <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${ch.name}', 'text')" title="Delete Channel">🗑️</button>
             `;
             list.appendChild(div);
@@ -3047,6 +3060,7 @@ class ChatVoiceManager {
 
     const currentVal = select.value;
     select.innerHTML = `
+      <option value="important">📌 IMPORTANT</option>
       <option value="lounge">💬 LOUNGE</option>
       <option value="games">🎮 GAME HUBS & LOBBIES</option>
       <option value="voice">🔊 VOICE CHANNELS</option>
@@ -3281,12 +3295,13 @@ class ChatVoiceManager {
       this.renderCustomCategories();
     } else {
       // Default category handling
+      const chanIcon = isVoice ? '🔊' : (targetCategory === 'important' ? '📌' : (targetCategory === 'games' ? '🎮' : '💬'));
       const newChanObj = {
         name: name,
         type: isVoice ? 'voice' : 'text',
         category: targetCategory,
         topic: topic,
-        icon: isVoice ? '🔊' : (targetCategory === 'games' ? '🎮' : '💬')
+        icon: chanIcon
       };
       this.customChannels.push(newChanObj);
       this.saveCustomChannels();
@@ -3301,6 +3316,18 @@ class ChatVoiceManager {
           div.innerHTML = `
             <div class="channel-item-left"><span>🔊</span> ${name.replace(/-/g, ' ')}</div>
             <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${name}', 'voice')" title="Delete Voice Channel">🗑️</button>
+          `;
+          list.appendChild(div);
+        }
+      } else if (targetCategory === 'important') {
+        const list = document.getElementById('textChannelsImportant');
+        if (list) {
+          const div = document.createElement('div');
+          div.className = 'channel-item';
+          div.setAttribute('data-channel', name);
+          div.innerHTML = `
+            <div class="channel-item-left"><span>📌</span> #${name}</div>
+            <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${name}', 'text')" title="Delete Channel">🗑️</button>
           `;
           list.appendChild(div);
         }
@@ -3566,6 +3593,215 @@ class ChatVoiceManager {
     } catch (e) {
       console.warn('Could not apply deleted channels', e);
     }
+  }
+
+  // --- Discord-Style Context Menu & Header Interactions ---
+  initContextMenu() {
+    const channelsPanel = document.querySelector('.chat-channels-panel');
+    if (channelsPanel) {
+      channelsPanel.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        this.openContextMenu(e);
+      });
+    }
+
+    const guildHeader = document.getElementById('guildHeaderContainer');
+    if (guildHeader) {
+      guildHeader.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleGuildHeaderMenu(guildHeader);
+      });
+    }
+  }
+
+  toggleGuildHeaderMenu(anchorEl) {
+    const menu = document.getElementById('discordContextMenu');
+    if (!menu) return;
+
+    if (menu.style.display === 'block') {
+      this.closeContextMenu();
+      return;
+    }
+
+    const rect = anchorEl.getBoundingClientRect();
+    const fakeEvent = {
+      target: anchorEl,
+      clientX: rect.left + 8,
+      clientY: rect.bottom + 4,
+      preventDefault: () => {}
+    };
+    this.openContextMenu(fakeEvent);
+
+    const chevron = document.getElementById('guildHeaderChevron');
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+  }
+
+  closeContextMenu() {
+    const menu = document.getElementById('discordContextMenu');
+    if (menu) menu.style.display = 'none';
+    const chevron = document.getElementById('guildHeaderChevron');
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+  }
+
+  openContextMenu(e) {
+    const menu = document.getElementById('discordContextMenu');
+    if (!menu) return;
+
+    const channelEl = e.target.closest('[data-channel], [data-voice]');
+    const categoryEl = e.target.closest('.channel-section-title, .custom-category-block');
+    const guildHeader = e.target.closest('#guildHeaderContainer, #guildTitleHeader');
+
+    let html = '';
+
+    if (channelEl) {
+      const isVoice = channelEl.hasAttribute('data-voice');
+      const chanName = isVoice ? channelEl.getAttribute('data-voice') : channelEl.getAttribute('data-channel');
+
+      let categoryId = 'lounge';
+      const customBlock = channelEl.closest('.custom-category-block');
+      if (customBlock) {
+        categoryId = customBlock.getAttribute('data-category-id') || 'lounge';
+      } else if (channelEl.closest('#textChannelsImportant')) {
+        categoryId = 'important';
+      } else if (channelEl.closest('#textChannelsGames')) {
+        categoryId = 'games';
+      } else if (channelEl.closest('#textChannelsTeams')) {
+        categoryId = 'teams';
+      } else if (channelEl.closest('#textChannelsPrivateLobbies')) {
+        categoryId = 'private';
+      } else if (channelEl.closest('#voiceChannelsList')) {
+        categoryId = 'voice';
+      }
+
+      const protectedChans = ['general', 'welcome', 'rules'];
+      const isProtected = protectedChans.includes(chanName);
+
+      html = `
+        <div class="context-menu-header">${isVoice ? '🔊' : '#'} ${chanName}</div>
+        <div class="context-menu-item" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.openCreateChannelModal('${categoryId}')">
+          <span>➕</span> Create Channel
+        </div>
+        <div class="context-menu-item" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.openCategoryModal()">
+          <span>📁</span> Create Category
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.copyToClipboard('${isVoice ? chanName : '#' + chanName}', 'Channel name copied!')">
+          <span>📋</span> Copy Channel Name
+        </div>
+        ${!isProtected ? `
+          <div class="context-menu-item danger" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.confirmDeleteChannel('${chanName}', '${isVoice ? 'voice' : 'text'}')">
+            <span>🗑️</span> Delete Channel
+          </div>
+        ` : `
+          <div class="context-menu-item" style="opacity: 0.45; cursor: not-allowed;" title="Protected system channel">
+            <span>🔒</span> Protected Channel
+          </div>
+        `}
+      `;
+    } else if (categoryEl && !guildHeader) {
+      const customBlock = categoryEl.closest('.custom-category-block') || (categoryEl.classList.contains('custom-category-block') ? categoryEl : null);
+      let catId = 'lounge';
+      let catName = 'LOUNGE';
+      let isCustom = false;
+
+      if (customBlock) {
+        catId = customBlock.getAttribute('data-category-id');
+        const customObj = this.customCategories.find(c => c.id === catId);
+        catName = customObj ? `${customObj.icon || '📁'} ${customObj.name}` : 'CATEGORY';
+        isCustom = true;
+      } else {
+        const text = categoryEl.textContent || '';
+        if (text.includes('IMPORTANT')) { catId = 'important'; catName = '📌 IMPORTANT'; }
+        else if (text.includes('LOUNGE')) { catId = 'lounge'; catName = '💬 LOUNGE'; }
+        else if (text.includes('GAME HUBS')) { catId = 'games'; catName = '🎮 GAME HUBS & LOBBIES'; }
+        else if (text.includes('TEAM')) { catId = 'teams'; catName = '🛡️ TEAM CHANNELS'; }
+        else if (text.includes('PRIVATE')) { catId = 'private'; catName = '🔒 PRIVATE LOBBIES'; }
+        else if (text.includes('VOICE')) { catId = 'voice'; catName = '🔊 VOICE CHANNELS'; }
+      }
+
+      html = `
+        <div class="context-menu-header">${catName}</div>
+        <div class="context-menu-item" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.openCreateChannelModal('${catId}')">
+          <span>➕</span> Create Channel
+        </div>
+        <div class="context-menu-item" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.openCategoryModal()">
+          <span>📁</span> Create Category
+        </div>
+        ${isCustom ? `
+          <div class="context-menu-separator"></div>
+          <div class="context-menu-item danger" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.confirmDeleteCategory('${catId}')">
+            <span>🗑️</span> Delete Category
+          </div>
+        ` : ''}
+      `;
+    } else {
+      // General sidebar space or Guild Header
+      html = `
+        <div class="context-menu-header">🎮 Games Server</div>
+        <div class="context-menu-item" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.openCreateChannelModal('lounge')">
+          <span>➕</span> Create Channel
+        </div>
+        <div class="context-menu-item" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.openCategoryModal()">
+          <span>📁</span> Create Category
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" onclick="window.chatVoiceManager.closeContextMenu(); if (window.app?.openApplyServerModal) window.app.openApplyServerModal();">
+          <span>🚀</span> Apply Front Page Server
+        </div>
+        <div class="context-menu-item" onclick="window.chatVoiceManager.closeContextMenu(); window.chatVoiceManager.copyToClipboard('CustomLobbies // Games Community Hub', 'Server info copied!')">
+          <span>📋</span> Copy Server Info
+        </div>
+      `;
+    }
+
+    menu.innerHTML = html;
+    menu.style.display = 'block';
+
+    const menuWidth = 215;
+    const menuHeight = 220;
+
+    let posX = e.clientX;
+    let posY = e.clientY;
+
+    if (posX + menuWidth > window.innerWidth - 10) {
+      posX = window.innerWidth - menuWidth - 10;
+    }
+    if (posY + menuHeight > window.innerHeight - 10) {
+      posY = window.innerHeight - menuHeight - 10;
+    }
+
+    menu.style.left = `${Math.max(10, posX)}px`;
+    menu.style.top = `${Math.max(10, posY)}px`;
+  }
+
+  copyToClipboard(text, notifyMsg = 'Copied to clipboard!') {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.notifyToast(notifyMsg, 'success');
+      }).catch(() => {
+        this.fallbackCopy(text, notifyMsg);
+      });
+    } else {
+      this.fallbackCopy(text, notifyMsg);
+    }
+  }
+
+  fallbackCopy(text, notifyMsg) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      this.notifyToast(notifyMsg, 'success');
+    } catch (e) {
+      this.notifyToast('Copied!', 'success');
+    }
+    ta.remove();
   }
 }
 
