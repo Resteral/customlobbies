@@ -989,6 +989,14 @@
             <h3 style="font-size: 1.02rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem; color: #fff;" id="guildTitleHeader">
               <span>🎮</span> Games <span style="font-size: 0.75rem; color: var(--text-muted);">▼</span>
             </h3>
+            <div style="display: flex; gap: 0.3rem; align-items: center;">
+              <button class="btn btn-secondary btn-sm" id="btnOpenCreateCategoryModal" onclick="window.chatVoiceManager.openCategoryModal()" title="Create New Category" style="padding: 0.2rem 0.45rem; font-size: 0.72rem; border-radius: 5px;">
+                <span>📁</span> + Cat
+              </button>
+              <button class="btn btn-primary btn-sm" id="btnOpenCreateChannelModal" onclick="window.chatVoiceManager.openCreateChannelModal()" title="Create New Channel" style="padding: 0.2rem 0.45rem; font-size: 0.72rem; border-radius: 5px;">
+                <span>#</span> + Chan
+              </button>
+            </div>
           </div>
 
           <div style="flex: 1; overflow-y: auto; padding-right: 0.2rem;">
@@ -1004,7 +1012,7 @@
             <!-- Category: LOUNGE -->
             <div class="channel-section-title">
               <span>💬 LOUNGE</span>
-              <button class="add-channel-btn" id="btnAddTextChannel" title="Create Text Channel">+</button>
+              <button class="add-channel-btn" id="btnAddTextChannel" onclick="window.chatVoiceManager.openCreateChannelModal('lounge')" title="Create Text Channel">+</button>
             </div>
             <div id="textChannelsList">
               <div class="channel-item active" data-channel="general"><div class="channel-item-left"><span>💬</span> # general</div></div>
@@ -1015,8 +1023,9 @@
             </div>
 
             <!-- Category: GAME HUBS & LOBBIES (Channels for Each Game) -->
-            <div class="channel-section-title" style="margin-top: 0.8rem;">
+            <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
               <span>🎮 GAME HUBS & LOBBIES</span>
+              <button class="add-channel-btn" id="btnAddGameChannel" onclick="window.chatVoiceManager.openCreateChannelModal('games')" title="Create Game Channel">+</button>
             </div>
             <div id="textChannelsGames">
               <div class="channel-item" data-channel="wardogs" title="WARDOGS 33v33v33 Tri-Faction Conquest & Matchmaking (99 Players)"><div class="channel-item-left"><span>🐕</span> # wardogs</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('wardogs')" title="Delete Channel">🗑️</button></div>
@@ -1056,10 +1065,15 @@
               <!-- Dynamically populated from private lobbies -->
             </div>
 
+            <!-- Custom User Created Categories Container -->
+            <div id="customCategoriesContainer">
+              <!-- Custom user categories and their channels dynamically rendered here -->
+            </div>
+
             <!-- Category: VOICE CHANNELS -->
-            <div class="channel-section-title" style="margin-top: 0.8rem;">
+            <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
               <span>🔊 VOICE CHANNELS</span>
-              <button class="add-channel-btn" id="btnAddVoiceChannel" title="Create Voice Room">+</button>
+              <button class="add-channel-btn" id="btnAddVoiceChannel" onclick="window.chatVoiceManager.openCreateChannelModal('voice')" title="Create Voice Room">+</button>
             </div>
             <div id="voiceChannelsList">
               <!-- Team Voice Comms injected here -->
@@ -2794,17 +2808,110 @@
 
   <!-- Create Channel Modal -->
   <div class="modal-overlay" id="createChannelModal">
-    <div class="modal-card">
-      <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;" id="channelModalTitle">Create Text Channel</h3>
-
-      <div class="input-group">
-        <label class="input-label">Channel Name</label>
-        <input type="text" class="input-field" id="newChannelNameInput" placeholder="e.g. strategy-talk">
+    <div class="modal-card" style="max-width: 520px; width: 92%;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin: 0; color: #fff; display: flex; align-items: center; gap: 0.5rem;" id="channelModalTitle">
+          <span>#</span> Create New Channel
+        </h3>
+        <button class="icon-btn-sm" id="btnCloseChannelModal" onclick="window.chatVoiceManager.closeChannelModal()">✕</button>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
-        <button class="btn btn-secondary" id="btnCloseChannelModal">Cancel</button>
-        <button class="btn btn-primary" id="btnSubmitNewChannel">Create</button>
+      <!-- Channel Type Selection: Text vs Voice -->
+      <div class="input-group">
+        <label class="input-label">Channel Type</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem;">
+          <label id="typeLabelText" style="display: flex; align-items: center; gap: 0.65rem; padding: 0.7rem 0.85rem; border-radius: 8px; border: 2px solid var(--accent-cyan); background: rgba(0, 242, 254, 0.1); cursor: pointer; color: #fff; transition: var(--transition-fast);">
+            <input type="radio" name="newChanTypeRadio" id="radioChanTypeText" value="text" checked onchange="window.chatVoiceManager.onChannelTypeRadioChange('text')">
+            <div>
+              <div style="font-weight: 800; font-size: 0.9rem;"># Text Channel</div>
+              <div style="font-size: 0.72rem; color: var(--text-dim);">Chat, strats, scrims & stickers</div>
+            </div>
+          </label>
+          <label id="typeLabelVoice" style="display: flex; align-items: center; gap: 0.65rem; padding: 0.7rem 0.85rem; border-radius: 8px; border: 2px solid var(--border-color); background: rgba(255,255,255,0.03); cursor: pointer; color: #fff; transition: var(--transition-fast);">
+            <input type="radio" name="newChanTypeRadio" id="radioChanTypeVoice" value="voice" onchange="window.chatVoiceManager.onChannelTypeRadioChange('voice')">
+            <div>
+              <div style="font-weight: 800; font-size: 0.9rem;">🔊 Voice Channel</div>
+              <div style="font-size: 0.72rem; color: var(--text-dim);">Live voice comms & squad talk</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Channel Name -->
+      <div class="input-group">
+        <label class="input-label">Channel Name</label>
+        <div style="position: relative;">
+          <span id="channelNamePrefix" style="position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--accent-cyan);">#</span>
+          <input type="text" class="input-field" id="newChannelNameInput" placeholder="e.g. strategy-talk" style="padding-left: 2rem;">
+        </div>
+      </div>
+
+      <!-- Destination Category -->
+      <div class="input-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <label class="input-label" style="margin: 0;">Target Category</label>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="window.chatVoiceManager.openCategoryModal(true)" style="padding: 0.15rem 0.45rem; font-size: 0.72rem;">+ New Category</button>
+        </div>
+        <select class="input-field" id="newChannelCategorySelect">
+          <option value="lounge">💬 LOUNGE</option>
+          <option value="games">🎮 GAME HUBS & LOBBIES</option>
+          <option value="voice">🔊 VOICE CHANNELS</option>
+          <!-- Dynamic custom categories added here -->
+        </select>
+      </div>
+
+      <!-- Optional Topic / Description -->
+      <div class="input-group" id="channelTopicGroup">
+        <label class="input-label">Topic / Purpose (Optional)</label>
+        <input type="text" class="input-field" id="newChannelTopicInput" placeholder="e.g. Lineup guides, smoke trajectories, and tactical coordination">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.4rem;">
+        <button class="btn btn-secondary" onclick="window.chatVoiceManager.closeChannelModal()">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitNewChannel" onclick="window.chatVoiceManager.handleCreateChannel()">Create Channel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Category Modal -->
+  <div class="modal-overlay" id="createCategoryModal">
+    <div class="modal-card" style="max-width: 480px; width: 92%;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin: 0; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+          <span>📁</span> Create New Category
+        </h3>
+        <button class="icon-btn-sm" onclick="window.chatVoiceManager.closeCategoryModal()">✕</button>
+      </div>
+
+      <div style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; padding: 0.75rem 0.9rem; margin-bottom: 1.2rem; font-size: 0.82rem; color: var(--text-dim);">
+        Categories let you organize community channels by game, tournament, scrimmage bracket, or clan topic.
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Category Name</label>
+        <input type="text" class="input-field" id="newCategoryNameInput" placeholder="e.g. TOURNAMENTS or COMMUNITY EVENTS">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Category Icon / Emoji</label>
+        <div style="display: flex; gap: 0.55rem; align-items: center;">
+          <input type="text" class="input-field" id="newCategoryIconInput" value="📁" style="width: 60px; text-align: center; font-size: 1.2rem; padding: 0.5rem;">
+          <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('newCategoryIconInput').value='🏆'">🏆</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('newCategoryIconInput').value='🎯'">🎯</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('newCategoryIconInput').value='🔥'">🔥</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('newCategoryIconInput').value='⚡'">⚡</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('newCategoryIconInput').value='🛡️'">🛡️</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('newCategoryIconInput').value='⚔️'">⚔️</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('newCategoryIconInput').value='🎮'">🎮</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('newCategoryIconInput').value='📚'">📚</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.4rem;">
+        <button class="btn btn-secondary" onclick="window.chatVoiceManager.closeCategoryModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.chatVoiceManager.handleCreateCategory()">Create Category</button>
       </div>
     </div>
   </div>

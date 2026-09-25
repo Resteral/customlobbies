@@ -83,6 +83,14 @@ class ChatVoiceManager {
     this.privateLobbies = [];
     this.loadPrivateLobbies();
 
+    // Custom Categories System
+    this.customCategories = [];
+    this.loadCustomCategories();
+
+    // Custom Channels in Default Categories
+    this.customChannels = [];
+    this.loadCustomChannels();
+
     // Per-Channel Match Lobby & Team Pool Engine
     this.channelLobbies = {};
 
@@ -311,6 +319,9 @@ class ChatVoiceManager {
     this.renderGuildRail();
     this.renderTeamChannels();
     this.renderPrivateLobbies();
+    this.renderCustomCategories();
+    this.renderCustomChannelsInDefaultCategories();
+    this.populateCategoryDropdown();
     this.applyDeletedChannels();
     this.loadPinnedStickers();
     this.loadChatTheme();
@@ -781,14 +792,14 @@ class ChatVoiceManager {
       // Channel Selection Clicks
       const textItem = e.target.closest('[data-channel]');
       if (textItem) {
-        if (e.target.closest('.channel-delete-btn')) return;
+        if (e.target.closest('.channel-delete-btn') || e.target.closest('.category-delete-btn')) return;
         const chan = textItem.getAttribute('data-channel');
         this.switchTextChannel(chan, textItem);
       }
 
       const voiceItem = e.target.closest('[data-voice]');
       if (voiceItem) {
-        if (e.target.closest('.channel-delete-btn')) return;
+        if (e.target.closest('.channel-delete-btn') || e.target.closest('.category-delete-btn')) return;
         const vroom = voiceItem.getAttribute('data-voice');
         this.selectVoiceRoom(vroom);
       }
@@ -841,36 +852,47 @@ class ChatVoiceManager {
     // Modal Create Channel Buttons
     const btnAddText = document.getElementById('btnAddTextChannel');
     const btnAddVoice = document.getElementById('btnAddVoiceChannel');
-    const modal = document.getElementById('createChannelModal');
     const btnCloseModal = document.getElementById('btnCloseChannelModal');
     const btnSubmitModal = document.getElementById('btnSubmitNewChannel');
+    const chanNameInput = document.getElementById('newChannelNameInput');
+    const catNameInput = document.getElementById('newCategoryNameInput');
 
     if (btnAddText) {
       btnAddText.addEventListener('click', () => {
-        this.creatingChannelType = 'text';
-        if (document.getElementById('channelModalTitle')) {
-          document.getElementById('channelModalTitle').textContent = 'Create Text Channel';
-        }
-        if (modal) modal.classList.add('active');
+        this.openCreateChannelModal('lounge', 'text');
       });
     }
 
     if (btnAddVoice) {
       btnAddVoice.addEventListener('click', () => {
-        this.creatingChannelType = 'voice';
-        if (document.getElementById('channelModalTitle')) {
-          document.getElementById('channelModalTitle').textContent = 'Create Voice Channel Room';
-        }
-        if (modal) modal.classList.add('active');
+        this.openCreateChannelModal('voice', 'voice');
       });
     }
 
-    if (btnCloseModal && modal) {
-      btnCloseModal.addEventListener('click', () => modal.classList.remove('active'));
+    if (btnCloseModal) {
+      btnCloseModal.addEventListener('click', () => this.closeChannelModal());
     }
 
     if (btnSubmitModal) {
       btnSubmitModal.addEventListener('click', () => this.handleCreateChannel());
+    }
+
+    if (chanNameInput) {
+      chanNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.handleCreateChannel();
+        }
+      });
+    }
+
+    if (catNameInput) {
+      catNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.handleCreateCategory();
+        }
+      });
     }
 
     // Voice Control Buttons
@@ -2861,53 +2883,468 @@ class ChatVoiceManager {
     }
   }
 
+  // --- CUSTOM CATEGORIES & PERSISTENT CHANNELS SYSTEM ---
+  loadCustomCategories() {
+    try {
+      const saved = localStorage.getItem('cl_custom_categories_v1');
+      if (saved) {
+        this.customCategories = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Unable to load custom categories', e);
+      this.customCategories = [];
+    }
+    if (!Array.isArray(this.customCategories)) {
+      this.customCategories = [];
+    }
+  }
+
+  saveCustomCategories() {
+    try {
+      localStorage.setItem('cl_custom_categories_v1', JSON.stringify(this.customCategories));
+    } catch (e) {
+      console.warn('Unable to save custom categories', e);
+    }
+  }
+
+  loadCustomChannels() {
+    try {
+      const saved = localStorage.getItem('cl_custom_channels_v1');
+      if (saved) {
+        this.customChannels = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Unable to load custom channels', e);
+      this.customChannels = [];
+    }
+    if (!Array.isArray(this.customChannels)) {
+      this.customChannels = [];
+    }
+  }
+
+  saveCustomChannels() {
+    try {
+      localStorage.setItem('cl_custom_channels_v1', JSON.stringify(this.customChannels));
+    } catch (e) {
+      console.warn('Unable to save custom channels', e);
+    }
+  }
+
+  renderCustomCategories() {
+    const container = document.getElementById('customCategoriesContainer');
+    if (!container) return;
+
+    if (!this.customCategories || this.customCategories.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML = this.customCategories.map(cat => {
+      const channelsHtml = (!cat.channels || cat.channels.length === 0)
+        ? `<div style="padding: 0.35rem 0.6rem; font-size: 0.72rem; color: var(--text-dim); font-style: italic;">No channels yet. Click + to add one!</div>`
+        : cat.channels.map(ch => {
+            const isVoice = ch.type === 'voice';
+            const isActive = isVoice ? (this.currentVoiceRoom === ch.name) : (this.currentTextChannel === ch.name);
+            const activeClass = isActive ? 'active' : '';
+
+            if (isVoice) {
+              return `
+                <div class="channel-item ${activeClass}" data-voice="${ch.name}" style="padding: 0.35rem 0.6rem;">
+                  <div class="channel-item-left" style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span>🔊</span>
+                    <span style="font-weight: 600;">${ch.name.replace(/-/g, ' ')}</span>
+                  </div>
+                  <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${ch.name}', 'voice')" title="Delete Voice Channel">🗑️</button>
+                </div>
+              `;
+            } else {
+              return `
+                <div class="channel-item ${activeClass}" data-channel="${ch.name}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.6rem;">
+                  <div class="channel-item-left" style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span style="font-size: 0.9rem;">${ch.icon || '💬'}</span>
+                    <span style="font-weight: 600; color: ${isActive ? '#fff' : 'var(--text-normal)'};">#${ch.name}</span>
+                  </div>
+                  <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${ch.name}', 'text')" title="Delete Channel">🗑️</button>
+                </div>
+              `;
+            }
+          }).join('');
+
+      return `
+        <div class="custom-category-block" data-category-id="${cat.id}" style="margin-top: 0.8rem;">
+          <div class="channel-section-title" style="display: flex; justify-content: space-between; align-items: center; margin: 0.5rem 0 0.4rem 0.5rem;">
+            <span>${cat.icon || '📁'} ${cat.name}</span>
+            <div class="category-action-group">
+              <button class="add-channel-btn" onclick="window.chatVoiceManager.openCreateChannelModal('${cat.id}')" title="Add Channel to ${cat.name}">+</button>
+              <button class="category-delete-btn" onclick="window.chatVoiceManager.confirmDeleteCategory('${cat.id}')" title="Delete Category ${cat.name}">🗑️</button>
+            </div>
+          </div>
+          <div class="category-channels-list" id="categoryChannels_${cat.id}">
+            ${channelsHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderCustomChannelsInDefaultCategories() {
+    if (!this.customChannels || this.customChannels.length === 0) return;
+
+    this.customChannels.forEach(ch => {
+      if (ch.type === 'voice') {
+        const existing = document.querySelector(`[data-voice="${ch.name}"]`);
+        if (!existing) {
+          const list = document.getElementById('voiceChannelsList');
+          if (list) {
+            const div = document.createElement('div');
+            div.className = 'channel-item';
+            div.setAttribute('data-voice', ch.name);
+            div.style.marginTop = '0.35rem';
+            div.innerHTML = `
+              <div class="channel-item-left"><span>🔊</span> ${ch.name.replace(/-/g, ' ')}</div>
+              <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${ch.name}', 'voice')" title="Delete Voice Channel">🗑️</button>
+            `;
+            list.appendChild(div);
+          }
+        }
+      } else {
+        const existing = document.querySelector(`[data-channel="${ch.name}"]`);
+        if (!existing) {
+          const containerId = ch.category === 'games' ? 'textChannelsGames' : 'textChannelsList';
+          const list = document.getElementById(containerId);
+          if (list) {
+            const div = document.createElement('div');
+            div.className = 'channel-item';
+            div.setAttribute('data-channel', ch.name);
+            div.innerHTML = `
+              <div class="channel-item-left"><span>${ch.icon || '💬'}</span> #${ch.name}</div>
+              <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${ch.name}', 'text')" title="Delete Channel">🗑️</button>
+            `;
+            list.appendChild(div);
+          }
+        }
+      }
+    });
+  }
+
+  populateCategoryDropdown() {
+    const select = document.getElementById('newChannelCategorySelect');
+    if (!select) return;
+
+    const currentVal = select.value;
+    select.innerHTML = `
+      <option value="lounge">💬 LOUNGE</option>
+      <option value="games">🎮 GAME HUBS & LOBBIES</option>
+      <option value="voice">🔊 VOICE CHANNELS</option>
+    `;
+
+    if (this.customCategories && this.customCategories.length > 0) {
+      this.customCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat.id;
+        opt.textContent = `${cat.icon || '📁'} ${cat.name}`;
+        select.appendChild(opt);
+      });
+    }
+
+    if (currentVal) {
+      select.value = currentVal;
+    }
+  }
+
+  openCreateChannelModal(preselectedCategory = 'lounge', defaultType = null) {
+    this.populateCategoryDropdown();
+    const select = document.getElementById('newChannelCategorySelect');
+    if (select) {
+      if (preselectedCategory) select.value = preselectedCategory;
+    }
+
+    const typeToSet = defaultType ? defaultType : (preselectedCategory === 'voice' ? 'voice' : 'text');
+    this.onChannelTypeRadioChange(typeToSet);
+
+    const inputName = document.getElementById('newChannelNameInput');
+    if (inputName) inputName.value = '';
+
+    const inputTopic = document.getElementById('newChannelTopicInput');
+    if (inputTopic) inputTopic.value = '';
+
+    const modal = document.getElementById('createChannelModal');
+    if (modal) modal.classList.add('active');
+
+    setTimeout(() => { if (inputName) inputName.focus(); }, 100);
+  }
+
+  closeChannelModal() {
+    const modal = document.getElementById('createChannelModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  onChannelTypeRadioChange(type) {
+    this.creatingChannelType = type;
+    const isVoice = type === 'voice';
+
+    const radioText = document.getElementById('radioChanTypeText');
+    const radioVoice = document.getElementById('radioChanTypeVoice');
+    if (radioText) radioText.checked = !isVoice;
+    if (radioVoice) radioVoice.checked = isVoice;
+
+    const labelText = document.getElementById('typeLabelText');
+    const labelVoice = document.getElementById('typeLabelVoice');
+    if (labelText && labelVoice) {
+      if (isVoice) {
+        labelVoice.style.border = '2px solid var(--accent-cyan)';
+        labelVoice.style.background = 'rgba(0, 242, 254, 0.1)';
+        labelText.style.border = '2px solid var(--border-color)';
+        labelText.style.background = 'rgba(255,255,255,0.03)';
+      } else {
+        labelText.style.border = '2px solid var(--accent-cyan)';
+        labelText.style.background = 'rgba(0, 242, 254, 0.1)';
+        labelVoice.style.border = '2px solid var(--border-color)';
+        labelVoice.style.background = 'rgba(255,255,255,0.03)';
+      }
+    }
+
+    const prefix = document.getElementById('channelNamePrefix');
+    if (prefix) prefix.textContent = isVoice ? '🔊' : '#';
+
+    const title = document.getElementById('channelModalTitle');
+    if (title) title.innerHTML = `<span>${isVoice ? '🔊' : '#'}</span> Create New ${isVoice ? 'Voice' : 'Text'} Channel`;
+  }
+
+  openCategoryModal(fromChannelModal = false) {
+    if (fromChannelModal) {
+      this.closeChannelModal();
+      this._returnToChannelModalAfterCategory = true;
+    } else {
+      this._returnToChannelModalAfterCategory = false;
+    }
+
+    const nameInput = document.getElementById('newCategoryNameInput');
+    if (nameInput) nameInput.value = '';
+
+    const iconInput = document.getElementById('newCategoryIconInput');
+    if (iconInput) iconInput.value = '📁';
+
+    const modal = document.getElementById('createCategoryModal');
+    if (modal) modal.classList.add('active');
+
+    setTimeout(() => { if (nameInput) nameInput.focus(); }, 100);
+  }
+
+  closeCategoryModal() {
+    const modal = document.getElementById('createCategoryModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  handleCreateCategory() {
+    const nameInput = document.getElementById('newCategoryNameInput');
+    if (!nameInput) return;
+    const rawName = nameInput.value.trim().toUpperCase();
+    if (!rawName) {
+      this.notifyToast('Please provide a name for the category.', 'warning');
+      return;
+    }
+
+    const iconInput = document.getElementById('newCategoryIconInput');
+    const icon = iconInput ? (iconInput.value.trim() || '📁') : '📁';
+
+    const id = 'cat-' + rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    if (this.customCategories.some(c => c.id === id)) {
+      this.notifyToast(`A category named "${rawName}" already exists.`, 'warning');
+      return;
+    }
+
+    const newCategory = {
+      id: id,
+      name: rawName,
+      icon: icon,
+      channels: []
+    };
+
+    this.customCategories.push(newCategory);
+    this.saveCustomCategories();
+    this.renderCustomCategories();
+    this.populateCategoryDropdown();
+    this.closeCategoryModal();
+
+    this.notifyToast(`📁 Category "${icon} ${rawName}" created!`, 'success');
+
+    if (this._returnToChannelModalAfterCategory) {
+      this._returnToChannelModalAfterCategory = false;
+      this.openCreateChannelModal(id);
+    }
+  }
+
+  confirmDeleteCategory(catId) {
+    const cat = this.customCategories.find(c => c.id === catId);
+    if (!cat) return;
+
+    const count = cat.channels ? cat.channels.length : 0;
+    const msg = count > 0
+      ? `Are you sure you want to permanently delete category "${cat.name}" and all its ${count} channels?\nThis action cannot be undone.`
+      : `Are you sure you want to delete category "${cat.name}"?`;
+
+    const confirmed = confirm(msg);
+    if (!confirmed) return;
+
+    this.deleteCategory(catId);
+  }
+
+  deleteCategory(catId) {
+    const cat = this.customCategories.find(c => c.id === catId);
+    if (!cat) return;
+
+    // Delete all channels inside this category
+    if (Array.isArray(cat.channels)) {
+      cat.channels.forEach(ch => {
+        if (ch.type === 'voice') {
+          if (this.currentVoiceRoom === ch.name) {
+            this.currentVoiceRoom = null;
+            const badge = document.getElementById('voiceStatusBadge');
+            if (badge && badge.textContent === 'Connected') {
+              this.toggleVoiceConnection();
+            }
+          }
+        } else {
+          if (this.textMessages && this.textMessages[ch.name]) {
+            delete this.textMessages[ch.name];
+          }
+          if (this.currentTextChannel === ch.name) {
+            this.switchTextChannel('general');
+          }
+        }
+      });
+    }
+
+    this.customCategories = this.customCategories.filter(c => c.id !== catId);
+    this.saveCustomCategories();
+    this.renderCustomCategories();
+    this.populateCategoryDropdown();
+
+    this.notifyToast(`🗑️ Category "${cat.name}" deleted.`, 'info');
+  }
+
   handleCreateChannel() {
     const input = document.getElementById('newChannelNameInput');
     if (!input) return;
-    const name = input.value.trim().toLowerCase().replace(/\s+/g, '-');
-    if (!name) return;
+    const rawName = input.value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9_-]/g, '');
+    if (!rawName) {
+      this.notifyToast('Please provide a channel name.', 'warning');
+      return;
+    }
 
-    // Un-delete if this channel name was previously deleted
+    const name = rawName;
+    const isVoice = this.creatingChannelType === 'voice';
+    const catSelect = document.getElementById('newChannelCategorySelect');
+    const targetCategory = catSelect ? catSelect.value : 'lounge';
+    const topicInput = document.getElementById('newChannelTopicInput');
+    const topic = topicInput ? topicInput.value.trim() : '';
+
+    // Un-delete if previously deleted
     try {
       let deleted = JSON.parse(localStorage.getItem('cl_deleted_channels_v1') || '[]');
       deleted = deleted.filter(n => n !== name);
       localStorage.setItem('cl_deleted_channels_v1', JSON.stringify(deleted));
     } catch (e) {}
 
-    if (this.creatingChannelType === 'text') {
-      const list = document.getElementById('textChannelsList');
-      if (list) {
-        const div = document.createElement('div');
-        div.className = 'channel-item';
-        div.setAttribute('data-channel', name);
-        div.innerHTML = `
-          <div class="channel-item-left"><span>💬</span> #${name}</div>
-          <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${name}')" title="Delete Channel">🗑️</button>
-        `;
-        list.appendChild(div);
+    // Check if targetCategory is a custom category
+    const customCat = this.customCategories.find(c => c.id === targetCategory);
+
+    if (customCat) {
+      if (!Array.isArray(customCat.channels)) customCat.channels = [];
+      if (customCat.channels.some(ch => ch.name === name)) {
+        this.notifyToast(`Channel #${name} already exists in ${customCat.name}.`, 'warning');
+        return;
       }
-      this.textMessages[name] = [
-        { id: Date.now(), author: 'System', text: `Welcome to #${name}!`, time: 'Just now', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' }
-      ];
+      customCat.channels.push({
+        id: name,
+        name: name,
+        type: isVoice ? 'voice' : 'text',
+        topic: topic || `Discussion in ${customCat.name}`,
+        icon: isVoice ? '🔊' : '💬'
+      });
+      this.saveCustomCategories();
+      this.renderCustomCategories();
+    } else {
+      // Default category handling
+      const newChanObj = {
+        name: name,
+        type: isVoice ? 'voice' : 'text',
+        category: targetCategory,
+        topic: topic,
+        icon: isVoice ? '🔊' : (targetCategory === 'games' ? '🎮' : '💬')
+      };
+      this.customChannels.push(newChanObj);
+      this.saveCustomChannels();
+
+      if (isVoice) {
+        const list = document.getElementById('voiceChannelsList');
+        if (list) {
+          const div = document.createElement('div');
+          div.className = 'channel-item';
+          div.setAttribute('data-voice', name);
+          div.style.marginTop = '0.35rem';
+          div.innerHTML = `
+            <div class="channel-item-left"><span>🔊</span> ${name.replace(/-/g, ' ')}</div>
+            <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${name}', 'voice')" title="Delete Voice Channel">🗑️</button>
+          `;
+          list.appendChild(div);
+        }
+      } else if (targetCategory === 'games') {
+        const list = document.getElementById('textChannelsGames');
+        if (list) {
+          const div = document.createElement('div');
+          div.className = 'channel-item';
+          div.setAttribute('data-channel', name);
+          div.innerHTML = `
+            <div class="channel-item-left"><span>🎮</span> #${name}</div>
+            <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${name}', 'text')" title="Delete Channel">🗑️</button>
+          `;
+          list.appendChild(div);
+        }
+        if (!this.channelGameMap[name]) {
+          this.channelGameMap[name] = {
+            game: name.toUpperCase(),
+            icon: '🎮',
+            topic: topic || `${name.toUpperCase()} Matchmaking Hub & Scrims`,
+            maxPerTeam: 5,
+            map: 'Standard'
+          };
+        }
+      } else {
+        const list = document.getElementById('textChannelsList');
+        if (list) {
+          const div = document.createElement('div');
+          div.className = 'channel-item';
+          div.setAttribute('data-channel', name);
+          div.innerHTML = `
+            <div class="channel-item-left"><span>💬</span> #${name}</div>
+            <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${name}', 'text')" title="Delete Channel">🗑️</button>
+          `;
+          list.appendChild(div);
+        }
+      }
+    }
+
+    if (!isVoice) {
+      if (!this.textMessages[name]) {
+        this.textMessages[name] = [
+          {
+            id: Date.now(),
+            author: 'CustomLobbiesBot',
+            text: `Welcome to <b>#${name}</b>! ${topic ? 'Topic: ' + topic : 'Feel free to chat and share strats.'}`,
+            time: 'Just now',
+            avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+          }
+        ];
+      }
       this.switchTextChannel(name);
     } else {
-      const list = document.getElementById('voiceChannelsList');
-      if (list) {
-        const div = document.createElement('div');
-        div.className = 'channel-item';
-        div.setAttribute('data-voice', name);
-        div.innerHTML = `
-          <div class="channel-item-left"><span>🔊</span> ${name.replace('-', ' ')}</div>
-          <button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('${name}', 'voice')" title="Delete Voice Channel">🗑️</button>
-        `;
-        list.appendChild(div);
-      }
       this.selectVoiceRoom(name);
     }
 
-    input.value = '';
-    const modal = document.getElementById('createChannelModal');
-    if (modal) modal.classList.remove('active');
+    this.closeChannelModal();
+    this.notifyToast(`🎉 Channel ${isVoice ? '🔊 ' : '#'}${name} is live!`, 'success');
   }
 
   confirmDeleteCurrentChannel() {
@@ -2947,8 +3384,33 @@ class ChatVoiceManager {
       console.warn('Could not record deleted channel in localStorage', e);
     }
 
+    // 2. Remove from Custom Categories if present
+    if (this.customCategories && this.customCategories.length > 0) {
+      let changed = false;
+      this.customCategories.forEach(cat => {
+        if (Array.isArray(cat.channels)) {
+          const before = cat.channels.length;
+          cat.channels = cat.channels.filter(ch => ch.name !== channelName && ch.id !== channelName);
+          if (cat.channels.length !== before) changed = true;
+        }
+      });
+      if (changed) {
+        this.saveCustomCategories();
+        this.renderCustomCategories();
+      }
+    }
+
+    // 3. Remove from Custom Channels in default categories if present
+    if (this.customChannels && this.customChannels.length > 0) {
+      const before = this.customChannels.length;
+      this.customChannels = this.customChannels.filter(ch => ch.name !== channelName);
+      if (this.customChannels.length !== before) {
+        this.saveCustomChannels();
+      }
+    }
+
     if (!isVoice) {
-      // 2. Remove from Team Channels if present
+      // 4. Remove from Team Channels if present
       if (this.teamChannels && this.teamChannels.length > 0) {
         const initialCount = this.teamChannels.length;
         this.teamChannels = this.teamChannels.filter(t => t.channelName !== channelName && t.id !== channelName);
@@ -2958,7 +3420,7 @@ class ChatVoiceManager {
         }
       }
 
-      // 3. Remove from Private Lobbies if present
+      // 5. Remove from Private Lobbies if present
       if (this.privateLobbies && this.privateLobbies.length > 0) {
         const initialCount = this.privateLobbies.length;
         this.privateLobbies = this.privateLobbies.filter(l => l.channelName !== channelName && l.id !== channelName);
@@ -2968,21 +3430,21 @@ class ChatVoiceManager {
         }
       }
 
-      // 4. Remove from channelGameMap if present
+      // 6. Remove from channelGameMap if present
       if (this.channelGameMap && this.channelGameMap[channelName]) {
         delete this.channelGameMap[channelName];
       }
 
-      // 5. Remove chat messages
+      // 7. Remove chat messages
       if (this.textMessages && this.textMessages[channelName]) {
         delete this.textMessages[channelName];
       }
 
-      // 6. Remove DOM element
+      // 8. Remove DOM element
       const el = document.querySelector(`[data-channel="${channelName}"]`);
       if (el) el.remove();
 
-      // 7. If currently on this channel, navigate back to general
+      // 9. If currently on this channel, navigate back to general
       if (this.currentTextChannel === channelName) {
         this.switchTextChannel('general');
       }
@@ -3063,6 +3525,16 @@ class ChatVoiceManager {
           }
 
           // Clean memory state
+          if (this.customCategories) {
+            this.customCategories.forEach(cat => {
+              if (Array.isArray(cat.channels)) {
+                cat.channels = cat.channels.filter(ch => ch.name !== name && ch.id !== name);
+              }
+            });
+          }
+          if (this.customChannels) {
+            this.customChannels = this.customChannels.filter(ch => ch.name !== name);
+          }
           if (this.teamChannels) {
             this.teamChannels = this.teamChannels.filter(t => t.channelName !== name && t.voiceRoom !== name);
           }

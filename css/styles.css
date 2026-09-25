@@ -523,10 +523,41 @@ div:has(.dropdown-wrapper:focus-within) {
   color: var(--text-muted);
   font-size: 1.1rem;
   cursor: pointer;
+  line-height: 1;
+  padding: 0.1rem 0.25rem;
 }
 
 .add-channel-btn:hover {
   color: var(--accent-cyan);
+}
+
+.category-action-group {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.category-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0.1rem 0.25rem;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  line-height: 1;
+}
+
+.channel-section-title:hover .category-delete-btn {
+  opacity: 0.75;
+}
+
+.category-delete-btn:hover {
+  opacity: 1 !important;
+  color: var(--accent-red) !important;
+  transform: scale(1.15);
 }
 
 .channel-item {
