@@ -1,7 +1,7 @@
 /* CustomLobbies.com - Community Chat & WebRTC Voice Channels Manager */
 class ChatVoiceManager {
   constructor() {
-    this.activeGuild = 'games';
+    this.activeGuild = 'all';
     this.currentTextChannel = 'general';
     this.currentVoiceRoom = null;
     this.isMicMuted = false;
@@ -39,30 +39,31 @@ class ChatVoiceManager {
     this.triviaScore = 0;
 
     const defaultGuilds = {
-      'home': { name: 'Direct Messages & Friends', icon: '💬' },
-      'games': { name: 'CustomLobbies Prime Hub', icon: '🎮' },
-      'cs2': { name: 'CS2 Premier 128-Tick Scrims', icon: '🎯' },
-      'valorant': { name: 'Valorant Radiant Arena', icon: '⚡' },
-      'wardogs': { name: 'WARDOGS 33v33v33 Tri-Faction', icon: '🐕' },
-      'tournaments': { name: 'Competitive Cups & Brackets', icon: '🏆' }
+      'all': { name: 'CustomLobbies Hub (All Games)', icon: '🎮', game: 'All' },
+      'cs2': { name: 'Counter-Strike 2', icon: '🎯', game: 'Counter-Strike 2' },
+      'valorant': { name: 'Valorant', icon: '⚡', game: 'Valorant' },
+      'wardogs': { name: 'WARDOGS (33v33v33)', icon: '🐕', game: 'WARDOGS' },
+      'marvel-rivals': { name: 'Marvel Rivals', icon: '💥', game: 'Marvel Rivals' },
+      'rocket-league': { name: 'Rocket League', icon: '🏎️', game: 'Rocket League' },
+      'deadlock': { name: 'Deadlock', icon: '🔮', game: 'Deadlock' },
+      'the-finals': { name: 'The Finals', icon: '🏆', game: 'The Finals' },
+      'slapshot': { name: 'Slapshot: Rebound', icon: '🏒', game: 'Slapshot: Rebound' },
+      'empulse': { name: 'Empulse', icon: '🚀', game: 'Empulse' },
+      'rematch': { name: 'REMATCH', icon: '⚽', game: 'REMATCH' },
+      'r6-siege': { name: 'Rainbow Six Siege', icon: '🛡️', game: 'Rainbow Six Siege' },
+      'dota2': { name: 'Dota 2', icon: '⚔️', game: 'Dota 2' },
+      'overwatch2': { name: 'Overwatch 2', icon: '🤖', game: 'Overwatch 2' },
+      'arkheron': { name: 'Arkheron', icon: '🏰', game: 'Arkheron' }
     };
     
-    // Load from admin settings if present, cleansing old placeholder servers
-    const savedGuilds = localStorage.getItem('cl_admin_servers');
-    let loadedGuilds = null;
+    this.guilds = { ...defaultGuilds };
     try {
+      const savedGuilds = localStorage.getItem('cl_admin_servers');
       if (savedGuilds) {
-        loadedGuilds = JSON.parse(savedGuilds);
+        const parsed = JSON.parse(savedGuilds);
+        Object.assign(this.guilds, parsed);
       }
     } catch (e) {}
-
-    if (!loadedGuilds || loadedGuilds['hotgirl'] || loadedGuilds['debate'] || !loadedGuilds['games'] || !loadedGuilds['home']) {
-      loadedGuilds = defaultGuilds;
-      try {
-        localStorage.setItem('cl_admin_servers', JSON.stringify(defaultGuilds));
-      } catch (e) {}
-    }
-    this.guilds = loadedGuilds;
 
     this.availableStickers = [
       { id: 'fire', emoji: '🔥', name: 'Fire Play' },
@@ -368,34 +369,28 @@ class ChatVoiceManager {
 
     const purchaseBtn = document.getElementById('serverPurchaseBtnContainer');
 
-    // 1. Home / Direct Messages & Friends Icon at Top
-    const homeEl = document.createElement('div');
-    homeEl.className = `server-icon ${this.activeGuild === 'home' ? 'active' : ''}`;
-    homeEl.setAttribute('data-guild', 'home');
-    homeEl.title = 'Direct Messages & Friends';
-    homeEl.innerHTML = `<span>💬</span>`;
-    rail.insertBefore(homeEl, purchaseBtn);
-
-    // Divider after Home
-    const div1 = document.createElement('div');
-    div1.className = 'server-rail-divider';
-    rail.insertBefore(div1, purchaseBtn);
-
-    // 2. Gaming Guilds / Scrim Hubs
+    // Render every game server icon
     for (const [key, guild] of Object.entries(this.guilds)) {
-      if (key === 'home') continue;
       const el = document.createElement('div');
       el.className = `server-icon ${this.activeGuild === key ? 'active' : ''}`;
       el.setAttribute('data-guild', key);
       el.title = guild.name;
       el.innerHTML = `<span>${guild.icon}</span>`;
-      rail.insertBefore(el, purchaseBtn);
+      if (purchaseBtn) {
+        rail.insertBefore(el, purchaseBtn);
+      } else {
+        rail.appendChild(el);
+      }
     }
 
-    // Divider before actions
-    const div2 = document.createElement('div');
-    div2.className = 'server-rail-divider';
-    rail.insertBefore(div2, purchaseBtn);
+    // Divider before add/discord actions
+    const div = document.createElement('div');
+    div.className = 'server-rail-divider';
+    if (purchaseBtn) {
+      rail.insertBefore(div, purchaseBtn);
+    } else {
+      rail.appendChild(div);
+    }
   }
 
   loadChatTheme() {
@@ -974,12 +969,47 @@ class ChatVoiceManager {
   switchGuild(guildId, element) {
     this.activeGuild = guildId;
     document.querySelectorAll('.server-icon').forEach(el => el.classList.remove('active'));
-    if (element) element.classList.add('active');
+    if (element) {
+      element.classList.add('active');
+    } else {
+      const el = document.querySelector(`.server-icon[data-guild="${guildId}"]`);
+      if (el) el.classList.add('active');
+    }
 
-    const guildInfo = this.guilds[guildId] || { name: 'Games', icon: '🎮' };
+    const guildInfo = this.guilds[guildId] || { name: 'Games', icon: '🎮', game: 'All' };
     const header = document.getElementById('guildTitleHeader');
     if (header) {
       header.innerHTML = `<span>${guildInfo.icon}</span> ${guildInfo.name} <span style="font-size: 0.75rem; color: var(--text-muted);">▼</span>`;
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
+
+    const titlebarChannel = document.getElementById('desktopTitlebarChannel');
+    if (titlebarChannel) {
+      titlebarChannel.textContent = `${guildInfo.icon} ${guildInfo.name} | #${this.currentTextChannel}`;
+    }
+
+    const actionBar = document.getElementById('channelGameActionBar');
+    if (guildId !== 'all' && guildInfo.game) {
+      const gTitle = document.getElementById('channelGameTitle');
+      const gIcon = document.getElementById('channelGameIcon');
+      const gDetail = document.getElementById('channelGameDetail');
+      const gBadge = document.getElementById('channelGameBadge');
+      const topic = document.getElementById('currentChannelTopic');
+
+      if (gTitle) gTitle.textContent = guildInfo.game;
+      if (gIcon) gIcon.textContent = guildInfo.icon;
+      if (gDetail) gDetail.textContent = `Dedicated ${guildInfo.game} Scrims, Snake Drafts & 128-Tick Nodes`;
+      if (gBadge) gBadge.textContent = 'Server Game Hub';
+      if (topic) topic.textContent = `Official ${guildInfo.game} community chat & scrimmage hub`;
+      if (actionBar) actionBar.style.display = 'flex';
+      this.notifyToast(`🎮 Switched to ${guildInfo.name} server!`, 'info');
+    } else {
+      if (actionBar) actionBar.style.display = 'none';
+      const topic = document.getElementById('currentChannelTopic');
+      if (topic) topic.textContent = 'General community chat & CustomLobbies discussion';
     }
   }
 

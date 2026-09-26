@@ -940,16 +940,31 @@
       <div class="discord-hub-container">
         <!-- 1. Left Vertical Server Rail Bar -->
         <div class="discord-server-rail" id="discordServerRailContainer">
-          <!-- Servers will be dynamically rendered here by app.js -->
-          <div class="server-icon" title="Purchase Team Chat Server (500 CL-Points)" onclick="window.app.purchaseTeamServer()" style="background: rgba(0, 242, 254, 0.1); border: 1px dashed var(--accent-cyan); color: var(--accent-cyan); margin-bottom: auto; margin-top: 0.5rem;" id="serverPurchaseBtnContainer">
+          <div class="server-icon active" data-guild="all" title="CustomLobbies Hub (All Games)"><span>🎮</span></div>
+          <div class="server-icon" data-guild="cs2" title="Counter-Strike 2"><span>🎯</span></div>
+          <div class="server-icon" data-guild="valorant" title="Valorant"><span>⚡</span></div>
+          <div class="server-icon" data-guild="wardogs" title="WARDOGS (33v33v33)"><span>🐕</span></div>
+          <div class="server-icon" data-guild="marvel-rivals" title="Marvel Rivals"><span>💥</span></div>
+          <div class="server-icon" data-guild="rocket-league" title="Rocket League"><span>🏎️</span></div>
+          <div class="server-icon" data-guild="deadlock" title="Deadlock"><span>🔮</span></div>
+          <div class="server-icon" data-guild="the-finals" title="The Finals"><span>🏆</span></div>
+          <div class="server-icon" data-guild="slapshot" title="Slapshot: Rebound"><span>🏒</span></div>
+          <div class="server-icon" data-guild="empulse" title="Empulse"><span>🚀</span></div>
+          <div class="server-icon" data-guild="rematch" title="REMATCH"><span>⚽</span></div>
+          <div class="server-icon" data-guild="r6-siege" title="Rainbow Six Siege"><span>🛡️</span></div>
+          <div class="server-icon" data-guild="dota2" title="Dota 2"><span>⚔️</span></div>
+          <div class="server-icon" data-guild="overwatch2" title="Overwatch 2"><span>🤖</span></div>
+          <div class="server-icon" data-guild="arkheron" title="Arkheron"><span>🏰</span></div>
+          <div class="server-rail-divider"></div>
+          <div class="server-icon" title="Purchase Team Chat Server (500 CL-Points)" onclick="window.app.purchaseTeamServer()" style="background: rgba(0, 242, 254, 0.1); border: 1px dashed var(--accent-cyan); color: var(--accent-cyan);" id="serverPurchaseBtnContainer">
             <span>➕</span>
           </div>
 
-          <a class="server-icon" href="https://discord.gg/fqy84VqVzv" target="_blank" rel="noopener" title="Join Official Discord Server (discord.gg/fqy84VqVzv)" style="background: rgba(88, 101, 242, 0.25); border: 1px solid #5865F2; color: #fff; text-decoration: none; display: flex; align-items: center; justify-content: center; margin-top: auto; margin-bottom: 0.5rem;" id="serverDiscordLinkBtn">
+          <a class="server-icon" href="https://discord.gg/fqy84VqVzv" target="_blank" rel="noopener" title="Join Official Discord Server (discord.gg/fqy84VqVzv)" style="background: rgba(88, 101, 242, 0.25); border: 1px solid #5865F2; color: #fff; text-decoration: none;" id="serverDiscordLinkBtn">
             <span style="font-size: 1.25rem;">💬</span>
           </a>
 
-          <div style="margin-top: 0; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;" id="serverBoostBadgeContainer">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;" id="serverBoostBadgeContainer">
             <div class="server-boost-badge" title="Server Level 2 Boost Goal">
               <span>🚀</span>
               <span style="font-size: 0.65rem; font-weight: 800; color: #ff73fa;">4/36</span>

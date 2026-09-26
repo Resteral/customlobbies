@@ -1518,7 +1518,14 @@ body.obs-transparent-mode {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.65rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.discord-server-rail::-webkit-scrollbar {
+  display: none;
 }
 
 .server-rail-divider {
@@ -1527,6 +1534,23 @@ body.obs-transparent-mode {
   background: rgba(255, 255, 255, 0.14);
   margin: 0.15rem 0;
   border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.server-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .server-icon::before {
