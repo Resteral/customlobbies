@@ -381,46 +381,6 @@
         </button>
       </div>
 
-      <!-- Dashboard Sticker & Avatar Showcase Card -->
-      <div id="dashboardStickerShowcaseCard" class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(20, 24, 36, 0.9), rgba(12, 14, 22, 0.95)); border: 1px solid rgba(0, 242, 254, 0.3);">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
-          <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <span style="font-size: 1.2rem;">🎨</span>
-            <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--accent-cyan);">My Dashboard Sticker & Avatar Showcase</h3>
-          </div>
-          <button class="btn btn-secondary btn-sm" onclick="document.querySelector('[data-tab=community-view]').click(); window.chatVoiceManager.toggleStickerDrawer();">
-            ✨ Open Sticker Drawer
-          </button>
-        </div>
-        <div id="dashboardStickerShowcaseGrid" style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; min-height: 50px;">
-          <!-- Injected via chat-voice.js -->
-        </div>
-      </div>
-
-      <!-- Featured Tournament Bracket Showcase Card on Dashboard -->
-      <div id="dashboardLiveBracketShowcaseCard" class="card" style="margin-bottom: 1.5rem; border-color: var(--accent-gold); background: linear-gradient(135deg, rgba(25, 20, 10, 0.9), rgba(12, 10, 5, 0.95)); border: 1px solid rgba(255, 215, 0, 0.35);">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
-          <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <span style="font-size: 1.3rem;">🏆</span>
-            <div>
-              <h3 style="font-size: 1.1rem; font-weight: 900; color: var(--accent-gold); margin: 0;">Live Tournament Bracket Showcase</h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.1rem 0 0 0;">View & track real-time esports tournament bracket trees directly on the site</p>
-            </div>
-          </div>
-          <div style="display: flex; gap: 0.4rem;">
-            <button class="btn btn-primary btn-sm" onclick="window.tournamentsStoreEngine.openConfiguratorModal()">
-              <span>⚡</span> Configure Bracket
-            </button>
-            <button class="btn btn-secondary btn-sm" onclick="document.querySelector('[data-tab=tournaments-view]').click();">
-              <span>🏆</span> All Brackets
-            </button>
-          </div>
-        </div>
-        <div id="dashboardBracketTreeWidget">
-          <!-- Injected via tournaments-store.js -->
-        </div>
-      </div>
-
       <!-- Queue Status Card (Hidden until joining queue) -->
       <div id="queueStatusCard" class="card" style="display: none; margin-bottom: 1.5rem; border-color: var(--accent-cyan);">
         <div style="display: flex; align-items: center; justify-content: space-between;">
