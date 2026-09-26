@@ -633,7 +633,7 @@
                 </h2>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">Find competitive teammates, scrim partners, or casual squad mates instantly</p>
               </div>
-              <button class="btn btn-primary" onclick="alert('⚡ POST LFG CALLOUT!\n\nYour LFG squad request was posted to the Global Gamers Wall and dispatched to Discord!')">
+              <button class="btn btn-primary" onclick="window.app.promptPostLFGCallout()">
                 ➕ Post LFG Callout
               </button>
             </div>
@@ -643,11 +643,13 @@
               <div>
                 <label class="input-label">Select Game</label>
                 <select class="input-field" id="lfgGameFilter">
-                  <option value="all">All Games</option>
                   <option value="cs2">Counter-Strike 2</option>
                   <option value="valorant">Valorant</option>
-                  <option value="dota2">Dota 2</option>
+                  <option value="wardogs">WARDOGS</option>
+                  <option value="marvelrivals">Marvel Rivals</option>
                   <option value="rocketleague">Rocket League</option>
+                  <option value="deadlock">Deadlock</option>
+                  <option value="all">All Games</option>
                 </select>
               </div>
 
@@ -663,11 +665,11 @@
               <div>
                 <label class="input-label">Required Role</label>
                 <select class="input-field" id="lfgRoleFilter">
-                  <option value="any">Any Role</option>
-                  <option value="entry">Entry Fragger</option>
+                  <option value="entry">Entry Fragger / Vanguard</option>
                   <option value="awp">AWPer / Sniper</option>
                   <option value="igl">IGL / Shotcaller</option>
                   <option value="support">Support / Smoke</option>
+                  <option value="any">Any Role</option>
                 </select>
               </div>
 
@@ -692,10 +694,10 @@
 
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem;">
               <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <button class="btn btn-secondary btn-sm" onclick="alert('🎥 CLIP ATTACHED!\n\nAttached latest 30s Stream Studio highlight clip to post.')">🎥 Attach Clip</button>
-                <button class="btn btn-secondary btn-sm" onclick="alert('📷 SCREENSHOT ATTACHED!\n\nAttached match victory screenshot.')">📷 Screenshot</button>
-                <button class="btn btn-secondary btn-sm" onclick="alert('🏆 SCORECARD LINKED!\n\nLinked 22/11/7 Mirage Match Scorecard.')">🏆 Scorecard</button>
-                <button class="btn btn-purple btn-sm" onclick="alert('🏷️ HASHTAG ADDED!\n\nAdded #CS2Ace #CustomLobbies')"># Hashtags</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.app.attachSocialMediaItem('clip')">🎥 Attach Clip</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.app.attachSocialMediaItem('screenshot')">📷 Screenshot</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.app.attachSocialMediaItem('scorecard')">🏆 Scorecard</button>
+                <button class="btn btn-purple btn-sm" onclick="window.app.attachSocialMediaItem('hashtag')"># Hashtags</button>
               </div>
 
               <button class="btn btn-primary" onclick="window.app.postToGamersWall()">
@@ -711,55 +713,12 @@
             </h2>
 
             <div style="display: flex; flex-direction: column; gap: 1.2rem;" id="gamersWallFeedContainer">
-              
-              <!-- Feed Post 1 -->
-              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                  <div style="display: flex; align-items: center; gap: 0.8rem;">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #9d4edd); display: flex; align-items: center; justify-content: center; font-weight: 900;">👑</div>
-                    <div>
-                      <h4 style="font-weight: 800; margin: 0;">RadiantReaper <span class="mmr-badge">2540 MMR</span></h4>
-                      <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Posted 15m ago • Counter-Strike 2</p>
-                    </div>
-                  </div>
-                  <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">⚡ NEED +2 PREMIER</span>
-                </div>
-
-                <p style="font-size: 0.95rem; margin-bottom: 1rem;">Need 2 solid players for 20k+ CS2 Premier 5v5 Scrims! Have IGL and AWP locked down, need 2 entry fraggers with mic. 🎙️ Join lobby below!</p>
-
-                <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem;">
-                  <button class="btn btn-secondary btn-sm" onclick="alert('🔥 UPVOTED! Post Hype +1')">🔥 Hype Upvote (24)</button>
-                  <button class="btn btn-purple btn-sm" onclick="window.app.connectLobbyVoice('CS2 Premier Scrims')">🎙️ Join Voice Channel</button>
-                  <button class="btn btn-primary btn-sm" onclick="alert('💬 Reply sent to RadiantReaper!')">💬 Reply (6)</button>
-                </div>
+              <!-- Dynamically populated from localStorage; clean empty state when no posts exist -->
+              <div id="gamersWallEmptyState" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted); background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 10px;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.6rem;">🌐</div>
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 0.3rem;">No Posts on The Gamers Wall Yet</h3>
+                <p style="font-size: 0.85rem; max-width: 440px; margin: 0 auto; color: var(--text-dim); line-height: 1.4;">Be the first to share an update, highlight clip, match scorecard, or LFG squad recruitment callout using the composer above!</p>
               </div>
-
-              <!-- Feed Post 2 -->
-              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                  <div style="display: flex; align-items: center; gap: 0.8rem;">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #ff007f, #ffd700); display: flex; align-items: center; justify-content: center; font-weight: 900;">🎯</div>
-                    <div>
-                      <h4 style="font-weight: 800; margin: 0;">Valkyrie_CS <span class="mmr-badge" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">1790 MMR</span></h4>
-                      <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Posted 1h ago • Stream Highlight Clip</p>
-                    </div>
-                  </div>
-                  <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold);">🎥 30s CLIP</span>
-                </div>
-
-                <p style="font-size: 0.95rem; margin-bottom: 0.8rem;">Insane 1v4 Retake clutch on Mirage A site with deagle only! Recorded using CustomLobbies Stream Studio! 🎬</p>
-
-                <div style="background: #000; border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; border: 1px solid var(--border-color);">
-                  <div style="font-size: 2.5rem; margin-bottom: 0.4rem;">🎬</div>
-                  <div style="font-weight: 700; color: var(--accent-cyan);">[Stream Highlight Replay Stream - 1080p 60FPS]</div>
-                </div>
-
-                <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem;">
-                  <button class="btn btn-secondary btn-sm" onclick="alert('🔥 UPVOTED! Post Hype +1')">🔥 Hype Upvote (42)</button>
-                  <button class="btn btn-primary btn-sm" onclick="alert('💬 Reply sent to Valkyrie_CS!')">💬 Reply (12)</button>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>
@@ -785,13 +744,13 @@
             <div style="background: rgba(0, 230, 118, 0.08); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; border: 1px solid rgba(0, 230, 118, 0.25);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                 <span style="font-size: 0.78rem; font-weight: 800; color: var(--accent-green); text-transform: uppercase;">⭐ Karma & Commendations</span>
-                <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-weight: 900; font-size: 0.75rem;">👍 100% Positive</span>
+                <span class="lobby-game-tag" id="userPassportKarmaBadge" style="background: rgba(255, 255, 255, 0.08); color: var(--text-muted); font-weight: 900; font-size: 0.75rem;">⭐ Unrated Karma</span>
               </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: 0.78rem;">
-                <div>🧠 Leadership: <strong style="color: var(--accent-green);">+19</strong></div>
-                <div>🎯 Friendly: <strong style="color: var(--accent-green);">+28</strong></div>
-                <div>⚡ Clutch: <strong style="color: var(--accent-green);">+34</strong></div>
-                <div>🎓 Helpful: <strong style="color: var(--accent-green);">+15</strong></div>
+                <div>🧠 Leadership: <strong style="color: var(--accent-green);" id="passportCommendLeadership">+0</strong></div>
+                <div>🎯 Friendly: <strong style="color: var(--accent-green);" id="passportCommendFriendly">+0</strong></div>
+                <div>⚡ Clutch: <strong style="color: var(--accent-green);" id="passportCommendClutch">+0</strong></div>
+                <div>🎓 Helpful: <strong style="color: var(--accent-green);" id="passportCommendHelpful">+0</strong></div>
               </div>
             </div>
 
@@ -801,26 +760,9 @@
                 <span>🎮 Per-Game Ranks & ELO</span>
                 <span>Global Ratings</span>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.82rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span>🎯 CS2 Premier:</span>
-                  <span style="font-weight: 800; color: #706fd3;">🟣 Level 8 (1840 ELO)</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span>🔴 Valorant:</span>
-                  <span style="font-weight: 800; color: #b388ff;">💎 Diamond 3 (450 RR)</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span>🏒 Slapshot: Rebound:</span>
-                  <span style="font-weight: 800; color: #ff1744;">🏒 Slapshot Legend #18</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span>⚽ Rocket League:</span>
-                  <span style="font-weight: 800; color: #ff1744;">⚽ Grand Champ II</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span>🛡️ R6 Siege:</span>
-                  <span style="font-weight: 800; color: #00e676;">🟢 Emerald I (3850)</span>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.82rem;" id="userPassportRanksList">
+                <div style="text-align: center; color: var(--text-dim); padding: 0.6rem 0.2rem; font-size: 0.8rem; line-height: 1.4;">
+                  Uncalibrated • Play matches in Lobbies or connect game accounts to establish per-game ELO ratings.
                 </div>
               </div>
             </div>
@@ -839,26 +781,26 @@
             </div>
 
             <!-- Linked Gaming Accounts List -->
-            <div style="display: flex; flex-direction: column; gap: 0.6rem; background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; font-size: 0.85rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; font-size: 0.85rem;" id="userPassportLinkedAccountsList">
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted);">🎮 Steam ID:</span>
-                <strong style="color: var(--accent-cyan);">76561198012345678</strong>
+                <span id="linkedSteamId" style="color: var(--text-dim);">Not Linked</span>
               </div>
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted);">🎯 Riot ID:</span>
-                <strong style="color: var(--accent-gold);">ProGamer#1337</strong>
+                <span id="linkedRiotId" style="color: var(--text-dim);">Not Linked</span>
               </div>
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted);">💬 Discord Tag:</span>
-                <strong style="color: #5865F2;">GamerHost#0001</strong>
+                <span id="linkedDiscordTag" style="color: var(--text-dim);">Not Linked</span>
               </div>
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted);">🎥 Stream:</span>
-                <strong style="color: #9146FF;">twitch.tv/CustomLobbiesHost</strong>
+                <span id="linkedStreamUrl" style="color: var(--text-dim);">Not Linked</span>
               </div>
             </div>
 
-            <button class="btn btn-purple btn-sm" style="width: 100%;" onclick="alert('🎮 LINK GAME ACCOUNTS:\n\nConnecting Steam OpenID, Discord OAuth2, and Riot API for instant rank synchronization...')">
+            <button class="btn btn-purple btn-sm" style="width: 100%;" onclick="window.app.promptConnectGameAccounts()">
               🔗 Connect Game Accounts
             </button>
           </div>
@@ -916,17 +858,17 @@
             </h3>
 
             <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.85rem;">
-              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.5rem 0.8rem; border-radius: 6px;">
-                <span style="font-weight: 800; color: var(--accent-cyan);">#CS2PremierMajor</span>
-                <span style="font-size: 0.75rem; color: var(--text-muted);">18.4k Posts</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer;" onclick="window.app.filterGamersWallByTag('#CS2Premier')" title="Click to filter feed">
+                <span style="font-weight: 800; color: var(--accent-cyan);">#CS2Premier</span>
+                <span style="font-size: 0.75rem; color: var(--accent-cyan);">Filter Feed</span>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.5rem 0.8rem; border-radius: 6px;">
-                <span style="font-weight: 800; color: var(--accent-gold);">#HNSFloppytown</span>
-                <span style="font-size: 0.75rem; color: var(--text-muted);">9.2k Posts</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer;" onclick="window.app.filterGamersWallByTag('#ValorantScrims')" title="Click to filter feed">
+                <span style="font-weight: 800; color: var(--accent-gold);">#ValorantScrims</span>
+                <span style="font-size: 0.75rem; color: var(--accent-gold);">Filter Feed</span>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.5rem 0.8rem; border-radius: 6px;">
-                <span style="font-weight: 800; color: var(--accent-green);">#ValorantRadiant</span>
-                <span style="font-size: 0.75rem; color: var(--text-muted);">6.7k Posts</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer;" onclick="window.app.filterGamersWallByTag('#WARDOGS')" title="Click to filter feed">
+                <span style="font-weight: 800; color: var(--accent-green);">#WARDOGS</span>
+                <span style="font-size: 0.75rem; color: var(--accent-green);">Filter Feed</span>
               </div>
             </div>
           </div>
@@ -937,22 +879,8 @@
               <span>👥</span> Suggested Gamers to Follow
             </h3>
 
-            <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.85rem;">
-              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.6rem 0.8rem; border-radius: 6px;">
-                <div>
-                  <div style="font-weight: 800;">ApexGod99 <span style="color: var(--accent-gold); font-size: 0.75rem;">(2150 MMR)</span></div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">CS2 IGL • 14.2k Followers</div>
-                </div>
-                <button class="btn btn-purple btn-sm" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;" onclick="alert('➕ FOLLOWED ApexGod99!')">➕ Follow</button>
-              </div>
-
-              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.6rem 0.8rem; border-radius: 6px;">
-                <div>
-                  <div style="font-weight: 800;">ShadowNinja <span style="color: var(--accent-cyan); font-size: 0.75rem;">(1920 MMR)</span></div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">Valorant Duelist • 8.9k Followers</div>
-                </div>
-                <button class="btn btn-purple btn-sm" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;" onclick="alert('➕ FOLLOWED ShadowNinja!')">➕ Follow</button>
-              </div>
+            <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.85rem;" id="suggestedGamersList">
+              <!-- Dynamically populated from active community players -->
             </div>
           </div>
 

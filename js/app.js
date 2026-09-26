@@ -312,6 +312,7 @@ class CustomLobbiesApp {
         } catch(e) {}
       }
       this.loadFrontpageServers();
+      this.loadGamersWallPosts();
     } catch (e) {
       console.warn('Error loading app state:', e);
     }
@@ -337,6 +338,7 @@ class CustomLobbiesApp {
     this.initAuthSession();
     this.initDebateSystem();
     this.setupTabNavigation();
+    this.renderGamersHubView();
     this.renderFavoriteStarTags();
     this.renderActiveGamesBar();
     this.renderSponsoredServers();
@@ -742,6 +744,286 @@ class CustomLobbiesApp {
     }
   }
 
+  // Gamers Hub & Gamers Wall System (Zero Mock Data Engine)
+  loadGamersWallPosts() {
+    try {
+      const saved = localStorage.getItem('cl_gamers_wall_posts_v1');
+      if (saved) {
+        this.gamersWallPosts = JSON.parse(saved);
+      } else {
+        this.gamersWallPosts = [];
+      }
+    } catch (e) {
+      this.gamersWallPosts = [];
+    }
+  }
+
+  saveGamersWallPosts() {
+    try {
+      localStorage.setItem('cl_gamers_wall_posts_v1', JSON.stringify(this.gamersWallPosts || []));
+    } catch (e) {}
+  }
+
+  renderGamersHubView() {
+    this.renderGamersWallFeed();
+    this.renderGamerPassportSidebar();
+    this.renderSuggestedGamers();
+  }
+
+  renderGamersWallFeed(filterTag = null) {
+    const container = document.getElementById('gamersWallFeedContainer');
+    if (!container) return;
+
+    if (!Array.isArray(this.gamersWallPosts)) {
+      this.gamersWallPosts = [];
+    }
+
+    let posts = this.gamersWallPosts;
+    if (filterTag) {
+      posts = posts.filter(p => p.text && p.text.toLowerCase().includes(filterTag.toLowerCase()));
+    }
+
+    if (posts.length === 0) {
+      container.innerHTML = `
+        <div id="gamersWallEmptyState" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted); background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 10px;">
+          <div style="font-size: 2.5rem; margin-bottom: 0.6rem;">🌐</div>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 0.3rem;">No Posts on The Gamers Wall Yet</h3>
+          <p style="font-size: 0.85rem; max-width: 440px; margin: 0 auto; color: var(--text-dim); line-height: 1.4;">
+            ${filterTag ? `No posts matching <strong>${filterTag}</strong>. Click below to view all posts or share one!` : 'Be the first to share an update, highlight clip, match scorecard, or LFG squad recruitment callout using the composer above!'}
+          </p>
+          ${filterTag ? `<button class="btn btn-secondary btn-sm" style="margin-top: 0.8rem;" onclick="window.app.renderGamersWallFeed()">View All Posts</button>` : ''}
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = posts.map(post => {
+      const isUpvoted = post.upvoted ? true : false;
+      const likesCount = post.likes || 0;
+      return `
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.2rem; transition: border-color 0.2s;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+            <div style="display: flex; align-items: center; gap: 0.8rem;">
+              <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid var(--accent-gold); font-size: 1.1rem;">
+                ${post.avatar || '👑'}
+              </div>
+              <div>
+                <h4 style="font-weight: 800; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                  ${post.author} 
+                  <span class="mmr-badge" style="font-size: 0.72rem; padding: 0.15rem 0.4rem;">${post.elo || 1840} MMR</span>
+                </h4>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">${post.time || 'Recently'} • ${post.category || 'Gamer Post'}</p>
+              </div>
+            </div>
+            ${post.tag ? `<span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">${post.tag}</span>` : ''}
+          </div>
+
+          <p style="font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.5; white-space: pre-wrap;">${post.text}</p>
+
+          ${post.clip ? `
+            <div style="background: #000; border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; border: 1px solid var(--border-color);">
+              <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">🎬</div>
+              <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.9rem;">${post.clip}</div>
+            </div>
+          ` : ''}
+
+          <div style="display: flex; gap: 0.8rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem; flex-wrap: wrap;">
+            <button class="btn ${isUpvoted ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="window.app.toggleGamersWallPostLike(${post.id})">
+              🔥 Hype Upvote (${likesCount})
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="window.app.replyToGamersWallPost(${post.id}, '${post.author}')">
+              💬 Reply (${post.replies ? post.replies.length : 0})
+            </button>
+            <button class="btn btn-danger btn-sm" style="margin-left: auto; padding: 0.2rem 0.5rem; font-size: 0.72rem;" onclick="window.app.deleteGamersWallPost(${post.id})" title="Delete post">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  toggleGamersWallPostLike(postId) {
+    const post = (this.gamersWallPosts || []).find(p => p.id === postId);
+    if (!post) return;
+    post.upvoted = !post.upvoted;
+    post.likes = (post.likes || 0) + (post.upvoted ? 1 : -1);
+    if (post.likes < 0) post.likes = 0;
+    this.saveGamersWallPosts();
+    this.renderGamersWallFeed();
+  }
+
+  deleteGamersWallPost(postId) {
+    this.gamersWallPosts = (this.gamersWallPosts || []).filter(p => p.id !== postId);
+    this.saveGamersWallPosts();
+    this.renderGamersWallFeed();
+    if (window.widgetBuilderEngine) window.widgetBuilderEngine.showToast('Post removed from The Gamers Wall', 'info');
+  }
+
+  filterGamersWallByTag(tag) {
+    this.renderGamersWallFeed(tag);
+  }
+
+  replyToGamersWallPost(postId, author) {
+    const input = document.getElementById('socialComposerInput');
+    if (input) {
+      input.value = `@${author} `;
+      input.focus();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  renderGamerPassportSidebar() {
+    const nameEl = document.getElementById('userPassportDisplayName');
+    const subtitleEl = document.getElementById('userPassportSubTitle');
+    const karmaBadge = document.getElementById('userPassportKarmaBadge');
+    const ranksList = document.getElementById('userPassportRanksList');
+
+    const displayName = (this.user && this.user.displayName) ? this.user.displayName : 'You (Host)';
+    const elo = (this.user && this.user.elo) ? this.user.elo : 1840;
+    const title = (this.user && this.user.title) ? this.user.title : this.equippedTitle || 'Gamer';
+
+    if (nameEl) nameEl.textContent = displayName;
+    if (subtitleEl) subtitleEl.textContent = `${title} (${elo} MMR)`;
+
+    const commends = (this.user && this.user.commendations) || { leadership: 0, friendly: 0, clutch: 0, helpful: 0 };
+    const leadEl = document.getElementById('passportCommendLeadership');
+    const friendEl = document.getElementById('passportCommendFriendly');
+    const clutchEl = document.getElementById('passportCommendClutch');
+    const helpEl = document.getElementById('passportCommendHelpful');
+
+    if (leadEl) leadEl.textContent = `+${commends.leadership || 0}`;
+    if (friendEl) friendEl.textContent = `+${commends.friendly || 0}`;
+    if (clutchEl) clutchEl.textContent = `+${commends.clutch || 0}`;
+    if (helpEl) helpEl.textContent = `+${commends.helpful || 0}`;
+
+    const totalCommends = (commends.leadership || 0) + (commends.friendly || 0) + (commends.clutch || 0) + (commends.helpful || 0);
+    if (karmaBadge) {
+      if (totalCommends > 0) {
+        karmaBadge.textContent = '👍 100% Positive';
+        karmaBadge.style.background = 'rgba(0, 230, 118, 0.2)';
+        karmaBadge.style.color = 'var(--accent-green)';
+      } else {
+        karmaBadge.textContent = '⭐ Unrated Karma';
+        karmaBadge.style.background = 'rgba(255, 255, 255, 0.08)';
+        karmaBadge.style.color = 'var(--text-muted)';
+      }
+    }
+
+    if (ranksList) {
+      if (this.user && this.user.games && Object.keys(this.user.games).length > 0) {
+        ranksList.innerHTML = Object.entries(this.user.games).map(([gName, gStat]) => `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>${gName}:</span>
+            <span style="font-weight: 800; color: var(--accent-cyan);">${gStat.rank || 'Calibrated'} (${gStat.elo || 1500} ELO)</span>
+          </div>
+        `).join('');
+      } else {
+        ranksList.innerHTML = `
+          <div style="text-align: center; color: var(--text-dim); padding: 0.6rem 0.2rem; font-size: 0.8rem; line-height: 1.4;">
+            Uncalibrated • Play matches in Lobbies or connect game accounts to establish per-game ELO ratings.
+          </div>
+        `;
+      }
+    }
+
+    // Update Linked Accounts
+    const steamEl = document.getElementById('linkedSteamId');
+    const riotEl = document.getElementById('linkedRiotId');
+    const discordEl = document.getElementById('linkedDiscordTag');
+    const streamEl = document.getElementById('linkedStreamUrl');
+
+    if (steamEl) steamEl.textContent = (this.user && this.user.steamId) ? this.user.steamId : 'Not Linked';
+    if (riotEl) riotEl.textContent = (this.user && this.user.riotId) ? this.user.riotId : 'Not Linked';
+    if (discordEl) discordEl.textContent = (this.user && this.user.discord) ? this.user.discord : 'Not Linked';
+    if (streamEl) streamEl.textContent = (this.user && this.user.twitch) ? this.user.twitch : 'Not Linked';
+  }
+
+  renderSuggestedGamers() {
+    const list = document.getElementById('suggestedGamersList');
+    if (!list) return;
+
+    if (!Array.isArray(this.leaderboardData) || this.leaderboardData.length === 0) {
+      list.innerHTML = `<div style="text-align: center; color: var(--text-dim); font-size: 0.8rem; padding: 0.5rem 0;">No suggestions available.</div>`;
+      return;
+    }
+
+    const currentUserName = (this.user && this.user.displayName) ? this.user.displayName : 'You (Host)';
+    const suggested = this.leaderboardData.filter(p => p.name !== currentUserName).slice(0, 3);
+
+    list.innerHTML = suggested.map(p => `
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.6rem 0.8rem; border-radius: 6px;">
+        <div>
+          <div style="font-weight: 800; font-size: 0.88rem;">${p.name} <span style="color: var(--accent-gold); font-size: 0.75rem;">(${p.targetElo || p.elo || 1800} MMR)</span></div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">${p.region || 'NA'} • ${p.role || 'Player'}</div>
+        </div>
+        <button class="btn btn-purple btn-sm" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;" onclick="window.app.followGamer('${p.name}')">
+          ➕ Follow
+        </button>
+      </div>
+    `).join('');
+  }
+
+  followGamer(playerName) {
+    if (window.widgetBuilderEngine) window.widgetBuilderEngine.playSoundEffect('click');
+    alert(`➕ Following ${playerName}!\nYou will receive updates when they open scrim lobbies or stream.`);
+  }
+
+  promptPostLFGCallout() {
+    const gameSelect = document.getElementById('lfgGameFilter');
+    const regionSelect = document.getElementById('lfgRegionFilter');
+    const roleSelect = document.getElementById('lfgRoleFilter');
+    const micSelect = document.getElementById('lfgMicFilter');
+
+    const game = gameSelect ? gameSelect.options[gameSelect.selectedIndex].text : 'Competitive Game';
+    const region = regionSelect ? regionSelect.options[regionSelect.selectedIndex].text : 'NA';
+    const role = roleSelect ? roleSelect.options[roleSelect.selectedIndex].text : 'Any Role';
+    const mic = micSelect ? micSelect.options[micSelect.selectedIndex].text : 'Mic';
+
+    const input = document.getElementById('socialComposerInput');
+    if (input) {
+      input.value = `[LFG CALLOUT] Looking for ${role} in ${game} (${region})! ${mic}. Join lobby or drop your handle! #LFG #${game.replace(/\s+/g, '')}`;
+      input.focus();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  attachSocialMediaItem(type) {
+    const input = document.getElementById('socialComposerInput');
+    if (!input) return;
+
+    if (type === 'clip') {
+      const clip = prompt('Enter a Stream highlight clip title or video URL:', 'Insane 1v3 Clutch Play');
+      if (clip) {
+        input.value = (input.value ? input.value + '\n\n' : '') + `🎬 [Highlight Clip]: "${clip}"`;
+      }
+    } else if (type === 'screenshot') {
+      const snap = prompt('Enter match victory screenshot description or image URL:', 'Match Victory 16-11');
+      if (snap) {
+        input.value = (input.value ? input.value + '\n\n' : '') + `📷 [Screenshot]: ${snap}`;
+      }
+    } else if (type === 'scorecard') {
+      input.value = (input.value ? input.value + '\n\n' : '') + `🏆 [Match Scorecard]: 22K / 11D / 7A • Rating: 1.45 (Victory)`;
+    } else if (type === 'hashtag') {
+      const tag = prompt('Enter hashtag to add (e.g. #CS2Scrims, #ValorantRadiant):', '#CustomLobbies #Competitive');
+      if (tag) {
+        input.value = (input.value ? input.value + ' ' : '') + tag;
+      }
+    }
+    input.focus();
+  }
+
+  promptConnectGameAccounts() {
+    const steam = prompt('Enter your Steam ID or Community Profile URL:', (this.user && this.user.steamId) || '');
+    if (steam !== null) {
+      if (!this.user) this.user = { displayName: 'You (Host)', elo: 1840, level: 8 };
+      this.user.steamId = steam.trim() || null;
+      this.saveState();
+      this.renderGamerPassportSidebar();
+      if (window.widgetBuilderEngine) window.widgetBuilderEngine.showToast('🎮 Game accounts updated!', 'success');
+    }
+  }
+
   // Social Media Post Handler
   postToGamersWall() {
     const input = document.getElementById('socialComposerInput');
@@ -753,79 +1035,74 @@ class CustomLobbiesApp {
       return;
     }
 
-    const container = document.getElementById('gamersWallFeedContainer');
-    if (!container) return;
+    const userName = (this.user && this.user.displayName) ? this.user.displayName : 'You (Host)';
+    const userMmr = (this.user && this.user.elo) ? this.user.elo : 1840;
+    const userAvatar = (this.user && this.user.emblem) ? this.user.emblem : '👑';
 
-    const postElement = document.createElement('div');
-    postElement.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid var(--accent-gold); border-radius: 10px; padding: 1.2rem; box-shadow: 0 0 15px rgba(255, 215, 0, 0.1); margin-bottom: 1.2rem;';
+    if (!Array.isArray(this.gamersWallPosts)) {
+      this.gamersWallPosts = [];
+    }
 
-    postElement.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-        <div style="display: flex; align-items: center; gap: 0.8rem;">
-          <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid var(--accent-gold);">👑</div>
-          <div>
-            <h4 style="font-weight: 800; margin: 0;">You (Host) <span class="mmr-badge">1840 MMR</span></h4>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Posted Just Now • Social Media Update</p>
-          </div>
-        </div>
-        <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">🛡️ Guardian AC Verified</span>
-      </div>
+    const newPost = {
+      id: Date.now(),
+      author: userName,
+      avatar: userAvatar,
+      elo: userMmr,
+      time: 'Just Now',
+      category: 'Social Media Update',
+      tag: '🛡️ AC Verified',
+      text: text,
+      likes: 1,
+      upvoted: true,
+      replies: []
+    };
 
-      <p style="font-size: 0.95rem; margin-bottom: 1rem;">${text}</p>
-
-      <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem;">
-        <button class="btn btn-secondary btn-sm" onclick="alert('🔥 UPVOTED! Post Hype +1')">🔥 Hype Upvote (1)</button>
-        <button class="btn btn-purple btn-sm" onclick="alert('🔁 REPOSTED to your profile!')">🔁 Repost</button>
-        <button class="btn btn-primary btn-sm" onclick="alert('💬 Opening Reply Thread...')">💬 Reply (0)</button>
-      </div>
-    `;
-
-    container.insertBefore(postElement, container.firstChild);
+    this.gamersWallPosts.unshift(newPost);
+    this.saveGamersWallPosts();
+    this.renderGamersWallFeed();
     input.value = '';
-    alert('🚀 POST PUBLISHED!\n\nYour post was published live to The Gamers Wall Social Media feed!');
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('queue_join');
+      window.widgetBuilderEngine.showToast('🚀 Post published live to The Gamers Wall!', 'success');
+    } else {
+      alert('🚀 POST PUBLISHED!\n\nYour post was published live to The Gamers Wall Social Media feed!');
+    }
   }
 
   // Publish Auto-Farmed Clip to The Gamers Wall Feed
   postAutoClipToGamersWall(clipTitle, gameTitle, triggerName) {
-    const container = document.getElementById('gamersWallFeedContainer');
-    if (!container) return;
+    const userName = (this.user && this.user.displayName) ? this.user.displayName : 'You (Host)';
+    const userMmr = (this.user && this.user.elo) ? this.user.elo : 1840;
+    const userAvatar = (this.user && this.user.emblem) ? this.user.emblem : '👑';
 
-    const postElement = document.createElement('div');
-    postElement.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid var(--accent-cyan); border-radius: 10px; padding: 1.2rem; box-shadow: 0 0 15px rgba(0, 242, 254, 0.15); margin-bottom: 1.2rem;';
+    if (!Array.isArray(this.gamersWallPosts)) {
+      this.gamersWallPosts = [];
+    }
 
-    postElement.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-        <div style="display: flex; align-items: center; gap: 0.8rem;">
-          <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid var(--accent-gold);">👑</div>
-          <div>
-            <h4 style="font-weight: 800; margin: 0;">You (Host) <span class="mmr-badge" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">1840 MMR</span></h4>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Posted Just Now • Auto-Farmed Clip</p>
-          </div>
-        </div>
-        <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">🎥 ${triggerName}</span>
-      </div>
+    const newPost = {
+      id: Date.now(),
+      author: userName,
+      avatar: userAvatar,
+      elo: userMmr,
+      time: 'Just Now',
+      category: 'Auto-Farmed Clip',
+      tag: `🎥 ${triggerName}`,
+      text: `🔥 Auto-Farmed Highlight Clip from ${gameTitle}: "${clipTitle}"! Harvested automatically using CustomLobbies Auto-Clip Engine! 🎬`,
+      clip: `[CustomLobbies Auto-Farmed Video Highlight Stream - 1080p 60FPS: "${clipTitle}"]`,
+      likes: 1,
+      upvoted: true,
+      replies: []
+    };
 
-      <p style="font-size: 0.95rem; margin-bottom: 0.8rem;">🔥 Auto-Farmed Highlight Clip from <strong>${gameTitle}</strong>: "${clipTitle}"! Harvested automatically using CustomLobbies Auto-Clip Engine! 🎬</p>
-
-      <div style="background: #000; border-radius: 8px; padding: 1.5rem; text-align: center; margin-bottom: 1rem; border: 1px solid var(--accent-cyan);">
-        <div style="font-size: 2.5rem; margin-bottom: 0.4rem;">🎬</div>
-        <div style="font-weight: 700; color: var(--accent-cyan);">[CustomLobbies Auto-Farmed Video Highlight Stream - 1080p 60FPS]</div>
-      </div>
-
-      <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem;">
-        <button class="btn btn-secondary btn-sm" onclick="alert('🔥 UPVOTED! Post Hype +1')">🔥 Hype Upvote (1)</button>
-        <button class="btn btn-purple btn-sm" onclick="alert('🔁 REPOSTED to your profile!')">🔁 Repost Clip</button>
-        <button class="btn btn-primary btn-sm" onclick="alert('💬 Opening Reply Thread...')">💬 Reply (0)</button>
-      </div>
-    `;
-
-    container.insertBefore(postElement, container.firstChild);
+    this.gamersWallPosts.unshift(newPost);
+    this.saveGamersWallPosts();
+    this.renderGamersWallFeed();
 
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('fanfare');
+      window.widgetBuilderEngine.showToast(`🚀 Farmed clip "${clipTitle}" posted to The Gamers Wall!`, 'success');
     }
-
-    alert(`🚀 FARMED CLIP PUBLISHED!\n\nClip "${clipTitle}" was posted to The Gamers Wall feed!`);
   }
 
   setupGameDraftPoolButton() {
@@ -4127,6 +4404,7 @@ class CustomLobbiesApp {
         btnOpenAuthModal.onclick = () => this.openAuthModal();
       }
     }
+    this.renderGamerPassportSidebar();
   }
 
   setupTabNavigation() {
@@ -4236,6 +4514,8 @@ class CustomLobbiesApp {
               if (window.tournamentsStoreEngine && typeof window.tournamentsStoreEngine.renderDashboardBracketWidget === 'function') {
                 window.tournamentsStoreEngine.renderDashboardBracketWidget();
               }
+            } else if (tabId === 'gamers-hub-view') {
+              this.renderGamersHubView();
             } else if (tabId === 'servers-view') {
               this.renderFrontpageServers();
             } else if (tabId === 'tournaments-view') {
