@@ -2508,6 +2508,10 @@ class ChatVoiceManager {
     const game = lobby ? lobby.game : 'Counter-Strike 2';
     const title = lobby ? lobby.title : 'Private Scrim';
 
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('lobby_start');
+    }
+
     if (window.eloDraftEngine) {
       window.eloDraftEngine.startSnakeDraft(game);
       this.notifyToast(`🐍 1-2-2-1 Snake Draft initiated for ${title} (${game})!`, 'success');

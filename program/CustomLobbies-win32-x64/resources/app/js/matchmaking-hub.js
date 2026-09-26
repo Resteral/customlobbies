@@ -143,6 +143,9 @@ class MatchmakingHubEngine {
       // Trigger Match Found when both teams are full
       if (this.teamBlue.length >= this.teamCapacity && this.teamRed.length >= this.teamCapacity) {
         this.stopMatchmakingQueue(false);
+        if (window.widgetBuilderEngine) {
+          window.widgetBuilderEngine.playSoundEffect('lobby_start');
+        }
         if (window.app && window.app.triggerMatchFoundModal) {
           window.app.triggerMatchFoundModal(`${this.selectedGame} • ${this.selectedMode} [Team Blue vs Team Red]`);
         }

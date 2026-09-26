@@ -749,7 +749,7 @@ class CustomLobbiesApp {
     this.currentMatchServerIp = serverIP;
 
     if (window.widgetBuilderEngine) {
-      window.widgetBuilderEngine.playSoundEffect('match_found');
+      window.widgetBuilderEngine.playSoundEffect('lobby_start');
       window.widgetBuilderEngine.showToast(`🚀 Competitive Match Popped! Connected to Dedicated Server (${serverIP})`, 'success');
     }
 
@@ -5025,6 +5025,9 @@ class CustomLobbiesApp {
 
     // Auto-launch snake draft for lobby match when filled
     if (lobby.players >= lobby.max) {
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('lobby_start');
+      }
       setTimeout(() => {
         this.triggerLobbySnakeDraft(lobby.title, lobby.game);
       }, 500);
@@ -5388,6 +5391,9 @@ class CustomLobbiesApp {
   }
 
   triggerLobbySnakeDraft(lobbyTitle, gameTitle) {
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('lobby_start');
+    }
     this.currentDraftLobby = lobbyTitle;
     this.currentDraftGame = gameTitle || 'Counter-Strike 2';
     this.captainSelectionMode = 'highest_mmr';
