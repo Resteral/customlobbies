@@ -3197,8 +3197,9 @@
     <div class="modal-card" style="max-width: 780px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
         <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan);" id="draftGameTitle">🐍 Competitive Draft Session</h3>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
           <span class="lobby-game-tag" style="background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.4); font-weight: 800;" id="draftSessionLockStatus">🔒 SESSION ACTIVE</span>
+          <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); border: 1px solid rgba(255, 215, 0, 0.4); font-weight: 800;">👑 Top 2 MMR = Auto-Captains</span>
           <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-weight: 800;">🐍 Snake Pick (1-2-2-1)</span>
           <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-weight: 800;">Auto-Balanced MMR</span>
         </div>
@@ -3215,7 +3216,7 @@
               <span style="font-size: 0.72rem; padding: 0.2rem 0.5rem; background: rgba(255,215,0,0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); border-radius: 4px; font-weight: 800;">GAME LOCKED</span>
             </div>
           </div>
-          <span style="font-size: 0.78rem; color: var(--text-dim); margin-left: 0.4rem; font-style: italic;">(Game locked for this session — captains & players must lock in)</span>
+          <span style="font-size: 0.78rem; color: var(--text-dim); margin-left: 0.4rem; font-style: italic;">(Game locked for this session • Top 2 MMRs automatically designated as Captains)</span>
           <select id="draftGameSelect" style="display: none;" disabled></select>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -3238,7 +3239,7 @@
               <span class="lobby-game-tag" style="background: rgba(0,242,254,0.15); color: var(--accent-cyan); font-size: 0.72rem; font-weight: 800;" id="teamACountTag">5 Players</span>
             </div>
           </div>
-          <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainAName">Captain Alpha</div>
+          <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainAName">👑 Captain Alpha (Auto-Assigned #1 MMR)</div>
           <div id="teamAList" style="max-height: 280px; overflow-y: auto; padding-right: 0.3rem;"></div>
         </div>
 
@@ -3251,7 +3252,7 @@
               <span class="lobby-game-tag" style="background: rgba(157,78,221,0.15); color: var(--accent-purple); font-size: 0.72rem; font-weight: 800;" id="teamBCountTag">5 Players</span>
             </div>
           </div>
-          <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainBName">Captain Bravo</div>
+          <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainBName">👑 Captain Bravo (Auto-Assigned #2 MMR)</div>
           <div id="teamBList" style="max-height: 280px; overflow-y: auto; padding-right: 0.3rem;"></div>
         </div>
       </div>

@@ -4630,6 +4630,7 @@ class CustomLobbiesApp {
   triggerLobbySnakeDraft(lobbyTitle, gameTitle) {
     this.currentDraftLobby = lobbyTitle;
     this.currentDraftGame = gameTitle || 'Counter-Strike 2';
+    this.captainSelectionMode = 'highest_mmr';
     this.bannedMaps.clear();
     this.selectedMatchMap = null;
     this.passedFirstPick = false;
@@ -4819,23 +4820,31 @@ class CustomLobbiesApp {
   }
 
   runDraftSimulation() {
+    this.captainSelectionMode = 'highest_mmr';
     const maxCap = window.eloEngine.getGameCapacity(this.currentDraftGame);
-    const mode = this.captainSelectionMode || 'highest_mmr';
     
     // Get dedicated, filled roster pool specifically for this game
     const draftPool = this.getDraftPoolForGame(this.currentDraftGame, maxCap);
-    const result = window.eloEngine.performCustomSnakeDraft(draftPool, this.passedFirstPick, mode);
-
-    const cap1Commends = result.captain1.commendations ? result.captain1.commendations.leadership || 0 : 0;
-    const cap2Commends = result.captain2.commendations ? result.captain2.commendations.leadership || 0 : 0;
-
-    const label1 = mode === 'captain_commends' ? `🧠 Commends: +${cap1Commends}` : `${result.captain1.elo} MMR`;
-    const label2 = mode === 'captain_commends' ? `🧠 Commends: +${cap2Commends}` : `${result.captain2.elo} MMR`;
+    const result = window.eloEngine.performCustomSnakeDraft(draftPool, this.passedFirstPick, 'highest_mmr');
 
     const capAEl = document.getElementById('captainAName');
     const capBEl = document.getElementById('captainBName');
-    if (capAEl) capAEl.textContent = `👑 Captain Alpha (${result.criteriaLabel}): ${result.captain1.name} (${label1})`;
-    if (capBEl) capBEl.textContent = `👑 Captain Bravo (${result.criteriaLabel}): ${result.captain2.name} (${label2})`;
+    if (capAEl) {
+      capAEl.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem;">
+          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Alpha:</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain1.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">AUTO-CAPTAIN (#1 MMR)</span></div>
+          <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold);">${result.captain1.elo} MMR</span>
+        </div>
+      `;
+    }
+    if (capBEl) {
+      capBEl.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem;">
+          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Bravo:</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain2.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">AUTO-CAPTAIN (#2 MMR)</span></div>
+          <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold);">${result.captain2.elo} MMR</span>
+        </div>
+      `;
+    }
 
     const tagCap = document.getElementById('draftRosterCapTag');
     if (tagCap) {
@@ -4852,9 +4861,10 @@ class CustomLobbiesApp {
 
     if (teamAContainer) {
       teamAContainer.innerHTML = result.team1.map((p, idx) => `
-        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,242,254,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.85rem; border: 1px solid rgba(0,242,254,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: ${idx === 0 ? 'linear-gradient(135deg, rgba(255,215,0,0.15), rgba(0,242,254,0.12))' : 'rgba(0,242,254,0.08)'}; padding: 0.55rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.85rem; border: 1px solid ${idx === 0 ? 'var(--accent-gold)' : 'rgba(0,242,254,0.2)'};">
           <div>
-            <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
+            <span style="font-weight: 800; color: ${idx === 0 ? 'var(--accent-gold)' : '#fff'};">${idx === 0 ? '👑 ' : ''}${p.name}</span>
+            ${idx === 0 ? `<span style="font-size: 0.68rem; background: rgba(255,215,0,0.22); color: var(--accent-gold); padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,215,0,0.35);">AUTO-CAPTAIN (#1 MMR)</span>` : ''}
             ${p.role ? `<span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 0.35rem;">[${p.role}]</span>` : ''}
           </div>
           <div style="text-align: right;">
@@ -4867,9 +4877,10 @@ class CustomLobbiesApp {
 
     if (teamBContainer) {
       teamBContainer.innerHTML = result.team2.map((p, idx) => `
-        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(157,78,221,0.08); padding: 0.5rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.85rem; border: 1px solid rgba(157,78,221,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: ${idx === 0 ? 'linear-gradient(135deg, rgba(255,215,0,0.15), rgba(157,78,221,0.12))' : 'rgba(157,78,221,0.08)'}; padding: 0.55rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.85rem; border: 1px solid ${idx === 0 ? 'var(--accent-gold)' : 'rgba(157,78,221,0.2)'};">
           <div>
-            <span style="font-weight: 700;">${idx === 0 ? '👑 ' : ''}${p.name}</span>
+            <span style="font-weight: 800; color: ${idx === 0 ? 'var(--accent-gold)' : '#fff'};">${idx === 0 ? '👑 ' : ''}${p.name}</span>
+            ${idx === 0 ? `<span style="font-size: 0.68rem; background: rgba(255,215,0,0.22); color: var(--accent-gold); padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,215,0,0.35);">AUTO-CAPTAIN (#2 MMR)</span>` : ''}
             ${p.role ? `<span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 0.35rem;">[${p.role}]</span>` : ''}
           </div>
           <div style="text-align: right;">
@@ -4882,7 +4893,7 @@ class CustomLobbiesApp {
 
     const summaryEl = document.getElementById('draftMMRSummary');
     if (summaryEl) {
-      summaryEl.innerHTML = `🐍 <strong>Snake Pick Order (1-2-2-1)</strong> | Game: <strong style="color: var(--accent-cyan);">${this.currentDraftGame}</strong> (${maxCap} Players) | Criteria: ${result.criteriaLabel} | First Pick: <strong>${result.firstPickOwner}</strong><br>🔵 Team Alpha Avg: <strong>${result.avgMMR1} MMR</strong> | 🔴 Team Bravo Avg: <strong>${result.avgMMR2} MMR</strong> | MMR Delta: <strong>${result.mmrDelta} MMR (Fair Match)</strong>`;
+      summaryEl.innerHTML = `👑 <strong>Auto-Captains Assigned to Top 2 MMRs:</strong> 🔵 Team Alpha: <strong>${result.captain1.name} (${result.captain1.elo} MMR)</strong> | 🔴 Team Bravo: <strong>${result.captain2.name} (${result.captain2.elo} MMR)</strong><br>🐍 <strong>Snake Pick Order (1-2-2-1)</strong> | Game: <strong style="color: var(--accent-cyan);">${this.currentDraftGame}</strong> (${maxCap} Players) | First Pick: <strong>${result.firstPickOwner}</strong><br>🔵 Team Alpha Avg: <strong>${result.avgMMR1} MMR</strong> | 🔴 Team Bravo Avg: <strong>${result.avgMMR2} MMR</strong> | MMR Delta: <strong>${result.mmrDelta} MMR (Fair Match)</strong>`;
     }
   }
 

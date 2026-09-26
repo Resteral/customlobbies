@@ -305,29 +305,19 @@ class EloEngine {
     };
   }
 
-  // Modified Captain Snake Draft (Supports Highest MMR, Captain Commendations, or Community Votes)
+  // Modified Captain Snake Draft (The two highest MMRs automatically get Captain)
   performCustomSnakeDraft(playersPool, passFirstPick = false, selectionMode = 'highest_mmr') {
     let sorted = [...playersPool];
 
-    if (selectionMode === 'captain_commends') {
-      sorted.sort((a, b) => {
-        const commendsA = (a.commendations ? a.commendations.leadership || 0 : 0);
-        const commendsB = (b.commendations ? b.commendations.leadership || 0 : 0);
-        if (commendsB !== commendsA) return commendsB - commendsA;
-        return (b.elo || 1800) - (a.elo || 1800);
-      });
-    } else if (selectionMode === 'selected') {
-      sorted.sort((a, b) => (b.votes || 0) - (a.votes || 0));
-    } else {
-      sorted.sort((a, b) => (b.elo || 1800) - (a.elo || 1800));
-    }
+    // Automatically designate the two highest MMR players as Team Captains
+    sorted.sort((a, b) => (Number(b.elo || b.mmr) || 1800) - (Number(a.elo || a.mmr) || 1800));
 
     const cap1 = sorted[0] || { name: 'Captain Alpha', elo: 2540, role: 'Team Captain' };
     const cap2 = sorted[1] || { name: 'Captain Bravo', elo: 2480, role: 'Team Captain' };
 
     const unpicked = sorted.slice(2);
-    const team1 = [{ ...cap1, isCaptain: true, pickNumber: 0, pickLabel: 'Captain #1' }];
-    const team2 = [{ ...cap2, isCaptain: true, pickNumber: 0, pickLabel: 'Captain #2' }];
+    const team1 = [{ ...cap1, isCaptain: true, captainRank: 1, pickNumber: 0, pickLabel: '👑 Auto-Captain (#1 MMR)' }];
+    const team2 = [{ ...cap2, isCaptain: true, captainRank: 2, pickNumber: 0, pickLabel: '👑 Auto-Captain (#2 MMR)' }];
 
     let turnOwner = passFirstPick ? 1 : 2;
     let picksRemainingForTurn = (turnOwner === 2 && !passFirstPick) ? 1 : 2;
@@ -360,12 +350,7 @@ class EloEngine {
     const sum1 = team1.reduce((acc, p) => acc + (p.elo || 1800), 0);
     const sum2 = team2.reduce((acc, p) => acc + (p.elo || 1800), 0);
 
-    const cap1Commends = cap1.commendations ? cap1.commendations.leadership || 0 : 0;
-    const cap2Commends = cap2.commendations ? cap2.commendations.leadership || 0 : 0;
-
-    const criteriaLabel = selectionMode === 'captain_commends' 
-      ? `Highest Captain Commends (+${cap1Commends} vs +${cap2Commends})`
-      : selectionMode === 'selected' ? 'Community Votes' : 'Highest ELO / MMR';
+    const criteriaLabel = 'Auto-Designated Highest MMR (Top 2 Players)';
 
     return {
       captain1: cap1,
