@@ -5937,7 +5937,7 @@ class CustomLobbiesApp {
     if (linkedContainer) {
       const steamLink = p.steamId ? `<a href="https://steamcommunity.com/profiles/${p.steamId}" target="_blank" rel="noopener" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">🎮 ${p.steamId}</a>` : '<span style="color: var(--text-dim);">Not Linked</span>';
       const riotLink = p.riotId ? `<a href="https://tracker.gg/valorant/profile/riot/${encodeURIComponent(p.riotId)}/overview" target="_blank" rel="noopener" style="color: var(--accent-gold); text-decoration: underline; font-weight: 700;">🔴 ${p.riotId}</a>` : '<span style="color: var(--text-dim);">Not Linked</span>';
-      const discordLink = p.discord ? `<a href="https://discord.gg/customlobbies" target="_blank" rel="noopener" style="color: var(--accent-purple); text-decoration: underline; font-weight: 700;">💬 ${p.discord}</a>` : '<span style="color: var(--text-dim);">Not Linked</span>';
+      const discordLink = p.discord ? `<a href="https://discord.gg/fqy84VqVzv" target="_blank" rel="noopener" style="color: var(--accent-purple); text-decoration: underline; font-weight: 700;">💬 ${p.discord}</a>` : '<span style="color: var(--text-dim);">Not Linked</span>';
       const twitchLink = p.twitch ? `<a href="https://${p.twitch.replace('https://', '')}" target="_blank" rel="noopener" style="color: var(--accent-green); text-decoration: underline; font-weight: 700;">📺 ${p.twitch}</a>` : '<span style="color: var(--text-dim);">Not Linked</span>';
 
       linkedContainer.innerHTML = `

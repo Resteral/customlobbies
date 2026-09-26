@@ -336,9 +336,9 @@ class ChatVoiceManager {
     const rail = document.getElementById('discordServerRailContainer');
     if (!rail) return;
     
-    // Clear existing servers (keep the boost badge container and purchase button)
+    // Clear existing servers (keep the boost badge container, purchase button, and discord link button)
     Array.from(rail.children).forEach(child => {
-        if (child.id !== 'serverBoostBadgeContainer' && child.id !== 'serverPurchaseBtnContainer') {
+        if (child.id !== 'serverBoostBadgeContainer' && child.id !== 'serverPurchaseBtnContainer' && child.id !== 'serverDiscordLinkBtn') {
             child.remove();
         }
     });
