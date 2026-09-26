@@ -3196,37 +3196,35 @@
   <div class="modal-overlay" id="autoDraftModal">
     <div class="modal-card" style="max-width: 780px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
-        <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan);" id="draftGameTitle">Captain Auto-Draft Engine</h3>
+        <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan);" id="draftGameTitle">🐍 Competitive Draft Session</h3>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="lobby-game-tag" style="background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.4); font-weight: 800;" id="draftSessionLockStatus">🔒 SESSION ACTIVE</span>
           <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-weight: 800;">🐍 Snake Pick (1-2-2-1)</span>
           <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-weight: 800;">Auto-Balanced MMR</span>
         </div>
       </div>
 
-      <!-- In-Modal Game Draft Switcher -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem; background: rgba(255,255,255,0.04); padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid var(--border-color);">
-        <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <label for="draftGameSelect" style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); white-space: nowrap;">🎯 Select Game Draft:</label>
-          <select id="draftGameSelect" class="form-control" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem; background: rgba(18, 24, 38, 0.95); color: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-weight: 700;" onchange="window.app.onDraftGameSelectChange(this.value)">
-            <option value="WARDOGS">🐕 WARDOGS (33v33v33 Tri-Faction)</option>
-            <option value="Counter-Strike 2" selected>🎮 Counter-Strike 2 (5v5)</option>
-            <option value="Valorant">🎯 Valorant (5v5)</option>
-            <option value="Marvel Rivals">⚡ Marvel Rivals (6v6)</option>
-            <option value="Empulse">⚡ Empulse (5v5)</option>
-            <option value="REMATCH">🔥 REMATCH (5v5)</option>
-            <option value="Slapshot: Rebound">🏒 Slapshot: Rebound (3v3)</option>
-            <option value="Rocket League">🚗 Rocket League (3v3)</option>
-            <option value="Deadlock">🔮 Deadlock (6v6)</option>
-            <option value="The Finals">💥 The Finals (3v3)</option>
-            <option value="Arkheron">⚔️ Arkheron (5v5)</option>
-            <option value="Rainbow Six Siege">🛡️ Rainbow Six Siege (5v5)</option>
-            <option value="Dota 2">🧙 Dota 2 (5v5)</option>
-            <option value="Overwatch 2">🦸 Overwatch 2 (5v5)</option>
-            <option value="League of Legends">⚔️ League of Legends (5v5)</option>
-          </select>
+      <!-- Locked Game Draft Session Banner (Game cannot be changed) -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem; background: linear-gradient(135deg, rgba(25, 20, 10, 0.85), rgba(14, 18, 28, 0.95)); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(255, 215, 0, 0.4); box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);">
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <span style="font-size: 1.3rem;">🔒</span>
+          <div>
+            <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-gold); font-weight: 900;">Locked Draft Game:</div>
+            <div style="font-size: 1.15rem; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 0.5rem;" id="draftLockedGameDisplay">
+              <span id="draftLockedGameTitle">Counter-Strike 2</span>
+              <span style="font-size: 0.72rem; padding: 0.2rem 0.5rem; background: rgba(255,215,0,0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); border-radius: 4px; font-weight: 800;">GAME LOCKED</span>
+            </div>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--text-dim); margin-left: 0.4rem; font-style: italic;">(Game locked for this session — captains & players must lock in)</span>
+          <select id="draftGameSelect" style="display: none;" disabled></select>
         </div>
-        <div style="font-size: 0.8rem; color: var(--text-muted);" id="draftRosterCapTag">
-          Drafting: <strong style="color: var(--accent-cyan);">10 Players (5v5)</strong>
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <div style="font-size: 0.8rem; color: var(--text-muted);" id="draftRosterCapTag">
+            Drafting: <strong style="color: var(--accent-cyan);">10 Players (5v5)</strong>
+          </div>
+          <div class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-weight: 900; font-size: 0.85rem; border: 1px solid rgba(0, 242, 254, 0.35);" id="draftSessionTimerBadge">
+            ⏱️ 45s Lock-In
+          </div>
         </div>
       </div>
 
@@ -3235,7 +3233,10 @@
         <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--accent-cyan);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
             <div style="font-size: 0.8rem; color: var(--accent-cyan); text-transform: uppercase; font-weight: 800;">🔵 Team Alpha</div>
-            <span class="lobby-game-tag" style="background: rgba(0,242,254,0.15); color: var(--accent-cyan); font-size: 0.72rem; font-weight: 800;" id="teamACountTag">5 Players</span>
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
+              <span class="lobby-game-tag" id="teamALockBadge" style="background: rgba(255, 171, 0, 0.15); color: var(--accent-gold); font-size: 0.72rem; font-weight: 800;">⏳ Ready to Lock</span>
+              <span class="lobby-game-tag" style="background: rgba(0,242,254,0.15); color: var(--accent-cyan); font-size: 0.72rem; font-weight: 800;" id="teamACountTag">5 Players</span>
+            </div>
           </div>
           <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainAName">Captain Alpha</div>
           <div id="teamAList" style="max-height: 280px; overflow-y: auto; padding-right: 0.3rem;"></div>
@@ -3245,7 +3246,10 @@
         <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--accent-purple);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
             <div style="font-size: 0.8rem; color: var(--accent-purple); text-transform: uppercase; font-weight: 800;">🔴 Team Bravo</div>
-            <span class="lobby-game-tag" style="background: rgba(157,78,221,0.15); color: var(--accent-purple); font-size: 0.72rem; font-weight: 800;" id="teamBCountTag">5 Players</span>
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
+              <span class="lobby-game-tag" id="teamBLockBadge" style="background: rgba(255, 171, 0, 0.15); color: var(--accent-gold); font-size: 0.72rem; font-weight: 800;">⏳ Ready to Lock</span>
+              <span class="lobby-game-tag" style="background: rgba(157,78,221,0.15); color: var(--accent-purple); font-size: 0.72rem; font-weight: 800;" id="teamBCountTag">5 Players</span>
+            </div>
           </div>
           <div style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem;" id="captainBName">Captain Bravo</div>
           <div id="teamBList" style="max-height: 280px; overflow-y: auto; padding-right: 0.3rem;"></div>
@@ -3257,7 +3261,7 @@
         <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
           <span>🗺️</span> Competitive Map Veto & Ban Phase
         </h4>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem;">Captains alternate banning maps. Click "Ban Map" or "Pick Map" to establish the official match map!</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem;">Captains alternate banning maps. Click "Ban Map" or "Pick Map" to establish the official match map before locking in!</p>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.6rem;" id="mapVetoGridContainer">
           <!-- Injected via app.js -->
         </div>
@@ -3268,13 +3272,15 @@
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-        <div style="display: flex; gap: 0.5rem;">
-          <button class="btn btn-secondary btn-sm" id="btnPassTurnCap" onclick="window.app.passTurnToCaptain1()">⏩ Pass First Pick (Cap #2 -> Cap #1)</button>
-          <button class="btn btn-secondary btn-sm" id="btnReDraftTeams">🔄 Re-Shuffle Draft</button>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button class="btn btn-secondary btn-sm" id="btnPassTurnCap" onclick="window.app.passTurnToCaptain1()">⏩ Pass First Pick</button>
+          <button class="btn btn-secondary btn-sm" id="btnReDraftTeams">🔄 Re-Shuffle Roster</button>
         </div>
-        <div style="display: flex; gap: 0.6rem;">
-          <button class="btn btn-secondary" id="btnCloseAutoDraftModal">Cancel</button>
-          <button class="btn btn-primary" id="btnConfirmDraftTeams">Lock Teams & Start Scrim 🎮</button>
+        <div style="display: flex; gap: 0.6rem; align-items: center;">
+          <button class="btn btn-secondary" id="btnCloseAutoDraftModal" onclick="window.app.attemptAbandonDraft()">Abandon Draft (Forfeit)</button>
+          <button class="btn btn-primary" id="btnConfirmDraftTeams" style="font-weight: 900; font-size: 1rem; padding: 0.7rem 1.6rem; box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); background: linear-gradient(135deg, #00f2fe, #4facfe); border: none; cursor: pointer; letter-spacing: 0.5px;">
+            🔒 LOCK IN DRAFT
+          </button>
         </div>
       </div>
     </div>

@@ -4633,36 +4633,173 @@ class CustomLobbiesApp {
     this.bannedMaps.clear();
     this.selectedMatchMap = null;
     this.passedFirstPick = false;
+    this.isDraftSessionLockedIn = false;
 
-    // Sync in-modal game select dropdown
-    const gameSelect = document.getElementById('draftGameSelect');
-    if (gameSelect) {
-      const matchedOpt = Array.from(gameSelect.options).find(opt => 
-        opt.value.toLowerCase() === this.currentDraftGame.toLowerCase() ||
-        this.currentDraftGame.toLowerCase().includes(opt.value.toLowerCase()) ||
-        opt.value.toLowerCase().includes(this.currentDraftGame.toLowerCase())
-      );
-      if (matchedOpt) {
-        gameSelect.value = matchedOpt.value;
-        this.currentDraftGame = matchedOpt.value;
-      }
+    // Display locked game in draft session banner
+    const lockedGameTitle = document.getElementById('draftLockedGameTitle');
+    if (lockedGameTitle) {
+      lockedGameTitle.textContent = this.currentDraftGame;
+    }
+
+    const titleEl = document.getElementById('draftGameTitle');
+    if (titleEl) {
+      titleEl.textContent = `🐍 ${this.currentDraftGame} — Competitive Draft Session`;
+    }
+
+    const statusLock = document.getElementById('draftSessionLockStatus');
+    if (statusLock) {
+      statusLock.textContent = '🔒 SESSION ACTIVE';
+      statusLock.style.background = 'rgba(255, 77, 77, 0.15)';
+      statusLock.style.color = '#ff4d4d';
+      statusLock.style.borderColor = 'rgba(255, 77, 77, 0.4)';
+    }
+
+    const badgeA = document.getElementById('teamALockBadge');
+    const badgeB = document.getElementById('teamBLockBadge');
+    if (badgeA) {
+      badgeA.textContent = '⏳ Ready to Lock';
+      badgeA.style.background = 'rgba(255, 171, 0, 0.15)';
+      badgeA.style.color = 'var(--accent-gold)';
+    }
+    if (badgeB) {
+      badgeB.textContent = '⏳ Ready to Lock';
+      badgeB.style.background = 'rgba(255, 171, 0, 0.15)';
+      badgeB.style.color = 'var(--accent-gold)';
+    }
+
+    const btnConfirm = document.getElementById('btnConfirmDraftTeams');
+    if (btnConfirm) {
+      btnConfirm.disabled = false;
+      btnConfirm.textContent = '🔒 LOCK IN DRAFT';
+      btnConfirm.style.background = 'linear-gradient(135deg, #00f2fe, #4facfe)';
     }
 
     const modal = document.getElementById('autoDraftModal');
-    const titleEl = document.getElementById('draftGameTitle');
-    if (titleEl) {
-      titleEl.textContent = `🐍 ${lobbyTitle || this.currentDraftGame} — FACEIT Snake Draft Board`;
-    }
     if (modal) modal.classList.add('active');
+
     this.runDraftSimulation();
     this.renderMapVetoGrid();
+    this.startDraftSessionTimer(45);
+  }
+
+  startDraftSessionTimer(seconds = 45) {
+    this.stopDraftSessionTimer();
+    this.draftSecondsRemaining = seconds;
+    const badge = document.getElementById('draftSessionTimerBadge');
+    if (badge) {
+      badge.textContent = `⏱️ ${this.draftSecondsRemaining}s Lock-In`;
+      badge.style.color = 'var(--accent-cyan)';
+      badge.style.borderColor = 'rgba(0, 242, 254, 0.35)';
+      badge.style.background = 'rgba(0, 242, 254, 0.15)';
+    }
+
+    this.draftSessionTimerInterval = setInterval(() => {
+      this.draftSecondsRemaining--;
+      if (badge) {
+        badge.textContent = `⏱️ ${this.draftSecondsRemaining}s Lock-In`;
+        if (this.draftSecondsRemaining <= 10) {
+          badge.style.color = '#ff4d4d';
+          badge.style.borderColor = '#ff4d4d';
+          badge.style.background = 'rgba(255, 77, 77, 0.2)';
+        }
+      }
+
+      if (this.draftSecondsRemaining <= 0) {
+        this.stopDraftSessionTimer();
+        this.lockInDraftSession(true);
+      }
+    }, 1000);
+  }
+
+  stopDraftSessionTimer() {
+    if (this.draftSessionTimerInterval) {
+      clearInterval(this.draftSessionTimerInterval);
+      this.draftSessionTimerInterval = null;
+    }
+  }
+
+  lockInDraftSession(isAutoTimeout = false) {
+    if (this.isDraftSessionLockedIn) return;
+    this.isDraftSessionLockedIn = true;
+    this.stopDraftSessionTimer();
+
+    // Auto-pick final match map from pool if not manually selected
+    if (!this.selectedMatchMap) {
+      const maps = window.eloEngine.getGameMapPool(this.currentDraftGame) || [];
+      const unbanned = maps.filter(m => !this.bannedMaps.has(m));
+      this.selectedMatchMap = unbanned.length > 0 ? unbanned[0] : (maps[0] || 'Official Arena');
+      this.renderMapVetoGrid();
+    }
+
+    const badgeA = document.getElementById('teamALockBadge');
+    const badgeB = document.getElementById('teamBLockBadge');
+    const statusLock = document.getElementById('draftSessionLockStatus');
+    const btnConfirm = document.getElementById('btnConfirmDraftTeams');
+    const timerBadge = document.getElementById('draftSessionTimerBadge');
+
+    if (badgeA) {
+      badgeA.textContent = '✔ LOCKED IN';
+      badgeA.style.background = 'rgba(0, 230, 118, 0.2)';
+      badgeA.style.color = 'var(--accent-green)';
+    }
+    if (badgeB) {
+      badgeB.textContent = '✔ LOCKED IN';
+      badgeB.style.background = 'rgba(0, 230, 118, 0.2)';
+      badgeB.style.color = 'var(--accent-green)';
+    }
+    if (statusLock) {
+      statusLock.textContent = '✔ DRAFT LOCKED';
+      statusLock.style.background = 'rgba(0, 230, 118, 0.2)';
+      statusLock.style.color = 'var(--accent-green)';
+      statusLock.style.borderColor = 'var(--accent-green)';
+    }
+    if (timerBadge) {
+      timerBadge.textContent = '✔ LOCKED';
+      timerBadge.style.background = 'rgba(0, 230, 118, 0.2)';
+      timerBadge.style.color = 'var(--accent-green)';
+    }
+    if (btnConfirm) {
+      btnConfirm.disabled = true;
+      btnConfirm.textContent = '✔ LOCKED IN — STARTING SCRIM...';
+      btnConfirm.style.background = 'linear-gradient(135deg, #00e676, #00b0ff)';
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('match_found');
+      if (typeof window.widgetBuilderEngine.showToast === 'function') {
+        window.widgetBuilderEngine.showToast(`🔒 DRAFT LOCKED IN! All rosters confirmed for ${this.currentDraftGame}. Launching 128-tick node...`, 'success');
+      }
+    }
+
+    setTimeout(() => {
+      const modal = document.getElementById('autoDraftModal');
+      if (modal) modal.classList.remove('active');
+      this.launchFaceitMatchRoom(this.currentDraftLobby || this.currentDraftGame, this.currentDraftGame);
+    }, 700);
+  }
+
+  attemptAbandonDraft() {
+    const confirmed = confirm(`⚠️ DRAFT SESSION IN PROGRESS!\n\nYou must lock in your draft teams and map to begin the match.\n\nAbandoning now will cancel the session and register a forfeit penalty for your team. Are you sure you want to forfeit?`);
+    if (confirmed) {
+      this.stopDraftSessionTimer();
+      const modal = document.getElementById('autoDraftModal');
+      if (modal) modal.classList.remove('active');
+      if (window.widgetBuilderEngine?.showToast) {
+        window.widgetBuilderEngine.showToast('Draft session aborted.', 'warning');
+      }
+    }
   }
 
   onDraftGameSelectChange(gameTitle) {
+    // Enforce locked draft session: Game cannot be changed
+    if (this.currentDraftGame) {
+      console.warn('Game is locked for this draft session and cannot be changed.');
+      return;
+    }
     this.currentDraftGame = gameTitle;
     const titleEl = document.getElementById('draftGameTitle');
     if (titleEl) {
-      titleEl.textContent = `🐍 ${gameTitle} — FACEIT Snake Draft Board`;
+      titleEl.textContent = `🐍 ${gameTitle} — Competitive Draft Session`;
     }
     this.bannedMaps.clear();
     this.selectedMatchMap = null;
@@ -4753,15 +4890,20 @@ class CustomLobbiesApp {
     const btnClose = document.getElementById('btnCloseAutoDraftModal');
     const btnReDraft = document.getElementById('btnReDraftTeams');
     const btnConfirmDraft = document.getElementById('btnConfirmDraftTeams');
-    const modal = document.getElementById('autoDraftModal');
 
-    if (btnClose) btnClose.addEventListener('click', () => modal.classList.remove('active'));
-    if (btnReDraft) btnReDraft.addEventListener('click', () => this.runDraftSimulation());
+    if (btnClose) {
+      btnClose.addEventListener('click', () => this.attemptAbandonDraft());
+    }
+    if (btnReDraft) {
+      btnReDraft.addEventListener('click', () => {
+        if (this.isDraftSessionLockedIn) return;
+        this.runDraftSimulation();
+      });
+    }
 
     if (btnConfirmDraft) {
       btnConfirmDraft.addEventListener('click', () => {
-        modal.classList.remove('active');
-        this.launchFaceitMatchRoom(this.currentDraftLobby || this.currentDraftGame, this.currentDraftGame);
+        this.lockInDraftSession();
       });
     }
   }
