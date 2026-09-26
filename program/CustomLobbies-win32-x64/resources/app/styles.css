@@ -1518,7 +1518,213 @@ body.obs-transparent-mode {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.65rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.discord-server-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.server-rail-divider {
+  width: 32px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.14);
+  margin: 0.15rem 0;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.server-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.server-icon::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 0px;
+  background: #ffffff;
+  border-radius: 0 4px 4px 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.server-icon:hover::before {
+  height: 20px;
+}
+
+.server-icon.active::before {
+  height: 38px;
+}
+
+/* Full Discord Client Standalone Mode */
+body.discord-client-fullscreen .navbar {
+  display: none !important;
+}
+
+body.discord-client-fullscreen .desktop-program-titlebar {
+  background: #1e1f22;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-app-region: drag;
+}
+
+body.discord-client-fullscreen .desktop-win-btn,
+body.discord-client-fullscreen .desktop-titlebar-btn {
+  -webkit-app-region: no-drag;
+}
+
+body.discord-client-fullscreen .discord-hub-container {
+  height: calc(100vh - 42px);
+  min-height: 0;
+  margin: 0;
+  gap: 0.5rem;
+  padding: 0.4rem;
+}
+
+/* Discord Voice Connected Dock in Sidebar */
+.discord-voice-connected-dock {
+  background: rgba(35, 165, 90, 0.12);
+  border: 1px solid rgba(35, 165, 90, 0.4);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.voice-conn-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #23a55a;
+  margin-bottom: 0.25rem;
+}
+
+.voice-conn-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.voice-conn-name {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.voice-conn-name:hover {
+  text-decoration: underline;
+  color: var(--accent-cyan);
+}
+
+.voice-conn-actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+/* Discord Voice Stage Live Room Call */
+.voice-call-stage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #111217;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.voice-stage-header {
+  padding: 0.75rem 1.25rem;
+  background: #1a1b23;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.voice-stage-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+  align-content: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.voice-participant-tile {
+  background: #1e1f26;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+}
+
+.voice-participant-tile.speaking-glow {
+  border-color: #23a55a;
+  box-shadow: 0 0 18px rgba(35, 165, 90, 0.65);
+}
+
+.voice-tile-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.6rem;
+  border: 3px solid #2b2d38;
+}
+
+.voice-tile-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.voice-tile-badge {
+  font-size: 0.72rem;
+  color: var(--accent-cyan);
+  margin-top: 0.15rem;
+}
+
+.voice-stage-controls {
+  background: #181920;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
 }
 
 .server-icon {
@@ -2415,5 +2621,496 @@ body.discord-activity-mode .navbar {
   border-bottom-color: #5865f2;
 }
 
+/* ==========================================================================
+   PARTY ENGINE & DIRECT TEAMS LOBBIES / QUEUES
+   ========================================================================== */
 
+.party-top-bar {
+  background: linear-gradient(90deg, rgba(20, 16, 35, 0.95), rgba(12, 16, 27, 0.95), rgba(20, 16, 35, 0.95));
+  border-bottom: 1px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  padding: 0.45rem 1.5rem;
+  position: relative;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.party-bar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.party-info-group {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.party-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid var(--accent-purple);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.25);
+}
+
+.party-count-tag {
+  background: var(--accent-purple);
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 900;
+}
+
+.party-members-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.party-member-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.party-member-chip.local-chip {
+  background: rgba(0, 242, 254, 0.08);
+  border-color: rgba(0, 242, 254, 0.4);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+}
+
+.party-avatar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.party-member-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.party-member-avatar-emoji {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ready-ring {
+  border: 2px solid var(--accent-green) !important;
+  box-shadow: 0 0 6px var(--accent-green);
+}
+
+.unready-ring {
+  border: 2px solid var(--accent-gold) !important;
+}
+
+.party-ready-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid #111;
+}
+
+.dot-ready {
+  background: var(--accent-green);
+  box-shadow: 0 0 5px var(--accent-green);
+}
+
+.dot-unready {
+  background: var(--accent-gold);
+}
+
+.party-crown {
+  position: absolute;
+  top: -7px;
+  right: -5px;
+  font-size: 0.7rem;
+}
+
+.party-member-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.party-member-name {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.party-member-elo {
+  font-size: 0.65rem;
+  color: var(--accent-gold);
+  font-weight: 700;
+}
+
+.party-chip-kick {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0 0.15rem;
+  transition: color 0.2s;
+}
+
+.party-chip-kick:hover {
+  color: var(--accent-red);
+}
+
+.party-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.party-ready-btn {
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.party-invite-btn {
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+}
+
+.party-full-badge {
+  font-size: 0.72rem;
+  font-weight: 900;
+  background: rgba(255, 171, 0, 0.2);
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.party-extra-menu {
+  display: flex;
+  gap: 0.35rem;
+}
+
+/* Direct Teams Lobby Cards Styling */
+.lobby-teams-direct-box {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.lobby-roster-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.78rem;
+  color: #fff;
+}
+
+.roster-chip-party {
+  background: rgba(168, 85, 247, 0.2) !important;
+  border-color: var(--accent-purple) !important;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.35) !important;
+}
+
+.chip-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 5px;
+  background: transparent;
+}
+
+.chip-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 105px;
+}
+
+/* ==========================================================================
+   TEAM SERVER RAIL & PUBLIC SHOWCASE STYLING
+   ========================================================================== */
+
+.server-icon.team-server-icon {
+  border: 2px solid rgba(168, 85, 247, 0.45);
+  background: linear-gradient(135deg, rgba(20, 15, 38, 0.95), rgba(30, 20, 58, 0.95));
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.server-icon.team-server-icon:hover {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.5);
+}
+
+.server-icon.team-server-icon.active {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.6);
+}
+
+.server-icon.showcase-hub-icon {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.2));
+  border: 2px solid rgba(255, 215, 0, 0.5);
+  color: var(--accent-gold);
+}
+
+.server-icon.showcase-hub-icon:hover {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Corner Privacy Badges on Server Rail */
+.team-rail-privacy-pill {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  z-index: 2;
+}
+
+.team-rail-privacy-pill.public {
+  background: #00f2fe;
+  color: #050b14;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.7);
+  animation: pulse-public 2.5s infinite;
+}
+
+.team-rail-privacy-pill.private {
+  background: #334155;
+  color: #f1f5f9;
+  border: 1.5px solid #64748b;
+}
+
+@keyframes pulse-public {
+  0% { box-shadow: 0 0 4px rgba(0, 242, 254, 0.4); }
+  50% { box-shadow: 0 0 10px rgba(0, 242, 254, 0.9); }
+  100% { box-shadow: 0 0 4px rgba(0, 242, 254, 0.4); }
+}
+
+/* Inline Team Privacy Pills */
+.team-privacy-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.team-privacy-pill.public {
+  background: rgba(0, 242, 254, 0.15) !important;
+  color: var(--accent-cyan) !important;
+  border: 1px solid var(--accent-cyan) !important;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.25);
+}
+
+.team-privacy-pill.private {
+  background: rgba(148, 163, 184, 0.15) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(148, 163, 184, 0.35) !important;
+}
+
+/* Trophy Cabinet & Showcase Card Grid */
+.trophy-cabinet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.65rem;
+}
+
+.trophy-card {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  transition: all 0.2s ease;
+}
+
+.trophy-card:hover {
+  border-color: var(--accent-gold);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 255, 255, 0.04));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+}
+
+.trophy-card-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
+}
+
+.trophy-card-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.trophy-card-subtitle {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-top: 0.1rem;
+}
+
+/* Stat Matrix */
+.stat-matrix-card {
+  background: rgba(8, 12, 22, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.2rem;
+}
+
+.stat-matrix-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.stat-matrix-val {
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-family: monospace;
+}
+
+.stat-matrix-sub {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+/* Showcase Roster Grid */
+.showcase-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 0.6rem;
+}
+
+.showcase-roster-member {
+  background: rgba(14, 18, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.65rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.showcase-roster-member.captain {
+  border-color: var(--accent-gold);
+  background: linear-gradient(180deg, rgba(255, 215, 0, 0.08), rgba(14, 18, 30, 0.9));
+}
+
+.showcase-roster-avatar {
+  font-size: 1.4rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.showcase-roster-name {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.showcase-roster-role {
+  font-size: 0.68rem;
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+.showcase-roster-rating {
+  font-size: 0.68rem;
+  color: var(--accent-gold);
+}
+
+/* Public Teams Directory Grid */
+.public-teams-directory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.8rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+
+.public-team-card {
+  background: rgba(12, 16, 28, 0.9);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  border-radius: 8px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.6rem;
+  transition: all 0.2s ease;
+}
+
+.public-team-card:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 4px 16px rgba(0, 242, 254, 0.2);
+  transform: translateY(-2px);
+}
 

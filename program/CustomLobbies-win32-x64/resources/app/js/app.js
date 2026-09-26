@@ -2728,6 +2728,7 @@ class CustomLobbiesApp {
     grid.innerHTML = this.myCreatedTeams.map(t => {
       const emblemHTML = this.renderEmblemHTML(t.emblem || '🛡️', '1.4rem');
       const synergy = t.synergy || '100% Synergy';
+      const isPublic = t.privacy !== 'private';
 
       return `
         <div class="card" style="border-color: var(--accent-purple); position: relative; display: flex; flex-direction: column; justify-content: space-between;">
@@ -2737,6 +2738,9 @@ class CustomLobbiesApp {
                 ${emblemHTML}
                 <span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe; font-weight: 900; border: 1px solid var(--accent-purple);">${t.tag}</span>
                 <span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan);">${t.game}</span>
+                <span class="team-privacy-pill ${isPublic ? 'public' : 'private'}" style="font-size: 0.65rem; padding: 0.1rem 0.35rem; border-radius: 4px;">
+                  ${isPublic ? '🌐 PUBLIC SHOWCASE' : '🔒 PRIVATE SQUAD'}
+                </span>
               </div>
               <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 800;">${t.record || '0W - 0L'}</span>
             </div>
@@ -2757,9 +2761,15 @@ class CustomLobbiesApp {
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.5rem;">
+            <button class="btn btn-warning btn-sm" style="padding: 0.3rem 0.5rem; font-size: 0.75rem;" onclick="if(window.chatVoiceManager) window.chatVoiceManager.openTeamPublicShowcase('${t.id}')" title="Publicly Show Off Team Card (Trophies & Stats)">
+              <span>✨</span> Show Off
+            </button>
+            <button class="btn btn-outline-cyan btn-sm" style="padding: 0.3rem 0.45rem; font-size: 0.72rem;" onclick="if(window.chatVoiceManager) window.chatVoiceManager.toggleTeamPrivacy('${t.id}')" title="Toggle Public Showcase vs Private Squad">
+              ${isPublic ? '🔒 Set Private' : '🌐 Go Public'}
+            </button>
             <button class="btn btn-purple btn-sm" style="flex: 1; padding: 0.3rem 0.5rem; font-size: 0.78rem;" onclick="window.app.openManageTeamModal('${t.id}')">
-              📋 Roster Hub
+              📋 Roster
             </button>
             <button class="btn btn-cyan btn-sm" style="padding: 0.3rem 0.5rem; font-size: 0.78rem;" onclick="window.app.openTeamScrimModal('${t.id}')">
               ⚔️ Scrim
@@ -2780,6 +2790,7 @@ class CustomLobbiesApp {
     const captain = document.getElementById('modalTeamCaptain').value.trim() || (this.user ? this.user.displayName : 'Sean');
     const focus = document.getElementById('modalTeamFocus') ? document.getElementById('modalTeamFocus').value : 'Competitive Scrims';
     const game = document.getElementById('modalTeamGame').value;
+    const privacy = document.getElementById('modalTeamPrivacy') ? document.getElementById('modalTeamPrivacy').value : 'public';
     const emblem = this.selectedClanEmblem || '🛡️';
     const membersRaw = document.getElementById('modalTeamMembers').value.trim();
 
@@ -2792,6 +2803,7 @@ class CustomLobbiesApp {
       tag,
       emblem,
       focus,
+      privacy,
       synergy: '100% (Role-Balanced)',
       captain,
       game,
@@ -2818,6 +2830,37 @@ class CustomLobbiesApp {
       window.leaguesEngine.registerLeagueTeam(name, tag, captain, game, 'Premier Division');
     }
 
+    // Sync with chat-voice manager if available
+    if (window.chatVoiceManager && typeof window.chatVoiceManager.loadTeamChannels === 'function') {
+      const cleanSlug = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+      const channelName = `team-${cleanSlug}`;
+      if (!window.chatVoiceManager.teamChannels) window.chatVoiceManager.teamChannels = [];
+      window.chatVoiceManager.teamChannels.unshift({
+        id: channelName,
+        teamId: newTeam.id,
+        name: newTeam.name,
+        tag: newTeam.tag,
+        channelName: channelName,
+        voiceRoom: `voice-${channelName}`,
+        game: newTeam.game,
+        emblem: newTeam.emblem,
+        captain: newTeam.captain,
+        membersCount: newTeam.members.length,
+        members: newTeam.members,
+        motto: newTeam.focus,
+        privacy: newTeam.privacy,
+        elo: newTeam.elo,
+        record: newTeam.record,
+        kd: newTeam.kd,
+        bountyEarned: newTeam.bountyEarned,
+        hasText: true,
+        hasVoice: true
+      });
+      window.chatVoiceManager.saveTeamChannels();
+      window.chatVoiceManager.renderGuildRail();
+      window.chatVoiceManager.renderTeamChannels();
+    }
+
     this.clPoints += 150;
     this.updatePointsWidget();
 
@@ -2828,7 +2871,8 @@ class CustomLobbiesApp {
     this.closeCreateTeamModal();
     this.renderMyCreatedTeams();
 
-    alert(`🎉 TEAM CREATED SUCCESSFULLY!\n\n${name} ${tag} created for ${game}!\nCustom Emblem Saved & Team Chemistry Synergy Active (+150 🪙 CL-Points)!`);
+    const modeText = privacy === 'public' ? '🌐 PUBLIC SHOWCASE (Showing Off Trophies & Stats)' : '🔒 PRIVATE SQUAD (Protected Comms)';
+    alert(`🎉 TEAM CREATED SUCCESSFULLY!\n\n${name} ${tag} created for ${game}!\nMode: ${modeText}\nCustom Emblem Saved & Team Chemistry Synergy Active (+150 🪙 CL-Points)!`);
   }
 
   openManageTeamModal(teamId) {
