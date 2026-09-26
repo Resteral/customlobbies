@@ -241,6 +241,18 @@ class StreamStudioEngine {
     alert(`📱 VERTICAL 9:16 EXPORT COMPLETE!\n\nClip "${clip.title}" exported in portrait format (1080x1920 60FPS) with #CustomLobbies branding! Ready for TikTok / Shorts / Reels!`);
   }
 
+  renderFarmedClipsFeed() {
+    const container = document.getElementById('farmedClipsGrid') || document.getElementById('farmedClipsFeedContainer');
+    if (!container) return;
+    if (!Array.isArray(this.farmedClips)) this.farmedClips = [];
+    container.innerHTML = this.farmedClips.map(clip => `
+      <div class="card" style="padding: 0.8rem; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px;">
+        <div style="font-weight: 800; font-size: 0.9rem; color: #fff;">${clip.title}</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">${clip.game} • ${clip.trigger}</div>
+      </div>
+    `).join('');
+  }
+
   openAnnouncementModal() {
     const modal = document.getElementById('streamerAnnouncementModal');
     if (modal) modal.classList.add('active');

@@ -373,6 +373,12 @@ class LeaguesEngine {
     }
     return { winsA: 2, winsB: 1, total: 3, lastMatch: 'Last Week (Close Duel)' };
   }
+
+  // Get League info for specific game
+  getLeagueForGame(gameName) {
+    if (!gameName) return this.leagues['Counter-Strike 2'];
+    return this.leagues[gameName] || this.leagues['Counter-Strike 2'];
+  }
 }
 
 // Global Export

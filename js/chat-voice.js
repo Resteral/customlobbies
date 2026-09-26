@@ -1465,6 +1465,7 @@ class ChatVoiceManager {
     }
 
     // Seed default message for team-vanguard if not present
+    if (!this.textMessages) this.textMessages = {};
     if (!this.textMessages['team-vanguard']) {
       this.textMessages['team-vanguard'] = [
         {
@@ -1941,6 +1942,7 @@ class ChatVoiceManager {
       this.savePrivateLobbies();
     }
 
+    if (!this.textMessages) this.textMessages = {};
     if (!this.textMessages['lobby-cs2-mirage-scrim']) {
       this.textMessages['lobby-cs2-mirage-scrim'] = [
         {

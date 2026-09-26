@@ -5091,7 +5091,8 @@ class CustomLobbiesApp {
 
       const renderTeamChips = (teamObj, teamKey, isBlue) => {
         let chips = [];
-        for (let i = 0; i < teamObj.max; i++) {
+        const maxDisplay = Math.min(teamObj.max || 5, 5);
+        for (let i = 0; i < maxDisplay; i++) {
           if (i < teamObj.members.length) {
             const m = teamObj.members[i];
             const isParty = m.isParty || (window.partyEngine && window.partyEngine.isInParty(m.name));
@@ -5109,6 +5110,15 @@ class CustomLobbiesApp {
               </div>
             `);
           }
+        }
+        if (teamObj.max > 5) {
+          const remaining = teamObj.max - 5;
+          const remainingMembers = Math.max(0, teamObj.members.length - 5);
+          chips.push(`
+            <div style="font-size: 0.68rem; color: var(--text-dim); text-align: center; padding: 0.15rem 0; font-weight: 600;">
+              +${remaining} more slots (${remainingMembers} filled)
+            </div>
+          `);
         }
         return chips.join('');
       };

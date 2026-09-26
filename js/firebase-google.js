@@ -41,6 +41,13 @@ class FirebaseGoogleEngine {
     }
   }
 
+  setupTTSVoiceAlerts() {
+    // Initialize Web Speech Synthesis API
+    if ('speechSynthesis' in window) {
+      this.ttsSynth = window.speechSynthesis;
+    }
+  }
+
   setupGoogleAuth() {
     const btnGoogle = document.getElementById('btnGoogleSignIn');
     if (!btnGoogle) return;
