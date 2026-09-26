@@ -825,6 +825,19 @@
               </div>
             </div>
 
+            <!-- Captaincy Preference & Matchmaker Settings -->
+            <div style="background: rgba(0, 242, 254, 0.06); padding: 0.85rem; border-radius: 8px; margin-bottom: 1.2rem; border: 1px solid rgba(0, 242, 254, 0.25);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <span style="font-size: 0.82rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase;">🛡️ Captaincy Settings</span>
+                <span class="lobby-game-tag" id="passportCaptainStatusBadge" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-size: 0.72rem; font-weight: 800;">👑 Eligible</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.6rem;">Set whether competitive draft sessions can automatically assign you as Team Captain when holding top MMR.</p>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; cursor: pointer; color: #fff; background: rgba(0,0,0,0.3); padding: 0.4rem 0.6rem; border-radius: 5px; border: 1px solid rgba(255,255,255,0.08);">
+                <input type="checkbox" id="passportOptOutCaptainCheckbox" onchange="window.app.toggleCaptainOptOut(this.checked)" style="accent-color: var(--accent-cyan); cursor: pointer; width: 16px; height: 16px;">
+                <span><strong>Opt out:</strong> Do not allow me to be captain</span>
+              </label>
+            </div>
+
             <!-- Linked Gaming Accounts List -->
             <div style="display: flex; flex-direction: column; gap: 0.6rem; background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; margin-bottom: 1.2rem; font-size: 0.85rem;">
               <div style="display: flex; justify-content: space-between;">
@@ -1141,7 +1154,7 @@
             <div style="display: flex; gap: 0.2rem; align-items: center;">
               <button class="icon-btn-sm" id="btnUserMicToggle" title="Mute/Unmute Mic">🎙️</button>
               <button class="icon-btn-sm" id="btnUserDeafenToggle" title="Deafen">🎧</button>
-              <button class="icon-btn-sm" title="User Settings">⚙️</button>
+              <button class="icon-btn-sm" id="btnUserPreferences" onclick="window.app.openUserSettingsModal()" title="User Settings (Captaincy & Audio Preferences)">⚙️</button>
             </div>
           </div>
         </div>
@@ -3268,8 +3281,17 @@
         </div>
       </div>
 
-      <div style="background: rgba(255, 255, 255, 0.05); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; text-align: center; color: var(--text-main); margin-bottom: 1.5rem;" id="draftMMRSummary">
+      <div style="background: rgba(255, 255, 255, 0.05); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; text-align: center; color: var(--text-main); margin-bottom: 1rem;" id="draftMMRSummary">
         Team Alpha Avg: 1890 MMR | Team Bravo Avg: 1885 MMR | Rating Delta: 5 MMR (Fair Match)
+      </div>
+
+      <!-- Quick Captaincy Preference Bar in Draft Modal -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.35); padding: 0.6rem 0.9rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.6rem;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.82rem; color: #fff;">
+          <input type="checkbox" id="draftOptOutCaptainCheckbox" onchange="window.app.toggleCaptainOptOut(this.checked)" style="accent-color: var(--accent-cyan); width: 16px; height: 16px; cursor: pointer;">
+          <span><strong>My Captaincy Setting:</strong> Do not allow me to be captain (Opt Out)</span>
+        </label>
+        <span style="font-size: 0.75rem; color: var(--text-dim); font-style: italic;">(If enabled, you will not be drafted as Captain even if holding top MMR)</span>
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
@@ -3442,6 +3464,61 @@
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
         <button class="btn btn-purple" onclick="alert('💬 MESSAGE SENT!\n\nDirect message opened on CustomLobbies Chat & Voice Hub!')">💬 Direct Message</button>
         <button class="btn btn-primary" onclick="alert('⚔️ CHALLENGE DISPATCHED!\n\n1v1 Duel challenge invite sent!')">⚔️ Challenge 1v1</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User & Competitive Match Settings Modal -->
+  <div class="modal-overlay" id="userSettingsModal">
+    <div class="modal-card" style="max-width: 560px; border-color: var(--accent-cyan); box-shadow: 0 0 35px rgba(0, 242, 254, 0.2);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.7rem;">
+          <div style="font-size: 1.8rem;">⚙️</div>
+          <div>
+            <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--accent-cyan); margin: 0;">User & Match Settings</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Configure your competitive gameplay and captaincy preferences</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('userSettingsModal').classList.remove('active')">✕ Close</button>
+      </div>
+
+      <!-- Captaincy Preference Setting Card -->
+      <div style="background: rgba(0,0,0,0.45); padding: 1.1rem; border-radius: 8px; border: 1px solid var(--accent-cyan); margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+          <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+            <span>🛡️</span> Competitive Draft Captaincy
+          </h4>
+          <span class="lobby-game-tag" id="userSettingsCaptainStatusBadge" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-size: 0.72rem; font-weight: 800;">👑 Eligible</span>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 0.8rem;">
+          In competitive draft sessions, the matchmaker automatically assigns the top 2 MMR players as Captain Alpha and Captain Bravo. If you prefer not to lead team vetoes and player picks, check this setting to opt out.
+        </p>
+        <label style="display: flex; align-items: flex-start; gap: 0.7rem; background: rgba(255, 255, 255, 0.05); padding: 0.8rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer;">
+          <input type="checkbox" id="userSettingsOptOutCaptainCheckbox" onchange="window.app.toggleCaptainOptOut(this.checked)" style="accent-color: var(--accent-cyan); width: 18px; height: 18px; margin-top: 2px; cursor: pointer;">
+          <div>
+            <strong style="color: #fff; font-size: 0.9rem;">Do not allow me to be captain (Opt Out)</strong>
+            <div style="font-size: 0.76rem; color: var(--text-dim); margin-top: 0.2rem;">
+              When checked, the draft engine will skip you when designating Captains and assign the role to the next highest MMR player. You will still play and be drafted normally.
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Audio & Alert Settings Card -->
+      <div style="background: rgba(0,0,0,0.45); padding: 1.1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-cyan); margin: 0 0 0.6rem 0; display: flex; align-items: center; gap: 0.4rem;">
+          <span>🔔</span> Audio & Notifications
+        </h4>
+        <label style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.84rem; cursor: pointer; color: #fff;">
+          <input type="checkbox" id="userSettingsSoundFxCheckbox" checked style="accent-color: var(--accent-cyan); width: 16px; height: 16px; cursor: pointer;">
+          <span>Play fanfare sounds on Match Ready, Map Veto, and Draft Lock-In</span>
+        </label>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.6rem;">
+        <button class="btn btn-primary" onclick="document.getElementById('userSettingsModal').classList.remove('active')" style="padding: 0.6rem 1.4rem;">
+          Save Settings ✔
+        </button>
       </div>
     </div>
   </div>

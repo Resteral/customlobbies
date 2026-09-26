@@ -305,17 +305,23 @@ class EloEngine {
     };
   }
 
-  // Modified Captain Snake Draft (The two highest MMRs automatically get Captain)
+  // Modified Captain Snake Draft (Highest MMRs get Captain, respecting opt-out settings)
   performCustomSnakeDraft(playersPool, passFirstPick = false, selectionMode = 'highest_mmr') {
     let sorted = [...playersPool];
 
-    // Automatically designate the two highest MMR players as Team Captains
+    // Sort players by MMR descending
     sorted.sort((a, b) => (Number(b.elo || b.mmr) || 1800) - (Number(a.elo || a.mmr) || 1800));
 
-    const cap1 = sorted[0] || { name: 'Captain Alpha', elo: 2540, role: 'Team Captain' };
-    const cap2 = sorted[1] || { name: 'Captain Bravo', elo: 2480, role: 'Team Captain' };
+    // Filter players who allow being captain (not opted out)
+    const eligibleCaptains = sorted.filter(p => !p.optOutCaptain && !p.neverCaptain);
 
-    const unpicked = sorted.slice(2);
+    // Designate the two highest eligible MMR players as Team Captains (fallback gracefully if needed)
+    const cap1 = eligibleCaptains[0] || sorted[0] || { name: 'Captain Alpha', elo: 2540, role: 'Team Captain' };
+    const cap2 = eligibleCaptains.find(p => p.name !== cap1.name) || sorted.find(p => p.name !== cap1.name) || sorted[1] || { name: 'Captain Bravo', elo: 2480, role: 'Team Captain' };
+
+    // Remaining unpicked players (includes high MMR players who opted out of captaincy)
+    const unpicked = sorted.filter(p => p.name !== cap1.name && p.name !== cap2.name);
+
     const team1 = [{ ...cap1, isCaptain: true, captainRank: 1, pickNumber: 0, pickLabel: '👑 Auto-Captain (#1 MMR)' }];
     const team2 = [{ ...cap2, isCaptain: true, captainRank: 2, pickNumber: 0, pickLabel: '👑 Auto-Captain (#2 MMR)' }];
 
@@ -350,7 +356,10 @@ class EloEngine {
     const sum1 = team1.reduce((acc, p) => acc + (p.elo || 1800), 0);
     const sum2 = team2.reduce((acc, p) => acc + (p.elo || 1800), 0);
 
-    const criteriaLabel = 'Auto-Designated Highest MMR (Top 2 Players)';
+    const optedOutCount = sorted.filter(p => p.optOutCaptain || p.neverCaptain).length;
+    const criteriaLabel = optedOutCount > 0 
+      ? `Auto-Designated Top MMR (${optedOutCount} opted out of captaincy)` 
+      : 'Auto-Designated Highest MMR (Top 2 Players)';
 
     return {
       captain1: cap1,
@@ -361,7 +370,8 @@ class EloEngine {
       avgMMR2: Math.round(sum2 / (team2.length || 1)),
       mmrDelta: Math.abs(Math.round(sum1 / (team1.length || 1)) - Math.round(sum2 / (team2.length || 1))),
       firstPickOwner: passFirstPick ? 'Captain #1 (Passed by Cap #2)' : 'Captain #2',
-      criteriaLabel: criteriaLabel
+      criteriaLabel: criteriaLabel,
+      optedOutCount: optedOutCount
     };
   }
 

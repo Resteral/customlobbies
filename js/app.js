@@ -10,6 +10,8 @@ class CustomLobbiesApp {
     this.bannedMaps = new Set();
     this.selectedMatchMap = null;
     this.passedFirstPick = false;
+    this.userCaptainOptOut = false;
+    this.playerCaptainOptOuts = new Set();
     this.acStatus = 'ACTIVE_RING0';
     this.clPoints = 2450;
     this.equippedTitle = '💎 Diamond Veteran';
@@ -301,6 +303,14 @@ class CustomLobbiesApp {
         if (parsed.lineup) this.teamLineup = parsed.lineup;
         if (parsed.bench) this.teamBench = parsed.bench;
       }
+      const savedCaptainOptOut = localStorage.getItem('cl_captain_opt_out');
+      if (savedCaptainOptOut !== null) this.userCaptainOptOut = (savedCaptainOptOut === 'true');
+      const savedPlayerOptOuts = localStorage.getItem('cl_player_opt_outs');
+      if (savedPlayerOptOuts) {
+        try {
+          this.playerCaptainOptOuts = new Set(JSON.parse(savedPlayerOptOuts));
+        } catch(e) {}
+      }
       this.loadFrontpageServers();
     } catch (e) {
       console.warn('Error loading app state:', e);
@@ -315,6 +325,8 @@ class CustomLobbiesApp {
       localStorage.setItem('cl_title_v2', this.equippedTitle);
       localStorage.setItem('cl_leaderboard_v2', JSON.stringify(this.leaderboardData));
       localStorage.setItem('cl_lineup_v2', JSON.stringify({ lineup: this.teamLineup, bench: this.teamBench }));
+      localStorage.setItem('cl_captain_opt_out', this.userCaptainOptOut ? 'true' : 'false');
+      localStorage.setItem('cl_player_opt_outs', JSON.stringify([...(this.playerCaptainOptOuts || [])]));
       this.saveFrontpageServers();
     } catch (e) {
       console.warn('Error saving app state:', e);
@@ -344,6 +356,7 @@ class CustomLobbiesApp {
     this.setupCaptainModeToggle();
     this.setupGameDraftPoolButton();
     this.setupLeaderboardHandlers();
+    this.updateCaptainOptOutUI();
   }
 
   loadFavorites() {
@@ -4624,6 +4637,16 @@ class CustomLobbiesApp {
       counter++;
     }
 
+    // Apply captaincy opt-out settings to each player in the draft pool
+    baseList.forEach(p => {
+      const isCurrentUser = (p.name && (p.name.includes('You') || p.name === 'You (Host)')) || p.isCurrentUser;
+      if (isCurrentUser) {
+        p.optOutCaptain = Boolean(this.userCaptainOptOut);
+      } else {
+        p.optOutCaptain = Boolean(p.optOutCaptain || (this.playerCaptainOptOuts && this.playerCaptainOptOuts.has(p.name)));
+      }
+    });
+
     return baseList.slice(0, targetCapacity);
   }
 
@@ -4865,6 +4888,7 @@ class CustomLobbiesApp {
           <div>
             <span style="font-weight: 800; color: ${idx === 0 ? 'var(--accent-gold)' : '#fff'};">${idx === 0 ? '👑 ' : ''}${p.name}</span>
             ${idx === 0 ? `<span style="font-size: 0.68rem; background: rgba(255,215,0,0.22); color: var(--accent-gold); padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,215,0,0.35);">AUTO-CAPTAIN (#1 MMR)</span>` : ''}
+            ${idx > 0 && p.optOutCaptain ? `<span style="font-size: 0.65rem; background: rgba(255,77,77,0.18); color: #ff6b6b; padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,77,77,0.35);" title="Player setting: Do not allow to be captain">🚫 OPTED OUT OF CAPTAIN</span>` : ''}
             ${p.role ? `<span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 0.35rem;">[${p.role}]</span>` : ''}
           </div>
           <div style="text-align: right;">
@@ -4881,6 +4905,7 @@ class CustomLobbiesApp {
           <div>
             <span style="font-weight: 800; color: ${idx === 0 ? 'var(--accent-gold)' : '#fff'};">${idx === 0 ? '👑 ' : ''}${p.name}</span>
             ${idx === 0 ? `<span style="font-size: 0.68rem; background: rgba(255,215,0,0.22); color: var(--accent-gold); padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,215,0,0.35);">AUTO-CAPTAIN (#2 MMR)</span>` : ''}
+            ${idx > 0 && p.optOutCaptain ? `<span style="font-size: 0.65rem; background: rgba(255,77,77,0.18); color: #ff6b6b; padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,77,77,0.35);" title="Player setting: Do not allow to be captain">🚫 OPTED OUT OF CAPTAIN</span>` : ''}
             ${p.role ? `<span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 0.35rem;">[${p.role}]</span>` : ''}
           </div>
           <div style="text-align: right;">
@@ -4893,8 +4918,91 @@ class CustomLobbiesApp {
 
     const summaryEl = document.getElementById('draftMMRSummary');
     if (summaryEl) {
-      summaryEl.innerHTML = `👑 <strong>Auto-Captains Assigned to Top 2 MMRs:</strong> 🔵 Team Alpha: <strong>${result.captain1.name} (${result.captain1.elo} MMR)</strong> | 🔴 Team Bravo: <strong>${result.captain2.name} (${result.captain2.elo} MMR)</strong><br>🐍 <strong>Snake Pick Order (1-2-2-1)</strong> | Game: <strong style="color: var(--accent-cyan);">${this.currentDraftGame}</strong> (${maxCap} Players) | First Pick: <strong>${result.firstPickOwner}</strong><br>🔵 Team Alpha Avg: <strong>${result.avgMMR1} MMR</strong> | 🔴 Team Bravo Avg: <strong>${result.avgMMR2} MMR</strong> | MMR Delta: <strong>${result.mmrDelta} MMR (Fair Match)</strong>`;
+      const optOutNotice = result.optedOutCount > 0 
+        ? `<div style="margin-top: 0.35rem; font-size: 0.78rem; color: var(--accent-gold);">🛡️ <strong>${result.optedOutCount} player(s) opted out of captaincy</strong> in settings. Captains assigned to next highest eligible MMR.</div>` 
+        : '';
+      summaryEl.innerHTML = `👑 <strong>Auto-Captains Assigned to Top Eligible MMRs:</strong> 🔵 Team Alpha: <strong>${result.captain1.name} (${result.captain1.elo} MMR)</strong> | 🔴 Team Bravo: <strong>${result.captain2.name} (${result.captain2.elo} MMR)</strong><br>🐍 <strong>Snake Pick Order (1-2-2-1)</strong> | Game: <strong style="color: var(--accent-cyan);">${this.currentDraftGame}</strong> (${maxCap} Players) | First Pick: <strong>${result.firstPickOwner}</strong><br>🔵 Team Alpha Avg: <strong>${result.avgMMR1} MMR</strong> | 🔴 Team Bravo Avg: <strong>${result.avgMMR2} MMR</strong> | MMR Delta: <strong>${result.mmrDelta} MMR (Fair Match)</strong>${optOutNotice}`;
     }
+  }
+
+  setCaptainOptOut(optOut) {
+    this.userCaptainOptOut = Boolean(optOut);
+    this.saveState();
+    this.updateCaptainOptOutUI();
+    if (window.widgetBuilderEngine?.showToast) {
+      if (this.userCaptainOptOut) {
+        window.widgetBuilderEngine.showToast('🛡️ Captaincy Setting Saved: You will NOT be assigned as Captain in draft sessions.', 'warning');
+      } else {
+        window.widgetBuilderEngine.showToast('👑 Captaincy Setting Saved: You are now eligible to be assigned as Captain.', 'success');
+      }
+    }
+  }
+
+  toggleCaptainOptOut(checked) {
+    this.setCaptainOptOut(checked);
+    const draftModal = document.getElementById('autoDraftModal');
+    if (draftModal && draftModal.classList.contains('active') && !this.isDraftSessionLockedIn) {
+      this.runDraftSimulation();
+    }
+  }
+
+  togglePlayerCaptainOptOut(playerName) {
+    if (!this.playerCaptainOptOuts) this.playerCaptainOptOuts = new Set();
+    if (this.playerCaptainOptOuts.has(playerName)) {
+      this.playerCaptainOptOuts.delete(playerName);
+    } else {
+      this.playerCaptainOptOuts.add(playerName);
+    }
+    this.saveState();
+    const draftModal = document.getElementById('autoDraftModal');
+    if (draftModal && draftModal.classList.contains('active') && !this.isDraftSessionLockedIn) {
+      this.runDraftSimulation();
+    }
+  }
+
+  updateCaptainOptOutUI() {
+    const isOptedOut = Boolean(this.userCaptainOptOut);
+
+    const chkPassport = document.getElementById('passportOptOutCaptainCheckbox');
+    if (chkPassport) chkPassport.checked = isOptedOut;
+
+    const chkDraft = document.getElementById('draftOptOutCaptainCheckbox');
+    if (chkDraft) chkDraft.checked = isOptedOut;
+
+    const chkSettings = document.getElementById('userSettingsOptOutCaptainCheckbox');
+    if (chkSettings) chkSettings.checked = isOptedOut;
+
+    const badgePassport = document.getElementById('passportCaptainStatusBadge');
+    if (badgePassport) {
+      if (isOptedOut) {
+        badgePassport.textContent = '🚫 Opted Out';
+        badgePassport.style.background = 'rgba(255, 77, 77, 0.2)';
+        badgePassport.style.color = '#ff6b6b';
+      } else {
+        badgePassport.textContent = '👑 Eligible';
+        badgePassport.style.background = 'rgba(0, 230, 118, 0.2)';
+        badgePassport.style.color = 'var(--accent-green)';
+      }
+    }
+
+    const badgeSettings = document.getElementById('userSettingsCaptainStatusBadge');
+    if (badgeSettings) {
+      if (isOptedOut) {
+        badgeSettings.textContent = '🚫 Opted Out';
+        badgeSettings.style.background = 'rgba(255, 77, 77, 0.2)';
+        badgeSettings.style.color = '#ff6b6b';
+      } else {
+        badgeSettings.textContent = '👑 Eligible';
+        badgeSettings.style.background = 'rgba(0, 230, 118, 0.2)';
+        badgeSettings.style.color = 'var(--accent-green)';
+      }
+    }
+  }
+
+  openUserSettingsModal() {
+    this.updateCaptainOptOutUI();
+    const modal = document.getElementById('userSettingsModal');
+    if (modal) modal.classList.add('active');
   }
 
   setupAutoDraftHandlers() {
@@ -5794,6 +5902,13 @@ class CustomLobbiesApp {
 
     if (btnHost) btnHost.addEventListener('click', () => modal.classList.add('active'));
     if (btnClose) btnClose.addEventListener('click', () => modal.classList.remove('active'));
+
+    const userSettingsModal = document.getElementById('userSettingsModal');
+    if (userSettingsModal) {
+      userSettingsModal.addEventListener('click', (e) => {
+        if (e.target === userSettingsModal) userSettingsModal.classList.remove('active');
+      });
+    }
 
     if (btnSubmit) {
       btnSubmit.addEventListener('click', () => {
