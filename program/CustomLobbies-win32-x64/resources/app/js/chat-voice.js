@@ -39,7 +39,12 @@ class ChatVoiceManager {
     this.triviaScore = 0;
 
     const defaultGuilds = {
-      'games': { name: 'Games', icon: '🎮' }
+      'home': { name: 'Direct Messages & Friends', icon: '💬' },
+      'games': { name: 'CustomLobbies Prime Hub', icon: '🎮' },
+      'cs2': { name: 'CS2 Premier 128-Tick Scrims', icon: '🎯' },
+      'valorant': { name: 'Valorant Radiant Arena', icon: '⚡' },
+      'wardogs': { name: 'WARDOGS 33v33v33 Tri-Faction', icon: '🐕' },
+      'tournaments': { name: 'Competitive Cups & Brackets', icon: '🏆' }
     };
     
     // Load from admin settings if present, cleansing old placeholder servers
@@ -51,7 +56,7 @@ class ChatVoiceManager {
       }
     } catch (e) {}
 
-    if (!loadedGuilds || loadedGuilds['hotgirl'] || loadedGuilds['debate'] || !loadedGuilds['games']) {
+    if (!loadedGuilds || loadedGuilds['hotgirl'] || loadedGuilds['debate'] || !loadedGuilds['games'] || !loadedGuilds['home']) {
       loadedGuilds = defaultGuilds;
       try {
         localStorage.setItem('cl_admin_servers', JSON.stringify(defaultGuilds));
@@ -354,7 +359,7 @@ class ChatVoiceManager {
     const rail = document.getElementById('discordServerRailContainer');
     if (!rail) return;
     
-    // Clear existing servers (keep the boost badge container, purchase button, and discord link button)
+    // Clear existing servers and dividers (keep the boost badge container, purchase button, and discord link button)
     Array.from(rail.children).forEach(child => {
         if (child.id !== 'serverBoostBadgeContainer' && child.id !== 'serverPurchaseBtnContainer' && child.id !== 'serverDiscordLinkBtn') {
             child.remove();
@@ -362,24 +367,35 @@ class ChatVoiceManager {
     });
 
     const purchaseBtn = document.getElementById('serverPurchaseBtnContainer');
-    const boostBadge = document.getElementById('serverBoostBadgeContainer');
 
+    // 1. Home / Direct Messages & Friends Icon at Top
+    const homeEl = document.createElement('div');
+    homeEl.className = `server-icon ${this.activeGuild === 'home' ? 'active' : ''}`;
+    homeEl.setAttribute('data-guild', 'home');
+    homeEl.title = 'Direct Messages & Friends';
+    homeEl.innerHTML = `<span>💬</span>`;
+    rail.insertBefore(homeEl, purchaseBtn);
+
+    // Divider after Home
+    const div1 = document.createElement('div');
+    div1.className = 'server-rail-divider';
+    rail.insertBefore(div1, purchaseBtn);
+
+    // 2. Gaming Guilds / Scrim Hubs
     for (const [key, guild] of Object.entries(this.guilds)) {
+      if (key === 'home') continue;
       const el = document.createElement('div');
       el.className = `server-icon ${this.activeGuild === key ? 'active' : ''}`;
       el.setAttribute('data-guild', key);
       el.title = guild.name;
       el.innerHTML = `<span>${guild.icon}</span>`;
-      
-      if (purchaseBtn) {
-          rail.insertBefore(el, purchaseBtn);
-      } else if (boostBadge) {
-          rail.insertBefore(el, boostBadge);
-      } else {
-          rail.appendChild(el);
-      }
+      rail.insertBefore(el, purchaseBtn);
     }
-    // Delegated click handler on document handles .server-icon clicks
+
+    // Divider before actions
+    const div2 = document.createElement('div');
+    div2.className = 'server-rail-divider';
+    rail.insertBefore(div2, purchaseBtn);
   }
 
   loadChatTheme() {
@@ -3214,58 +3230,194 @@ class ChatVoiceManager {
       if (el) el.classList.add('active');
     }
     const voiceRoomElem = document.getElementById('voiceRoomName');
-    if (voiceRoomElem) voiceRoomElem.textContent = roomKey.replace('voice-', '').replace('-', ' ').toUpperCase();
+    const cleanTitle = roomKey.replace('voice-', '').replace(/-/g, ' ').toUpperCase();
+    if (voiceRoomElem) voiceRoomElem.textContent = cleanTitle;
+
+    // Discord behavior: Clicking a voice room immediately connects and shows Call Stage
+    this.connectVoice(roomKey);
+    this.showVoiceCallStage();
   }
 
-  syncVoiceToCurrentChannel() {
-    if (!this.currentTextChannel) return;
-    this.selectVoiceRoom(this.currentTextChannel);
-    
-    const badge = document.getElementById('voiceStatusBadge');
-    if (badge && badge.textContent !== 'Connected') {
-      this.toggleVoiceConnection();
-    }
-    
-    if (window.widgetBuilderEngine) {
-      window.widgetBuilderEngine.playSoundEffect('click');
-    }
-    
-    this.notifyToast(`🎙️ Voice Synced! Joined [${this.currentTextChannel.toUpperCase()}] voice room.`, 'success');
-  }
+  connectVoice(roomKey) {
+    this.currentVoiceRoom = roomKey || this.currentVoiceRoom || 'general-lounge';
+    this.isVoiceConnected = true;
+    const cleanName = this.currentVoiceRoom.replace('voice-', '').replace(/-/g, ' ');
 
-  toggleVoiceConnection() {
+    // 1. Show Discord Voice Connected Dock above User Card
+    const dock = document.getElementById('discordVoiceConnectedDock');
+    const dockRoom = document.getElementById('dockVoiceRoomName');
+    if (dock) dock.style.display = 'block';
+    if (dockRoom) dockRoom.textContent = `🔊 ${cleanName}`;
+
+    // 2. Show Call Screen toggle in Chat Header
+    const callBtn = document.getElementById('btnHeaderVoiceStage');
+    if (callBtn) callBtn.style.display = 'inline-flex';
+
+    // 3. Update Titlebar Channel & Voice pill
+    const titlebarVoice = document.getElementById('desktopTitlebarVoicePill');
+    if (titlebarVoice) titlebarVoice.style.display = 'inline-block';
+
+    // 4. Update Right Voice Sidebar controls
     const badge = document.getElementById('voiceStatusBadge');
     const roomName = document.getElementById('voiceRoomName');
     const btnConnect = document.getElementById('btnConnectVoice');
     const btnMic = document.getElementById('btnToggleMic');
     const btnDeafen = document.getElementById('btnToggleDeafen');
 
-    if (!badge) return;
-
-    if (badge.textContent === 'Connected') {
-      badge.textContent = 'Disconnected';
-      badge.style.background = 'rgba(255, 82, 82, 0.2)';
-      badge.style.color = 'var(--accent-red)';
-      if (btnConnect) {
-        btnConnect.textContent = 'Join Voice Channel';
-        btnConnect.classList.remove('btn-danger');
-        btnConnect.classList.add('btn-primary');
-      }
-      if (btnMic) btnMic.disabled = true;
-      if (btnDeafen) btnDeafen.disabled = true;
-    } else {
-      if (!this.currentVoiceRoom) this.currentVoiceRoom = 'lounge-1';
+    if (badge) {
       badge.textContent = 'Connected';
       badge.style.background = 'rgba(0, 230, 118, 0.2)';
       badge.style.color = 'var(--accent-green)';
-      if (roomName) roomName.textContent = this.currentVoiceRoom.replace('-', ' ').toUpperCase();
-      if (btnConnect) {
-        btnConnect.textContent = 'Disconnect Voice';
-        btnConnect.classList.remove('btn-primary');
-        btnConnect.classList.add('btn-danger');
-      }
-      if (btnMic) btnMic.disabled = false;
-      if (btnDeafen) btnDeafen.disabled = false;
+    }
+    if (roomName) roomName.textContent = cleanName.toUpperCase();
+    if (btnConnect) {
+      btnConnect.textContent = 'Disconnect Voice';
+      btnConnect.classList.remove('btn-primary');
+      btnConnect.classList.add('btn-danger');
+    }
+    if (btnMic) btnMic.disabled = false;
+    if (btnDeafen) btnDeafen.disabled = false;
+
+    // Play connection chime
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('queue_join');
+    }
+
+    this.notifyToast(`🔊 Voice Connected: ${cleanName}`, 'success');
+  }
+
+  disconnectVoice() {
+    this.isVoiceConnected = false;
+    const dock = document.getElementById('discordVoiceConnectedDock');
+    if (dock) dock.style.display = 'none';
+
+    const callBtn = document.getElementById('btnHeaderVoiceStage');
+    if (callBtn) callBtn.style.display = 'none';
+
+    this.hideVoiceCallStage();
+
+    const badge = document.getElementById('voiceStatusBadge');
+    const btnConnect = document.getElementById('btnConnectVoice');
+    const btnMic = document.getElementById('btnToggleMic');
+    const btnDeafen = document.getElementById('btnToggleDeafen');
+
+    if (badge) {
+      badge.textContent = 'Disconnected';
+      badge.style.background = 'rgba(255, 82, 82, 0.2)';
+      badge.style.color = 'var(--accent-red)';
+    }
+    if (btnConnect) {
+      btnConnect.textContent = 'Join Voice Channel';
+      btnConnect.classList.remove('btn-danger');
+      btnConnect.classList.add('btn-primary');
+    }
+    if (btnMic) btnMic.disabled = true;
+    if (btnDeafen) btnDeafen.disabled = true;
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+    }
+
+    this.notifyToast('📞 Disconnected from voice channel.', 'info');
+  }
+
+  showVoiceCallStage() {
+    const stage = document.getElementById('voiceCallStageContainer');
+    const chatFeed = document.getElementById('chatMessagesContainer');
+    const chatForm = document.getElementById('chatForm');
+    const stageTitle = document.getElementById('voiceStageRoomTitle');
+
+    if (stage) stage.style.display = 'flex';
+    if (chatFeed) chatFeed.style.display = 'none';
+    if (chatForm) chatForm.style.display = 'none';
+
+    if (stageTitle && this.currentVoiceRoom) {
+      stageTitle.textContent = this.currentVoiceRoom.replace('voice-', '').replace(/-/g, ' ').toUpperCase();
+    }
+
+    this.renderVoiceCallStage();
+  }
+
+  hideVoiceCallStage() {
+    const stage = document.getElementById('voiceCallStageContainer');
+    const chatFeed = document.getElementById('chatMessagesContainer');
+    const chatForm = document.getElementById('chatForm');
+
+    if (stage) stage.style.display = 'none';
+    if (chatFeed) chatFeed.style.display = 'block';
+    if (chatForm) chatForm.style.display = 'flex';
+  }
+
+  toggleVoiceCallStage() {
+    const stage = document.getElementById('voiceCallStageContainer');
+    if (stage && stage.style.display === 'flex') {
+      this.hideVoiceCallStage();
+    } else {
+      this.showVoiceCallStage();
+    }
+  }
+
+  renderVoiceCallStage() {
+    const grid = document.getElementById('voiceStageParticipantsGrid');
+    if (!grid) return;
+
+    const participants = [
+      { name: 'You (Host)', avatar: 'assets/logo.jpg', isHost: true, speaking: false, ping: '12ms', elo: '2150' },
+      { name: 'ApexGod99', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=120&auto=format&fit=crop&q=80', speaking: true, ping: '18ms', elo: '2420' },
+      { name: 'Valkyrie_CS', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&auto=format&fit=crop&q=80', speaking: false, ping: '24ms', elo: '2380' },
+      { name: 'TenZ_Duelist', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=120&auto=format&fit=crop&q=80', speaking: false, ping: '15ms', elo: '2720' },
+      { name: 'S1mple_Fragger', avatar: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=120&auto=format&fit=crop&q=80', speaking: true, ping: '29ms', elo: '2850' }
+    ];
+
+    grid.innerHTML = participants.map(p => `
+      <div class="voice-participant-tile ${p.speaking ? 'speaking-glow' : ''}">
+        <div style="position: relative;">
+          <img src="${p.avatar}" class="voice-tile-avatar" alt="${p.name}">
+          <span style="position: absolute; bottom: 8px; right: 4px; width: 14px; height: 14px; border-radius: 50%; background: ${p.speaking ? '#23a55a' : '#555'}; border: 2px solid #1e1f26;"></span>
+        </div>
+        <div class="voice-tile-name">${p.name}</div>
+        <div class="voice-tile-badge">${p.isHost ? '👑 Host' : '🎮 ' + p.elo + ' MMR'} • ${p.ping}</div>
+      </div>
+    `).join('');
+  }
+
+  toggleScreenShare() {
+    this.isScreenSharing = !this.isScreenSharing;
+    if (this.isScreenSharing) {
+      this.notifyToast('🖥️ Screen Share Active! Streaming to voice channel.', 'success');
+      if (window.widgetBuilderEngine) window.widgetBuilderEngine.playSoundEffect('fanfare');
+    } else {
+      this.notifyToast('🖥️ Screen Share stopped.', 'info');
+    }
+  }
+
+  launchScrimWithVoiceRoom() {
+    const roomTitle = this.currentVoiceRoom ? this.currentVoiceRoom.replace('voice-', '').replace(/-/g, ' ') : 'Voice Scrim';
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('lobby_start');
+    }
+
+    if (window.app && typeof window.app.triggerLobbySnakeDraft === 'function') {
+      window.app.triggerLobbySnakeDraft(`${roomTitle} Scrim`, 'Counter-Strike 2');
+      this.notifyToast(`🎮 1-2-2-1 Snake Draft launched with all ${roomTitle} voice participants!`, 'success');
+    } else if (window.app && typeof window.app.launchFaceitMatchRoom === 'function') {
+      window.app.launchFaceitMatchRoom(`${roomTitle} Scrim`, 'Counter-Strike 2');
+    }
+
+    this.postBotNotice(`🚀 <b>Voice Room Scrim Started:</b> Host launched a competitive match room for <b>${roomTitle}</b>! Connecting dedicated 128-tick server...`);
+  }
+
+  syncVoiceToCurrentChannel() {
+    if (!this.currentTextChannel) return;
+    this.selectVoiceRoom(this.currentTextChannel);
+    this.notifyToast(`🎙️ Voice Synced! Joined [${this.currentTextChannel.toUpperCase()}] voice room.`, 'success');
+  }
+
+  toggleVoiceConnection() {
+    if (this.isVoiceConnected) {
+      this.disconnectVoice();
+    } else {
+      this.connectVoice(this.currentVoiceRoom);
     }
   }
 

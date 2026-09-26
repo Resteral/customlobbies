@@ -8,10 +8,32 @@ class ProgramClientSuite {
   }
 
   init() {
+    this.initClientMode();
     this.setupWindowControls();
     this.setupKeyboardShortcuts();
     this.startSystemMetricsTicker();
     console.log('🛡️ CustomLobbies Desktop Program Client Engine initialized!');
+  }
+
+  initClientMode() {
+    const saved = localStorage.getItem('cl_discord_client_mode');
+    const isDesktopApp = !!(window.require || (window.process && window.process.type));
+    if (saved === 'true' || (saved === null && isDesktopApp)) {
+      document.body.classList.add('discord-client-fullscreen');
+      const label = document.getElementById('labelDesktopClientMode');
+      if (label) label.textContent = 'Web View';
+    }
+  }
+
+  toggleClientMode() {
+    const isClient = document.body.classList.toggle('discord-client-fullscreen');
+    localStorage.setItem('cl_discord_client_mode', isClient ? 'true' : 'false');
+    const label = document.getElementById('labelDesktopClientMode');
+    if (label) label.textContent = isClient ? 'Web View' : 'Full Client View';
+
+    if (window.app && typeof window.app.showToast === 'function') {
+      window.app.showToast(isClient ? '🖥️ Switched to Standalone Discord Client View' : '🌐 Switched to Web Browser Navigation View', 'info');
+    }
   }
 
   setupWindowControls() {
@@ -66,7 +88,16 @@ class ProgramClientSuite {
     window.addEventListener('keydown', (e) => {
       if (e.ctrlKey || e.metaKey) {
         const key = e.key.toLowerCase();
-        if (key === 'q') {
+        if (e.shiftKey && key === 'd') {
+          e.preventDefault();
+          this.toggleClientMode();
+        } else if (key === 'm') {
+          e.preventDefault();
+          if (window.chatVoiceManager) window.chatVoiceManager.toggleMic();
+        } else if (key === 'd' && !e.shiftKey) {
+          e.preventDefault();
+          if (window.chatVoiceManager) window.chatVoiceManager.toggleDeafen();
+        } else if (key === 'q') {
           e.preventDefault();
           const btn = document.querySelector('[data-tab=lobbies-view]');
           if (btn) btn.click();
@@ -78,10 +109,6 @@ class ProgramClientSuite {
         } else if (key === 't' || key === 'b') {
           e.preventDefault();
           const btn = document.querySelector('[data-tab=tournaments-view]');
-          if (btn) btn.click();
-        } else if (key === 'd') {
-          e.preventDefault();
-          const btn = document.querySelector('[data-tab=debate-view]');
           if (btn) btn.click();
         } else if (key === 'c') {
           e.preventDefault();

@@ -28,11 +28,15 @@
   <div class="desktop-program-titlebar">
     <div style="display: flex; align-items: center; gap: 0.6rem;">
       <span class="desktop-program-badge">💻 CUSTOMLOBBIES PROGRAM CLIENT v2.5</span>
+      <span style="font-size: 0.78rem; color: #fff; font-weight: 700; margin-left: 0.2rem;" id="desktopTitlebarChannel">🎮 CustomLobbies Prime | #general</span>
       <span style="font-size: 0.78rem; color: var(--text-dim);" id="desktopStatusPing">⚡ 14ms</span>
       <span style="font-size: 0.78rem; color: var(--text-dim);" id="desktopStatusMemory">💾 128.4 MB</span>
     </div>
     <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-      <span style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 700; margin-right: 0.5rem;">Shortcuts: Ctrl+Q (Queue) | Ctrl+L (Lobbies) | Ctrl+B (Bracket)</span>
+      <button class="desktop-win-btn desktop-titlebar-btn" id="btnToggleDesktopClientMode" onclick="window.programClientSuite.toggleClientMode()" title="Toggle Standalone Discord Client View (Ctrl+Shift+D)" style="display: flex; align-items: center; gap: 0.35rem; font-weight: 700; background: rgba(88, 101, 242, 0.2); border-color: #5865F2;">
+        <span>🖥️</span> <span id="labelDesktopClientMode">Full Client View</span>
+      </button>
+      <span style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 700; margin-right: 0.3rem;">Shortcuts: Ctrl+Q (Queue) | Ctrl+M (Mute) | Ctrl+D (Deafen)</span>
       <button class="desktop-win-btn" id="desktopMinBtn" title="Minimize to Tray">🗕</button>
       <button class="desktop-win-btn" id="desktopMaxBtn" title="Maximize / Fullscreen">🗖</button>
       <button class="desktop-win-btn close" id="desktopCloseBtn" title="Close / Run in Background">✕</button>
@@ -1107,6 +1111,21 @@
             </div>
           </div>
 
+          <!-- Discord Voice Connected Dock (Above User Profile) -->
+          <div class="discord-voice-connected-dock" id="discordVoiceConnectedDock" style="display: none;">
+            <div class="voice-conn-header">
+              <span id="dockVoiceStatusText">🟢 Voice Connected</span>
+              <span id="dockVoicePing" style="font-size: 0.68rem; color: #23a55a; opacity: 0.85;">12ms / RTC</span>
+            </div>
+            <div class="voice-conn-info">
+              <span class="voice-conn-name" id="dockVoiceRoomName" onclick="window.chatVoiceManager.showVoiceCallStage()" title="Click to view Voice Call Stage">🔊 General Lounge</span>
+              <div class="voice-conn-actions">
+                <button class="icon-btn-sm" id="btnDockScreenShare" onclick="window.chatVoiceManager.toggleScreenShare()" title="Share Screen / Stream">🖥️</button>
+                <button class="icon-btn-sm" id="btnDockDisconnectVoice" onclick="window.chatVoiceManager.disconnectVoice()" title="Disconnect from Voice" style="color: var(--accent-red);">📞</button>
+              </div>
+            </div>
+          </div>
+
           <!-- Bottom Discord User Status Card -->
           <div class="discord-user-card">
             <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0;">
@@ -1159,8 +1178,52 @@
               <button class="btn btn-secondary btn-sm" id="btnHeaderOpenStickers" onclick="window.chatVoiceManager.toggleStickerDrawer()" title="Stickers & Emotes">
                 <span>✨</span> Stickers
               </button>
+              <button class="btn btn-purple btn-sm" id="btnHeaderVoiceStage" onclick="window.chatVoiceManager.toggleVoiceCallStage()" title="View Voice Call Stage & Video Grid" style="display: none; font-weight: 800;">
+                <span>🔊</span> Call Screen
+              </button>
               <button class="btn btn-danger btn-sm" id="btnHeaderDeleteChannel" onclick="window.chatVoiceManager.confirmDeleteCurrentChannel()" title="Delete This Channel" style="display: none;">
                 <span>🗑️</span> Delete Channel
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Voice Call Stage (Discord Call Screen) -->
+          <div id="voiceCallStageContainer" class="voice-call-stage" style="display: none;">
+            <div class="voice-stage-header">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span style="font-size: 1.2rem; font-weight: 800; color: #23a55a;">🔊</span>
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #fff;" id="voiceStageRoomTitle">General Lounge</h3>
+                <span class="lobby-game-tag" style="background: rgba(35, 165, 90, 0.2); color: #23a55a; font-size: 0.72rem;">🟢 RTC HD Audio (128kbps)</span>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button class="btn btn-secondary btn-sm" onclick="window.chatVoiceManager.hideVoiceCallStage()" title="Return to Text Chat">
+                  💬 Return to Text Chat
+                </button>
+              </div>
+            </div>
+            
+            <div class="voice-stage-grid" id="voiceStageParticipantsGrid">
+              <!-- Dynamically populated participant tiles -->
+            </div>
+
+            <div class="voice-stage-controls">
+              <button class="btn btn-secondary btn-sm" id="btnStageMic" onclick="window.chatVoiceManager.toggleMic()">
+                <span id="stageMicIcon">🎙️</span> Mic
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnStageDeafen" onclick="window.chatVoiceManager.toggleDeafen()">
+                <span id="stageDeafenIcon">🎧</span> Deafen
+              </button>
+              <button class="btn btn-purple btn-sm" id="btnStageScreenShare" onclick="window.chatVoiceManager.toggleScreenShare()">
+                <span>🖥️</span> Screen Share
+              </button>
+              <button class="btn btn-cyan btn-sm" onclick="window.widgetBuilderEngine?.playSoundEffect('lobby_start')" title="Play Custom Lobby Start Sound">
+                <span>🔊</span> Soundboard: Start
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="window.chatVoiceManager.launchScrimWithVoiceRoom()" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); font-weight: 900;">
+                <span>🎮</span> Start Scrim with Room
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="window.chatVoiceManager.disconnectVoice()">
+                <span>📞</span> Disconnect
               </button>
             </div>
           </div>
