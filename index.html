@@ -70,6 +70,12 @@
       <button class="nav-btn active" data-tab="community-view">
         <span>💬</span> Community Hub
       </button>
+
+      <button class="nav-btn" id="btnNavbarDiscordActivity" onclick="window.discordActivityEngine.openActivityModal()" title="Discord Activity Hub, Voice Sync & Launcher" style="background: rgba(88, 101, 242, 0.2); border: 1px solid #5865F2; color: #fff; font-weight: 800; display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; border-radius: 6px;">
+        <span id="navbarDiscordActivityPill" style="display: flex; align-items: center; gap: 0.35rem;">
+          <span>👾</span> Activity
+        </span>
+      </button>
       
       <!-- Sleek Dropdown for Secondary Nav Items -->
       
@@ -186,6 +192,11 @@
       <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="profile-avatar" id="userAvatar" onclick="window.app.openAvatarCustomizerModal()" title="Click to Customize Profile Picture & Gamer Passport">
     </div>
   </header>
+
+  <!-- DISCORD ACTIVITY EMBEDDED TOP BAR (Shown inside Discord Voice Activity or in Simulator Mode) -->
+  <div id="discordActivityTopBar" class="discord-activity-top-bar" style="display: none;">
+    <!-- Rendered dynamically by discord-activity.js -->
+  </div>
 
   <!-- Live Esports Telemetry Ticker Bar -->
   <div style="background: linear-gradient(90deg, #07090d, #12161f, #07090d); border-bottom: 1px solid var(--border-glow); padding: 0.45rem 1.5rem; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; overflow-x: auto; white-space: nowrap; font-family: monospace;">
@@ -5431,6 +5442,131 @@
   <script src="js/program-client-suite.js"></script>
   <script src="js/app.js"></script>
   <script src="js/custom-lobbies-enhancements.js"></script>
+  <script src="js/discord-activity.js"></script>
+
+  <!-- ========================================== -->
+  <!-- DISCORD ACTIVITY (EMBEDDED APP) HUB MODAL   -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" id="discordActivityModal">
+    <div class="modal-content glass-panel" style="max-width: 760px; width: 95%; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(88, 101, 242, 0.2); border: 2px solid #5865F2; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+            <span>👾</span>
+          </div>
+          <div>
+            <h2 style="margin: 0; font-size: 1.35rem; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+              Discord Activity (Embedded App) Suite
+            </h2>
+            <p style="margin: 0.2rem 0 0 0; font-size: 0.85rem; color: var(--text-dim);" id="discordActivityEnvStatus">
+              Run CustomLobbies directly inside Discord voice channels and server chats.
+            </p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseDiscordActivityModal" style="background: none; border: none; font-size: 1.4rem; color: var(--text-muted); cursor: pointer;">✕</button>
+      </div>
+
+      <!-- Live Discord Rich Presence Card -->
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.75rem; font-weight: 800; color: #5865F2; text-transform: uppercase; margin-bottom: 0.4rem;">
+          🎮 Live Discord Rich Presence (SET_ACTIVITY)
+        </label>
+        <div id="discordRichPresencePreview">
+          <!-- Populated dynamically by discord-activity.js -->
+        </div>
+      </div>
+
+      <!-- Discord Quick Actions & Simulator -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin-bottom: 1.25rem;">
+        <div style="background: rgba(0,0,0,0.35); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <h4 style="margin: 0 0 0.4rem 0; font-size: 0.95rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.4rem;">
+            <span>🧪</span> Activity Simulator
+          </h4>
+          <p style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.8rem;">
+            Test the Discord voice channel frame bar, participant list, and responsive layout instantly.
+          </p>
+          <button class="btn btn-purple btn-sm" id="btnToggleDiscordSimulator" onclick="window.discordActivityEngine.toggleSimulatorMode()" style="width: 100%;">
+            🧪 Launch Discord Activity Simulator
+          </button>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.35); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <h4 style="margin: 0 0 0.4rem 0; font-size: 0.95rem; color: #5865F2; display: flex; align-items: center; gap: 0.4rem;">
+            <span>⚡</span> Slash Command
+          </h4>
+          <p style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.8rem;">
+            Launch in any Discord voice channel with the standard Activity slash command.
+          </p>
+          <button class="btn btn-secondary btn-sm" onclick="window.discordActivityEngine.copySlashCommand()" style="width: 100%;">
+            📋 Copy /activity Command
+          </button>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.35); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <h4 style="margin: 0 0 0.4rem 0; font-size: 0.95rem; color: var(--accent-green); display: flex; align-items: center; gap: 0.4rem;">
+            <span>🚀</span> Activity Invite URL
+          </h4>
+          <p style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.8rem;">
+            Direct link to open CustomLobbies in your selected Discord voice channel.
+          </p>
+          <button class="btn btn-primary btn-sm" onclick="window.discordActivityEngine.copyInviteUrl()" style="width: 100%;">
+            📋 Copy Launch URL
+          </button>
+        </div>
+      </div>
+
+      <!-- Developer Portal Settings -->
+      <div style="background: rgba(0,0,0,0.4); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1rem; color: #fff; margin: 0 0 0.8rem 0; display: flex; align-items: center; gap: 0.5rem;">
+          <span>⚙️</span> Discord Developer Portal Configuration
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.75rem; font-weight: 800; color: #ccc; margin-bottom: 0.35rem;">
+              Application Client ID (Discord App ID)
+            </label>
+            <input type="text" id="discordActivityClientIdInput" class="auth-input" style="width: 100%; font-family: monospace; font-size: 0.85rem;" placeholder="e.g. 1283928109382910291">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75rem; font-weight: 800; color: #ccc; margin-bottom: 0.35rem;">
+              Client Secret (Optional, for OAuth Token Exchange)
+            </label>
+            <input type="password" id="discordActivitySecretInput" class="auth-input" style="width: 100%; font-family: monospace; font-size: 0.85rem;" placeholder="••••••••••••••••">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 800; color: #ccc; margin-bottom: 0.35rem;">
+            Generated Discord Activity Launch URL
+          </label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="discordActivityInviteUrl" class="auth-input" readonly style="flex: 1; font-family: monospace; font-size: 0.82rem; background: rgba(0,0,0,0.6);" value="https://discord.com/activities/1283928109382910291">
+            <button class="btn btn-secondary btn-sm" onclick="window.discordActivityEngine.copyInviteUrl()">Copy</button>
+          </div>
+        </div>
+
+        <!-- 3-Step Setup Instructions -->
+        <div style="background: rgba(88, 101, 242, 0.1); border: 1px solid rgba(88, 101, 242, 0.3); border-radius: 6px; padding: 0.85rem; font-size: 0.82rem; line-height: 1.5; color: #dbdee1;">
+          <strong style="color: #fff; display: block; margin-bottom: 0.35rem;">📋 Quick 3-Step Setup in Discord Developer Portal:</strong>
+          1. Go to <a href="https://discord.com/developers/applications" target="_blank" rel="noopener" style="color: #5865F2; text-decoration: underline;">Discord Developer Portal</a> and select/create your application.<br>
+          2. Under <b>Activities</b>, set <b>Supported Platforms</b> to <i>Web, Desktop, and Mobile</i>, and map the URL to your domain (or tunnel for localhost testing).<br>
+          3. Save your <b>Client ID</b> above and save settings! Now anyone in your voice channel can click the rocket 🚀 icon to launch CustomLobbies!
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.78rem; color: var(--text-dim);" id="discordActivitySlashCmd">/activity activity_id:1283928109382910291</span>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary" onclick="window.discordActivityEngine.closeActivityModal()">Close</button>
+          <button class="btn btn-primary" onclick="window.discordActivityEngine.saveConfiguration()" style="background: #5865F2; border-color: #5865F2; box-shadow: 0 0 15px rgba(88, 101, 242, 0.4);">
+            Save Discord Activity Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ========================================== -->
   <!-- SERVER ADMIN DASHBOARD MODAL               -->
   <!-- ========================================== -->

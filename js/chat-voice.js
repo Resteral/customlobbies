@@ -2943,6 +2943,29 @@ class ChatVoiceManager {
     });
 
     let html = '';
+
+    // Render Discord Activity Voice Channel Participants if active
+    if (window.discordActivityEngine && (window.discordActivityEngine.isDiscordActivity || window.discordActivityEngine.isSimulatorMode)) {
+      const dParts = window.discordActivityEngine.participants || [];
+      if (dParts.length > 0) {
+        html += `<div style="font-size: 0.7rem; font-weight: 800; color: #5865F2; text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+          <span>👾</span> DISCORD VOICE CHANNEL - ${dParts.length}
+        </div>`;
+        dParts.forEach(dp => {
+          const isSpk = dp.speaking ? 'border: 2px solid #23a55a;' : '';
+          html += `
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <img src="${dp.avatar}" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; ${isSpk}">
+                <span style="font-weight: 700; color: #fff;">${dp.global_name || dp.username}</span>
+                ${dp.speaking ? '<span style="font-size: 0.65rem; color: #23a55a;">● mic</span>' : ''}
+              </div>
+              <button onclick="window.chatVoiceManager.invitePlayerToTeam('${dp.username}')" style="background: rgba(88, 101, 242, 0.2); border: 1px solid #5865F2; color: #fff; cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite Discord Teammate">➕</button>
+            </div>
+          `;
+        });
+      }
+    }
     
     // Render custom roles first
     rolesMap.forEach(r => {

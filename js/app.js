@@ -378,6 +378,9 @@ class CustomLobbiesApp {
     if (window.chatVoiceManager && typeof window.chatVoiceManager.syncCustomLobbiesChannels === 'function') {
       window.chatVoiceManager.syncCustomLobbiesChannels();
     }
+    if (window.discordActivityEngine && typeof window.discordActivityEngine.renderActivityStatusPills === 'function') {
+      window.discordActivityEngine.renderActivityStatusPills();
+    }
   }
 
   loadFavorites() {
@@ -4925,6 +4928,14 @@ class CustomLobbiesApp {
       }
     }
 
+    if (window.discordActivityEngine) {
+      window.discordActivityEngine.setActivity({
+        details: `In Lobby: ${lobby.title}`,
+        state: `Queued (${lobby.players}/${lobby.max} Players) • ${lobby.game}`,
+        party: { size: [lobby.players, lobby.max] }
+      });
+    }
+
     // Auto-launch snake draft for lobby match when filled
     if (lobby.players >= lobby.max) {
       setTimeout(() => {
@@ -5231,6 +5242,13 @@ class CustomLobbiesApp {
     const lockedGameTitle = document.getElementById('draftLockedGameTitle');
     if (lockedGameTitle) {
       lockedGameTitle.textContent = this.currentDraftGame;
+    }
+
+    if (window.discordActivityEngine) {
+      window.discordActivityEngine.setActivity({
+        details: `Snake Drafting: ${lobbyTitle}`,
+        state: `Picking Rosters (1-2-2-1) • ${this.currentDraftGame}`
+      });
     }
 
     const titleEl = document.getElementById('draftGameTitle');
