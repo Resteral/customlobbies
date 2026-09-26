@@ -183,7 +183,7 @@
         </div>
       </div>
 
-      <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="profile-avatar" id="userAvatar">
+      <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="profile-avatar" id="userAvatar" onclick="window.app.openAvatarCustomizerModal()" title="Click to Customize Profile Picture & Gamer Passport">
     </div>
   </header>
 
@@ -732,11 +732,11 @@
             </h3>
 
             <div style="text-align: center; margin-bottom: 1.2rem;">
-              <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); margin: 0 auto 0.6rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--accent-gold); cursor: pointer; transition: transform 0.2s;" id="userProfileEmblemAvatar" onclick="window.app.promptCustomizePassportEmblem()" title="Click to Change Custom Gamer Crest / Emblem">👑</div>
+              <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); margin: 0 auto 0.6rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--accent-gold); cursor: pointer; transition: transform 0.2s; overflow: hidden;" id="userProfileEmblemAvatar" onclick="window.app.openAvatarCustomizerModal()" title="Click to Customize Gamer Avatar / Profile Picture">👑</div>
               <h4 style="font-size: 1.1rem; font-weight: 800; margin: 0;" id="userPassportDisplayName">You (Host)</h4>
               <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.2rem;" id="userPassportSubTitle">Novice Challenger (1,500 MMR)</p>
-              <button class="btn btn-purple btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; margin-top: 0.4rem; gap: 0.3rem;" onclick="window.app.promptCustomizePassportEmblem()">
-                <span>🎨</span> Custom Emblem
+              <button class="btn btn-purple btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; margin-top: 0.4rem; gap: 0.3rem;" onclick="window.app.openAvatarCustomizerModal()">
+                <span>🎨</span> Customize Avatar
               </button>
             </div>
 
@@ -3283,9 +3283,14 @@
     <div class="modal-card" style="max-width: 620px;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
         <div style="display: flex; align-items: center; gap: 1rem;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 2px solid var(--accent-gold);" id="passportAvatar">👑</div>
+          <div style="width: 68px; height: 68px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--accent-gold); cursor: pointer; overflow: hidden; position: relative; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);" id="passportAvatar" onclick="window.app.openAvatarCustomizerModal()" title="Click to Change Profile Picture">👑</div>
           <div>
-            <h3 style="font-size: 1.4rem; font-weight: 900; margin: 0;" id="passportName">Player Profile</h3>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <h3 style="font-size: 1.4rem; font-weight: 900; margin: 0;" id="passportName">Player Profile</h3>
+              <button class="btn btn-secondary btn-xs" id="btnEditPassportAvatarTop" onclick="window.app.openAvatarCustomizerModal()" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; border-color: var(--accent-cyan); color: var(--accent-cyan);" title="Customize Profile Picture">
+                🎨 Change Avatar
+              </button>
+            </div>
             <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.3rem; flex-wrap: wrap;">
               <span class="mmr-badge" id="passportPrimaryRank">Unrated Rating</span>
               <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 900;" id="passportHonorBadge">👑 Honor Level 1: Standard</span>
@@ -3389,9 +3394,97 @@
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
-        <button class="btn btn-purple" onclick="alert('💬 MESSAGE SENT!\n\nDirect message opened on CustomLobbies Chat & Voice Hub!')">💬 Direct Message</button>
-        <button class="btn btn-primary" onclick="alert('⚔️ CHALLENGE DISPATCHED!\n\n1v1 Duel challenge invite sent!')">⚔️ Challenge 1v1</button>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+        <button class="btn btn-purple btn-sm" id="btnCustomizePassportAvatarBottom" onclick="window.app.openAvatarCustomizerModal()" style="font-weight: 800;">
+          <span>🎨</span> Customize Profile Picture
+        </button>
+        <div style="display: flex; gap: 0.8rem;">
+          <button class="btn btn-purple" onclick="alert('💬 MESSAGE SENT!\n\nDirect message opened on CustomLobbies Chat & Voice Hub!')">💬 Direct Message</button>
+          <button class="btn btn-primary" onclick="alert('⚔️ CHALLENGE DISPATCHED!\n\n1v1 Duel challenge invite sent!')">⚔️ Challenge 1v1</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Picture / Passport Avatar Customizer Modal -->
+  <div class="modal-overlay" id="avatarCustomizerModal">
+    <div class="modal-card" style="max-width: 580px; border-color: var(--accent-purple); box-shadow: 0 0 35px rgba(157, 78, 221, 0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.7rem;">
+          <div style="font-size: 1.8rem;">🎨</div>
+          <div>
+            <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--accent-gold); margin: 0;">Customize Profile Picture & Passport Avatar</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Upload your own custom image, paste a web URL, or choose a gamer crest</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="window.app.closeAvatarCustomizerModal()">✕ Close</button>
+      </div>
+
+      <!-- Live Avatar Preview Box -->
+      <div style="background: rgba(0,0,0,0.5); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-glow); text-align: center; margin-bottom: 1.25rem;">
+        <div style="display: inline-block; position: relative;">
+          <div id="avatarCustomizerPreview" style="width: 88px; height: 88px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; border: 3px solid var(--accent-gold); margin: 0 auto; box-shadow: 0 0 25px rgba(255, 215, 0, 0.4); overflow: hidden;">
+            👑
+          </div>
+        </div>
+        <div style="font-weight: 800; font-size: 0.95rem; color: #fff; margin-top: 0.6rem;" id="avatarCustomizerPreviewName">You (Host)</div>
+        <div style="font-size: 0.75rem; color: var(--accent-cyan);" id="avatarCustomizerPreviewType">Active Profile Picture Preview</div>
+      </div>
+
+      <!-- Customization Options -->
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; max-height: 52vh; overflow-y: auto; padding-right: 0.3rem;">
+        <!-- 1. Upload from Computer -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.9rem;">
+          <label style="font-size: 0.85rem; font-weight: 800; color: var(--accent-green); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem;">
+            <span>📁</span> Upload Image from Device (PNG, JPG, WebP, GIF)
+          </label>
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="window.app.handleAvatarFileUpload(event)">
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('avatarFileInput').click()" style="border-color: var(--accent-green); color: var(--accent-green);">
+              📂 Browse Device File...
+            </button>
+            <span style="font-size: 0.75rem; color: var(--text-dim);" id="avatarFileStatus">No file selected</span>
+          </div>
+        </div>
+
+        <!-- 2. Web Image URL Input -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.9rem;">
+          <label class="input-label" style="margin-bottom: 0.4rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.4rem;">
+            <span>🌐</span> Paste Web Image URL (Discord, Steam, Imgur)
+          </label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" class="input-field" id="avatarUrlInput" placeholder="https://example.com/avatar.png" style="margin-bottom: 0;" oninput="window.app.previewAvatarUrl(this.value)">
+            <button class="btn btn-secondary btn-sm" onclick="window.app.applyAvatarUrl()">Preview</button>
+          </div>
+        </div>
+
+        <!-- 3. Curated Gamer Avatars -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.9rem;">
+          <label style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem;">
+            <span>🎮</span> Pro Gamer Avatar Presets
+          </label>
+          <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.6rem;" id="gamerAvatarPresetsGrid">
+            <!-- Injected via app.js -->
+          </div>
+        </div>
+
+        <!-- 4. Gamer Crests & Emoji Badges -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.9rem;">
+          <label style="font-size: 0.85rem; font-weight: 800; color: var(--accent-purple); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem;">
+            <span>👑</span> Gamer Crests & Badges
+          </label>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="gamerCrestPresetsContainer">
+            <!-- Injected via app.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; justify-content: flex-end; gap: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <button class="btn btn-secondary" onclick="window.app.closeAvatarCustomizerModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="window.app.saveCustomizedAvatar()" style="font-weight: 900; padding: 0.6rem 1.4rem;">
+          <span>💾</span> Save & Equip Profile Picture
+        </button>
       </div>
     </div>
   </div>

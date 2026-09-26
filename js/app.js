@@ -17,6 +17,8 @@ class CustomLobbiesApp {
     this.equippedTitle = 'Novice Challenger';
     this.equippedBanner = 'Cyberpunk Neon Matrix';
     this.equippedFrame = 'Gold Crown Ring';
+    this.userAvatar = localStorage.getItem('cl_user_avatar') || 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80';
+    this.pendingAvatar = this.userAvatar;
 
     // CL Pulse Gamer Social Media Feed Posts
     this.pulsePosts = [];
@@ -312,6 +314,15 @@ class CustomLobbiesApp {
           this.playerCaptainOptOuts = new Set(JSON.parse(savedPlayerOptOuts));
         } catch(e) {}
       }
+      const savedAvatar = localStorage.getItem('cl_user_avatar');
+      if (savedAvatar) {
+        this.userAvatar = savedAvatar;
+        this.pendingAvatar = savedAvatar;
+        if (this.user) {
+          this.user.avatar = savedAvatar;
+          this.user.emblem = savedAvatar;
+        }
+      }
       this.loadFrontpageServers();
       this.loadGamersWallPosts();
     } catch (e) {
@@ -325,6 +336,7 @@ class CustomLobbiesApp {
       localStorage.setItem('cl_lobbies_v2', JSON.stringify(this.lobbies));
       localStorage.setItem('cl_pool_v2', JSON.stringify(this.poolFeed));
       localStorage.setItem('cl_title_v2', this.equippedTitle);
+      localStorage.setItem('cl_user_avatar', this.userAvatar || '👑');
       localStorage.setItem('cl_leaderboard_v2', JSON.stringify(this.leaderboardData));
       localStorage.setItem('cl_lineup_v2', JSON.stringify({ lineup: this.teamLineup, bench: this.teamBench }));
       localStorage.setItem('cl_captain_opt_out', this.userCaptainOptOut ? 'true' : 'false');
@@ -888,6 +900,12 @@ class CustomLobbiesApp {
 
     if (nameEl) nameEl.textContent = displayName;
     if (subtitleEl) subtitleEl.textContent = `${title} (${elo} MMR)`;
+
+    const activeAvatar = this.userAvatar || (this.user && (this.user.avatar || this.user.emblem)) || '👑';
+    const emblemEl = document.getElementById('userProfileEmblemAvatar');
+    if (emblemEl) {
+      this.renderAvatarElement(emblemEl, activeAvatar);
+    }
 
     const commends = (this.user && this.user.commendations) || { leadership: 0, friendly: 0, clutch: 0, helpful: 0 };
     const leadEl = document.getElementById('passportCommendLeadership');
@@ -2523,6 +2541,22 @@ class CustomLobbiesApp {
       return `<img src="${emblem}" alt="Emblem" style="width: ${size}; height: ${size}; border-radius: 6px; object-fit: cover; vertical-align: middle; display: inline-block; border: 1px solid var(--accent-purple); box-shadow: 0 0 10px rgba(168,85,247,0.4); ${extraStyle}">`;
     }
     return `<span style="font-size: ${size}; vertical-align: middle; display: inline-block; line-height: 1; ${extraStyle}">${emblem}</span>`;
+  }
+
+  getEmojiDataUrl(emoji = '👑') {
+    const cleanEmoji = emoji || '👑';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="%230f141e"/><text x="50%" y="54%" font-size="34" text-anchor="middle" dominant-baseline="middle">${cleanEmoji}</text></svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
+
+  renderAvatarElement(el, avatar = '👑') {
+    if (!el) return;
+    const a = avatar || '👑';
+    if (a.startsWith('http://') || a.startsWith('https://') || a.startsWith('data:image/') || a.startsWith('/') || a.includes('.png') || a.includes('.jpg') || a.includes('.webp') || a.includes('.svg')) {
+      el.innerHTML = `<img src="${a}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block;">`;
+    } else {
+      el.innerHTML = `<span style="font-size: 2rem; line-height: 1; display: inline-block;">${a}</span>`;
+    }
   }
 
   selectClanEmblem(emblem, btnEl) {
@@ -4354,30 +4388,199 @@ class CustomLobbiesApp {
   }
 
   promptCustomizePassportEmblem() {
-    const defaultEmblems = ['👑', '💎', '🔥', '🦁', '⚡', '🦅', '🐺', '🐉', '💀', '🎯', '🚀', '👾', '🏆', '🩸', '🛡️', '⚔️'];
-    const current = (this.user && this.user.emblem) || '👑';
-    const choice = prompt(`🎨 CUSTOMIZE YOUR GAMER EMBLEM & CREST:\n\nType any custom Emoji, Symbol, or paste an Image URL:\n(Presets: ${defaultEmblems.slice(0, 10).join(' ')})\n`, current);
-    
-    if (choice !== null && choice.trim()) {
-      const emblem = choice.trim();
-      if (!this.user) {
-        this.user = {
-          username: 'Sean',
-          displayName: 'Sean (Host)',
-          elo: 1500,
-          level: 1,
-          title: 'Novice Challenger',
-          emblem: emblem
-        };
-      } else {
-        this.user.emblem = emblem;
+    this.openAvatarCustomizerModal();
+  }
+
+  getGamerAvatarPresets() {
+    return [
+      { id: 'pres_cyber', name: 'Cyber Operative', url: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=140&auto=format&fit=crop&q=80' },
+      { id: 'pres_samurai', name: 'Neon Samurai', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=140&auto=format&fit=crop&q=80' },
+      { id: 'pres_progamer', name: 'Pro IGL', url: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=140&auto=format&fit=crop&q=80' },
+      { id: 'pres_tactical', name: 'Tactical Recon', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=140&auto=format&fit=crop&q=80' },
+      { id: 'pres_valkyrie', name: 'Cyber Valkyrie', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=140&auto=format&fit=crop&q=80' },
+      { id: 'pres_ace', name: 'Apex Ace', url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=140&auto=format&fit=crop&q=80' }
+    ];
+  }
+
+  getGamerCrests() {
+    return ['👑', '💎', '🔥', '🦁', '⚡', '🦅', '🐺', '🐉', '💀', '🎯', '🚀', '👾', '🏆', '🩸', '🛡️', '⚔️'];
+  }
+
+  openAvatarCustomizerModal() {
+    const modal = document.getElementById('avatarCustomizerModal');
+    if (!modal) return;
+
+    this.pendingAvatar = this.userAvatar || (this.user && (this.user.avatar || this.user.emblem)) || '👑';
+
+    this.renderAvatarCustomizerPreview();
+    this.renderAvatarCustomizerPresets();
+
+    const urlInput = document.getElementById('avatarUrlInput');
+    if (urlInput) {
+      urlInput.value = (this.pendingAvatar.startsWith('http://') || this.pendingAvatar.startsWith('https://')) ? this.pendingAvatar : '';
+    }
+
+    const fileStatus = document.getElementById('avatarFileStatus');
+    if (fileStatus) fileStatus.textContent = 'No file selected';
+
+    const nameEl = document.getElementById('avatarCustomizerPreviewName');
+    if (nameEl) nameEl.textContent = (this.user && this.user.displayName) ? this.user.displayName : 'You (Host)';
+
+    modal.classList.add('active');
+  }
+
+  closeAvatarCustomizerModal() {
+    const modal = document.getElementById('avatarCustomizerModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  renderAvatarCustomizerPreview() {
+    const previewEl = document.getElementById('avatarCustomizerPreview');
+    if (previewEl) {
+      this.renderAvatarElement(previewEl, this.pendingAvatar);
+    }
+  }
+
+  renderAvatarCustomizerPresets() {
+    const presetsGrid = document.getElementById('gamerAvatarPresetsGrid');
+    if (presetsGrid) {
+      const presets = this.getGamerAvatarPresets();
+      presetsGrid.innerHTML = presets.map(p => `
+        <div class="avatar-preset-item ${this.pendingAvatar === p.url ? 'active' : ''}" onclick="window.app.selectAvatarPreset('${p.url}', this)" title="${p.name}">
+          <img src="${p.url}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      `).join('');
+    }
+
+    const crestsContainer = document.getElementById('gamerCrestPresetsContainer');
+    if (crestsContainer) {
+      const crests = this.getGamerCrests();
+      crestsContainer.innerHTML = crests.map(c => `
+        <button type="button" class="avatar-crest-btn ${this.pendingAvatar === c ? 'active' : ''}" onclick="window.app.selectAvatarPreset('${c}', this)" title="Gamer Crest ${c}">
+          ${c}
+        </button>
+      `).join('');
+    }
+  }
+
+  selectAvatarPreset(presetUrlOrEmoji, btnEl) {
+    this.pendingAvatar = presetUrlOrEmoji;
+    this.renderAvatarCustomizerPreview();
+
+    document.querySelectorAll('.avatar-preset-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.avatar-crest-btn').forEach(el => el.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+
+    const urlInput = document.getElementById('avatarUrlInput');
+    if (urlInput) {
+      urlInput.value = (presetUrlOrEmoji.startsWith('http://') || presetUrlOrEmoji.startsWith('https://')) ? presetUrlOrEmoji : '';
+    }
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('button_click');
+    }
+  }
+
+  handleAvatarFileUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('⚠️ Please select a valid image file (PNG, JPG, WebP, GIF).');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('⚠️ File size exceeds 5MB limit. Please choose a smaller image.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.pendingAvatar = e.target.result;
+      this.renderAvatarCustomizerPreview();
+
+      const statusEl = document.getElementById('avatarFileStatus');
+      if (statusEl) statusEl.textContent = `✔ Loaded: ${file.name}`;
+
+      const typeEl = document.getElementById('avatarCustomizerPreviewType');
+      if (typeEl) typeEl.textContent = `Uploaded File: ${file.name}`;
+
+      document.querySelectorAll('.avatar-preset-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.avatar-crest-btn').forEach(el => el.classList.remove('active'));
+    };
+    reader.readAsDataURL(file);
+  }
+
+  previewAvatarUrl(url) {
+    if (!url || !url.trim()) return;
+    this.pendingAvatar = url.trim();
+    this.renderAvatarCustomizerPreview();
+  }
+
+  applyAvatarUrl() {
+    const urlInput = document.getElementById('avatarUrlInput');
+    if (!urlInput || !urlInput.value.trim()) {
+      alert('⚠️ Please enter an image URL.');
+      return;
+    }
+    this.pendingAvatar = urlInput.value.trim();
+    this.renderAvatarCustomizerPreview();
+    const typeEl = document.getElementById('avatarCustomizerPreviewType');
+    if (typeEl) typeEl.textContent = 'Custom Web Image URL';
+  }
+
+  saveCustomizedAvatar() {
+    if (!this.pendingAvatar) {
+      alert('⚠️ Please choose or upload an avatar first.');
+      return;
+    }
+
+    this.userAvatar = this.pendingAvatar;
+
+    if (!this.user) {
+      this.user = {
+        username: 'Sean',
+        displayName: 'You (Host)',
+        elo: 1500,
+        level: 1,
+        title: this.equippedTitle || 'Novice Challenger',
+        avatar: this.userAvatar,
+        emblem: this.userAvatar
+      };
+    } else {
+      this.user.avatar = this.userAvatar;
+      this.user.emblem = this.userAvatar;
+    }
+
+    localStorage.setItem('cl_user_avatar', this.userAvatar);
+    localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
+
+    // Update in leaderboardData for current user
+    if (Array.isArray(this.leaderboardData)) {
+      const userEntry = this.leaderboardData.find(u => u.name === this.user.displayName || u.name === 'Sean' || u.name === 'You (Host)');
+      if (userEntry) {
+        userEntry.avatar = this.userAvatar;
       }
-      localStorage.setItem('cl_auth_user', JSON.stringify(this.user));
-      this.updateUserAuthUI();
-      if (window.widgetBuilderEngine) {
-        window.widgetBuilderEngine.playSoundEffect('fanfare');
-      }
-      alert(`🎉 GAMER EMBLEM UPDATED!\n\nYour custom gamer emblem has been equipped across your Passport & profile badges!`);
+    }
+
+    this.saveState();
+    this.updateUserAuthUI();
+    this.renderGamerPassportSidebar();
+
+    // If Player Passport modal is currently open, refresh avatar
+    const passportAvatarEl = document.getElementById('passportAvatar');
+    if (passportAvatarEl) {
+      this.renderAvatarElement(passportAvatarEl, this.userAvatar);
+    }
+
+    this.closeAvatarCustomizerModal();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+      window.widgetBuilderEngine.showToast('🎉 Profile picture updated!', 'success');
+    } else {
+      alert('🎉 PROFILE PICTURE UPDATED!\n\nYour new avatar has been equipped to your Gamer Passport, profile card, and navbar!');
     }
   }
 
@@ -4388,9 +4591,18 @@ class CustomLobbiesApp {
     const btnOpenAuthModal = document.getElementById('btnOpenAuthModal');
     const userProfileEmblemAvatar = document.getElementById('userProfileEmblemAvatar');
 
-    const userEmblem = (this.user && this.user.emblem) || '👑';
+    const activeAvatar = this.userAvatar || (this.user && (this.user.avatar || this.user.emblem)) || '👑';
+    const userAvatarImg = document.getElementById('userAvatar');
+    if (userAvatarImg) {
+      if (activeAvatar.startsWith('http://') || activeAvatar.startsWith('https://') || activeAvatar.startsWith('data:image/') || activeAvatar.startsWith('/') || activeAvatar.includes('.png') || activeAvatar.includes('.jpg') || activeAvatar.includes('.webp') || activeAvatar.includes('.svg')) {
+        userAvatarImg.src = activeAvatar;
+      } else {
+        userAvatarImg.src = this.getEmojiDataUrl(activeAvatar);
+      }
+    }
+
     if (userProfileEmblemAvatar) {
-      userProfileEmblemAvatar.innerHTML = this.renderEmblemHTML(userEmblem, '2.2rem');
+      this.renderAvatarElement(userProfileEmblemAvatar, activeAvatar);
     }
 
     if (this.user) {
@@ -5617,12 +5829,12 @@ class CustomLobbiesApp {
     if (!modal) return;
 
     this.activePassportPlayer = playerName;
+    const isCurrentUser = (!playerName || playerName === 'Sean' || playerName === 'You (Host)' || (this.user && this.user.displayName === playerName));
     let p = this.leaderboardData.find(user => user.name === playerName);
     if (!p) {
-      const isCurrentUser = (!playerName || playerName === 'Sean' || playerName === 'You (Host)' || (this.user && this.user.displayName === playerName));
       p = {
         name: isCurrentUser ? ((this.user && this.user.displayName) || 'Sean') : playerName,
-        avatar: isCurrentUser ? ((this.user && this.user.emblem) || '👑') : '🎮',
+        avatar: isCurrentUser ? (this.userAvatar || (this.user && (this.user.avatar || this.user.emblem)) || '👑') : '🎮',
         region: 'NA-East',
         targetElo: (isCurrentUser && this.user && this.user.elo) ? this.user.elo : 1500,
         honorPoints: 100,
@@ -5634,7 +5846,11 @@ class CustomLobbiesApp {
       };
     }
 
-    document.getElementById('passportAvatar').textContent = p.avatar || '👑';
+    const passportAvatarEl = document.getElementById('passportAvatar');
+    if (passportAvatarEl) {
+      const avatarToShow = isCurrentUser ? (this.userAvatar || (this.user && (this.user.avatar || this.user.emblem)) || p.avatar || '👑') : (p.avatar || '👑');
+      this.renderAvatarElement(passportAvatarEl, avatarToShow);
+    }
     document.getElementById('passportName').textContent = p.name;
     document.getElementById('passportPrimaryRank').textContent = `${p.region || 'Global'} Region • ${p.targetElo || 1500} Rating`;
 
