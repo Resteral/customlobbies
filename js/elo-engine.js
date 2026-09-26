@@ -315,18 +315,23 @@ class EloEngine {
     // Filter players who allow being captain (not opted out)
     const eligibleCaptains = sorted.filter(p => !p.optOutCaptain && !p.neverCaptain);
 
-    // Designate the two highest eligible MMR players as Team Captains (fallback gracefully if needed)
-    const cap1 = eligibleCaptains[0] || sorted[0] || { name: 'Captain Alpha', elo: 2540, role: 'Team Captain' };
-    const cap2 = eligibleCaptains.find(p => p.name !== cap1.name) || sorted.find(p => p.name !== cap1.name) || sorted[1] || { name: 'Captain Bravo', elo: 2480, role: 'Team Captain' };
+    // Identify highest and second highest eligible MMR players
+    const highestPlayer = eligibleCaptains[0] || sorted[0] || { name: 'Captain Bravo', elo: 2540, role: 'Team Captain' };
+    const secondHighestPlayer = eligibleCaptains.find(p => p.name !== highestPlayer.name) || sorted.find(p => p.name !== highestPlayer.name) || sorted[1] || { name: 'Captain Alpha', elo: 2480, role: 'Team Captain' };
+
+    // The second highest ELO gets Captain #1 (gets first pick)
+    const cap1 = secondHighestPlayer;
+    // The highest ELO gets Captain #2
+    const cap2 = highestPlayer;
 
     // Remaining unpicked players (includes high MMR players who opted out of captaincy)
     const unpicked = sorted.filter(p => p.name !== cap1.name && p.name !== cap2.name);
 
-    const team1 = [{ ...cap1, isCaptain: true, captainRank: 1, pickNumber: 0, pickLabel: '👑 Auto-Captain (#1 MMR)' }];
-    const team2 = [{ ...cap2, isCaptain: true, captainRank: 2, pickNumber: 0, pickLabel: '👑 Auto-Captain (#2 MMR)' }];
+    const team1 = [{ ...cap1, isCaptain: true, captainRank: 1, pickNumber: 0, pickLabel: '👑 Auto-Captain (1st Pick • 2nd Highest ELO)' }];
+    const team2 = [{ ...cap2, isCaptain: true, captainRank: 2, pickNumber: 0, pickLabel: '👑 Auto-Captain (Highest ELO)' }];
 
-    let turnOwner = passFirstPick ? 1 : 2;
-    let picksRemainingForTurn = (turnOwner === 2 && !passFirstPick) ? 1 : 2;
+    let turnOwner = passFirstPick ? 2 : 1; // Default: Captain 1 (2nd highest ELO) picks first
+    let picksRemainingForTurn = (turnOwner === 1 && !passFirstPick) ? 1 : 2;
     let globalPick = 1;
 
     while (unpicked.length > 0) {
@@ -338,10 +343,10 @@ class EloEngine {
         pickLabel: `Pick #${globalPick} (Round ${Math.ceil(globalPick / 2)})`
       };
 
-      if (turnOwner === 2) {
-        team2.push(pWithPick);
-      } else {
+      if (turnOwner === 1) {
         team1.push(pWithPick);
+      } else {
+        team2.push(pWithPick);
       }
 
       globalPick++;
@@ -358,8 +363,8 @@ class EloEngine {
 
     const optedOutCount = sorted.filter(p => p.optOutCaptain || p.neverCaptain).length;
     const criteriaLabel = optedOutCount > 0 
-      ? `Auto-Designated Top MMR (${optedOutCount} opted out of captaincy)` 
-      : 'Auto-Designated Highest MMR (Top 2 Players)';
+      ? `Auto-Designated (2nd Highest ELO = 1st Captain • ${optedOutCount} opted out)` 
+      : 'Auto-Designated (2nd Highest ELO = 1st Captain)';
 
     return {
       captain1: cap1,
@@ -369,7 +374,7 @@ class EloEngine {
       avgMMR1: Math.round(sum1 / (team1.length || 1)),
       avgMMR2: Math.round(sum2 / (team2.length || 1)),
       mmrDelta: Math.abs(Math.round(sum1 / (team1.length || 1)) - Math.round(sum2 / (team2.length || 1))),
-      firstPickOwner: passFirstPick ? 'Captain #1 (Passed by Cap #2)' : 'Captain #2',
+      firstPickOwner: passFirstPick ? `Captain #2 (${cap2.name} - Highest ELO • Passed by Cap #1)` : `Captain #1 (${cap1.name} - 2nd Highest ELO)`,
       criteriaLabel: criteriaLabel,
       optedOutCount: optedOutCount
     };

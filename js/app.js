@@ -4837,9 +4837,17 @@ class CustomLobbiesApp {
   }
 
   passTurnToCaptain1() {
-    this.passedFirstPick = true;
+    this.passFirstPickTurn();
+  }
+
+  passFirstPickTurn() {
+    this.passedFirstPick = !this.passedFirstPick;
     this.runDraftSimulation();
-    alert('⏩ TURN PASSED!\n\nCaptain #2 passed First Pick turn to Captain #1 (Highest MMR)! Captain #1 now has the first pick.');
+    if (this.passedFirstPick) {
+      alert('⏩ FIRST PICK PASSED!\n\nCaptain #1 (2nd Highest ELO) passed First Pick turn to Captain #2 (Highest ELO)! Captain #2 now has the first pick.');
+    } else {
+      alert('⏪ FIRST PICK RESTORED!\n\nFirst Pick restored to Captain #1 (2nd Highest ELO)!');
+    }
   }
 
   runDraftSimulation() {
@@ -4855,7 +4863,7 @@ class CustomLobbiesApp {
     if (capAEl) {
       capAEl.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem;">
-          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Alpha:</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain1.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">AUTO-CAPTAIN (#1 MMR)</span></div>
+          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Alpha (1st Pick):</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain1.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">AUTO-CAPTAIN (2ND HIGHEST ELO)</span></div>
           <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold);">${result.captain1.elo} MMR</span>
         </div>
       `;
@@ -4863,7 +4871,7 @@ class CustomLobbiesApp {
     if (capBEl) {
       capBEl.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem;">
-          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Bravo:</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain2.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">AUTO-CAPTAIN (#2 MMR)</span></div>
+          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Bravo:</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain2.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">AUTO-CAPTAIN (HIGHEST ELO)</span></div>
           <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold);">${result.captain2.elo} MMR</span>
         </div>
       `;
@@ -4886,14 +4894,14 @@ class CustomLobbiesApp {
       teamAContainer.innerHTML = result.team1.map((p, idx) => `
         <div style="display: flex; justify-content: space-between; align-items: center; background: ${idx === 0 ? 'linear-gradient(135deg, rgba(255,215,0,0.15), rgba(0,242,254,0.12))' : 'rgba(0,242,254,0.08)'}; padding: 0.55rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.85rem; border: 1px solid ${idx === 0 ? 'var(--accent-gold)' : 'rgba(0,242,254,0.2)'};">
           <div>
-            <span style="font-weight: 800; color: ${idx === 0 ? 'var(--accent-gold)' : '#fff'};">${idx === 0 ? '👑 ' : ''}${p.name}</span>
-            ${idx === 0 ? `<span style="font-size: 0.68rem; background: rgba(255,215,0,0.22); color: var(--accent-gold); padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,215,0,0.35);">AUTO-CAPTAIN (#1 MMR)</span>` : ''}
+            <span style="font-weight: 800; color: ${idx === 0 ? 'var(--accent-gold)' : '#fff'};">${idx === 0 ? '👑 [CAPTAIN 1] ' : ''}${p.name}</span>
+            ${idx === 0 ? `<span style="font-size: 0.68rem; background: rgba(255,215,0,0.22); color: var(--accent-gold); padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,215,0,0.35);">AUTO-CAPTAIN (2ND HIGHEST ELO • 1ST PICK)</span>` : ''}
             ${idx > 0 && p.optOutCaptain ? `<span style="font-size: 0.65rem; background: rgba(255,77,77,0.18); color: #ff6b6b; padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,77,77,0.35);" title="Player setting: Do not allow to be captain">🚫 OPTED OUT OF CAPTAIN</span>` : ''}
             ${p.role ? `<span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 0.35rem;">[${p.role}]</span>` : ''}
           </div>
           <div style="text-align: right;">
             <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
-            <span style="font-size: 0.72rem; color: var(--accent-cyan); margin-left: 0.35rem;">${p.pickLabel || (idx === 0 ? 'Cap #1' : `Pick #${idx*2}`)}</span>
+            <span style="font-size: 0.72rem; color: var(--accent-cyan); margin-left: 0.35rem;">${p.pickLabel || (idx === 0 ? 'Cap #1 (1st Pick)' : `Pick #${idx*2-1}`)}</span>
           </div>
         </div>
       `).join('');
@@ -4903,14 +4911,14 @@ class CustomLobbiesApp {
       teamBContainer.innerHTML = result.team2.map((p, idx) => `
         <div style="display: flex; justify-content: space-between; align-items: center; background: ${idx === 0 ? 'linear-gradient(135deg, rgba(255,215,0,0.15), rgba(157,78,221,0.12))' : 'rgba(157,78,221,0.08)'}; padding: 0.55rem 0.8rem; border-radius: 6px; margin-bottom: 0.4rem; font-size: 0.85rem; border: 1px solid ${idx === 0 ? 'var(--accent-gold)' : 'rgba(157,78,221,0.2)'};">
           <div>
-            <span style="font-weight: 800; color: ${idx === 0 ? 'var(--accent-gold)' : '#fff'};">${idx === 0 ? '👑 ' : ''}${p.name}</span>
-            ${idx === 0 ? `<span style="font-size: 0.68rem; background: rgba(255,215,0,0.22); color: var(--accent-gold); padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,215,0,0.35);">AUTO-CAPTAIN (#2 MMR)</span>` : ''}
+            <span style="font-weight: 800; color: ${idx === 0 ? 'var(--accent-gold)' : '#fff'};">${idx === 0 ? '👑 [CAPTAIN 2] ' : ''}${p.name}</span>
+            ${idx === 0 ? `<span style="font-size: 0.68rem; background: rgba(255,215,0,0.22); color: var(--accent-gold); padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,215,0,0.35);">AUTO-CAPTAIN (HIGHEST ELO)</span>` : ''}
             ${idx > 0 && p.optOutCaptain ? `<span style="font-size: 0.65rem; background: rgba(255,77,77,0.18); color: #ff6b6b; padding: 1px 5px; border-radius: 3px; font-weight: 800; margin-left: 0.35rem; border: 1px solid rgba(255,77,77,0.35);" title="Player setting: Do not allow to be captain">🚫 OPTED OUT OF CAPTAIN</span>` : ''}
             ${p.role ? `<span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 0.35rem;">[${p.role}]</span>` : ''}
           </div>
           <div style="text-align: right;">
             <span style="color: var(--accent-gold); font-weight: 800;">${p.elo} MMR</span>
-            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-left: 0.35rem;">${p.pickLabel || (idx === 0 ? 'Cap #2' : `Pick #${idx*2-1}`)}</span>
+            <span style="font-size: 0.72rem; color: var(--accent-purple); margin-left: 0.35rem;">${p.pickLabel || (idx === 0 ? 'Cap #2' : `Pick #${idx*2}`)}</span>
           </div>
         </div>
       `).join('');
@@ -4921,7 +4929,7 @@ class CustomLobbiesApp {
       const optOutNotice = result.optedOutCount > 0 
         ? `<div style="margin-top: 0.35rem; font-size: 0.78rem; color: var(--accent-gold);">🛡️ <strong>${result.optedOutCount} player(s) opted out of captaincy</strong> in settings. Captains assigned to next highest eligible MMR.</div>` 
         : '';
-      summaryEl.innerHTML = `👑 <strong>Auto-Captains Assigned to Top Eligible MMRs:</strong> 🔵 Team Alpha: <strong>${result.captain1.name} (${result.captain1.elo} MMR)</strong> | 🔴 Team Bravo: <strong>${result.captain2.name} (${result.captain2.elo} MMR)</strong><br>🐍 <strong>Snake Pick Order (1-2-2-1)</strong> | Game: <strong style="color: var(--accent-cyan);">${this.currentDraftGame}</strong> (${maxCap} Players) | First Pick: <strong>${result.firstPickOwner}</strong><br>🔵 Team Alpha Avg: <strong>${result.avgMMR1} MMR</strong> | 🔴 Team Bravo Avg: <strong>${result.avgMMR2} MMR</strong> | MMR Delta: <strong>${result.mmrDelta} MMR (Fair Match)</strong>${optOutNotice}`;
+      summaryEl.innerHTML = `👑 <strong>Auto-Captains:</strong> 🔵 Captain #1 (1st Pick): <strong>${result.captain1.name} (${result.captain1.elo} MMR • 2nd Highest ELO)</strong> | 🔴 Captain #2: <strong>${result.captain2.name} (${result.captain2.elo} MMR • Highest ELO)</strong><br>🐍 <strong>Snake Pick Order (1-2-2-1)</strong> | Game: <strong style="color: var(--accent-cyan);">${this.currentDraftGame}</strong> (${maxCap} Players) | First Pick: <strong>${result.firstPickOwner}</strong><br>🔵 Team Alpha Avg: <strong>${result.avgMMR1} MMR</strong> | 🔴 Team Bravo Avg: <strong>${result.avgMMR2} MMR</strong> | MMR Delta: <strong>${result.mmrDelta} MMR (Fair Match)</strong>${optOutNotice}`;
     }
   }
 
