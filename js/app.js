@@ -4900,22 +4900,109 @@ class CustomLobbiesApp {
     }
   }
 
-  joinAndQueueLobby(id) {
+  ensureLobbyTeams(lobby) {
+    if (!lobby) return;
+    const halfMax = Math.ceil((lobby.max || 10) / 2);
+    if (!lobby.teams || !lobby.teams.team1 || !lobby.teams.team2) {
+      lobby.teams = {
+        team1: { name: 'Team Alpha', color: '#00f2fe', max: halfMax, members: [] },
+        team2: { name: 'Team Omega', color: '#ff5252', max: halfMax, members: [] }
+      };
+    }
+
+    const t1 = lobby.teams.team1;
+    const t2 = lobby.teams.team2;
+    if (!Array.isArray(t1.members)) t1.members = [];
+    if (!Array.isArray(t2.members)) t2.members = [];
+
+    const totalInTeams = t1.members.length + t2.members.length;
+    if (totalInTeams < lobby.players) {
+      const sampleNames = ['S1mple_Fragger', 'ZywOo_Master', 'TenZ_Duelist', 'NiKo_Rifler', 'Faker_Mid', 'Device_CS', 'Shroud_Echo', 'Valkyrie_CS', 'Ghost_Scout', 'IronClad_Gunner'];
+      let needed = lobby.players - totalInTeams;
+      let toggle = false;
+      while (needed > 0) {
+        const target = (!toggle && t1.members.length < t1.max) ? t1 : (t2.members.length < t2.max ? t2 : (t1.members.length < t1.max ? t1 : null));
+        if (!target) break;
+        const name = sampleNames[(totalInTeams + needed) % sampleNames.length];
+        target.members.push({
+          name: name,
+          avatar: '🎮',
+          elo: Math.floor(Math.random() * 500 + 2200),
+          role: 'Roster Member'
+        });
+        needed--;
+        toggle = !toggle;
+      }
+    }
+  }
+
+  joinAndQueueLobby(id, preferredTeamKey = null) {
     const lobby = this.lobbies.find(l => l.id == id);
     if (!lobby) return;
 
-    if (lobby.players >= lobby.max) {
+    this.ensureLobbyTeams(lobby);
+
+    const partyMembers = (window.partyEngine && typeof window.partyEngine.getMembers === 'function')
+      ? window.partyEngine.getMembers()
+      : [{ name: 'You (Host)', avatar: '👑', elo: 2150, role: 'Party Leader' }];
+
+    const partyCount = partyMembers.length;
+    const t1 = lobby.teams.team1;
+    const t2 = lobby.teams.team2;
+
+    const t1Spots = t1.max - t1.members.length;
+    const t2Spots = t2.max - t2.members.length;
+
+    let targetTeam = null;
+    let targetTeamKey = preferredTeamKey;
+
+    if (preferredTeamKey === 'team1' && t1Spots >= partyCount) {
+      targetTeam = t1;
+    } else if (preferredTeamKey === 'team2' && t2Spots >= partyCount) {
+      targetTeam = t2;
+    } else {
+      // Pick team with most room
+      if (t1Spots >= partyCount && t1Spots >= t2Spots) {
+        targetTeam = t1;
+        targetTeamKey = 'team1';
+      } else if (t2Spots >= partyCount) {
+        targetTeam = t2;
+        targetTeamKey = 'team2';
+      } else if (t1Spots > 0 || t2Spots > 0) {
+        targetTeam = t1Spots >= t2Spots ? t1 : t2;
+        targetTeamKey = t1Spots >= t2Spots ? 'team1' : 'team2';
+      }
+    }
+
+    if (!targetTeam || (targetTeam.max - targetTeam.members.length) <= 0) {
+      const msg = `⚠️ Not enough open spots for your party (${partyCount} players) in lobby "${lobby.title}"!`;
       if (window.widgetBuilderEngine?.showToast) {
-        window.widgetBuilderEngine.showToast(`⚠️ Lobby "${lobby.title}" is full!`, 'error');
+        window.widgetBuilderEngine.showToast(msg, 'error');
       } else {
-        alert(`⚠️ Lobby "${lobby.title}" is currently full!`);
+        alert(msg);
       }
       return;
     }
 
-    lobby.players++;
-    if (!lobby.members) lobby.members = [];
-    lobby.members.push({ name: 'You (Host)', role: 'Queue Member', elo: 2150 });
+    // Add party members to target team
+    partyMembers.forEach(m => {
+      if (targetTeam.members.length < targetTeam.max) {
+        targetTeam.members = targetTeam.members.filter(existing => existing.name !== m.name);
+        const otherTeam = (targetTeam === t1) ? t2 : t1;
+        otherTeam.members = otherTeam.members.filter(existing => existing.name !== m.name);
+
+        targetTeam.members.push({
+          name: m.name,
+          avatar: m.avatar || '👑',
+          elo: m.elo || 2150,
+          role: m.role || 'Party Member',
+          isParty: true,
+          isLeader: m.isLeader || false
+        });
+      }
+    });
+
+    lobby.players = t1.members.length + t2.members.length;
     
     this.saveState();
     this.renderActiveGamesBar();
@@ -4924,14 +5011,14 @@ class CustomLobbiesApp {
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('fanfare');
       if (typeof window.widgetBuilderEngine.showToast === 'function') {
-        window.widgetBuilderEngine.showToast(`⚡ Joined & Queued in "${lobby.title}" (${lobby.players}/${lobby.max} Players)!`, 'success');
+        window.widgetBuilderEngine.showToast(`⚡ Your Party (${partyCount} Players) joined ${targetTeam.name} in "${lobby.title}"!`, 'success');
       }
     }
 
     if (window.discordActivityEngine) {
       window.discordActivityEngine.setActivity({
         details: `In Lobby: ${lobby.title}`,
-        state: `Queued (${lobby.players}/${lobby.max} Players) • ${lobby.game}`,
+        state: `Direct Teams: ${targetTeam.name} • Party of ${partyCount}`,
         party: { size: [lobby.players, lobby.max] }
       });
     }
@@ -4956,7 +5043,7 @@ class CustomLobbiesApp {
 
     let list = [...this.lobbies];
 
-    // Filter by Lobby Type (defaults to open public lobbies with players!)
+    // Filter by Lobby Type
     if (this.lobbyFilterType === 'public_with_players') {
       list = list.filter(l => (l.players || 0) > 0 && (l.players < l.max) && (l.isPublic !== false));
     } else if (this.lobbyFilterType === 'favorites') {
@@ -4988,12 +5075,43 @@ class CustomLobbiesApp {
     }
 
     grid.innerHTML = list.map(l => {
+      this.ensureLobbyTeams(l);
+
       const fillPct = Math.round((l.players / l.max) * 100);
       const isFav = this.favoriteGames.has(l.game);
       const isPublic = l.isPublic !== false;
       const spotsLeft = l.max - l.players;
       const statusBadge = l.matchStatus || (fillPct >= 90 ? '🟢 IN-GAME (Live)' : (fillPct >= 70 ? '⚡ DRAFTING' : '🔥 RECRUITING'));
       const statusColor = statusBadge.includes('IN-GAME') || statusBadge.includes('LIVE') ? 'var(--accent-green)' : (statusBadge.includes('DRAFT') ? 'var(--accent-cyan)' : 'var(--accent-gold)');
+
+      const t1 = l.teams.team1;
+      const t2 = l.teams.team2;
+      const t1SpotsLeft = t1.max - t1.members.length;
+      const t2SpotsLeft = t2.max - t2.members.length;
+
+      const renderTeamChips = (teamObj, teamKey, isBlue) => {
+        let chips = [];
+        for (let i = 0; i < teamObj.max; i++) {
+          if (i < teamObj.members.length) {
+            const m = teamObj.members[i];
+            const isParty = m.isParty || (window.partyEngine && window.partyEngine.isInParty(m.name));
+            chips.push(`
+              <div class="lobby-roster-chip ${isParty ? 'roster-chip-party' : ''}" style="${isParty ? 'border-color: var(--accent-purple); background: rgba(168, 85, 247, 0.2); box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);' : ''}">
+                <span style="font-size: 0.85rem;">${m.avatar || '🎮'}</span>
+                <span class="chip-name" style="${isParty ? 'color: #d8b4fe; font-weight: 800;' : ''}">${m.name}</span>
+                ${isParty ? '<span style="font-size: 0.55rem; background: var(--accent-purple); color: #fff; padding: 0.05rem 0.2rem; border-radius: 2px; font-weight: 900;">PARTY</span>' : ''}
+              </div>
+            `);
+          } else {
+            chips.push(`
+              <div class="lobby-roster-chip chip-empty" style="border: 1px dashed ${isBlue ? 'rgba(0, 242, 254, 0.3)' : 'rgba(255, 82, 82, 0.3)'};">
+                <span style="color: var(--text-dim); font-size: 0.72rem;">+ Open Slot</span>
+              </div>
+            `);
+          }
+        }
+        return chips.join('');
+      };
 
       return `
         <div class="lobby-card" style="${isFav ? 'border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);' : (isPublic ? 'border-color: rgba(0, 242, 254, 0.35);' : '')}">
@@ -5016,27 +5134,57 @@ class CustomLobbiesApp {
           <h3 style="font-size: 1.15rem; font-weight: 900; margin: 0.5rem 0; color: #fff;">${l.title}</h3>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">Host: <strong style="color: var(--accent-cyan);">${l.host}</strong> | Type: <strong style="color: var(--accent-gold);">${l.draftType}</strong> | Region: <strong style="color: var(--text-main);">${l.region || 'NA East'}</strong></p>
 
-          <div class="lobby-players-bar">
-            <div class="lobby-players-fill" style="width: ${fillPct}%; background: ${spotsLeft <= 2 ? 'linear-gradient(90deg, #ffab00, #00e676)' : 'linear-gradient(90deg, #00f2fe, #4facfe)'};"></div>
+          <!-- DIRECT TEAMS VIEW -->
+          <div class="lobby-teams-direct-box" style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.75rem; margin: 0.75rem 0;">
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.75rem; align-items: start;">
+              
+              <!-- Team 1 (Blue) -->
+              <div style="background: rgba(0, 242, 254, 0.04); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 8px; padding: 0.6rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; padding-bottom: 0.25rem; border-bottom: 1px solid rgba(0, 242, 254, 0.2);">
+                  <strong style="color: var(--accent-cyan); font-size: 0.82rem;">🔵 ${t1.name}</strong>
+                  <span style="font-size: 0.75rem; font-weight: 800; color: #fff;">${t1.members.length}/${t1.max}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                  ${renderTeamChips(t1, 'team1', true)}
+                </div>
+                <button class="btn btn-cyan btn-sm btn-block" style="margin-top: 0.5rem; font-size: 0.75rem; padding: 0.3rem; font-weight: 800;" onclick="window.app.joinAndQueueLobby('${l.id}', 'team1')" ${t1SpotsLeft <= 0 ? 'disabled' : ''}>
+                  ${t1SpotsLeft > 0 ? `🔵 Join ${t1.name}` : 'Team Full'}
+                </button>
+              </div>
+
+              <!-- Center VS -->
+              <div style="text-align: center; padding-top: 1rem;">
+                <div style="font-size: 1.1rem; font-weight: 900; color: var(--accent-gold); text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);">VS</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 0.2rem;">${l.players}/${l.max}</div>
+              </div>
+
+              <!-- Team 2 (Red) -->
+              <div style="background: rgba(255, 82, 82, 0.04); border: 1px solid rgba(255, 82, 82, 0.25); border-radius: 8px; padding: 0.6rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; padding-bottom: 0.25rem; border-bottom: 1px solid rgba(255, 82, 82, 0.2);">
+                  <strong style="color: var(--accent-red); font-size: 0.82rem;">🔴 ${t2.name}</strong>
+                  <span style="font-size: 0.75rem; font-weight: 800; color: #fff;">${t2.members.length}/${t2.max}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                  ${renderTeamChips(t2, 'team2', false)}
+                </div>
+                <button class="btn btn-danger btn-sm btn-block" style="margin-top: 0.5rem; font-size: 0.75rem; padding: 0.3rem; font-weight: 800;" onclick="window.app.joinAndQueueLobby('${l.id}', 'team2')" ${t2SpotsLeft <= 0 ? 'disabled' : ''}>
+                  ${t2SpotsLeft > 0 ? `🔴 Join ${t2.name}` : 'Team Full'}
+                </button>
+              </div>
+
+            </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; flex-wrap: wrap; gap: 0.6rem;">
-            <div>
-              <span style="font-size: 0.88rem; font-weight: 800; color: ${spotsLeft <= 0 ? 'var(--accent-red)' : (spotsLeft <= 3 ? 'var(--accent-green)' : 'var(--accent-cyan)')};">
-                ${l.players} / ${l.max} Players
-              </span>
-              <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 0.4rem;">
-                (${spotsLeft > 0 ? `${spotsLeft} Spots Left • Open to Join` : 'Full Match'})
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-size: 0.8rem; font-weight: 800; color: ${spotsLeft <= 0 ? 'var(--accent-red)' : 'var(--accent-cyan)'};">
+                ${spotsLeft > 0 ? `${spotsLeft} Total Slots Open` : 'Match Full'}
               </span>
             </div>
             <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
-              ${spotsLeft > 0 ? `
-                <button class="btn btn-primary btn-sm" onclick="window.app.joinAndQueueLobby('${l.id}')" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); font-weight: 800; padding: 0.35rem 0.75rem;">
-                  <span>⚡</span> Queue Up / Join (${l.players}/${l.max})
-                </button>
-              ` : `
-                <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.6;">Full</button>
-              `}
+              <button class="btn btn-primary btn-sm" onclick="window.app.joinAndQueueLobby('${l.id}')" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); font-weight: 800; padding: 0.35rem 0.75rem;" ${spotsLeft <= 0 ? 'disabled' : ''}>
+                <span>⚡</span> Auto-Queue Party
+              </button>
               <button class="btn btn-purple btn-sm" onclick="window.chatVoiceManager ? window.chatVoiceManager.openLobbyChannel('${l.id}') : window.app.connectLobbyVoice('${l.title}')" title="Open Dedicated Live Chat & Voice Comms in Community Hub" style="background: rgba(88, 101, 242, 0.25); border-color: #5865F2; color: #fff; font-weight: 800; box-shadow: 0 0 12px rgba(88, 101, 242, 0.3);">
                 <span>💬</span> Hub & Voice
               </button>

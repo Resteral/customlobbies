@@ -1,0 +1,56 @@
+{
+  "$schema": "https://discord.com/developers/docs/activities/overview",
+  "name": "CustomLobbies",
+  "client_id": "1283928109382910291",
+  "summary": "Competitive Matchmaking, 128-Tick Scrims, 1-2-2-1 Snake Drafts & Universal Player Pool",
+  "description": "CustomLobbies is a high-performance esports matchmaking platform running as a Discord Activity. Play competitive 5v5 scrims (CS2, Valorant, Marvel Rivals, Empulse), participate in 33v33v33 WARDOG Tri-Faction conquest, draft teams live with voice channel participants, and track ELO MMR ratings directly inside Discord.",
+  "bot_public": true,
+  "embedded_activity_config": {
+    "supported_platforms": [
+      "web",
+      "desktop",
+      "mobile"
+    ],
+    "orientation_lock_state": 1,
+    "activity_url_mappings": [
+      {
+        "custom_id": "root",
+        "url": "/"
+      }
+    ],
+    "default_orientation": "landscape",
+    "client_platform_config": {
+      "web": {
+        "label": "Web & Browser Discord"
+      },
+      "desktop": {
+        "label": "Discord Desktop Client (Win/Mac/Linux)"
+      },
+      "mobile": {
+        "label": "Discord Mobile (iOS/Android)"
+      }
+    }
+  },
+  "scopes": [
+    "identify",
+    "guilds",
+    "rpc.voice.read",
+    "activities.read",
+    "activities.write"
+  ],
+  "tags": [
+    "gaming",
+    "esports",
+    "matchmaking",
+    "custom-lobbies",
+    "tournaments",
+    "cs2",
+    "valorant",
+    "wardogs"
+  ],
+  "developer": {
+    "organization": "CustomLobbies Inc.",
+    "website": "https://customlobbies.com",
+    "discord_community": "https://discord.gg/fqy84VqVzv"
+  }
+}

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hydroponic Planter Box Assembly, Soil & Weed Cultivation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a10;
+      --card: #0e1420;
+      --card-hover: #151e30;
+      --border: #223048;
+      --green: #10b981;
+      --weed-green: #22c55e;
+      --trichome: #00ffc8;
+      --soil-brown: #854d0e;
+      --cyan: #06b6d4;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+      --amber: #f59e0b;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    header {
+      background: linear-gradient(180deg, #141c2c 0%, #0a0e17 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      color: #021a14;
+    }
+
+    main {
+      padding: 24px;
+      flex: 1;
+      display: grid;
+      grid-template-columns: 360px 1fr 360px;
+      gap: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .panel-header {
+      padding: 1rem 1.25rem;
+      background: #090d14;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cyan);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-body {
+      padding: 1.25rem;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .part-card {
+      background: #090c13;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .part-card:hover {
+      background: var(--card-hover);
+      border-color: var(--cyan);
+    }
+
+    .btn-meld {
+      background: var(--blue);
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-meld:hover { opacity: 0.9; }
+    .btn-soil { background: #92400e; }
+    .btn-seed { background: #16a34a; }
+    .btn-bloom { background: #9333ea; }
+    .btn-unmeld { background: #ef4444; }
+
+    /* Visual Blueprint Stage */
+    .assembly-stage {
+      background: radial-gradient(circle at center, #0f1a2c 0%, #05070c 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+    }
+
+    .diagram-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    .slot-box {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 14px 24px;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 85%;
+      transition: all 0.3s;
+    }
+
+    .slot-box.installed {
+      border: 2px solid var(--green);
+      background: rgba(16, 185, 129, 0.1);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+    }
+
+    .pot-container {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      transition: all 0.3s;
+    }
+
+    .pot-container.installed {
+      border: 2px solid var(--amber);
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .pot-container.soil-filled {
+      border-color: #b45309;
+      background: rgba(180, 83, 9, 0.15);
+    }
+
+    .pot-container.planted {
+      border-color: var(--weed-green);
+      background: rgba(34, 197, 94, 0.2);
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+    }
+
+    .soil-badge {
+      background: #78350f;
+      color: #fed7aa;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .weed-plant-view {
+      background: rgba(6, 78, 59, 0.6);
+      border: 1px solid var(--weed-green);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-track {
+      background: #05080e;
+      border: 1px solid var(--border);
+      height: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--green));
+      width: 15%;
+      transition: width 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="brand-badge">HELIX BOTANY LAB</div>
+      <h1 style="font-size:1.15rem; font-weight:700;">Hydroponic Planter Box Assembly, Soil & Weed Cultivation</h1>
+    </div>
+
+    <div style="font-family:'Fira Code', monospace; color:var(--cyan); font-weight:600;">
+      Assembly Stage: Physical Parts, Organic Soil & Plants
+    </div>
+  </header>
+
+  <main>
+    <!-- Left Parts & Soil Workbench -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>🔧 1. Structural Hardware Assembly</span>
+      </div>
+      <div class="panel-body" id="parts-workbench">
+        <!-- Structural parts -->
+      </div>
+    </div>
+
+    <!-- Center Interactive Blueprint Stage with Live Plants -->
+    <div class="assembly-stage">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 style="font-size:1.05rem; color:var(--cyan);">[ Hydroponic Planter Assembly & Live Weed Plants ]</h2>
+        <div style="font-family:'Fira Code', monospace; font-size:1.05rem; font-weight:700; color:var(--green);" id="progress-number">15% Melded</div>
+      </div>
+
+      <div class="progress-track" style="margin-bottom:16px;">
+        <div class="progress-bar" id="progress-fill"></div>
+      </div>
+
+      <div class="diagram-container">
+        <!-- 1. Top Quantum LED Light Fixture -->
+        <div class="slot-box" id="slot-light_fixture">
+          <span style="font-size:1.6rem;">💡</span>
+          <div>
+            <div style="font-weight:700;">[ Top Rail Mount ] Quantum LED Full-Spectrum Light Bar</div>
+            <div style="font-size:0.8rem; color:var(--text-dim);" id="desc-light_fixture">EMPTY - Requires Quantum LED Fixture</div>
+          </div>
+        </div>
+
+        <!-- 2. Dual Pots with Soil & Weed Plants Inside -->
+        <div style="display:flex; gap:16px; width:85%;">
+          <!-- Left Pot A -->
+          <div class="pot-container" id="pot-left-box">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700;">🪴 [ Bay A ] Left Pot</span>
+              <span id="badge-soil-left" style="display:none;" class="soil-badge">Coco Coir Soil</span>
+            </div>
+            
+            <div id="pot-left-content" style="font-size:0.8rem; color:var(--text-dim);">
+              EMPTY POT BAY - Install Aeration Pot
+            </div>
+          </div>
+
+          <!-- Right Pot B -->
+          <div class="pot-container" id="pot-right-box">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700;">🪴 [ Bay B ] Right Pot</span>
+              <span id="badge-soil-right" style="display:none;" class="soil-badge">Coco Coir Soil</span>
+            </div>
+            
+            <div id="pot-right-content" style="font-size:0.8rem; color:var(--text-dim);">
+              EMPTY POT BAY - Install Aeration Pot
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Irrigation Drip Lines -->
+        <div class="slot-box" id="slot-irrigation_lines">
+          <span style="font-size:1.6rem;">🚿</span>
+          <div>
+            <div style="font-weight:700;">[ Manifold ] Dual Drip Emitter Irrigation Hoses</div>
+            <div style="font-size:0.8rem; color:var(--text-dim);" id="desc-irrigation_lines">EMPTY - Requires Drip Line Connection</div>
+          </div>
+        </div>
+
+        <!-- 4. Radiator & Water Tank Row -->
+        <div style="display:flex; gap:16px; width:85%;">
+          <div class="slot-box" id="slot-radiator_unit" style="flex:1;">
+            <span style="font-size:1.5rem;">❄</span>
+            <div>
+              <div style="font-weight:700;">[ Side ] Radiator Fan</div>
+              <div style="font-size:0.75rem; color:var(--text-dim);" id="desc-radiator_unit">EMPTY</div>
+            </div>
+          </div>
+
+          <div class="slot-box" id="slot-water_tank" style="flex:1;">
+            <span style="font-size:1.5rem;">💧</span>
+            <div>
+              <div style="font-weight:700;">[ Rear ] 50L Water Tank</div>
+              <div style="font-size:0.75rem; color:var(--text-dim);" id="desc-water_tank">EMPTY</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Soil & Botany Operations -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>🌿 2. Soil Substrate & Seed Inoculation</span>
+      </div>
+      <div class="panel-body">
+        <!-- Pot A Controls -->
+        <div class="part-card">
+          <div style="font-weight:700; color:var(--amber);">🪴 Pot Bay A (Left) Operations</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-meld btn-soil" style="flex:1;" onclick="pourSoil('left')">🟫 Pour Organic Soil</button>
+            <button class="btn-meld btn-seed" style="flex:1;" onclick="sowSeed('left', 'purple_haze')">🌱 Sow Purple Haze</button>
+          </div>
+          <button class="btn-meld btn-bloom" onclick="bloomPlant('left')">✨ Bloom Trichome Buds (100%)</button>
+        </div>
+
+        <!-- Pot B Controls -->
+        <div class="part-card">
+          <div style="font-weight:700; color:var(--amber);">🪴 Pot Bay B (Right) Operations</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-meld btn-soil" style="flex:1;" onclick="pourSoil('right')">🟫 Pour Organic Soil</button>
+            <button class="btn-meld btn-seed" style="flex:1;" onclick="sowSeed('right', 'og_kush')">🌱 Sow OG Kush</button>
+          </div>
+          <button class="btn-meld btn-bloom" onclick="bloomPlant('right')">✨ Bloom Trichome Buds (100%)</button>
+        </div>
+
+        <!-- Station Summary -->
+        <div style="font-size:0.85rem; color:var(--text-dim); line-height:1.6; margin-top:10px;">
+          <div>• <strong>Quantum LED</strong>: 2,400 Lumens Full-Spectrum UV</div>
+          <div>• <strong>Substrate</strong>: 70% Organic Coco Coir + 30% Aerated Perlite</div>
+          <div>• <strong>Nutrients</strong>: Nitrogen, Phosphorus, Potassium (NPK)</div>
+          <div>• <strong>Curing</strong>: Dense trichome crystals with frosty terpenes</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const PARTS = {
+      light_fixture: { name: "Quantum LED Grow Light Bar", slot: "top_rail_fixture", desc: "Full-spectrum UV emission", installed: false },
+      radiator_unit: { name: "Heat Radiator & Exhaust Fan", slot: "side_cooling_mount", desc: "Thermal regulation against heat-wilt", installed: false },
+      water_tank: { name: "Submersible Pump 50L Tank", slot: "rear_tank_bay", desc: "50-liter automated hydration feed", installed: false },
+      irrigation_lines: { name: "Dual Drip Emitter Hose Lines", slot: "drip_manifold", desc: "Direct root nutrient distribution", installed: false },
+      planting_pot_left: { name: "Left Aeration Soil Pot", slot: "pot_bay_left", desc: "Substrate pot for Bay A", installed: false, soil: false, plant: null },
+      planting_pot_right: { name: "Right Aeration Soil Pot", slot: "pot_bay_right", desc: "Substrate pot for Bay B", installed: false, soil: false, plant: null }
+    };
+
+    function renderUI() {
+      // 1. Hardware Workbench
+      const bench = document.getElementById('parts-workbench');
+      bench.innerHTML = '';
+      Object.entries(PARTS).forEach(([key, part]) => {
+        bench.innerHTML += `
+          <div class="part-card" style="opacity:${part.installed ? 0.4 : 1.0};">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; font-size:0.88rem;">${part.name}</span>
+              ${!part.installed 
+                ? `<button class="btn-meld" onclick="meldPart('${key}')">➕ Meld & Bolt</button>` 
+                : `<button class="btn-meld btn-unmeld" onclick="unmeldPart('${key}')">✕ Detach</button>`
+              }
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-dim);">${part.desc}</div>
+          </div>
+        `;
+      });
+
+      // 2. Blueprint Slots
+      ['light_fixture', 'radiator_unit', 'water_tank', 'irrigation_lines'].forEach(key => {
+        const slotEl = document.getElementById(`slot-${key}`);
+        const descEl = document.getElementById(`desc-${key}`);
+        if (slotEl && descEl) {
+          if (PARTS[key].installed) {
+            slotEl.classList.add('installed');
+            descEl.innerText = `INSTALLED & POWERED: ${PARTS[key].name}`;
+            descEl.style.color = 'var(--green)';
+          } else {
+            slotEl.classList.remove('installed');
+            descEl.innerText = `EMPTY - Requires ${PARTS[key].name}`;
+            descEl.style.color = 'var(--text-dim)';
+          }
+        }
+      });
+
+      // 3. Pot A (Left) Render
+      renderPot('left', PARTS.planting_pot_left);
+      renderPot('right', PARTS.planting_pot_right);
+
+      // Progress Calculation
+      let installedCount = 1; // Base chassis
+      Object.values(PARTS).forEach(p => { if (p.installed) installedCount++; });
+      const pct = Math.floor((installedCount / 7) * 100);
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-number').innerText = pct + '% Melded';
+    }
+
+    function renderPot(side, potData) {
+      const box = document.getElementById(`pot-${side}-box`);
+      const content = document.getElementById(`pot-${side}-content`);
+      const soilBadge = document.getElementById(`badge-soil-${side}`);
+
+      if (!potData.installed) {
+        box.className = 'pot-container';
+        soilBadge.style.display = 'none';
+        content.innerHTML = `<span style="color:var(--text-dim);">EMPTY POT BAY - Click 'Meld & Bolt' on ${potData.name}</span>`;
+        return;
+      }
+
+      box.classList.add('installed');
+
+      if (!potData.soil) {
+        soilBadge.style.display = 'none';
+        content.innerHTML = `
+          <div style="color:var(--amber); font-weight:600;">🪴 Pot Installed (Empty Substrate)</div>
+          <div style="color:var(--text-dim); font-size:0.75rem;">Click 'Pour Organic Soil' to add coco coir.</div>
+        `;
+        return;
+      }
+
+      box.classList.add('soil-filled');
+      soilBadge.style.display = 'inline-block';
+
+      if (!potData.plant) {
+        content.innerHTML = `
+          <div style="color:#f59e0b; font-weight:600;">🟫 Moist Organic Coco Coir (Ready for Seed)</div>
+          <div style="color:var(--text-dim); font-size:0.75rem;">Click 'Sow Seed' to plant cannabis strain.</div>
+        `;
+        return;
+      }
+
+      box.classList.add('planted');
+      const p = potData.plant;
+      content.innerHTML = `
+        <div class="weed-plant-view">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="color:${p.thc >= 26 ? 'var(--purple)' : 'var(--weed-green)'}; font-size:0.9rem;">
+              🌿 ${p.strainName}
+            </strong>
+            <span style="font-family:'Fira Code'; color:var(--trichome); font-weight:700; font-size:0.8rem;">
+              ${p.thc}% THC
+            </span>
+          </div>
+          <div style="font-size:0.75rem; color:#86efac;">
+            Stage: <strong>${p.stage}</strong>
+          </div>
+          <div style="font-size:0.72rem; color:var(--trichome);">
+            ✨ ${p.trichomes}
+          </div>
+        </div>
+      `;
+    }
+
+    function meldPart(key) {
+      PARTS[key].installed = true;
+      renderUI();
+    }
+
+    function unmeldPart(key) {
+      PARTS[key].installed = false;
+      PARTS[key].soil = false;
+      PARTS[key].plant = null;
+      renderUI();
+    }
+
+    function pourSoil(side) {
+      const potKey = side === 'left' ? 'planting_pot_left' : 'planting_pot_right';
+      if (!PARTS[potKey].installed) {
+        alert(`Install ${PARTS[potKey].name} first before pouring soil!`);
+        return;
+      }
+      PARTS[potKey].soil = true;
+      renderUI();
+    }
+
+    function sowSeed(side, strain) {
+      const potKey = side === 'left' ? 'planting_pot_left' : 'planting_pot_right';
+      if (!PARTS[potKey].soil) {
+        alert(`Pour organic soil into ${PARTS[potKey].name} first before planting!`);
+        return;
+      }
+
+      const strainInfo = strain === 'purple_haze' 
+        ? { strainName: "Purple Haze (Exotic Sativa)", thc: 26.5, stage: "Sprouted Seedling (Green Sprout)", trichomes: "Seedling Roots Established" }
+        : { strainName: "OG Kush (Dense Indica)", thc: 24.0, stage: "Sprouted Seedling (Green Sprout)", trichomes: "Seedling Roots Established" };
+
+      PARTS[potKey].plant = strainInfo;
+      renderUI();
+    }
+
+    function bloomPlant(side) {
+      const potKey = side === 'left' ? 'planting_pot_left' : 'planting_pot_right';
+      if (!PARTS[potKey].plant) {
+        alert("Sow a cannabis seed in this pot first!");
+        return;
+      }
+
+      PARTS[potKey].plant.stage = "Mature Flowering Buds (Trichome Heavy)";
+      PARTS[potKey].plant.trichomes = "Dense Sparkling Crystal Frost (Ready for Harvest)";
+      renderUI();
+    }
+
+    renderUI();
+  </script>
+</body>
+</html>

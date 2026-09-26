@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Subterranean Mining & Blast Furnace Foundry</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: transparent;
+      color: #f8fafc;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+    }
+    .foundry-modal {
+      background: radial-gradient(circle at 50% 20%, #1a1512, #080605 90%);
+      border: 2px solid #f97316;
+      border-radius: 16px;
+      width: 1080px;
+      height: 680px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(90deg, #9a3412, #1c1917);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(249, 115, 22, 0.4);
+    }
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .title-badge {
+      background: #ea580c;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+    .title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fed7aa;
+    }
+
+    .main-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    /* Left: Mining Vein Extraction */
+    .section-panel {
+      flex: 1;
+      background: rgba(28, 25, 23, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+    .panel-heading {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fdba74;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 8px;
+    }
+
+    .ore-card {
+      background: rgba(41, 37, 36, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .ore-card:hover {
+      border-color: #f97316;
+    }
+    .ore-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ore-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f5f5f4;
+    }
+    .ore-count-badge {
+      background: rgba(249, 115, 22, 0.2);
+      color: #fb923c;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+    .ore-desc {
+      font-size: 0.78rem;
+      color: #a8a29e;
+      line-height: 1.4;
+    }
+    .btn-mine {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-mine:hover { background: #ea580c; }
+
+    /* Right: Blast Furnace Smelter */
+    .furnace-card {
+      background: rgba(41, 37, 36, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .furnace-card:hover { border-color: #f97316; }
+    .refined-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fed7aa;
+    }
+    .furnace-temp {
+      font-size: 0.75rem;
+      color: #ef4444;
+      font-weight: 700;
+    }
+    .btn-smelt {
+      background: linear-gradient(135deg, #ea580c, #c2410c);
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-smelt:hover { background: #f97316; }
+  </style>
+</head>
+<body>
+  <div class="foundry-modal">
+    <div class="header">
+      <div class="title-group">
+        <span class="title-badge">PACIFICA FOUNDRY</span>
+        <div class="title">🔥 SUBTERRANEAN MINING & BLAST FURNACE REFINERY</div>
+      </div>
+      <button onclick="closeUI()" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:bold;cursor:pointer;">✕ Close (F11)</button>
+    </div>
+
+    <div class="main-body">
+      <!-- Left: Mining Vein Harvesting -->
+      <div class="section-panel">
+        <div class="panel-heading">
+          <span>⛏️ Pacifica Geological Veins</span>
+          <span style="font-size:0.8rem;color:#a8a29e;">Jackhammer Extraction</span>
+        </div>
+        <div id="oreNodesList" style="display:flex;flex-direction:column;gap:12px;">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+      <!-- Right: Smelting Crucible -->
+      <div class="section-panel">
+        <div class="panel-heading">
+          <span>🔥 Blast Furnace Smelter</span>
+          <span style="font-size:0.8rem;color:#f97316;">High-Heat Metallurgical Crucible</span>
+        </div>
+        <div id="smeltingFurnaceList" style="display:flex;flex-direction:column;gap:12px;">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let miningState = {
+      rawOres: { ore_tungsten: 6, ore_titanium: 8, ore_cobalt: 4, ore_lithium: 6, ore_chromium: 10 },
+      refinedIngots: { ingot_tungsten_carbide: 2, ingot_titanium_grade5: 3, core_cobalt_magnetite: 1, prism_lithium_quartz: 2, bar_chromium_polish: 4 }
+    };
+
+    const ORE_DEFS = [
+      {
+        id: 'ore_tungsten',
+        name: 'Raw Tungsten Heavy Ore',
+        refinedId: 'ingot_tungsten_carbide',
+        refinedName: 'Tungsten Carbide Ingot',
+        temp: '1,650°C',
+        ratio: 3,
+        desc: 'Dense mineral extracted from deep tectonic faults. Smelts into armor-piercing gun barrels and drum magazines.'
+      },
+      {
+        id: 'ore_titanium',
+        name: 'Titanium Bauxite Crystal Ore',
+        refinedId: 'ingot_titanium_grade5',
+        refinedName: 'Grade 5 Titanium Plate',
+        temp: '1,400°C',
+        ratio: 2,
+        desc: 'Aerospace-grade crystal ore. Smelts into ultra-lightweight skeletonized receivers and monolithic suppressors.'
+      },
+      {
+        id: 'ore_cobalt',
+        name: 'Cobalt Magnetite Cluster',
+        refinedId: 'core_cobalt_magnetite',
+        refinedName: 'Cobalt Magnetite Core',
+        temp: '1,550°C',
+        ratio: 3,
+        desc: 'Ferromagnetic mineral with electromagnetic charge. Smelts into Gauss velocity accelerators.'
+      },
+      {
+        id: 'ore_lithium',
+        name: 'Lithium Quartz Geode',
+        refinedId: 'prism_lithium_quartz',
+        refinedName: 'Lithium Quartz Optical Prism',
+        temp: '1,100°C',
+        ratio: 2,
+        desc: 'Optically clear infrared crystal geode. Refines into thermal scopes and precision reticles.'
+      },
+      {
+        id: 'ore_chromium',
+        name: 'Raw Chromium Vein Ore',
+        refinedId: 'bar_chromium_polish',
+        refinedName: 'Polished Chromium Bar',
+        temp: '1,250°C',
+        ratio: 2,
+        desc: 'Frictionless alloy vein. Refines into rapid-cycling bolt carriers and buffer assemblies.'
+      }
+    ];
+
+    function refreshData() {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('getMiningState').then(res => {
+          if (res && res.success) {
+            miningState = res.minerals;
+            renderAll();
+          }
+        });
+      } else {
+        renderAll();
+      }
+    }
+
+    function renderAll() {
+      // 1. Render Ore Extraction
+      const oreContainer = document.getElementById('oreNodesList');
+      oreContainer.innerHTML = '';
+      ORE_DEFS.forEach(ore => {
+        const count = miningState.rawOres[ore.id] || 0;
+        const card = document.createElement('div');
+        card.className = 'ore-card';
+        card.innerHTML = `
+          <div class="ore-title-row">
+            <span class="ore-name">${ore.name}</span>
+            <span class="ore-count-badge">${count} Ore in Bag</span>
+          </div>
+          <div class="ore-desc">${ore.desc}</div>
+          <button class="btn-mine" onclick="mineOre('${ore.id}')">⛏️ Strike Geological Vein with Drill</button>
+        `;
+        oreContainer.appendChild(card);
+      });
+
+      // 2. Render Smelter Furnace
+      const furnaceContainer = document.getElementById('smeltingFurnaceList');
+      furnaceContainer.innerHTML = '';
+      ORE_DEFS.forEach(ore => {
+        const rawCount = miningState.rawOres[ore.id] || 0;
+        const refinedCount = miningState.refinedIngots[ore.refinedId] || 0;
+        const card = document.createElement('div');
+        card.className = 'furnace-card';
+        card.innerHTML = `
+          <div class="ore-title-row">
+            <span class="refined-name">${ore.refinedName}</span>
+            <span class="ore-count-badge">${refinedCount} Refined Stock</span>
+          </div>
+          <div style="font-size:0.75rem;color:#cbd5e1;display:flex;justify-content:space-between;">
+            <span>Smelting Ratio: <strong>${ore.ratio}x Raw -> 1x Refined</strong></span>
+            <span class="furnace-temp">Required Crucible Temp: ${ore.temp}</span>
+          </div>
+          <button class="btn-smelt" onclick="smelt('${ore.id}')">🔥 Smelt Ingot in Blast Furnace (${rawCount}/${ore.ratio} Ores Available)</button>
+        `;
+        furnaceContainer.appendChild(card);
+      });
+    }
+
+    function mineOre(oreId) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('mineOreDeposit', { oreType: oreId }).then(res => {
+          alert(res.message);
+          refreshData();
+        });
+      } else {
+        const yieldAmt = Math.floor(Math.random() * 3) + 2;
+        miningState.rawOres[oreId] = (miningState.rawOres[oreId] || 0) + yieldAmt;
+        alert(`⛏️ Mined ${yieldAmt}x ores!`);
+        renderAll();
+      }
+    }
+
+    function smelt(oreId) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('smeltIngot', { oreType: oreId }).then(res => {
+          alert(res.message);
+          refreshData();
+        });
+      } else {
+        const oreDef = ORE_DEFS.find(o => o.id === oreId);
+        if ((miningState.rawOres[oreId] || 0) < oreDef.ratio) {
+          alert(`Need at least ${oreDef.ratio}x raw ores to smelt 1x ${oreDef.refinedName}!`);
+          return;
+        }
+        miningState.rawOres[oreId] -= oreDef.ratio;
+        miningState.refinedIngots[oreDef.refinedId] = (miningState.refinedIngots[oreDef.refinedId] || 0) + 1;
+        alert(`🔥 Smelted 1x ${oreDef.refinedName}!`);
+        renderAll();
+      }
+    }
+
+    function closeUI() {
+      if (typeof Helix !== 'undefined' && Helix.emit) {
+        Helix.emit('CloseGunsmithUI');
+      }
+    }
+
+    refreshData();
+  </script>
+</body>
+</html>

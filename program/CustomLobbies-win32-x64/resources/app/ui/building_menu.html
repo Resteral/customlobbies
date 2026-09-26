@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sandbox World Construction & Building Toolgun</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: transparent;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+    }
+    .build-modal {
+      background: #0f172a;
+      border: 2px solid #f59e0b;
+      border-radius: 16px;
+      width: 950px;
+      height: 600px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(90deg, #b45309, #0f172a);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .build-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .build-card:hover {
+      border-color: #fbbf24;
+    }
+    .struct-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 4px;
+    }
+    .category-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(245, 158, 11, 0.2);
+      color: #fde68a;
+      margin-bottom: 12px;
+    }
+    .specs {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .specs strong { color: #f1f5f9; }
+    .btn-place {
+      background: #d97706;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-place:hover { background: #b45309; }
+  </style>
+</head>
+<body>
+  <div class="build-modal">
+    <div class="header">
+      <div class="title">🔨 SANDBOX BUILDING & FORTIFICATION TOOLGUN</div>
+      <button onclick="closeUI()" style="background:#ef4444;color:white;border:none;padding:6px 14px;border-radius:6px;font-weight:bold;cursor:pointer;">✕ Close (B)</button>
+    </div>
+
+    <div class="grid" id="buildList">
+      <!-- Populated via JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    const buildables = [
+      {
+        id: 'steel_wall',
+        name: 'Reinforced Steel Blast Wall (3x3m)',
+        category: 'Structural',
+        hp: 2500,
+        cost: 350,
+        desc: 'Tungsten-reinforced steel plate. Absorbs high-caliber bullet fire and explosions.'
+      },
+      {
+        id: 'wood_wall',
+        name: 'Plywood Interior Partition Wall',
+        category: 'Structural',
+        hp: 800,
+        cost: 120,
+        desc: 'Lightweight interior partition for dividing basement rooms and stealth grow tents.'
+      },
+      {
+        id: 'security_door',
+        name: 'Heavy Vault Security Door (PIN Keypad)',
+        category: 'Access Control',
+        hp: 3500,
+        cost: 750,
+        desc: 'Biometric keypad locking door. Keeps rival gangs and police without warrants out.'
+      },
+      {
+        id: 'floodlight',
+        name: 'Halogen Floodlight Tower (0.5 kW)',
+        category: 'Utility & Power',
+        hp: 400,
+        cost: 220,
+        desc: 'High-lumen stadium floodlight for lighting perimeter compounds and outdoor farms.'
+      },
+      {
+        id: 'barbed_barricade',
+        name: 'Barbed Wire Steel Barricade',
+        category: 'Defense Barrier',
+        hp: 1200,
+        cost: 180,
+        desc: 'Inflicts 25 puncture bleed damage on contact. Prevents enemy vehicles from ramming.'
+      },
+      {
+        id: 'storage_shelf',
+        name: 'Industrial Metal Storage Rack (30 Slots)',
+        category: 'Storage',
+        hp: 900,
+        cost: 290,
+        desc: 'Heavy-duty shelving unit to store chemical drums, seeds, and contraband trays.'
+      }
+    ];
+
+    function renderBuildables() {
+      const container = document.getElementById('buildList');
+      container.innerHTML = '';
+      buildables.forEach(b => {
+        const card = document.createElement('div');
+        card.className = 'build-card';
+        card.innerHTML = `
+          <div>
+            <div class="struct-name">${b.name}</div>
+            <div class="category-badge">${b.category}</div>
+            <div class="specs">
+              🛡️ Max Durability: <strong>${b.hp} HP</strong><br>
+              💵 Construction Cost: <strong>$${b.cost}</strong><br>
+              📝 Description: <strong>${b.desc}</strong>
+            </div>
+          </div>
+          <button class="btn-place" onclick="placeStructure('${b.id}')">Equip / Build ($${b.cost})</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function placeStructure(id) {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('placeStructure', { objectId: id, x: 0, y: 0, z: 0 }).then(res => alert(res.message));
+      } else {
+        const item = buildables.find(b => b.id === id);
+        alert(`Constructed ${item.name}! Surface snapped & anchored.`);
+      }
+    }
+
+    function closeUI() {
+      if (typeof Helix !== 'undefined' && Helix.emit) {
+        Helix.emit('CloseCustomUI');
+      }
+    }
+
+    renderBuildables();
+  </script>
+</body>
+</html>

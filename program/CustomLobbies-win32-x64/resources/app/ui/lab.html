@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELIX Laboratory & Chemistry Control Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090c12;
+      --bg-card: #111722;
+      --bg-card-hover: #172030;
+      --bg-input: #070a0e;
+      --border: #202b3d;
+      --cyan: #06b6d4;
+      --blue: #3b82f6;
+      --green: #10b981;
+      --purple: #a855f7;
+      --pink: #ec4899;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    header {
+      background: linear-gradient(180deg, #161e2e 0%, #0d121c 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-lab {
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      color: #03141a;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: #06090e;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    main {
+      padding: 24px;
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--cyan);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .gauge-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gauge-val {
+      font-family: 'Fira Code', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .gauge-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-action {
+      background: var(--blue);
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-action:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-heat { background: #ef4444; }
+    .btn-cool { background: #06b6d4; color: #021a24; font-weight: 700; }
+    .btn-green { background: #10b981; }
+    .btn-purple { background: #a855f7; }
+
+    .progress-bar {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      height: 16px;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #06b6d4, #10b981);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .log-box {
+      background: #05070a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      max-height: 140px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    .alert-banner {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="badge-lab">HELIX CHEMISTRY LAB</div>
+      <div>
+        <h1 style="font-size:1.15rem; font-weight:700;">Pacifica Clandestine Laboratory & Botany Studio</h1>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('meth')">⚗ Meth Synthesis</button>
+      <button class="tab-btn" onclick="switchTab('botany')">🌿 Cannabis Botany</button>
+      <button class="tab-btn" onclick="switchTab('coke')">🧱 Cocaine Press</button>
+      <button class="tab-btn" onclick="switchTab('market')">💰 Pacifica Dealing</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 1. METH SYNTHESIS TAB -->
+    <div id="tab-meth" class="grid-2">
+      <!-- Left Controls -->
+      <div class="card">
+        <div class="card-title">⚗ Reaction Flask & Thermodynamic Controls</div>
+        
+        <div id="meth-alert" class="alert-banner">⚠️ WARNING: Thermal Runaway Imminent (>130°C)! Vent or Cool Immediately!</div>
+
+        <div class="grid-3">
+          <div class="gauge-box">
+            <div id="m-temp" class="gauge-val">24.0°C</div>
+            <div class="gauge-label">Temp (Safe: 78-92°C)</div>
+          </div>
+          <div class="gauge-box">
+            <div id="m-psi" class="gauge-val">14.7</div>
+            <div class="gauge-label">Pressure (PSI)</div>
+          </div>
+          <div class="gauge-box">
+            <div id="m-ph" class="gauge-val" style="color:#38bdf8;">7.0</div>
+            <div class="gauge-label">pH Buffer (6.8-7.4)</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn-action btn-heat" style="flex:1;" onclick="methAction('heat')">🔥 Apply Heat (+12°C)</button>
+          <button class="btn-action btn-cool" style="flex:1;" onclick="methAction('cool')">❄ Cool Condenser (-12°C)</button>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn-action" style="flex:1;" onclick="methAction('add_base_buffer')">🧪 Add Base (Raise pH)</button>
+          <button class="btn-action" style="flex:1;" onclick="methAction('add_acid_buffer')">🧪 Add Acid (Lower pH)</button>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn-action btn-purple" style="flex:1;" onclick="methAction('toggle_stirrer')">🌀 Toggle Magnetic Stirrer</button>
+          <button class="btn-action btn-green" style="flex:1;" onclick="methAction('toggle_ventilation')">💨 Lab Fume Exhaust</button>
+        </div>
+      </div>
+
+      <!-- Right Purity & Stage -->
+      <div class="card">
+        <div class="card-title">💎 Synthesis Stage & Blue Crystal Purity</div>
+
+        <div class="gauge-box" style="background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(59,130,246,0.1));">
+          <div id="m-purity" class="gauge-val" style="color:#00ffc8; font-size:2.8rem;">99.1%</div>
+          <div class="gauge-label">Batch Purity Grade (Heisenberg Blue)</div>
+        </div>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:6px;">
+            <span id="m-stage-text">Stage 2: Reflux Distillation & Reaction</span>
+            <span id="m-progress-text">45%</span>
+          </div>
+          <div class="progress-bar">
+            <div id="m-progress-bar" class="progress-fill" style="width:45%;"></div>
+          </div>
+        </div>
+
+        <button id="m-btn-package" class="btn-action btn-green" style="padding:14px; font-size:1rem;" onclick="packageMeth()">
+          📦 Vacuum Package 20x Blue Crystal Baggies ($3,000)
+        </button>
+
+        <div class="log-box" id="meth-log">
+          [00:00:01] Lab initialized. Methylamine precursor added.<br>
+          [00:00:05] Heating mantle active. Temperature climbing...
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. BOTANY TAB -->
+    <div id="tab-botany" class="grid-2" style="display:none;">
+      <div class="card">
+        <div class="card-title">🌿 Hydroponic Soil & Moisture Monitor</div>
+
+        <div class="grid-3">
+          <div class="gauge-box">
+            <div id="b-moisture" class="gauge-val" style="color:#38bdf8;">85%</div>
+            <div class="gauge-label">Soil Moisture</div>
+          </div>
+          <div class="gauge-box">
+            <div id="b-thc" class="gauge-val" style="color:#22c55e;">26.0%</div>
+            <div class="gauge-label">Estimated THC</div>
+          </div>
+          <div class="gauge-box">
+            <div id="b-stage" class="gauge-val" style="font-size:1.2rem; color:#a855f7;">Flowering</div>
+            <div class="gauge-label">Life Stage</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn-action btn-cool" style="flex:1;" onclick="waterPlant()">💧 Water Hydroponic Pot (+40%)</button>
+          <button class="btn-action btn-purple" style="flex:1;" onclick="fertilizePlant()">🌱 Add NPK Nutrients</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📦 Crop Harvest & Curing</div>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:6px;">
+            <span>Trichome Maturation Progress</span>
+            <span id="b-progress-text">80%</span>
+          </div>
+          <div class="progress-bar">
+            <div id="b-progress-bar" class="progress-fill" style="width:80%; background:#22c55e;"></div>
+          </div>
+        </div>
+
+        <button class="btn-action btn-green" style="padding:14px; font-size:1rem;" onclick="harvestCrop()">
+          ✂ Harvest Purple Haze (168 Grams Top-Shelf)
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. COCAINE REFINERY TAB -->
+    <div id="tab-coke" class="grid-2" style="display:none;">
+      <div class="card">
+        <div class="card-title">🍃 Coca Maceration & Solvent Extraction</div>
+        <p style="color:var(--text-dim); font-size:0.88rem;">Process raw coca leaf bundles into hydrochloric cocaine powder.</p>
+        <button class="btn-action btn-green" onclick="refinePaste()">Extract Coca Base Paste (125g)</button>
+        <button class="btn-action btn-purple" onclick="crystallizePowder()">Crystallize Pure Powder (100g HCl)</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🧱 Hydraulic 1kg Brick Press (Export Grade)</div>
+        <p style="color:var(--text-dim); font-size:0.88rem;">Compress 10x 100g bags into a stamped 1kg wholesale brick for Pacifica Docks.</p>
+        <button class="btn-action btn-cool" onclick="pressBrick('Golden Scorpion')">
+          ⚙ Stamp 1kg 'Golden Scorpion' Brick ($65,000)
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. PACIFICA DEALING TAB -->
+    <div id="tab-market" class="grid-2" style="display:none;">
+      <div class="card">
+        <div class="card-title">🏙 Pacifica District Demand & Street Dealing</div>
+        <div style="font-size:0.9rem; line-height:1.6; color:var(--text-dim);">
+          <div>• <strong>Downtown Financial</strong>: Luxury Demand (+50% Payout) - High Cop Risk</div>
+          <div>• <strong>Industrial Docks</strong>: Pure Meth & Bulk Wholesale (+40% Payout)</div>
+          <div>• <strong>Neon Strip Nightclubs</strong>: Exotic Weed & Party Packs (+35% Payout)</div>
+        </div>
+        <button class="btn-action btn-green" onclick="sellStreet('purple_haze')">Sell 5x Purple Haze Bags ($260)</button>
+        <button class="btn-action btn-purple" onclick="sellStreet('pure_meth')">Sell 5x Blue Crystal Baggies ($1,120)</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🚢 Pacifica Docks Wholesale Export</div>
+        <p style="color:var(--text-dim); font-size:0.88rem;">Load bulk contraband crates onto shipping freighters for instant wire transfers.</p>
+        <button class="btn-action btn-heat" onclick="exportCargo('cocaine_brick')">Load 1kg Stamped Brick ($65,000 Payout)</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let lab = { temp: 82.5, psi: 18.2, ph: 7.1, purity: 99.1, progress: 50 };
+
+    function switchTab(tab) {
+      ['meth', 'botany', 'coke', 'market'].forEach(t => {
+        document.getElementById(`tab-${t}`).style.display = t === tab ? 'grid' : 'none';
+      });
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function methAction(act) {
+      if (act === 'heat') lab.temp += 12;
+      if (act === 'cool') lab.temp -= 12;
+      if (act === 'add_base_buffer') lab.ph = Math.min(14, +(lab.ph + 0.5).toFixed(1));
+      if (act === 'add_acid_buffer') lab.ph = Math.max(1, +(lab.ph - 0.5).toFixed(1));
+      updateUI();
+    }
+
+    function updateUI() {
+      document.getElementById('m-temp').innerText = lab.temp.toFixed(1) + '°C';
+      document.getElementById('m-psi').innerText = lab.psi.toFixed(1);
+      document.getElementById('m-ph').innerText = lab.ph.toFixed(1);
+      document.getElementById('m-purity').innerText = lab.purity.toFixed(1) + '%';
+      
+      const alertEl = document.getElementById('meth-alert');
+      alertEl.style.display = lab.temp >= 125 ? 'block' : 'none';
+    }
+
+    function packageMeth() {
+      alert("Successfully packaged 20x 99.1% Blue Crystal Baggies ($3,000)!");
+    }
+
+    function waterPlant() {
+      alert("Watered pot! Soil moisture replenished to 95%.");
+    }
+
+    function fertilizePlant() {
+      alert("Added NPK nutrients. Growth speed boosted +25%.");
+    }
+
+    function harvestCrop() {
+      alert("Harvested 168g of Purple Haze (26.0% THC) Top-Shelf!");
+    }
+
+    function refinePaste() { alert("Extracted 125g Coca Base Paste."); }
+    function crystallizePowder() { alert("Crystallized 100g pure Cocaine HCl Powder (92% Purity)."); }
+    function pressBrick(stamp) { alert(`Pressed 1kg '${stamp}' Wholesale Cocaine Brick ($65,000)!`); }
+    function sellStreet(type) { alert(`Corner deal successful! Sold in Downtown Pacifica.`); }
+    function exportCargo(type) { alert(`Loaded onto Pacifica Docks freighter! Wire transfer received: $65,000.`); }
+  </script>
+</body>
+</html>

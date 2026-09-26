@@ -1,0 +1,55 @@
+{
+  "name": "HelixGame",
+  "title": "Pacifica: Clandestine Narcotics, Botany, Real Estate & In-House Lab Engineering",
+  "version": "1.0.0",
+  "description": "Comprehensive in-depth drug synthesis, GMod physical socketing & welding, in-house grow ops, real estate stashhouses, CCTV security, and Pacifica economy system for HELIX (Unreal Engine 5 Sandbox Platform by Hypersonic Laboratories).",
+  "author": "HelixGame Community",
+  "license": "MIT",
+  "category": "Gamemode & Roleplay Systems",
+  "tags": [
+    "drugs",
+    "botany",
+    "meth-lab",
+    "gmod-physics",
+    "housing",
+    "cctv",
+    "real-estate",
+    "heists",
+    "crypto-mining",
+    "pacifica"
+  ],
+  "main": "main-desktop.js",
+  "server": "js/index.js",
+  "client": "js/index.js",
+  "mapConfig": "maps/pacifica_crime_map.json",
+  "compatibility": {
+    "helix": ">=1.0.0",
+    "unrealEngine": "5.7+"
+  },
+  "scripts": {
+    "start": "node js/index.js",
+    "play:pacifica": "node js/index.js",
+    "server:pacifica": "node js/index.js",
+    "package:build": "node tools/package_publisher.js",
+    "package:publish": "node tools/package_publisher.js --zip",
+    "sync:workspace": "node tools/sync_to_helix_workspace.js",
+    "assets:search": "node tools/asset_source_hub.js search",
+    "assets:download": "node tools/asset_source_hub.js download",
+    "assets:curated": "node tools/asset_source_hub.js fetch-curated",
+    "generate-meshy": "node tools/meshy_model_generator.js",
+    "generate-tripo": "node tools/tripo_model_generator.js",
+    "import-models": "node tools/auto_model_importer.js",
+    "watch-models": "node tools/auto_model_importer.js --watch",
+    "helix:system": "node tools/helix-system-builder.js system",
+    "helix:station": "node tools/helix-system-builder.js station",
+    "helix:client": "node tools/helix-system-builder.js client",
+    "helix:ui": "node tools/helix-system-builder.js ui",
+    "helix:poi": "node tools/helix-system-builder.js poi",
+    "helix:help": "node tools/helix-system-builder.js help",
+    "build:exe": "electron-packager . CustomLobbies --platform=win32 --arch=x64 --out=program --overwrite --ignore=\"^/(node_modules|dist|program|models_raw|fivem_.*|gamemode|drug_crafting_minigame|helix_hospitality|munchies_complete|outbreak_game|perkpulse|qbx_.*|salty_ai_arena|standalone_drug_turfs|tools|trackball-tracker|weed_icecream_truck|maps|entities|items|\\.git|discord-bot)\""
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-packager": "^17.1.2"
+  }
+}

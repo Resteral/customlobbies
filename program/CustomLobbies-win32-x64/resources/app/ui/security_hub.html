@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Safehouse Security, CCTV & Mobile RV Ops</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: transparent;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+    }
+    .security-terminal {
+      background: #090d16;
+      border: 2px solid #ef4444;
+      border-radius: 16px;
+      width: 980px;
+      height: 640px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95);
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      overflow: hidden;
+    }
+    .cctv-matrix {
+      background: #020617;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      border-right: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .cam-feed {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .cam-header {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #ef4444;
+      text-shadow: 0 0 5px rgba(239, 68, 68, 0.8);
+      z-index: 2;
+    }
+    .cam-view {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, #1e293b 0%, #020617 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+    .rec-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .control-panel {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #0b1120;
+    }
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #f87171;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 10px;
+    }
+    .btn-action {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: left;
+    }
+    .btn-action:hover {
+      background: #334155;
+    }
+    .btn-burn-trap {
+      background: #7f1d1d;
+      border-color: #ef4444;
+      color: #fee2e2;
+      font-weight: 800;
+    }
+    .btn-burn-trap:hover {
+      background: #991b1b;
+    }
+    .rv-box {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="security-terminal">
+    <div class="cctv-matrix">
+      <div class="cam-feed">
+        <div class="cam-header">
+          <span><span class="rec-dot"></span> CAM 01 - FRONT PORCH</span>
+          <span>LIVE</span>
+        </div>
+        <div class="cam-view">📹 [Front Door Intrusion Sensor Active]</div>
+      </div>
+      <div class="cam-feed">
+        <div class="cam-header">
+          <span><span class="rec-dot"></span> CAM 02 - BASEMENT GROW</span>
+          <span>LIVE</span>
+        </div>
+        <div class="cam-view">🌿 [4x Mylar Hydroponic Planters Online]</div>
+      </div>
+      <div class="cam-feed">
+        <div class="cam-header">
+          <span><span class="rec-dot"></span> CAM 03 - METH KITCHEN</span>
+          <span>LIVE</span>
+        </div>
+        <div class="cam-view">🧪 [Fume Extraction Hood Active]</div>
+      </div>
+      <div class="cam-feed">
+        <div class="cam-header">
+          <span><span class="rec-dot"></span> CAM 04 - FALSE WALL SAFE</span>
+          <span>LIVE</span>
+        </div>
+        <div class="cam-view">🔒 [Concealed Stash: SECURE]</div>
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <div class="panel-title">
+        <span>SECURITY & COUNTER-RAID</span>
+        <button onclick="closeUI()" style="background:#ef4444;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">✕</button>
+      </div>
+
+      <button class="btn-action" onclick="toggleMotion()">🚨 Laser Motion Sensors: <span id="motionStatus" style="color:#22c55e;">ARMED</span></button>
+
+      <div class="rv-box">
+        <strong style="color:#38bdf8;">🚐 Mobile Cook RV Status</strong><br>
+        • Generator: <span id="genStatus" style="color:#4ade80;">RUNNING (45.0L Diesel)</span><br>
+        • Location: Outskirts Desert Badlands<br>
+        • City Grid Trail: <strong>0% (UNDETECTABLE)</strong>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button style="flex:1;background:#0284c7;color:white;border:none;padding:6px;border-radius:4px;font-weight:bold;cursor:pointer;" onclick="toggleRVGen()">Toggle Gen</button>
+          <button style="flex:1;background:#059669;color:white;border:none;padding:6px;border-radius:4px;font-weight:bold;cursor:pointer;" onclick="cookInRV()">Start Mobile Cook</button>
+        </div>
+      </div>
+
+      <button class="btn-action btn-burn-trap" onclick="triggerBurnTrap()">
+        🔥 DETONATE THERMITE BURN TRAP<br>
+        <span style="font-size:0.75rem;font-weight:normal;opacity:0.8;">Incinerate all contraband into ash before police breach</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let motionArmed = true;
+    let genRunning = true;
+
+    function toggleMotion() {
+      motionArmed = !motionArmed;
+      document.getElementById('motionStatus').innerText = motionArmed ? 'ARMED' : 'DISARMED';
+      document.getElementById('motionStatus').style.color = motionArmed ? '#22c55e' : '#ef4444';
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('armMotionSensors', { propertyId: 'prop_suburb_stash', armed: motionArmed });
+      }
+    }
+
+    function toggleRVGen() {
+      genRunning = !genRunning;
+      document.getElementById('genStatus').innerText = genRunning ? 'RUNNING (45.0L Diesel)' : 'OFFLINE';
+      document.getElementById('genStatus').style.color = genRunning ? '#4ade80' : '#ef4444';
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('toggleRVGenerator', { vehicleId: 'rv_Player_1' });
+      }
+    }
+
+    function cookInRV() {
+      if (typeof Helix !== 'undefined' && Helix.call) {
+        Helix.call('startMobileCook', { vehicleId: 'rv_Player_1', cookType: 'meth' }).then(res => alert(res.message));
+      } else {
+        alert('Mobile clandestine synthesis initiated inside RV!');
+      }
+    }
+
+    function triggerBurnTrap() {
+      const code = prompt('ENTER CONFIRMATION CODE TO VAPORIZE ALL CONTRABAND (Type BURN99):');
+      if (code === 'BURN99') {
+        if (typeof Helix !== 'undefined' && Helix.call) {
+          Helix.call('detonateBurnTrap', { propertyId: 'prop_suburb_stash', confirmationCode: code }).then(res => alert(res.message));
+        } else {
+          alert('🔥 THERMITE ACTIVATED! All contraband turned to sterile ash. Zero police evidence remaining.');
+        }
+      }
+    }
+
+    function closeUI() {
+      if (typeof Helix !== 'undefined' && Helix.emit) {
+        Helix.emit('CloseHousingUI');
+      }
+    }
+  </script>
+</body>
+</html>

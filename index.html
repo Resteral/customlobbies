@@ -198,6 +198,11 @@
     <!-- Rendered dynamically by discord-activity.js -->
   </div>
 
+  <!-- GLOBAL SQUAD PARTY BAR (Shows your party members across all lobbies & queues) -->
+  <div id="globalPartyBar" class="party-top-bar">
+    <!-- Rendered dynamically by party-engine.js -->
+  </div>
+
   <!-- Live Esports Telemetry Ticker Bar -->
   <div style="background: linear-gradient(90deg, #07090d, #12161f, #07090d); border-bottom: 1px solid var(--border-glow); padding: 0.45rem 1.5rem; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; overflow-x: auto; white-space: nowrap; font-family: monospace;">
     <div style="display: flex; gap: 1.5rem; align-items: center;">
@@ -1722,21 +1727,25 @@
         </div>
       </div>
 
-      <!-- Searching Radar Animation Banner (Appears when in queue) -->
-      <div style="display: none; background: rgba(0, 229, 255, 0.12); border: 2px solid var(--accent-cyan); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; align-items: center; justify-content: space-between;" id="matchmakingRadarBanner">
-        <div style="display: flex; align-items: center; gap: 1.25rem;">
-          <div style="width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--accent-cyan); border-top-color: transparent; animation: spin 1s linear infinite;"></div>
-          <div>
-            <div style="font-size: 1.1rem; font-weight: 900; color: var(--accent-cyan);" id="mmSearchStatusText">⚡ SEARCHING FOR COMPETITIVE SCRIM...</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;" id="mmPlayerCountDisplay">1 / 10 Players Found • Balancing ELO MMR Delta...</div>
+      <!-- Searching Radar Animation Banner (Appears when in queue - Direct Teams Blue vs Red) -->
+      <div style="display: none; background: rgba(0, 229, 255, 0.12); border: 2px solid var(--accent-cyan); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;" id="matchmakingRadarBanner">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--accent-cyan); border-top-color: transparent; animation: spin 1s linear infinite;"></div>
+            <div>
+              <div style="font-size: 1.1rem; font-weight: 900; color: var(--accent-cyan);" id="mmSearchStatusText">⚡ SEARCHING FOR COMPETITIVE SCRIM (DIRECT TEAMS)...</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;" id="mmPlayerCountDisplay">1 / 10 Players Found • Balancing ELO MMR Delta...</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span style="font-size: 1.3rem; font-weight: 900; color: var(--accent-gold);" id="mmSearchTimerDisplay">⏱️ 00:00</span>
+            <button class="btn btn-danger" style="width: auto; padding: 0.6rem 1.2rem;" onclick="window.app.cancelMatchmakingQueue()">
+              ❌ Cancel Search
+            </button>
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <span style="font-size: 1.3rem; font-weight: 900; color: var(--accent-gold);" id="mmSearchTimerDisplay">⏱️ 00:00</span>
-          <button class="btn btn-danger" style="width: auto; padding: 0.6rem 1.2rem;" onclick="window.app.cancelMatchmakingQueue()">
-            ❌ Cancel Search
-          </button>
-        </div>
+        <!-- Live Side-by-Side Direct Teams Queue Roster (Team Blue vs Team Red) -->
+        <div id="mmTeamsQueueContainer"></div>
       </div>
 
       <!-- Matchmaking Options & Queue Controls Grid -->
@@ -1810,21 +1819,8 @@
 
         <!-- Right: Party Queue & MMR Status Card -->
         <div>
-          <div class="card" style="margin-bottom: 1.5rem;">
-            <h3 style="font-size: 1.1rem; font-weight: 900; color: var(--accent-purple); margin-bottom: 0.8rem;">👥 Party Queue Roster</h3>
-            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Invite party members to queue together into Ranked Scrims!</p>
-
-            <div style="background: rgba(0,0,0,0.4); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1rem;">
-              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; margin-bottom: 0.4rem;">
-                <span>You (Host)</span>
-                <span id="mmPartyHostELO" style="color: var(--accent-gold);">1,500 ELO</span>
-              </div>
-              <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-size: 0.72rem;">✔ Ready</span>
-            </div>
-
-            <button class="btn btn-secondary btn-block" onclick="alert('➕ PARTY INVITE SENT!\n\nDirect party invite link copied to clipboard & sent to CustomLobbies Chat!')">
-              ➕ Invite Party Member
-            </button>
+          <div class="card" id="mmPartyQueueRoster" style="margin-bottom: 1.5rem;">
+            <!-- Populated dynamically by window.partyEngine.renderMatchmakingPartyRoster() -->
           </div>
         </div>
       </div>
@@ -5429,6 +5425,7 @@
   </div>
 
   <!-- Application Script Imports -->
+  <script src="js/party-engine.js"></script>
   <script src="js/elo-engine.js"></script>
   <script src="js/chat-voice.js"></script>
   <script src="js/stream-studio.js"></script>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELIX Crime & Business WebUI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Police Alert Notification Banner -->
+    <div id="police-alert-banner" class="hidden">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-text">
+        <span class="title">POLICE DISPATCH ALARM</span>
+        <span id="alert-message">Silent alarm triggered at Bank Vault!</span>
+      </div>
+    </div>
+
+    <!-- Business Management Modal -->
+    <div id="modal-business" class="modal hidden">
+      <div class="modal-content business-theme">
+        <div class="modal-header">
+          <h2>COMMERCIAL BUSINESS & LAUNDERING MANAGEMENT</h2>
+          <button class="btn-close" onclick="closeModal('modal-business')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="business-list">
+            <div class="biz-card">
+              <div class="biz-info">
+                <span class="biz-name">Velvet Lounge Nightclub</span>
+                <span class="biz-type">Type: Nightclub (15% Launder Fee)</span>
+              </div>
+              <div class="biz-stats">
+                <div>Clean Legal Profits: <strong id="biz-clean">$5,000</strong></div>
+                <div>Dirty Cash Launder Vault: <strong id="biz-dirty">$0</strong></div>
+                <div>Suspicion Level: <span id="biz-suspicion" class="susp-low">15%</span></div>
+              </div>
+              <div class="biz-actions">
+                <button class="btn-action buy" onclick="buyBusiness('nightclub_1')">Buy ($25,000)</button>
+                <button class="btn-action deposit" onclick="depositDirty('nightclub_1')">Launder Dirty Cash ($1,000)</button>
+                <button class="btn-action collect" onclick="collectClean('nightclub_1')">Collect Profits</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hacking Minigame Modal -->
+    <div id="modal-hacking" class="modal hidden">
+      <div class="modal-content cyber-theme">
+        <div class="modal-header">
+          <h2>CYBER SECURITY OVERRIDE TERMINAL</h2>
+          <button class="btn-close" onclick="closeModal('modal-hacking')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="hack-status">BYPASS NODES REQUIRED: 0 / 4</div>
+          <div id="hack-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Meth Lab Control Modal -->
+    <div id="modal-meth" class="modal hidden">
+      <div class="modal-content lab-theme">
+        <div class="modal-header">
+          <h2>METH SYNTHESIS CONTROL PANEL</h2>
+          <button class="btn-close" onclick="closeModal('modal-meth')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="stat-row">
+            <span>Temperature:</span>
+            <span id="lab-temp" class="stat-val">25°C</span>
+          </div>
+          <div class="stat-row">
+            <span>Cook Progress:</span>
+            <span id="lab-prog" class="stat-val">0%</span>
+          </div>
+          <div class="stat-row">
+            <span>Purity Rating:</span>
+            <span id="lab-purity" class="stat-val">99%</span>
+          </div>
+          <div class="lab-actions">
+            <button class="btn-action start" onclick="sendCookAction('start')">START COOKING BATCH</button>
+            <div class="btn-group">
+              <button class="btn-action heat" onclick="sendCookAction('heat')">HEAT (+15°C)</button>
+              <button class="btn-action cool" onclick="sendCookAction('cool')">COOL (-15°C)</button>
+            </div>
+          </div>
+          <div class="warning-text">⚠️ Target Temp: 75°C - 95°C. Heat > 130°C causes explosion!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Black Market Shop Modal -->
+    <div id="modal-blackmarket" class="modal hidden">
+      <div class="modal-content market-theme">
+        <div class="modal-header">
+          <h2>BLACK MARKET DEALER EXCHANGE</h2>
+          <button class="btn-close" onclick="closeModal('modal-blackmarket')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('sell')">Sell Contraband</button>
+            <button class="tab-btn" onclick="switchTab('buy')">Buy Equipment & Parts</button>
+          </div>
+          <div id="tab-sell" class="tab-content">
+            <div class="shop-item">
+              <span>Weed Baggie</span>
+              <button onclick="tradeItem('weed_bag', 'sell')">Sell for $150</button>
+            </div>
+            <div class="shop-item">
+              <span>Crystal Meth Baggie</span>
+              <button onclick="tradeItem('meth_bag', 'sell')">Sell for $350</button>
+            </div>
+            <div class="shop-item">
+              <span>Cocaine Brick</span>
+              <button onclick="tradeItem('cocaine_brick', 'sell')">Sell for $600</button>
+            </div>
+          </div>
+          <div id="tab-buy" class="tab-content hidden">
+            <div class="shop-item">
+              <span>Hydroponic Weed Seeds - $50</span>
+              <button onclick="tradeItem('weed_seed', 'buy')">Buy</button>
+            </div>
+            <div class="shop-item">
+              <span>Meth Precursor Chemicals - $120</span>
+              <button onclick="tradeItem('meth_chemicals', 'buy')">Buy</button>
+            </div>
+            <div class="shop-item">
+              <span>Thermal Drill Kit - $1,500</span>
+              <button onclick="tradeItem('thermal_drill', 'buy')">Buy</button>
+            </div>
+            <div class="shop-item">
+              <span>Crypto Siphon USB Flash Drive - $500</span>
+              <button onclick="tradeItem('crypto_usb', 'buy')">Buy</button>
+            </div>
+            <div class="shop-item">
+              <span>Cyber Hacking Device - $800</span>
+              <button onclick="tradeItem('hacking_device', 'buy')">Buy</button>
+            </div>
+            <div class="shop-item">
+              <span>Modular Metal Wall Panel - $250</span>
+              <button onclick="tradeItem('brick_wall', 'buy')">Buy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vault Keypad Modal -->
+    <div id="modal-keypad" class="modal hidden">
+      <div class="modal-content keypad-theme">
+        <div class="modal-header">
+          <h2>SECURITY VAULT KEYPAD</h2>
+          <button class="btn-close" onclick="closeModal('modal-keypad')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="pin-display">******</div>
+          <div class="keypad-grid">
+            <button onclick="pressKey('1')">1</button>
+            <button onclick="pressKey('2')">2</button>
+            <button onclick="pressKey('3')">3</button>
+            <button onclick="pressKey('4')">4</button>
+            <button onclick="pressKey('5')">5</button>
+            <button onclick="pressKey('6')">6</button>
+            <button onclick="pressKey('7')">7</button>
+            <button onclick="pressKey('8')">8</button>
+            <button onclick="pressKey('9')">9</button>
+            <button class="btn-clear" onclick="clearPIN()">CLR</button>
+            <button onclick="pressKey('0')">0</button>
+            <button class="btn-enter" onclick="submitPIN()">ENT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

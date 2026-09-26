@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paradise Coast RP - Official Server Wiki & Guide Hub</title>
+  <meta name="description" content="Official community wiki for Paradise Coast RP: Server rules, police & medical SOPs, criminal guides, crafting calculators, and interactive penal codes.">
+  <link rel="stylesheet" href="css/wiki.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="wiki-navbar">
+    <div class="brand-section">
+      <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle navigation menu">☰</button>
+      <a href="#home" class="brand-logo" title="Paradise Coast RP Wiki">🌴</a>
+      <div class="brand-text-block">
+        <a href="#home" class="brand-title">Paradise Coast RP</a>
+        <span class="brand-subtitle">Knowledge Base & Wiki</span>
+      </div>
+    </div>
+
+    <!-- Quick Search Bar Trigger -->
+    <div class="search-trigger-wrapper">
+      <span class="search-trigger-icon">🔍</span>
+      <input type="text" id="top-search-input" class="search-trigger-input" placeholder="Search guides, rules, penal codes... (Press Ctrl+K)" readonly />
+      <span class="search-shortcut-badge">Ctrl+K</span>
+    </div>
+
+    <!-- Right Actions -->
+    <div class="nav-actions">
+      <button class="btn-icon-label btn-ghost" id="nav-backup-btn" title="Backup & Restore Wiki Data">
+        💾 <span>Backup</span>
+      </button>
+      <button class="btn-icon-label btn-primary-gradient" id="nav-create-article-btn" title="Create New Article">
+        ✨ <span>New Article</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="wiki-layout">
+    
+    <!-- Left Navigation Sidebar -->
+    <aside class="wiki-sidebar">
+      <div class="sidebar-static-nav">
+        <a href="#home" class="nav-link-item active">
+          <span>🏠</span> Home Portal
+        </a>
+        <a href="#all-articles" class="nav-link-item">
+          <span>📚</span> All Articles Directory
+        </a>
+        <a href="#bookmarks" class="nav-link-item">
+          <span>⭐</span> Saved Bookmarks
+        </a>
+      </div>
+
+      <div class="sidebar-section-title">⚡ Interactive Tools</div>
+      <div class="sidebar-static-nav">
+        <a href="#tools/penal-calculator" class="nav-link-item">
+          <span>⚖️</span> PCPD Penal Calculator
+        </a>
+        <a href="#tools/crafting-calculator" class="nav-link-item">
+          <span>🧪</span> Drug & Crafting Lab
+        </a>
+        <a href="#tools/turf-map" class="nav-link-item">
+          <span>🗺️</span> Gang Turf & Wars Map
+        </a>
+        <a href="#tools/businesses" class="nav-link-item">
+          <span>💼</span> Businesses Directory
+        </a>
+        <a href="#tools/radio-directory" class="nav-link-item">
+          <span>📻</span> Radio Frequencies
+        </a>
+        <a href="#tools/emotes" class="nav-link-item">
+          <span>🎭</span> Emotes & Animations
+        </a>
+      </div>
+
+      <div class="sidebar-section-title">📂 Server Categories</div>
+      <div id="sidebar-categories-list">
+        <!-- Dynamically rendered by wiki-app.js -->
+      </div>
+    </aside>
+
+    <!-- Main Content Reader / View -->
+    <main class="wiki-main-container" id="main-content-view">
+      <!-- Dynamically populated by router -->
+    </main>
+  </div>
+
+  <!-- ==========================================
+       Article Editor / Post Creator Modal
+       ========================================== -->
+  <div class="modal-overlay" id="editor-modal">
+    <div class="editor-modal-container">
+      
+      <!-- Top Modal Header -->
+      <div class="modal-top-bar">
+        <span class="modal-title-text" id="editor-modal-title">✨ Create New Wiki Article</span>
+        <button class="modal-close-btn" id="close-editor-modal-btn" aria-label="Close Editor">✕</button>
+      </div>
+
+      <!-- Article Metadata Form Header -->
+      <div class="editor-meta-grid">
+        <div class="editor-input-group">
+          <label for="editor-title">Article Title *</label>
+          <input type="text" id="editor-title" placeholder="e.g. PCPD High-Speed Pursuit Intervention Protocol" required />
+        </div>
+        <div class="editor-input-group">
+          <label for="editor-category">Category *</label>
+          <select id="editor-category">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div class="editor-input-group">
+          <label for="editor-author">Author / Department</label>
+          <input type="text" id="editor-author" placeholder="e.g. PCPD Command or Citizen Name" value="Paradise Resident" />
+        </div>
+        <div class="editor-input-group">
+          <label for="editor-slug">URL Slug</label>
+          <input type="text" id="editor-slug" placeholder="auto-generated-slug" />
+        </div>
+        <div class="editor-input-group">
+          <label for="editor-tags">Tags (Comma-separated)</label>
+          <input type="text" id="editor-tags" placeholder="e.g. Police, Pursuit, Code 3, Tactical" />
+        </div>
+        <div class="editor-input-group" style="display: flex; gap: 1rem; align-items: center; padding-top: 1.2rem;">
+          <label style="display: inline-flex; align-items: center; gap: 0.3rem; margin: 0; cursor: pointer;">
+            <input type="checkbox" id="editor-featured" /> ⭐ Featured
+          </label>
+          <label style="display: inline-flex; align-items: center; gap: 0.3rem; margin: 0; cursor: pointer;">
+            <input type="checkbox" id="editor-pinned" /> 📌 Pinned
+          </label>
+        </div>
+      </div>
+
+      <!-- Short Summary Input -->
+      <div style="padding: 0.5rem 1.5rem; background: var(--bg-sidebar); border-bottom: 1px solid var(--border-color);">
+        <input type="text" id="editor-summary" class="form-control" placeholder="Short single-sentence summary for previews and search results..." />
+      </div>
+
+      <!-- Dynamic Infobox Key-Value Builder -->
+      <div class="infobox-builder-section">
+        <div class="infobox-builder-header">
+          <span>📊 Sidebar Infobox Properties (Optional server stats/specs):</span>
+          <button type="button" class="add-infobox-btn" id="add-infobox-row-btn">+ Add Field</button>
+        </div>
+        <div class="infobox-entries-list" id="infobox-entries-list">
+          <!-- Dynamic key-value row items -->
+        </div>
+      </div>
+
+      <!-- Formatting Toolbar -->
+      <div class="editor-toolbar">
+        <button type="button" class="editor-toolbar-btn" data-action="h1">H1</button>
+        <button type="button" class="editor-toolbar-btn" data-action="h2">H2</button>
+        <button type="button" class="editor-toolbar-btn" data-action="h3">H3</button>
+        <span class="tb-sep"></span>
+        <button type="button" class="editor-toolbar-btn" data-action="bold"><strong>B</strong></button>
+        <button type="button" class="editor-toolbar-btn" data-action="italic"><em>I</em></button>
+        <button type="button" class="editor-toolbar-btn" data-action="quote">Quote</button>
+        <button type="button" class="editor-toolbar-btn" data-action="code">&lt;/&gt;</button>
+        <button type="button" class="editor-toolbar-btn" data-action="table">📊 Table</button>
+        <button type="button" class="editor-toolbar-btn" data-action="kbd">⌨️ Keybind</button>
+        <span class="tb-sep"></span>
+        <button type="button" class="editor-toolbar-btn" data-action="alert-note">ℹ️ Note</button>
+        <button type="button" class="editor-toolbar-btn" data-action="alert-tip">💡 Tip</button>
+        <button type="button" class="editor-toolbar-btn" data-action="alert-warning">⚠️ Warning</button>
+        <button type="button" class="editor-toolbar-btn" data-action="image">🖼️ Image</button>
+        <button type="button" class="editor-toolbar-btn" data-action="link">🔗 Link</button>
+        
+        <div style="margin-left: auto; display: flex; gap: 0.25rem;">
+          <button type="button" class="editor-tab-btn" data-mode="write">Write</button>
+          <button type="button" class="editor-tab-btn active" data-mode="split">Split</button>
+          <button type="button" class="editor-tab-btn" data-mode="preview">Preview</button>
+        </div>
+      </div>
+
+      <!-- Main Split Editor Body -->
+      <div class="editor-split-body mode-split">
+        <div class="editor-textarea-column">
+          <textarea id="editor-content" class="editor-textarea" placeholder="Type Markdown here..."></textarea>
+        </div>
+        <div class="editor-preview-column" id="editor-preview">
+          <!-- Live Preview -->
+        </div>
+      </div>
+
+      <!-- Modal Bottom Actions -->
+      <div class="modal-bottom-actions">
+        <div class="left-actions">
+          <button type="button" class="btn-danger" id="delete-article-btn" style="display: none;">🗑️ Delete Article</button>
+        </div>
+        <div class="right-actions">
+          <button type="button" class="btn-icon-label btn-ghost" id="cancel-editor-btn">Cancel</button>
+          <button type="button" class="btn-icon-label btn-primary-gradient" id="save-article-btn">💾 Publish & Save Article</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================
+       Global Search Modal (Ctrl+K)
+       ========================================== -->
+  <div class="modal-overlay" id="search-modal">
+    <div class="modal-backdrop" id="search-modal-backdrop"></div>
+    <div class="search-modal-container">
+      <div class="search-input-header">
+        <span>🔍</span>
+        <input type="text" id="modal-search-input" class="modal-search-input" placeholder="Search articles, penal codes, recipes, keybinds..." autocomplete="off" />
+        <button class="modal-close-btn" id="close-search-modal-btn">✕</button>
+      </div>
+      <div class="search-results-scroll" id="search-results-list">
+        <!-- Live search results rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       Backup, Export & Import Modal
+       ========================================== -->
+  <div class="modal-overlay" id="backup-modal">
+    <div class="modal-backdrop" id="backup-modal-backdrop"></div>
+    <div class="backup-modal-container">
+      <div class="modal-top-bar" style="background: transparent; padding: 0 0 1.25rem;">
+        <span class="modal-title-text">💾 Wiki Backup & Storage Manager</span>
+        <button class="modal-close-btn" id="close-backup-modal-btn">✕</button>
+      </div>
+
+      <div class="backup-option-box">
+        <h4>📥 Export Full Wiki Database (JSON)</h4>
+        <p>Save all articles, custom posts, penal codes, and categories to a portable JSON backup file.</p>
+        <button class="hero-primary-btn" id="btn-export-json" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Download JSON Backup</button>
+      </div>
+
+      <div class="backup-option-box">
+        <h4>📤 Import Wiki Database</h4>
+        <p>Restore or load articles from a previously exported `.json` file.</p>
+        <input type="file" id="import-json-file-input" accept=".json" style="font-size: 0.85rem;" />
+      </div>
+
+      <div class="backup-option-box" style="border-color: rgba(239, 68, 68, 0.3);">
+        <h4 style="color: var(--accent-red);">🔄 Reset to Default Dataset</h4>
+        <p>Reset the wiki to official seeded Paradise Coast RP starter guides and rules.</p>
+        <button class="btn-danger" id="btn-reset-default">Reset to Default Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/wiki-data.js"></script>
+  <script src="js/wiki-storage.js"></script>
+  <script src="js/wiki-editor.js"></script>
+  <script src="js/wiki-tools.js"></script>
+  <script src="js/wiki-app.js"></script>
+</body>
+</html>

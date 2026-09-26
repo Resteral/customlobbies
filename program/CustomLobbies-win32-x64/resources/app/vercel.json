@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "name": "customlobbies-com",
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "overlay.html", "use": "@vercel/static" },
+    { "src": "js/**", "use": "@vercel/static" },
+    { "src": "css/**", "use": "@vercel/static" },
+    { "src": "assets/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/overlay", "dest": "/overlay.html" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}

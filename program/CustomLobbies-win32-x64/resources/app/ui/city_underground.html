@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>City Underground - Fictional East Coast Roleplay Prototype</title>
+  <link rel="stylesheet" href="css/city_underground.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Game 2D District Viewport -->
+  <div id="game-viewport">
+    <canvas id="city-canvas"></canvas>
+  </div>
+
+  <!-- UI Overlay Layer -->
+  <div id="ui-root">
+
+    <!-- Police Dispatch Alarm Banner -->
+    <div id="police-dispatch-banner" class="hidden interactive">
+      <span style="font-size: 20px;">🚨</span>
+      <span id="police-dispatch-text">911 DISPATCH: Silent alarm triggered at First National Bank!</span>
+    </div>
+
+    <!-- Minimal In-Game HUD -->
+    <div id="hud-container" class="interactive">
+      <div class="hud-pill">
+        <div class="hud-bars">
+          <!-- Health -->
+          <div class="bar-wrapper">
+            <span>❤️</span>
+            <div class="bar-bg"><div id="hud-fill-health" class="bar-fill fill-health" style="width: 100%;"></div></div>
+          </div>
+          <!-- Hunger -->
+          <div class="bar-wrapper">
+            <span>🍔</span>
+            <div class="bar-bg"><div id="hud-fill-hunger" class="bar-fill fill-hunger" style="width: 92%;"></div></div>
+          </div>
+          <!-- Thirst -->
+          <div class="bar-wrapper">
+            <span>💧</span>
+            <div class="bar-bg"><div id="hud-fill-thirst" class="bar-fill fill-thirst" style="width: 85%;"></div></div>
+          </div>
+        </div>
+
+        <div style="width: 1px; height: 36px; background: rgba(255,255,255,0.15);"></div>
+
+        <div class="hud-wallet">
+          <div class="wallet-cash">Cash: <span id="hud-cash-val">$500</span></div>
+          <div class="wallet-bank">Bank: <span id="hud-bank-val">$2,500</span></div>
+          <div class="wallet-job"><span id="hud-job-val">CITIZEN</span></div>
+        </div>
+
+        <div style="width: 1px; height: 36px; background: rgba(255,255,255,0.15);"></div>
+
+        <!-- Proximity Voice Range HUD Indicator -->
+        <div class="hud-voice" onclick="VoiceRadio.cycleVoiceMode()">
+          <div id="voice-indicator-dot" class="voice-dot"></div>
+          <span id="voice-mode-label" style="color: var(--accent-cyan);">Normal (15m)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Objective Tracker HUD -->
+    <div id="objective-hud" class="hidden interactive">
+      <div class="obj-title">📍 Active Objective</div>
+      <div id="obj-dest-text" class="obj-text">Deliver Parcel to First Trust Bank</div>
+      <div id="obj-payout-text" class="obj-sub">Expected Payout: $275</div>
+    </div>
+
+    <!-- Proximity Interaction Floating Prompt -->
+    <div id="interaction-prompt" class="hidden interactive">
+      <span class="key-badge" id="prompt-key">E</span>
+      <span id="prompt-text">Access First Trust Bank ATM</span>
+    </div>
+
+    <!-- Tabletop Seated Activity HUD Overlay -->
+    <div id="tabletop-seated-hud" class="hidden interactive" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.92); border: 1px solid var(--accent-cyan); border-radius: 10px; padding: 10px 18px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); z-index: 10000;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 22px;">🪑</span>
+        <div>
+          <div style="font-size: 13px; font-weight: 800; color: #fff;">SEATED AT TABLE</div>
+          <div style="font-size: 10px; color: var(--accent-emerald); font-weight: 700;">+100% Resting Regen</div>
+        </div>
+      </div>
+      <div style="width: 1px; height: 28px; background: rgba(255,255,255,0.15);"></div>
+      <button class="btn-builder-sm" onclick="ChairSystem.dineAtTable()">🍽️ Dine on Meal</button>
+      <button class="btn-builder-sm" onclick="ChairSystem.sipCoffeeAtTable()">☕ Sip Coffee</button>
+      <button class="btn-builder-sm" style="background: rgba(239, 68, 68, 0.25); border-color: var(--accent-danger); color: #f87171;" onclick="ChairSystem.standUp()">🚶 Stand Up (SPACE / E)</button>
+    </div>
+
+    <!-- Roleplay Chatbox -->
+    <div id="chatbox" class="interactive">
+      <div id="chat-messages"></div>
+      <div id="chat-input-wrapper">
+        <input type="text" id="chat-input" placeholder="Type chat message or command (/me, /do, /ooc, /introduce)..." autocomplete="off">
+      </div>
+    </div>
+
+    <!-- Quick Navigation Bar -->
+    <div id="quick-nav" class="interactive">
+      <button class="nav-pill-btn" onclick="CityUndergroundCore.toggleModal('modal-inventory')"><span>🎒</span> Inv (I)</button>
+      <button class="nav-pill-btn" onclick="CityUndergroundCore.toggleModal('modal-banking')"><span>🏦</span> Bank (B)</button>
+      <button class="nav-pill-btn" onclick="RadialMenu.toggle()"><span>☸️</span> Radial (C)</button>
+      <button class="nav-pill-btn" onclick="SkillsUI.open()"><span>⚡</span> Skills</button>
+      <button class="nav-pill-btn" onclick="BaseBuilder.open()"><span>🛡️</span> Defenses & Base (H)</button>
+      <button class="nav-pill-btn" onclick="CraftingBenchUI.open('workbench')"><span>🔧</span> Workbench</button>
+      <button class="nav-pill-btn" onclick="CookingStoveUI.open()"><span>🍳</span> Stove</button>
+      <button class="nav-pill-btn" onclick="CCTVSystem.openTerminal()"><span>📹</span> CCTV Hub</button>
+      <button class="nav-pill-btn" onclick="LockSystem.openMinigame('tier2_medeco', 'door_front')"><span>🔐</span> Locks</button>
+      <button class="nav-pill-btn" onclick="Store.open()"><span>🛒</span> Shop</button>
+      <button class="nav-pill-btn" onclick="BotanyUI.open()"><span>🌱</span> Botany</button>
+      <button class="nav-pill-btn" onclick="Casino.open()"><span>🎲</span> Casino</button>
+      <button class="nav-pill-btn" onclick="Fishing.open()"><span>🎣</span> Fishing</button>
+      <button class="nav-pill-btn" onclick="MapSpawner.open()"><span>📍</span> Spawner (F9)</button>
+      <button class="nav-pill-btn" onclick="CityUndergroundCore.toggleModal('modal-mdt')"><span>💻</span> MDT (M)</button>
+      <button class="nav-pill-btn" onclick="CityUndergroundCore.toggleModal('modal-dealership')"><span>🚗</span> Garage</button>
+      <button class="nav-pill-btn" onclick="CityUndergroundCore.toggleModal('modal-property')"><span>🏢</span> Apartment</button>
+      <button class="nav-pill-btn" onclick="CityUndergroundCore.toggleModal('modal-admin')"><span>⚙️</span> Admin (F10)</button>
+    </div>
+
+    <!-- ================= CIRCULAR RADIAL WHEEL MENU ================= -->
+    <div id="radial-menu-container" class="hidden interactive" onclick="if(event.target===this) RadialMenu.toggle()">
+      <div id="radial-menu-wheel"></div>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Electronic Keypad Security Modal -->
+    <div id="modal-keypad" class="modal-window hidden interactive" style="max-width: 420px;">
+      <div class="modal-header" style="background: rgba(3, 105, 161, 0.4);">
+        <h2><span>🔢</span> Security Keypad Terminal</h2>
+        <button class="btn-close" onclick="KeypadTerminal.close()">✕</button>
+      </div>
+      <div class="modal-body" style="align-items: center; gap: 15px;">
+        <div id="keypad-status-text" style="font-size: 13px; font-weight: 700; color: var(--text-muted);">ENTER 4-DIGIT SECURITY PIN</div>
+        
+        <!-- Display -->
+        <div id="keypad-code-display" style="width: 220px; height: 50px; background: #000; border: 2px solid var(--accent-cyan); border-radius: 8px; font-family: monospace; font-size: 32px; font-weight: 900; color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; letter-spacing: 8px; box-shadow: inset 0 0 10px rgba(0,242,254,0.3);">
+          ----
+        </div>
+
+        <!-- 3x4 Number Keypad Grid -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 220px;">
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(1)">1</button>
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(2)">2</button>
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(3)">3</button>
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(4)">4</button>
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(5)">5</button>
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(6)">6</button>
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(7)">7</button>
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(8)">8</button>
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(9)">9</button>
+          <button class="btn-primary btn-danger" onclick="KeypadTerminal.clear()">CLR</button>
+          <button class="btn-primary" onclick="KeypadTerminal.pressKey(0)">0</button>
+          <button class="btn-primary btn-success" onclick="KeypadTerminal.submit()">ENT</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; width: 100%; margin-top: 5px;">
+          <button class="btn-primary" onclick="KeypadTerminal.setNewPin()" style="flex: 1; font-size: 11px;">Set PIN (Owner)</button>
+          <button class="btn-primary btn-danger" onclick="KeypadTerminal.bypassWithLockpick()" style="flex: 1; font-size: 11px;">Lockpick Bypass</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Entity & NPC Spawner Placement Modal (F9) -->
+    <div id="modal-spawner" class="modal-window hidden interactive" style="max-width: 820px;">
+      <div class="modal-header" style="background: rgba(16, 185, 129, 0.3);">
+        <h2><span>📍</span> Map Entity & Persistent NPC Placement Tool</h2>
+        <button class="btn-close" onclick="MapSpawner.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px;">
+          <!-- Left: Spawner Controls -->
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="input-group">
+              <label>Select NPC / Entity Archetype</label>
+              <select id="spawner-archetype-select"></select>
+            </div>
+            <div id="spawner-arch-desc" style="font-size: 12px; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;"></div>
+
+            <div class="input-group">
+              <label>Custom Entity Name (Optional)</label>
+              <input type="text" id="spawner-custom-name" placeholder="Leave blank to use archetype default">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+              <div class="input-group" style="flex: 1;">
+                <label>Target X</label>
+                <input type="number" id="spawner-pos-x" value="500">
+              </div>
+              <div class="input-group" style="flex: 1;">
+                <label>Target Y</label>
+                <input type="number" id="spawner-pos-y" value="500">
+              </div>
+              <div class="input-group" style="flex: 1;">
+                <label>Heading (°)</label>
+                <input type="number" id="spawner-heading" value="0">
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 6px;">
+              <button class="btn-primary" onclick="MapSpawner.useCurrentPosition()" style="flex: 1;">Use My Pos</button>
+              <button class="btn-primary btn-success" onclick="MapSpawner.placeSelected()" style="flex: 1.2;">Place in World</button>
+            </div>
+          </div>
+
+          <!-- Right: Active Placed Entities List -->
+          <div style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 13px; font-weight: 700; color: var(--accent-cyan);">Active Placed World Entities</div>
+            <div id="spawner-placed-list" style="overflow-y: auto; max-height: 280px; display: flex; flex-direction: column; gap: 6px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Velvet Lounge Casino Blackjack Modal -->
+    <div id="modal-casino" class="modal-window hidden interactive" style="max-width: 650px;">
+      <div class="modal-header" style="background: rgba(180, 83, 9, 0.4);">
+        <h2><span>🎲</span> Velvet Lounge Blackjack & Casino Pit</h2>
+        <button class="btn-close" onclick="Casino.close()">✕</button>
+      </div>
+      <div class="modal-body" style="background: rgba(4, 47, 46, 0.6); border-radius: 10px; border: 2px solid #059669;">
+        <!-- Dealer Hand -->
+        <div style="text-align: center;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-muted);">DEALER HAND (<span id="casino-dealer-score">0</span>)</div>
+          <div id="casino-dealer-cards" style="display: flex; gap: 8px; justify-content: center; margin-top: 6px; min-height: 64px;"></div>
+        </div>
+
+        <div id="casino-status-text" style="text-align: center; font-size: 14px; font-weight: 700; color: #fff; margin: 15px 0;">
+          Place your bet and press [Deal Cards] to begin.
+        </div>
+
+        <!-- Player Hand -->
+        <div style="text-align: center;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--accent-cyan);">YOUR HAND (<span id="casino-player-score">0</span>)</div>
+          <div id="casino-player-cards" style="display: flex; gap: 8px; justify-content: center; margin-top: 6px; min-height: 64px;"></div>
+        </div>
+
+        <!-- Bet & Actions -->
+        <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 15px;">
+          <div class="input-group" style="width: 140px;">
+            <label>Bet Amount ($)</label>
+            <input type="number" id="casino-bet-input" value="100" min="10">
+          </div>
+          <button class="btn-primary" onclick="Casino.startRound()">Deal Cards</button>
+          <button class="btn-primary btn-success" onclick="Casino.hit()">Hit (+1)</button>
+          <button class="btn-primary btn-danger" onclick="Casino.stand()">Stand</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pier Fisherman Angler Trading Modal -->
+    <div id="modal-fishing" class="modal-window hidden interactive">
+      <div class="modal-header" style="background: rgba(2, 132, 199, 0.4);">
+        <h2><span>🎣</span> Pier Master & Fresh Fishmonger</h2>
+        <button class="btn-close" onclick="Fishing.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 15px; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+          <div>
+            <div style="font-weight: 700; font-size: 14px; color: #fff;">Harbor Cast Fishing Line</div>
+            <div id="fishing-cast-status" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Requires fishing rod & nightcrawler bait in inventory.</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-primary" onclick="Fishing.buyGear('fishing_rod', 120)">Buy Rod ($120)</button>
+            <button class="btn-primary btn-success" onclick="Fishing.castLine()">Cast Line</button>
+          </div>
+        </div>
+
+        <div style="font-size: 13px; font-weight: 700; color: var(--accent-cyan); margin-top: 8px;">Fish Market - Sell Today's Catch</div>
+        <div id="fish-market-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div id="modal-inventory" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>🎒</span> Slot-Based Inventory</h2>
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <span id="inv-weight-text" style="font-size: 13px; color: var(--accent-cyan); font-weight: 600;">2.8 / 35.0 kg</span>
+          <button class="btn-close" onclick="CityUndergroundCore.toggleModal('modal-inventory')">✕</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div id="player-inventory-grid" class="inventory-grid"></div>
+      </div>
+    </div>
+
+    <!-- Dual-Grid Container Storage Modal -->
+    <div id="modal-storage" class="modal-window hidden interactive" style="max-width: 900px;">
+      <div class="modal-header">
+        <h2><span>🗄️</span> <span id="storage-title-text">Apartment 101 Personal Stash</span></h2>
+        <button class="btn-close" onclick="StorageContainer.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <!-- Left: Player Inventory -->
+          <div>
+            <div style="font-weight: 700; font-size: 13px; margin-bottom: 8px; color: var(--accent-cyan);">🎒 Player Inventory</div>
+            <div id="storage-player-grid" class="inventory-grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+          </div>
+          <!-- Right: Container Stash -->
+          <div style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
+            <div style="font-weight: 700; font-size: 13px; margin-bottom: 8px; color: var(--accent-emerald);">📦 Secure Container Stash</div>
+            <div id="storage-container-grid" class="inventory-grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERP Skills & Progression Modal -->
+    <div id="modal-skills" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>⚡</span> Skills & Character Progression</h2>
+        <button class="btn-close" onclick="SkillsUI.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="skills-list-container" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      </div>
+    </div>
+
+    <!-- QuickMart Convenience Store Modal -->
+    <div id="modal-store" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>🛒</span> 24/7 Corner QuickMart Supplies</h2>
+        <button class="btn-close" onclick="Store.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="store-item-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+    </div>
+
+    <!-- Botany & Hydroponic Growth Modal -->
+    <div id="modal-botany" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>🌱</span> Hydroponic Plant Growth Chamber</h2>
+        <button class="btn-close" onclick="BotanyUI.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="char-card" style="flex-direction: column; align-items: stretch; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 700; font-size: 15px; color: #fff;">Cultivar Botanical Pot #1</div>
+            <div id="botany-stage-text" style="font-size: 13px; font-weight: 700; color: var(--accent-emerald);">Vegetative Foliage 🌿</div>
+          </div>
+
+          <!-- Hydration -->
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span style="color: var(--text-muted);">Soil Hydration</span>
+              <span id="botany-water-text" style="color: var(--accent-blue);">75% Hydration</span>
+            </div>
+            <div class="bar-bg" style="height: 8px;">
+              <div id="botany-water-bar" class="bar-fill" style="width: 75%; background: linear-gradient(90deg, #38bdf8, #60a5fa);"></div>
+            </div>
+          </div>
+
+          <!-- Maturity Growth -->
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span style="color: var(--text-muted);">Growth Maturity</span>
+              <span id="botany-growth-text" style="color: var(--accent-emerald);">45% Matured</span>
+            </div>
+            <div class="bar-bg" style="height: 8px;">
+              <div id="botany-growth-bar" class="bar-fill" style="width: 45%; background: linear-gradient(90deg, #10b981, #00f2fe);"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 8px;">
+            <button class="btn-primary" onclick="BotanyUI.water()" style="flex: 1;">Water Plant (1x Water Bottle)</button>
+            <button class="btn-primary btn-success" id="btn-botany-harvest" onclick="BotanyUI.harvest()" style="flex: 1;">Harvest Botanicals</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lockpicking Minigame Modal -->
+    <div id="modal-lockpick" class="modal-window hidden interactive" style="max-width: 450px; text-align: center;">
+      <div class="modal-header">
+        <h2><span>🗝️</span> Lockpicking & Tumbler Alignment</h2>
+        <button class="btn-close" onclick="LockpickMinigame.close()">✕</button>
+      </div>
+      <div class="modal-body" style="align-items: center;">
+        <p style="font-size: 13px; color: var(--text-muted);">Move mouse to align pick. Press and hold [SPACE] to turn cylinder.</p>
+        <canvas id="lock-cylinder-canvas" width="240" height="240" style="margin: 10px 0;"></canvas>
+        <div style="width: 100%;">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+            <span style="color: var(--text-muted);">Lockpick Durability</span>
+          </div>
+          <div class="bar-bg" style="height: 6px;">
+            <div id="lockpick-durability-fill" class="bar-fill" style="width: 100%; background: #10b981;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banking & ATM Modal -->
+    <div id="modal-banking" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>🏦</span> First Trust Bank & ATM Terminal</h2>
+        <button class="btn-close" onclick="Banking.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 20px;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+            <div class="input-group">
+              <label>Amount ($)</label>
+              <input type="number" id="bank-amount-input" value="100" min="1">
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn-primary btn-success" id="btn-bank-deposit" style="flex: 1;">Deposit Cash</button>
+              <button class="btn-primary" id="btn-bank-withdraw" style="flex: 1;">Withdraw Bank</button>
+            </div>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
+            <div class="input-group">
+              <label>Target Citizen ID</label>
+              <input type="text" id="bank-target-id" placeholder="char_1234...">
+            </div>
+            <div class="input-group">
+              <label>Transfer Amount ($)</label>
+              <input type="number" id="bank-transfer-amt" value="250">
+            </div>
+            <button class="btn-primary" id="btn-bank-transfer">Wire Direct Transfer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Driver Logistics Modal -->
+    <div id="modal-delivery" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>📦</span> Harbor Express Courier Dispatch</h2>
+        <button class="btn-close" onclick="DeliveryJob.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">
+          Sign on for an express cargo delivery route across New Harbor. You will be assigned a company van and an express parcel to transport to a commercial client.
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <div>
+            <div style="font-size: 13px; font-weight: 700;">Base Wage: <span style="color: var(--accent-emerald)">$200 + Distance Bonus</span></div>
+            <div style="font-size: 12px; color: var(--text-muted);">Vehicle return bonus applied upon completion.</div>
+          </div>
+          <button class="btn-primary btn-success" onclick="DeliveryJob.startRoute()">Accept Delivery Route</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chemical Synthesis Lab Modal -->
+    <div id="modal-synth" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>⚗️</span> Chemical Synthesis Chamber</h2>
+        <button class="btn-close" onclick="CrimeLab.closeSynth()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="synth-status-text" style="font-size: 14px; color: var(--text-muted);">
+          Synthesis chamber ready. Requires 1x Chemical Reagents to produce Refined Starlight Crystals.
+        </p>
+        <div class="bar-bg" style="height: 12px; margin: 10px 0;">
+          <div id="synth-progress-bar" class="bar-fill" style="width: 0%; background: linear-gradient(90deg, #c084fc, #00f2fe);"></div>
+        </div>
+        <button class="btn-primary" onclick="CrimeLab.startSynthesis()" style="background: linear-gradient(135deg, #a855f7, #6366f1);">Begin Synthesis Process</button>
+      </div>
+    </div>
+
+    <!-- Street Contraband Buyer Modal -->
+    <div id="modal-buyer" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>🕶️</span> Shady Street Contact</h2>
+        <button class="btn-close" onclick="CrimeLab.closeBuyer()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14px; color: var(--text-muted);">
+          "Looking to unload some Starlight Crystals? I pay top dollar in cash. Keep it discreet."
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <div style="font-size: 14px; font-weight: 700; color: var(--accent-emerald);">Current Offer: $450 Cash / Unit</div>
+          <button class="btn-primary btn-success" onclick="CrimeLab.sellContraband()">Sell Contraband</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Police CAD / MDT Terminal Modal -->
+    <div id="modal-mdt" class="modal-window hidden interactive">
+      <div class="modal-header" style="background: rgba(3, 105, 161, 0.4);">
+        <h2><span>💻</span> Metro Police CAD / MDT Terminal</h2>
+        <button class="btn-close" onclick="PoliceMDT.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 20px;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+            <h3 style="font-size: 14px;">Issue Citation & Violation</h3>
+            <div class="input-group">
+              <label>Suspect Citizen ID</label>
+              <input type="text" id="mdt-suspect-id" placeholder="char_...">
+            </div>
+            <div class="input-group">
+              <label>Penal Code Violation</label>
+              <select id="mdt-penal-code">
+                <option value="PC-101">PC-101 Contraband Possession ($500 / 3m)</option>
+                <option value="PC-102">PC-102 Unlawful Chemical Synthesis ($1,000 / 5m)</option>
+                <option value="PC-103">PC-103 Reckless Driving ($250)</option>
+                <option value="PC-104">PC-104 Evading Police ($750 / 4m)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Fine Amount ($)</label>
+              <input type="number" id="mdt-fine-amt" value="500">
+            </div>
+            <button class="btn-primary" onclick="PoliceMDT.issueCitation()">Issue Citation & Record</button>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 8px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
+            <h3 style="font-size: 14px;">Duty Status & Uniform</h3>
+            <p style="font-size: 12px; color: var(--text-muted);">Clock on duty to receive equipment, handcuffs, and dispatch radio alerts.</p>
+            <button class="btn-primary btn-success" onclick="CityUndergroundCore.sendEvent('CU_Police_ToggleDuty')">Toggle Police Duty</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vehicle Dealership Modal -->
+    <div id="modal-dealership" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>🚗</span> Metro Auto Dealership Showroom</h2>
+        <button class="btn-close" onclick="Dealership.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="dealership-catalog-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+    </div>
+
+    <!-- Property Apartment Modal -->
+    <div id="modal-property" class="modal-window hidden interactive">
+      <div class="modal-header">
+        <h2><span>🏢</span> Harborview Apartment 101</h2>
+        <button class="btn-close" onclick="Property.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14px; color: var(--text-muted);">
+          1-Bedroom apartment unit featuring secure lockable front door, integrated personal storage stash (60 kg), custom Sims-style base building, and key sharing for roommates.
+        </p>
+        <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+          <button class="btn-primary btn-success" onclick="Property.buy()" style="flex: 1;">Purchase ($12,000)</button>
+          <button class="btn-primary" onclick="Property.rent()" style="flex: 1;">Rent ($150 / hr)</button>
+          <button class="btn-primary" onclick="BaseBuilder.open('apt_101')" style="flex: 1; background: linear-gradient(135deg, #10b981, #0284c7); color: #fff;">🛡️ Defenses & Base</button>
+          <button class="btn-primary btn-danger" onclick="Property.toggleLock()" style="flex: 1;">Toggle Lock</button>
+          <button class="btn-primary" onclick="StorageContainer.open('Apartment 101 Personal Stash', 60.0)" style="flex: 1;">Open Stash</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sims-Style Base Building & Prop Defenses Modal (Key: H) -->
+    <div id="modal-base-builder" class="modal-window hidden interactive" style="max-width: 1100px; width: 95vw; height: 90vh; max-height: 880px; display: flex; flex-direction: column;">
+      <!-- Modal Header -->
+      <div class="modal-header" style="background: linear-gradient(135deg, rgba(14, 116, 144, 0.6), rgba(15, 23, 42, 0.9)); padding: 12px 18px; border-bottom: 1px solid rgba(56, 189, 248, 0.3);">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <h2 style="font-size: 16px; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span>🏡</span>
+            <span id="builder-canvas-title">Sims-Style Open MLO Base Builder</span>
+          </h2>
+          <span id="builder-view-badge" class="badge-accent" style="font-size: 11px; padding: 3px 8px; border-radius: 4px; background: rgba(56, 189, 248, 0.2); color: var(--accent-cyan);">[2D Top-Down Mode]</span>
+        </div>
+
+        <!-- Header Quick Toggles -->
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <!-- Property Selector -->
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label style="font-size: 11px; color: var(--text-muted); font-weight: 600;">MLO PLOT:</label>
+            <select id="builder-property-select" onchange="BaseBuilder.switchProperty(this.value)" class="builder-select">
+              <option value="apt_101">🏢 Harborview Apt 101</option>
+              <option value="mlo_industrial_warehouse">🏭 Pier 9 Industrial Warehouse</option>
+              <option value="mlo_suburban_ranch">🏡 Suburban Ranch House</option>
+              <option value="mlo_downtown_storefront">🏪 Downtown Storefront & Loft</option>
+              <option value="mlo_dockside_garage">🔧 Harbor Chop Shop Garage</option>
+              <option value="mlo_underground_bunker">🛡️ Underground Fallout Bunker</option>
+            </select>
+          </div>
+
+          <!-- Floor Level Selector -->
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button class="btn-builder-sm" onclick="BaseBuilder.changeFloor(-1)" title="Level Down (PageDown)">🔽 FL-</button>
+            <span id="builder-floor-badge" style="font-size: 11px; font-weight: 700; color: #fff; min-width: 48px; text-align: center;">FL 1</span>
+            <button class="btn-builder-sm" onclick="BaseBuilder.changeFloor(1)" title="Level Up (PageUp)">🔼 FL+</button>
+          </div>
+
+          <!-- Cutaway Mode -->
+          <div class="builder-segmented-control">
+            <button id="btn-cutaway-up" class="btn-segment active" onclick="BaseBuilder.setCutawayMode('up')" title="Walls Up">🧱 Full</button>
+            <button id="btn-cutaway-cut" class="btn-segment" onclick="BaseBuilder.setCutawayMode('cutaway')" title="Walls Cutaway (Sims Style)">📐 Cutaway</button>
+            <button id="btn-cutaway-down" class="btn-segment" onclick="BaseBuilder.setCutawayMode('down')" title="Walls Down (Blueprint)">📋 Down</button>
+          </div>
+
+          <!-- Perspective Mode -->
+          <button id="btn-toggle-view-mode" class="btn-primary btn-sm" onclick="BaseBuilder.togglePerspective()" style="padding: 5px 10px; font-size: 11px;">🎲 3D Isometric View</button>
+
+          <button class="btn-close" onclick="BaseBuilder.close()">✕</button>
+        </div>
+      </div>
+
+      <!-- Main Workspace Body -->
+      <div class="modal-body" style="flex: 1; display: flex; flex-direction: column; padding: 12px; gap: 10px; overflow: hidden; background: #070c16;">
+        
+        <!-- Sims Tools & Status HUD Bar -->
+        <div class="builder-tools-bar">
+          <!-- Tool Buttons -->
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <button id="tool-btn-place" class="builder-tool-btn active" onclick="BaseBuilder.setTool('place')" title="Build / Place Selected Object (P)">
+              <span>🔨</span> Place
+            </button>
+            <button id="tool-btn-eyedropper" class="builder-tool-btn" onclick="BaseBuilder.setTool('eyedropper')" title="Eyedropper / Pipette Clone (E)">
+              <span>💧</span> Pipette
+            </button>
+            <button id="tool-btn-sledgehammer" class="builder-tool-btn" onclick="BaseBuilder.setTool('sledgehammer')" title="Sledgehammer Demolish & 70% Refund (K)">
+              <span>💥</span> Demolish
+            </button>
+            <button id="tool-btn-shove" class="builder-tool-btn" onclick="BaseBuilder.setTool('shove')" title="Shove / Drag Furniture against Doors (S)">
+              <span>🖐️</span> Shove
+            </button>
+            <button id="tool-btn-zone" class="builder-tool-btn" onclick="BaseBuilder.setTool('zone')" title="Paint Room Zone (Z)">
+              <span>🏷️</span> Room Zone
+            </button>
+            <button id="tool-btn-rotate" class="builder-tool-btn" onclick="BaseBuilder.rotateSelected()" title="Rotate 90° (R key)">
+              <span>🔄</span> Rotate <span id="builder-rot-badge" style="font-size: 10px; opacity: 0.8;">0°</span>
+            </button>
+            <button id="tool-btn-interact" class="builder-tool-btn" onclick="BaseBuilder.setTool('interact')" title="Interact / Test Traps & Keypads (T)">
+              <span>🎯</span> Test & Trigger
+            </button>
+          </div>
+
+          <!-- Base Stats HUD -->
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="font-size: 12px; color: var(--text-muted);">
+              Property Value: <strong id="builder-property-value" style="color: var(--accent-emerald); font-size: 13px;">$0</strong>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted);">
+              Objects: <strong id="builder-item-count" style="color: var(--accent-cyan); font-size: 13px;">0 Items</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canvas and Building Panels Layout -->
+        <div style="flex: 1; display: grid; grid-template-columns: 1fr 340px; gap: 12px; min-height: 0;">
+          
+          <!-- Interactive Floor Plan Canvas Container -->
+          <div class="builder-canvas-container" style="position: relative; background: radial-gradient(circle at center, #0f172a 0%, #060913 100%); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <canvas id="builder-floor-canvas" width="620" height="520" style="cursor: crosshair; display: block; max-width: 100%; max-height: 100%;"></canvas>
+
+            <!-- On-Canvas Quick Controls -->
+            <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); z-index: 10;">
+              <button class="btn-builder-sm" onclick="BaseBuilder.rotateCamera()" title="Rotate Grid 90°">🔄 Cam 90°</button>
+              <button class="btn-builder-sm" onclick="BaseBuilder.cycleRoomZone()" title="Cycle Room Zone Type">🎨 Zone</button>
+              <button class="btn-builder-sm" onclick="BaseBuilder.clearBase()" style="color: var(--accent-danger);" title="Clear Entire Floor">🗑️ Reset</button>
+            </div>
+
+            <!-- Current Action Info Overlay -->
+            <div id="builder-canvas-info-overlay" style="position: absolute; top: 12px; left: 12px; font-size: 11px; background: rgba(0,0,0,0.65); padding: 4px 10px; border-radius: 4px; color: var(--text-muted); border-left: 3px solid var(--accent-cyan); z-index: 10;">
+              [Hold Click] Turbo Build | [Z] Wall | [X] Floor | [C] Ramp | [V] Cone | [G] Fast 3x3 Edit
+            </div>
+
+            <!-- Fortnite-Style Quick-Build Hotbar HUD -->
+            <div class="fortnite-quickbar-container">
+              <!-- Turbo Build Status -->
+              <div class="fortnite-turbo-badge" title="Hold Left-Click to Turbo Build anywhere">
+                <span>⚡</span> TURBO
+              </div>
+
+              <!-- Quick Build Piece Slots -->
+              <div id="fortnite-slot-wall" class="fortnite-slot active" onclick="BaseBuilder.selectFortnitePiece('wall')" title="Wall (Hotkeys: Z or F1)">
+                <div class="fortnite-keybind-badge">Z</div>
+                <div class="fortnite-slot-icon">🧱</div>
+                <div class="fortnite-slot-label">Wall</div>
+              </div>
+
+              <div id="fortnite-slot-floor" class="fortnite-slot" onclick="BaseBuilder.selectFortnitePiece('floor')" title="Floor / Platform (Hotkeys: X or F2)">
+                <div class="fortnite-keybind-badge">X</div>
+                <div class="fortnite-slot-icon">🪵</div>
+                <div class="fortnite-slot-label">Floor</div>
+              </div>
+
+              <div id="fortnite-slot-ramp" class="fortnite-slot" onclick="BaseBuilder.selectFortnitePiece('ramp')" title="Ramp / Stairs (Hotkeys: C or F3)">
+                <div class="fortnite-keybind-badge">C</div>
+                <div class="fortnite-slot-icon">📐</div>
+                <div class="fortnite-slot-label">Ramp</div>
+              </div>
+
+              <div id="fortnite-slot-cone" class="fortnite-slot" onclick="BaseBuilder.selectFortnitePiece('cone')" title="Cone / Roof (Hotkeys: V or F4)">
+                <div class="fortnite-keybind-badge">V</div>
+                <div class="fortnite-slot-icon">🔺</div>
+                <div class="fortnite-slot-label">Cone</div>
+              </div>
+
+              <div id="fortnite-slot-trap" class="fortnite-slot" onclick="BaseBuilder.selectFortnitePiece('trap')" title="Trap Slot (Hotkey: T)">
+                <div class="fortnite-keybind-badge">T</div>
+                <div class="fortnite-slot-icon">⚡</div>
+                <div class="fortnite-slot-label">Trap</div>
+              </div>
+
+              <div id="fortnite-slot-edit" class="fortnite-slot" onclick="BaseBuilder.toggleEditMode()" title="Fast 3x3 Edit Mode (Hotkey: G)">
+                <div class="fortnite-keybind-badge" style="background: var(--accent-cyan);">G</div>
+                <div class="fortnite-slot-icon">✂️</div>
+                <div class="fortnite-slot-label">Edit</div>
+              </div>
+
+              <!-- Material Selector -->
+              <div class="fortnite-mat-toggle">
+                <button id="mat-btn-wood" class="fortnite-mat-btn active" onclick="BaseBuilder.setMaterial('wood')" title="Wood (150 HP) [Hotkey: 1]">
+                  <span>🪵</span> Wood
+                </button>
+                <button id="mat-btn-brick" class="fortnite-mat-btn" onclick="BaseBuilder.setMaterial('brick')" title="Brick / Stone (300 HP) [Hotkey: 2]">
+                  <span>🧱</span> Brick
+                </button>
+                <button id="mat-btn-metal" class="fortnite-mat-btn" onclick="BaseBuilder.setMaterial('metal')" title="Metal / Steel (500 HP) [Hotkey: 3]">
+                  <span>⛓️</span> Metal
+                </button>
+              </div>
+            </div>
+
+            <!-- Fortnite 3x3 Tile Edit Popover -->
+            <div id="fortnite-edit-popover" class="fortnite-edit-overlay hidden">
+              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span style="font-weight: 800; font-size: 13px; color: var(--accent-cyan); display: flex; align-items: center; gap: 6px;">
+                  <span>✂️</span> 3x3 FAST TILE EDIT
+                </span>
+                <span style="font-size: 11px; color: var(--text-muted);">[G] Confirm</span>
+              </div>
+
+              <!-- 3x3 Grid -->
+              <div id="fortnite-edit-tiles" class="fortnite-edit-grid">
+                <div class="fortnite-edit-tile" data-idx="0" onclick="BaseBuilder.toggleEditTile(0)"></div>
+                <div class="fortnite-edit-tile" data-idx="1" onclick="BaseBuilder.toggleEditTile(1)"></div>
+                <div class="fortnite-edit-tile" data-idx="2" onclick="BaseBuilder.toggleEditTile(2)"></div>
+                <div class="fortnite-edit-tile" data-idx="3" onclick="BaseBuilder.toggleEditTile(3)"></div>
+                <div class="fortnite-edit-tile" data-idx="4" onclick="BaseBuilder.toggleEditTile(4)"></div>
+                <div class="fortnite-edit-tile" data-idx="5" onclick="BaseBuilder.toggleEditTile(5)"></div>
+                <div class="fortnite-edit-tile" data-idx="6" onclick="BaseBuilder.toggleEditTile(6)"></div>
+                <div class="fortnite-edit-tile" data-idx="7" onclick="BaseBuilder.toggleEditTile(7)"></div>
+                <div class="fortnite-edit-tile" data-idx="8" onclick="BaseBuilder.toggleEditTile(8)"></div>
+              </div>
+
+              <!-- Preset Shortcuts -->
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;">
+                <button class="btn-builder-sm" onclick="BaseBuilder.applyEditPreset('door')">🚪 Doorway</button>
+                <button class="btn-builder-sm" onclick="BaseBuilder.applyEditPreset('window')">🪟 Window</button>
+                <button class="btn-builder-sm" onclick="BaseBuilder.applyEditPreset('half')">🧱 Half-Wall</button>
+                <button class="btn-builder-sm" onclick="BaseBuilder.applyEditPreset('arch')">🏛️ Archway</button>
+                <button class="btn-builder-sm" onclick="BaseBuilder.applyEditPreset('reset')" style="color: var(--accent-cyan);">🔄 Reset</button>
+              </div>
+
+              <div style="display: flex; gap: 8px; width: 100%;">
+                <button class="btn-primary btn-success btn-sm" style="flex: 1;" onclick="BaseBuilder.confirmEdit()">Confirm Edit [G]</button>
+                <button class="btn-primary btn-danger btn-sm" onclick="BaseBuilder.cancelEdit()">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sims Build & Buy Catalog Tray Panel -->
+          <div class="builder-catalog-panel" style="display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden;">
+            
+            <!-- Build vs Buy Mode Switcher Tabs -->
+            <div class="builder-mode-tabs" style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(30, 41, 59, 0.6);">
+              <button id="tab-mode-build" class="builder-main-tab active" onclick="BaseBuilder.setModeCategory('build')">
+                <span>🔨</span> BUILD MODE
+              </button>
+              <button id="tab-mode-buy" class="builder-main-tab" onclick="BaseBuilder.setModeCategory('buy')">
+                <span>🛋️</span> BUY MODE
+              </button>
+            </div>
+
+            <!-- Sub-Category Pill Selector -->
+            <div id="builder-subcategory-pills" class="builder-subcategories">
+              <!-- Dynamically populated subcategory pill buttons -->
+            </div>
+
+            <!-- Scrollable Catalog Items Grid -->
+            <div id="builder-catalog-grid" class="builder-catalog-grid" style="flex: 1; overflow-y: auto; padding: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; align-content: start;">
+              <!-- Catalog Item Cards -->
+            </div>
+
+            <!-- Selected Item Preview & Details Footer -->
+            <div id="builder-item-inspector" class="builder-inspector" style="padding: 10px; background: rgba(10, 15, 28, 0.95); border-top: 1px solid rgba(56, 189, 248, 0.2);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div id="inspector-name" style="font-weight: 700; font-size: 12px; color: #fff;">Oak Stand-Up Bookshelf</div>
+                <div id="inspector-price" style="font-weight: 700; font-size: 12px; color: var(--accent-emerald);">$380</div>
+              </div>
+              <div id="inspector-desc" style="font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.3;">
+                Flips upright into a 1,500 HP corridor-sealing barricade.
+              </div>
+              <div id="inspector-meta" style="display: flex; gap: 8px; margin-top: 6px; font-size: 10px; color: var(--accent-cyan);">
+                <span>📐 Size: 2x1</span>
+                <span>🛡️ HP: 1500</span>
+                <span>⚡ Action: FLIP_STAND</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Admin Suite Modal (F10) -->
+    <div id="modal-admin" class="modal-window hidden interactive">
+      <div class="modal-header" style="background: rgba(220, 38, 38, 0.4);">
+        <h2><span>⚙️</span> Administration & Moderation Suite</h2>
+        <button class="btn-close" onclick="AdminPanel.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 15px;">
+          <div class="input-group" style="flex: 1;">
+            <label>Target SteamID / Citizen ID</label>
+            <input type="text" id="admin-target-id" placeholder="STEAM_0:1:..." value="LOCAL_PLAYER">
+          </div>
+          <div class="input-group" style="flex: 1;">
+            <label>Argument / Amount</label>
+            <input type="text" id="admin-arg1" placeholder="Value (e.g. 50000)">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+          <button class="btn-primary" onclick="AdminPanel.execute('teleport')">Teleport To</button>
+          <button class="btn-primary" onclick="AdminPanel.execute('bring')">Bring Player</button>
+          <button class="btn-primary btn-success" onclick="AdminPanel.execute('revive')">Revive Full HP</button>
+          <button class="btn-primary" onclick="AdminPanel.execute('set_money')">Set Bank Funds</button>
+          <button class="btn-primary btn-danger" onclick="AdminPanel.execute('kick')">Kick Player</button>
+          <button class="btn-primary btn-danger" onclick="AdminPanel.execute('warn')">Warn Player</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Character Selection & Creation Screen -->
+    <div id="char-screen" class="interactive">
+      <div style="text-align: center; margin-bottom: 25px;">
+        <h1 style="font-size: 28px; font-weight: 900; letter-spacing: 1px; color: #fff;">CITY UNDERGROUND</h1>
+        <p style="font-size: 14px; color: var(--text-muted); margin-top: 4px;">New Harbor Metro District Roleplay Prototype</p>
+      </div>
+
+      <div class="char-container">
+        <!-- Existing Characters -->
+        <div class="char-list-panel">
+          <h2 style="font-size: 16px; font-weight: 700; color: var(--accent-cyan);">Select Character</h2>
+          <div id="char-list-items" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto;">
+            <div class="char-card selected">
+              <div>
+                <div style="font-weight:700; font-size:15px; color:#fff;">Marcus Vance</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">
+                  Job: <strong style="color:var(--accent-blue)">CITIZEN</strong> | 
+                  Cash: <strong style="color:var(--accent-emerald)">$500</strong> | 
+                  Bank: <strong style="color:var(--accent-cyan)">$2,500</strong>
+                </div>
+              </div>
+              <button class="btn-primary" style="padding:6px 14px; font-size:12px;" onclick="document.getElementById('char-screen').classList.add('hidden')">Play</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Create New Character -->
+        <div class="char-form-panel">
+          <h2 style="font-size: 16px; font-weight: 700; color: var(--accent-emerald);">Create New Character</h2>
+          <div style="display: flex; gap: 12px;">
+            <div class="input-group" style="flex: 1;">
+              <label>First Name</label>
+              <input type="text" id="char-firstname" placeholder="John" value="Leo">
+            </div>
+            <div class="input-group" style="flex: 1;">
+              <label>Last Name</label>
+              <input type="text" id="char-lastname" placeholder="Doe" value="Sterling">
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Gender & Voice</label>
+            <select id="char-gender">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Clothing Style</label>
+            <select id="char-clothing">
+              <option value="casual">Casual Urban (Hoodie & Jeans)</option>
+              <option value="business">Formal Business (Tailored Suit)</option>
+              <option value="streetwear">Streetwear (Track Jacket)</option>
+              <option value="workwear">Industrial Workwear (Utility Vest)</option>
+            </select>
+          </div>
+
+          <button class="btn-primary btn-success" id="btn-create-char" style="margin-top: 10px;">Create & Spawn Character</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= CCTV SECURITY SURVEILLANCE TERMINAL ================= -->
+    <div id="modal-cctv-terminal" class="modal hidden interactive">
+      <div class="modal-content" style="width: 960px; max-width: 95vw; height: 680px; max-height: 92vh; display: flex; flex-direction: column;">
+        <div class="modal-header" style="border-bottom: 1px solid rgba(56, 189, 248, 0.2);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 20px;">📹</span>
+            <h2 style="font-size: 16px; font-weight: 800; color: var(--accent-cyan); margin: 0;">CCTV SECURITY SURVEILLANCE HUB</h2>
+            <span style="font-size: 11px; background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); padding: 2px 8px; border-radius: 4px; font-weight: 700;">● SYSTEM ARMED</span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn-builder-sm" onclick="CCTVSystem.openInstaller()" style="color: var(--accent-cyan);">➕ Install Camera</button>
+            <button class="modal-close-btn" onclick="CCTVSystem.closeTerminal()">✕</button>
+          </div>
+        </div>
+
+        <!-- Motion Alert Warning Banner -->
+        <div id="cctv-motion-banner" class="hidden" style="background: rgba(239, 68, 68, 0.25); border-bottom: 1px solid #ef4444; padding: 6px 14px; font-size: 12px; font-weight: 700; color: #ef4444; text-align: center;">
+          🚨 MOTION DETECTED IN CAMERA CONE (TRESPASSER SPOTTED)
+        </div>
+
+        <div style="flex: 1; display: grid; grid-template-columns: 260px 1fr; gap: 12px; padding: 12px; min-height: 0;">
+          <!-- Camera Feed Selector Sidebar -->
+          <div style="display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; overflow-y: auto;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Installed Cameras</div>
+            <div id="cctv-camera-tree" style="display: flex; flex-direction: column; gap: 6px;"></div>
+          </div>
+
+          <!-- Live CCTV Viewport & Controls -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Canvas Feed Container -->
+            <div style="flex: 1; position: relative; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid rgba(56, 189, 248, 0.3); display: flex; align-items: center; justify-content: center;">
+              <canvas id="cctv-feed-canvas" width="640" height="420" style="width: 100%; height: 100%; display: block;"></canvas>
+            </div>
+
+            <!-- CCTV Operator PTZ Control Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.7); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button class="btn-builder-sm" onclick="CCTVSystem.prevCamera()">◀ Prev Cam</button>
+                <button class="btn-builder-sm" onclick="CCTVSystem.nextCamera()">Next Cam ▶</button>
+                <button id="cctv-btn-nv" class="btn-builder-sm" onclick="CCTVSystem.toggleNightVision()">🌙 NV: OFF</button>
+              </div>
+
+              <!-- PTZ Pan / Tilt / Zoom -->
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <span style="font-size: 11px; color: var(--text-muted);">PTZ:</span>
+                <button class="btn-builder-sm" onclick="CCTVSystem.panCamera(-15)" title="Pan Left">⬅️</button>
+                <button class="btn-builder-sm" onclick="CCTVSystem.panCamera(15)" title="Pan Right">➡️</button>
+                <button class="btn-builder-sm" onclick="CCTVSystem.tiltCamera(-10)" title="Tilt Up">⬆️</button>
+                <button class="btn-builder-sm" onclick="CCTVSystem.tiltCamera(10)" title="Tilt Down">⬇️</button>
+                <button class="btn-builder-sm" onclick="CCTVSystem.zoomCamera(0.5)" title="Zoom In">🔍+</button>
+                <button class="btn-builder-sm" onclick="CCTVSystem.zoomCamera(-0.5)" title="Zoom Out">🔍-</button>
+                <button class="btn-builder-sm" onclick="CCTVSystem.resetPTZ()" title="Reset Camera">🔄</button>
+              </div>
+
+              <div style="display: flex; gap: 6px;">
+                <button class="btn-builder-sm" onclick="CCTVSystem.speakIntercom()" style="color: var(--accent-yellow);">📢 PA Intercom</button>
+                <button class="btn-builder-sm" onclick="CCTVSystem.triggerMotionTest()" style="color: var(--accent-danger);">🚨 Test Sensor</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 4-STEP MANUAL CAMERA INSTALLATION WIZARD ================= -->
+    <div id="modal-camera-installer" class="modal hidden interactive">
+      <div class="modal-content" style="width: 580px; max-width: 90vw;">
+        <div class="modal-header">
+          <h2 style="font-size: 15px; font-weight: 800; color: var(--accent-cyan); display: flex; align-items: center; gap: 6px;">
+            <span>📹</span> CCTV CAMERA MANUAL INSTALLATION WIZARD
+          </h2>
+          <button class="modal-close-btn" onclick="CCTVSystem.closeInstaller()">✕</button>
+        </div>
+
+        <div style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+          <!-- Step Progress Pills -->
+          <div style="display: flex; gap: 6px; justify-content: space-between;">
+            <div class="cam-step-pill active" id="cam-pill-1">1. Bracket</div>
+            <div class="cam-step-pill" id="cam-pill-2">2. Power Drill</div>
+            <div class="cam-step-pill" id="cam-pill-3">3. Wiring</div>
+            <div class="cam-step-pill" id="cam-pill-4">4. Calibration</div>
+          </div>
+
+          <!-- Step 1: Bracket Mount -->
+          <div id="cam-step-1" class="cam-install-step">
+            <h3 style="font-size: 13px; color: #fff; margin-bottom: 6px;">Step 1: Align Mounting Bracket Angle</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Position camera mounting base against wall or ceiling corner stud.</p>
+            <div style="display: flex; gap: 8px;">
+              <button id="btn-align-0" class="btn-bracket-align active" onclick="CCTVSystem.alignBracket(0)">Front Facing (0°)</button>
+              <button id="btn-align-45" class="btn-bracket-align" onclick="CCTVSystem.alignBracket(45)">Corner Right (45°)</button>
+              <button id="btn-align--45" class="btn-bracket-align" onclick="CCTVSystem.alignBracket(-45)">Corner Left (-45°)</button>
+              <button id="btn-align-90" class="btn-bracket-align" onclick="CCTVSystem.alignBracket(90)">Side Hallway (90°)</button>
+            </div>
+            <button class="btn-primary btn-success" style="margin-top: 14px; width: 100%;" onclick="CCTVSystem.goToStep(2)">Proceed to Drilling Screws ▶</button>
+          </div>
+
+          <!-- Step 2: Power Drill Screws -->
+          <div id="cam-step-2" class="cam-install-step hidden">
+            <h3 style="font-size: 13px; color: #fff; margin-bottom: 6px;">Step 2: Drill & Tighten 4 Heavy Anchor Bolts</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Click each mounting bolt to engage cordless 20V power drill.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button id="cam-screw-0" class="btn-drill-bolt" onclick="CCTVSystem.tightenScrew(0)">🔩 Bolt 1: Click to Drill</button>
+              <button id="cam-screw-1" class="btn-drill-bolt" onclick="CCTVSystem.tightenScrew(1)">🔩 Bolt 2: Click to Drill</button>
+              <button id="cam-screw-2" class="btn-drill-bolt" onclick="CCTVSystem.tightenScrew(2)">🔩 Bolt 3: Click to Drill</button>
+              <button id="cam-screw-3" class="btn-drill-bolt" onclick="CCTVSystem.tightenScrew(3)">🔩 Bolt 4: Click to Drill</button>
+            </div>
+            <button id="btn-cam-step2-next" class="btn-primary btn-success" style="margin-top: 14px; width: 100%;" onclick="CCTVSystem.goToStep(3)" disabled>Proceed to Cabling & Wiring ▶</button>
+          </div>
+
+          <!-- Step 3: Wire Stripping & Cabling -->
+          <div id="cam-step-3" class="cam-install-step hidden">
+            <h3 style="font-size: 13px; color: #fff; margin-bottom: 6px;">Step 3: Connect 12V Power & Coaxial/BNC Video Feed</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Click each lead to strip insulation and lock BNC twist-lock collar.</p>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button id="cam-wire-power" class="btn-wire-conn" onclick="CCTVSystem.connectWire('power')">🔴 Connect +12V DC Transformer</button>
+              <button id="cam-wire-ground" class="btn-wire-conn" onclick="CCTVSystem.connectWire('ground')">⚫ Connect Earth Ground Shield</button>
+              <button id="cam-wire-videoBnc" class="btn-wire-conn" onclick="CCTVSystem.connectWire('videoBnc')">🔵 Lock 75Ω BNC Coaxial Video Feed</button>
+              <button id="cam-wire-networkRj45" class="btn-wire-conn" onclick="CCTVSystem.connectWire('networkRj45')">🟢 Plug RJ-45 Cat6 IP Data Cable</button>
+            </div>
+            <button id="btn-cam-step3-next" class="btn-primary btn-success" style="margin-top: 14px; width: 100%;" onclick="CCTVSystem.goToStep(4)" disabled>Proceed to Lens Calibration ▶</button>
+          </div>
+
+          <!-- Step 4: Calibration & Finalize -->
+          <div id="cam-step-4" class="cam-install-step hidden">
+            <h3 style="font-size: 13px; color: #fff; margin-bottom: 6px;">Step 4: Camera Sensor Test & Channel Naming</h3>
+            <canvas id="cam-install-preview-canvas" width="540" height="120" style="width: 100%; border-radius: 6px; margin-bottom: 10px;"></canvas>
+            <div class="input-group">
+              <label>Camera Designation Label</label>
+              <input type="text" id="cam-label-input" value="CAM 05 - REAR STASH VAULT">
+            </div>
+            <button class="btn-primary btn-success" style="margin-top: 10px; width: 100%;" onclick="CCTVSystem.finalizeInstallation()">🎉 Finalize & Arm Camera</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= ADVANCED MULTI-TIER LOCK SYSTEM & LOCKPICKING ================= -->
+    <div id="modal-advanced-lock" class="modal hidden interactive">
+      <div class="modal-content" style="width: 640px; max-width: 95vw;">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h2 id="lock-modal-title" style="font-size: 15px; font-weight: 800; color: var(--accent-cyan); margin: 0;">🔐 HIGH-SECURITY LOCK SYSTEM</h2>
+            <span id="lock-modal-tier-badge" style="font-size: 11px; font-weight: 800; color: var(--accent-emerald);">[TIER 2 MEDECO]</span>
+          </div>
+          <button class="modal-close-btn" onclick="LockSystem.close()">✕</button>
+        </div>
+
+        <div style="padding: 16px;">
+          <!-- 1. 5-PIN MECHANICAL TUMBLER SECTION -->
+          <div id="lock-section-tumbler" class="lock-mode-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 12px; color: var(--text-muted);">Use Pick to lift binding pins to shear line | Space to tension</span>
+              <span id="lock-tension-value" style="font-size: 12px; color: var(--accent-cyan); font-weight: 700;">40% Torque</span>
+            </div>
+
+            <!-- 5-Pin Visual Cross Section -->
+            <div style="background: #000; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.3); overflow: hidden; margin-bottom: 12px; display: flex; justify-content: center;">
+              <canvas id="lock-tumbler-canvas" width="460" height="220" style="max-width: 100%;"></canvas>
+            </div>
+
+            <!-- Pin Selection Buttons -->
+            <div style="display: flex; gap: 6px; justify-content: center; margin-bottom: 12px;">
+              <button class="btn-builder-sm" onclick="LockSystem.selectTumblerPin(0)">Pin 1</button>
+              <button class="btn-builder-sm" onclick="LockSystem.selectTumblerPin(1)">Pin 2</button>
+              <button class="btn-builder-sm" onclick="LockSystem.selectTumblerPin(2)">Pin 3</button>
+              <button class="btn-builder-sm" onclick="LockSystem.selectTumblerPin(3)">Pin 4</button>
+              <button class="btn-builder-sm" onclick="LockSystem.selectTumblerPin(4)">Pin 5</button>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-primary btn-success" style="flex: 1;" onclick="LockSystem.liftSelectedPin(10)">⬆️ Lift Pick (+10%)</button>
+              <button class="btn-primary" style="flex: 1;" onclick="LockSystem.setTension(65)">🔧 Apply 65% Tension</button>
+            </div>
+          </div>
+
+          <!-- 2. ELECTRONIC CIRCUIT & MULTIMETER BYPASS SECTION -->
+          <div id="lock-section-electronic" class="lock-mode-section hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="font-size: 12px; color: var(--text-muted);">Multimeter Voltage Probe & Wire Jumper Hacking</span>
+              <span id="circuit-multimeter-reading" style="font-size: 12px; color: var(--accent-emerald); font-weight: 700;">PROBE READY</span>
+            </div>
+
+            <div id="circuit-wires-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
+          </div>
+
+          <!-- 3. BIOMETRIC THERMAL RESIDUE SECTION -->
+          <div id="lock-section-biometric" class="lock-mode-section hidden">
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Thermal IR Camera reveals heat signature sequence of pressed keys:</p>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 14px;">
+              <div class="thermal-card" onclick="LockSystem.pressBiometricDigit(7)">
+                <div style="font-size: 20px; font-weight: 800; color: #ef4444;">7</div>
+                <div style="font-size: 10px; color: #ef4444;">36.8°C (Fresh)</div>
+              </div>
+              <div class="thermal-card" onclick="LockSystem.pressBiometricDigit(2)">
+                <div style="font-size: 20px; font-weight: 800; color: #f97316;">2</div>
+                <div style="font-size: 10px; color: #f97316;">34.2°C (Warm)</div>
+              </div>
+              <div class="thermal-card" onclick="LockSystem.pressBiometricDigit(9)">
+                <div style="font-size: 20px; font-weight: 800; color: #eab308;">9</div>
+                <div style="font-size: 10px; color: #eab308;">31.5°C (Cooling)</div>
+              </div>
+              <div class="thermal-card" onclick="LockSystem.pressBiometricDigit(4)">
+                <div style="font-size: 20px; font-weight: 800; color: #38bdf8;">4</div>
+                <div style="font-size: 10px; color: #38bdf8;">29.1°C (Faint)</div>
+              </div>
+            </div>
+            <div style="font-size: 13px; text-align: center; color: var(--accent-cyan); font-weight: 700;">
+              Sequence: <span id="biometric-code-display">_ _ _ _</span>
+            </div>
+          </div>
+
+          <!-- 4. MANUAL LOCK INSTALLATION / UPGRADE SECTION -->
+          <div id="lock-section-installer" class="lock-mode-section hidden">
+            <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+              <button id="btn-tier-choice-tier1_brass" class="btn-lock-tier-choice" onclick="LockSystem.selectInstallLockTier('tier1_brass')">Tier 1 Brass</button>
+              <button id="btn-tier-choice-tier2_medeco" class="btn-lock-tier-choice active" onclick="LockSystem.selectInstallLockTier('tier2_medeco')">Tier 2 Medeco</button>
+              <button id="btn-tier-choice-tier3_keypad" class="btn-lock-tier-choice" onclick="LockSystem.selectInstallLockTier('tier3_keypad')">Tier 3 Keypad</button>
+              <button id="btn-tier-choice-tier4_biometric" class="btn-lock-tier-choice" onclick="LockSystem.selectInstallLockTier('tier4_biometric')">Tier 4 Biometric</button>
+            </div>
+
+            <!-- Step 1 Core -->
+            <div id="lock-install-step-1" class="lock-install-step-pane">
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Insert mortise lock cylinder body into door bore hole.</p>
+              <button id="btn-insert-core" class="btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="LockSystem.insertCylinderCore()">📥 Insert High-Security Core</button>
+              <button id="btn-lock-step1-next" class="btn-primary btn-success" style="width: 100%;" onclick="LockSystem.goToInstallStep(2)" disabled>Next: Stack Pins & Springs ▶</button>
+            </div>
+
+            <!-- Step 2 Pins -->
+            <div id="lock-install-step-2" class="lock-install-step-pane hidden">
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Drop 5 spool & hardened steel anti-drill pins into cylinder chambers.</p>
+              <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
+                <button id="install-pin-chamber-0" class="btn-builder-sm" onclick="LockSystem.dropPinInChamber(0)">Chamber 1: Drop Pin</button>
+                <button id="install-pin-chamber-1" class="btn-builder-sm" onclick="LockSystem.dropPinInChamber(1)">Chamber 2: Drop Pin</button>
+                <button id="install-pin-chamber-2" class="btn-builder-sm" onclick="LockSystem.dropPinInChamber(2)">Chamber 3: Drop Pin</button>
+                <button id="install-pin-chamber-3" class="btn-builder-sm" onclick="LockSystem.dropPinInChamber(3)">Chamber 4: Drop Pin</button>
+                <button id="install-pin-chamber-4" class="btn-builder-sm" onclick="LockSystem.dropPinInChamber(4)">Chamber 5: Drop Pin</button>
+              </div>
+              <button id="btn-lock-step2-next" class="btn-primary btn-success" style="width: 100%;" onclick="LockSystem.goToInstallStep(3)" disabled>Next: Secure Faceplate ▶</button>
+            </div>
+
+            <!-- Step 3 Faceplate -->
+            <div id="lock-install-step-3" class="lock-install-step-pane hidden">
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Torque heavy hardened steel strike plate and deadbolt collar.</p>
+              <button id="btn-tighten-faceplate" class="btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="LockSystem.tightenFaceplateScrew()">🔩 Torque Faceplate Screws</button>
+              <button id="btn-finalize-lock-install" class="btn-primary btn-success" style="width: 100%;" onclick="LockSystem.finalizeLockUpgrade()" disabled>🎉 Complete Lock Installation</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Physical Strength & Gym Workout Modal -->
+    <div id="modal-workout" class="modal hidden">
+      <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+          <h2 id="workout-title">🏋️ 225-LB OLYMPIC BENCH PRESS</h2>
+          <button class="btn-close" onclick="Workout.close()">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 18px; text-align: center;">
+
+          <!-- Bench Press Panel -->
+          <div id="workout-panel-bench" class="workout-mode-panel">
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+              Press <kbd style="background:#1e293b; padding:2px 6px; border-radius:4px; border:1px solid #475569;">SPACE</kbd> to press the 225-lb barbell upwards into the Lockout Zone. Use <kbd style="background:#1e293b; padding:2px 6px; border-radius:4px; border:1px solid #475569;">A</kbd> / <kbd style="background:#1e293b; padding:2px 6px; border-radius:4px; border:1px solid #475569;">D</kbd> or the balance buttons to keep the bar level.
+            </p>
+            <div style="background: #020617; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 14px; display: flex; justify-content: center;">
+              <canvas id="workout-bench-canvas" width="480" height="260" style="width: 100%; max-width: 480px; height: auto; display: block;"></canvas>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 12px;">
+              <button class="btn-secondary" style="flex: 1;" onclick="Workout.balanceBarbell('left')">⬅ Balance Left (A)</button>
+              <button class="btn-primary btn-success" style="flex: 2; font-weight: bold; font-size: 15px;" onclick="Workout.pushBarbell()">🏋️ PUSH REP (SPACE)</button>
+              <button class="btn-secondary" style="flex: 1;" onclick="Workout.balanceBarbell('right')">Balance Right (D) ➡</button>
+            </div>
+          </div>
+
+          <!-- Boxing Punch Bag Panel -->
+          <div id="workout-panel-punching_bag" class="workout-mode-panel hidden">
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+              Throw rapid combinations on the heavy leather punching bag to build arm endurance and core knockout power.
+            </p>
+            <div style="background: #020617; border-radius: 8px; border: 1px solid var(--border-color); padding: 30px 20px; margin-bottom: 14px; text-align: center;">
+              <div style="font-size: 54px; margin-bottom: 10px;">🥊</div>
+              <div style="font-size: 20px; font-weight: bold; color: #f59e0b;" id="punch-combo-counter">0 / 12 Hits</div>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Land 12 clean hits to complete set</p>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+              <button class="btn-primary" onclick="Workout.throwPunch('jab')">🥊 Left Jab</button>
+              <button class="btn-primary" onclick="Workout.throwPunch('cross')">💥 Right Cross</button>
+              <button class="btn-primary" onclick="Workout.throwPunch('hook')">⚡ Lead Hook</button>
+              <button class="btn-primary" onclick="Workout.throwPunch('uppercut')">🔥 Power Uppercut</button>
+            </div>
+          </div>
+
+          <!-- Treadmill Cardio Panel -->
+          <div id="workout-panel-treadmill" class="workout-mode-panel hidden">
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+              Sprint at 15° incline to expand stamina capacity, lower sprint drain rate, and gain Athletics XP.
+            </p>
+            <div style="background: #020617; border-radius: 8px; border: 1px solid var(--border-color); padding: 25px 20px; margin-bottom: 14px; text-align: center;">
+              <div style="font-size: 48px; margin-bottom: 10px;">🏃💨</div>
+              <div style="font-size: 20px; font-weight: bold; color: #38bdf8;" id="treadmill-distance-counter">0.0 km / 1.0 km</div>
+              <div style="background: #1e293b; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 12px; width: 80%; margin-left: auto; margin-right: auto;">
+                <div id="treadmill-progress-fill" style="background: linear-gradient(90deg, #38bdf8, #10b981); height: 100%; width: 0%; transition: width 0.2s;"></div>
+              </div>
+            </div>
+            <button class="btn-primary btn-success" style="width: 100%; font-size: 15px; font-weight: bold; padding: 12px;" onclick="Workout.treadmillSprint()">🏃 PUSH SPRINT (SPACE)</button>
+          </div>
+
+          <button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="Workout.close()">Finish Workout & Exit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid-Locked Work Bench & Crafting Bench Modal -->
+    <div id="modal-crafting-bench" class="modal hidden interactive">
+      <div class="modal-content" style="width: 720px; max-width: 95vw;">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h2 id="crafting-bench-title" style="font-size: 15px; font-weight: 800; color: var(--accent-cyan); margin: 0;">🔧 PRECISION ENGINEERING WORK BENCH</h2>
+            <span id="crafting-bench-badge" style="font-size: 11px; font-weight: 800; color: var(--accent-emerald);">[1 PER HOUSE]</span>
+          </div>
+          <button class="modal-close-btn" onclick="CraftingBenchUI.close()">✕</button>
+        </div>
+
+        <div style="padding: 16px;">
+          <!-- Mode Tabs -->
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <button id="tab-bench-workbench" class="craft-bench-mode-tab active" style="flex: 1; padding: 8px 12px; background: rgba(14, 165, 233, 0.2); border: 1px solid var(--accent-cyan); border-radius: 6px; color: #fff; font-weight: 700; cursor: pointer;" onclick="CraftingBenchUI.setMode('workbench')">🔧 Precision Work Bench (Tuning & Locks)</button>
+            <button id="tab-bench-crafting_bench" class="craft-bench-mode-tab" style="flex: 1; padding: 8px 12px; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: var(--text-muted); font-weight: 700; cursor: pointer;" onclick="CraftingBenchUI.setMode('crafting_bench')">🔨 Heavy Fabrication Bench (Defenses & Kits)</button>
+          </div>
+
+          <p id="crafting-bench-desc" style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+            Upgrade high-security lock cylinders, calibrate multimeters, overclock cordless drill motors, and harden lockpicks.
+          </p>
+
+          <!-- Crafting Progress Bar -->
+          <div id="crafting-progress-container" class="hidden" style="background: rgba(15, 23, 42, 0.9); border: 1px solid var(--accent-cyan); border-radius: 6px; padding: 12px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--accent-cyan);">
+              <span id="crafting-progress-label">Crafting...</span>
+              <span>⚡ FABRICATING</span>
+            </div>
+            <div style="background: #1e293b; height: 10px; border-radius: 5px; overflow: hidden;">
+              <div id="crafting-progress-bar" style="background: linear-gradient(90deg, #38bdf8, #10b981); height: 100%; width: 0%; transition: width 0.05s;"></div>
+            </div>
+          </div>
+
+          <!-- Recipe Cards Grid -->
+          <div id="crafting-recipe-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-height: 440px; overflow-y: auto; padding-right: 4px;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid-Locked Cooking Stove Modal -->
+    <div id="modal-cooking-stove" class="modal hidden interactive">
+      <div class="modal-content" style="width: 720px; max-width: 95vw;">
+        <div class="modal-header" style="background: rgba(217, 119, 6, 0.25);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h2 style="font-size: 15px; font-weight: 800; color: #f59e0b; margin: 0;">🍳 COMMERCIAL 6-BURNER COOKING STOVE</h2>
+            <span style="font-size: 11px; font-weight: 800; color: var(--accent-emerald);">[1 PER HOUSE]</span>
+          </div>
+          <button class="modal-close-btn" onclick="CookingStoveUI.close()">✕</button>
+        </div>
+
+        <div style="padding: 16px;">
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+            Cook hot gourmet meals to replenish hunger, thirst, and health, gain stamina buffs, and level up your Culinary Arts skill.
+          </p>
+
+          <!-- Cooking Progress Bar -->
+          <div id="cooking-progress-container" class="hidden" style="background: rgba(15, 23, 42, 0.9); border: 1px solid #f59e0b; border-radius: 6px; padding: 12px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #f59e0b;">
+              <span id="cooking-progress-label">Sizzling on 6-burner range... 🔥</span>
+              <span>🔥 375°F ACTIVE HEAT</span>
+            </div>
+            <div style="background: #1e293b; height: 10px; border-radius: 5px; overflow: hidden;">
+              <div id="cooking-progress-bar" style="background: linear-gradient(90deg, #f59e0b, #ef4444); height: 100%; width: 0%; transition: width 0.05s;"></div>
+            </div>
+          </div>
+
+          <!-- Cooking Recipes Grid -->
+          <div id="cooking-recipe-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-height: 440px; overflow-y: auto; padding-right: 4px;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modular Scripts -->
+  <script src="js/modules/char_creator.js"></script>
+  <script src="js/modules/hud.js"></script>
+  <script src="js/modules/inventory.js"></script>
+  <script src="js/modules/banking.js"></script>
+  <script src="js/modules/store.js"></script>
+  <script src="js/modules/botany.js"></script>
+  <script src="js/modules/skills.js"></script>
+  <script src="js/modules/workout.js"></script>
+  <script src="js/modules/crafting_bench.js"></script>
+  <script src="js/modules/cooking_stove.js"></script>
+  <script src="js/modules/chair_seating.js"></script>
+  <script src="js/modules/storage_container.js"></script>
+  <script src="js/modules/lockpick_minigame.js"></script>
+  <script src="js/modules/lock_system.js"></script>
+  <script src="js/modules/keypad.js"></script>
+  <script src="js/modules/cctv_system.js"></script>
+  <script src="js/modules/base_builder.js"></script>
+  <script src="js/modules/radial_menu.js"></script>
+  <script src="js/modules/voice_radio.js"></script>
+  <script src="js/modules/casino.js"></script>
+  <script src="js/modules/fishing.js"></script>
+  <script src="js/modules/map_spawner.js"></script>
+  <script src="js/modules/delivery_job.js"></script>
+  <script src="js/modules/crime_lab.js"></script>
+  <script src="js/modules/police_mdt.js"></script>
+  <script src="js/modules/dealership.js"></script>
+  <script src="js/modules/property.js"></script>
+  <script src="js/modules/chat.js"></script>
+  <script src="js/modules/admin.js"></script>
+  <script src="js/modules/city_simulator.js"></script>
+  <script src="js/city_underground_core.js"></script>
+
+</body>
+</html>

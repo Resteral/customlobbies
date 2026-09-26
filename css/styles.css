@@ -2415,5 +2415,244 @@ body.discord-activity-mode .navbar {
   border-bottom-color: #5865f2;
 }
 
+/* ==========================================================================
+   PARTY ENGINE & DIRECT TEAMS LOBBIES / QUEUES
+   ========================================================================== */
 
+.party-top-bar {
+  background: linear-gradient(90deg, rgba(20, 16, 35, 0.95), rgba(12, 16, 27, 0.95), rgba(20, 16, 35, 0.95));
+  border-bottom: 1px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  padding: 0.45rem 1.5rem;
+  position: relative;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
 
+.party-bar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.party-info-group {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.party-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid var(--accent-purple);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.25);
+}
+
+.party-count-tag {
+  background: var(--accent-purple);
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 900;
+}
+
+.party-members-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.party-member-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.party-member-chip.local-chip {
+  background: rgba(0, 242, 254, 0.08);
+  border-color: rgba(0, 242, 254, 0.4);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+}
+
+.party-avatar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.party-member-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.party-member-avatar-emoji {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ready-ring {
+  border: 2px solid var(--accent-green) !important;
+  box-shadow: 0 0 6px var(--accent-green);
+}
+
+.unready-ring {
+  border: 2px solid var(--accent-gold) !important;
+}
+
+.party-ready-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid #111;
+}
+
+.dot-ready {
+  background: var(--accent-green);
+  box-shadow: 0 0 5px var(--accent-green);
+}
+
+.dot-unready {
+  background: var(--accent-gold);
+}
+
+.party-crown {
+  position: absolute;
+  top: -7px;
+  right: -5px;
+  font-size: 0.7rem;
+}
+
+.party-member-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.party-member-name {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.party-member-elo {
+  font-size: 0.65rem;
+  color: var(--accent-gold);
+  font-weight: 700;
+}
+
+.party-chip-kick {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0 0.15rem;
+  transition: color 0.2s;
+}
+
+.party-chip-kick:hover {
+  color: var(--accent-red);
+}
+
+.party-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.party-ready-btn {
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.party-invite-btn {
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+}
+
+.party-full-badge {
+  font-size: 0.72rem;
+  font-weight: 900;
+  background: rgba(255, 171, 0, 0.2);
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.party-extra-menu {
+  display: flex;
+  gap: 0.35rem;
+}
+
+/* Direct Teams Lobby Cards Styling */
+.lobby-teams-direct-box {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.lobby-roster-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.78rem;
+  color: #fff;
+}
+
+.roster-chip-party {
+  background: rgba(168, 85, 247, 0.2) !important;
+  border-color: var(--accent-purple) !important;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.35) !important;
+}
+
+.chip-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 5px;
+  background: transparent;
+}
+
+.chip-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 105px;
+}

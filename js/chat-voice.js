@@ -303,16 +303,32 @@ class ChatVoiceManager {
     };
 
     this.onlineUsers = [
-      { name: 'S1mple_Fragger', mmr: 2850, teamTag: 'NAVI', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80' },
-      { name: 'ZywOo_Master', mmr: 2810, teamTag: 'VIT', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80' },
-      { name: 'ApexGod99', mmr: 2450, teamTag: 'APEX', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80' },
-      { name: 'Valkyrie_CS', mmr: 2380, teamTag: 'VALK', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&auto=format&fit=crop&q=80' },
-      { name: 'Marshal_Vanguard', mmr: 2320, teamTag: 'VANG', avatar: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=80&auto=format&fit=crop&q=80' },
-      { name: 'TenZ_Duelist', mmr: 2720, teamTag: 'SEN', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80&auto=format&fit=crop&q=80' },
-      { name: 'NiKo_Rifler', mmr: 2690, teamTag: 'FALC', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80' },
-      { name: 'Shroud_Echo', mmr: 2540, teamTag: 'OG', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80' },
-      { name: 'Faker_Mid', mmr: 2900, teamTag: 'T1', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80' },
-      { name: 'Device_CS', mmr: 2480, teamTag: 'ASTR', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80' }
+      { name: 'S1mple_Fragger', mmr: 2850, teamTag: 'NAVI', avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=80&auto=format&fit=crop&q=80', game: 'Counter-Strike 2' },
+      { name: 'ZywOo_Master', mmr: 2810, teamTag: 'VIT', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80', game: 'Counter-Strike 2' },
+      { name: 'ApexGod99', mmr: 2450, teamTag: 'APEX', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80', game: 'Valorant' },
+      { name: 'Valkyrie_CS', mmr: 2380, teamTag: 'VALK', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&auto=format&fit=crop&q=80', game: 'Counter-Strike 2' },
+      { name: 'Marshal_Vanguard', mmr: 2320, teamTag: 'VANG', avatar: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=80&auto=format&fit=crop&q=80', game: 'WARDOGS' },
+      { name: 'TenZ_Duelist', mmr: 2720, teamTag: 'SEN', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80&auto=format&fit=crop&q=80', game: 'Valorant' },
+      { name: 'NiKo_Rifler', mmr: 2690, teamTag: 'FALC', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80', game: 'Counter-Strike 2' },
+      { name: 'Shroud_Echo', mmr: 2540, teamTag: 'OG', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80', game: 'Deadlock' },
+      { name: 'Faker_Mid', mmr: 2900, teamTag: 'T1', avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80', game: 'Dota 2' },
+      { name: 'Device_CS', mmr: 2480, teamTag: 'ASTR', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80', game: 'Counter-Strike 2' },
+      { name: 'IronClad_Gunner', mmr: 2590, teamTag: 'WD', avatar: '🤖', game: 'WARDOGS' },
+      { name: 'Ghost_Scout', mmr: 2540, teamTag: 'WD', avatar: '👻', game: 'WARDOGS' },
+      { name: 'Apex_Striker', mmr: 2450, teamTag: 'MR', avatar: '💥', game: 'Marvel Rivals' },
+      { name: 'PuckMaster99', mmr: 2360, teamTag: 'SLAP', avatar: '🏒', game: 'Slapshot: Rebound' },
+      { name: 'Rematch_God', mmr: 2620, teamTag: 'RM', avatar: '⚽', game: 'REMATCH' },
+      { name: 'Empulse_Overlord', mmr: 2580, teamTag: 'EMP', avatar: '⚡', game: 'Empulse' },
+      { name: 'Seven_Main', mmr: 2490, teamTag: 'DL', avatar: '💀', game: 'Deadlock' },
+      { name: 'HeavySledge', mmr: 2340, teamTag: 'FIN', avatar: '🔨', game: 'The Finals' },
+      { name: 'AerialKing_RL', mmr: 2610, teamTag: 'RL', avatar: '🚗', game: 'Rocket League' },
+      { name: 'CyberSamurai', mmr: 2420, teamTag: 'CYBER', avatar: '⚔️', game: 'Counter-Strike 2' },
+      { name: 'NeonViper', mmr: 2510, teamTag: 'VIPER', avatar: '🐍', game: 'Valorant' },
+      { name: 'ChronoTrigger', mmr: 2390, teamTag: 'TIME', avatar: '⏱️', game: 'Empulse' },
+      { name: 'PixelWarrior', mmr: 2270, teamTag: 'PIXEL', avatar: '🕹️', game: 'Arkheron' },
+      { name: 'QuantumRebel', mmr: 2440, teamTag: 'QUANT', avatar: '🌌', game: 'REMATCH' },
+      { name: 'FrostBite', mmr: 2330, teamTag: 'ICE', avatar: '❄️', game: 'Overwatch 2' },
+      { name: 'ShadowSniper', mmr: 2520, teamTag: 'SHAD', avatar: '🎯', game: 'Counter-Strike 2' }
     ];
   }
 
@@ -2896,15 +2912,111 @@ class ChatVoiceManager {
   }
 
   invitePlayerToTeam(playerName) {
+    if (window.partyEngine && typeof window.partyEngine.invitePlayer === 'function') {
+      window.partyEngine.invitePlayer(playerName);
+      return;
+    }
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('queue_join');
     }
-    this.notifyToast(`📨 Team Invite sent to ${playerName} from the Community Hub!`, 'success');
+    this.notifyToast(`📨 Party Invite sent to ${playerName} from the Community Hub!`, 'success');
   }
 
   renderOnlineUsers() {
     const container = document.getElementById('onlineUsersList');
     if (!container) return;
+
+    let html = '';
+
+    // 1. TOP SECTION: 🎉 YOUR PARTY (Prominently shows everyone in your party)
+    if (window.partyEngine && typeof window.partyEngine.getMembers === 'function') {
+      const partyMembers = window.partyEngine.getMembers();
+      const partyCount = partyMembers.length;
+      const isFull = partyCount >= window.partyEngine.maxMembers;
+
+      html += `
+        <div style="background: rgba(168, 85, 247, 0.12); border: 1px solid var(--accent-purple); border-radius: 8px; padding: 0.6rem; margin-bottom: 0.9rem; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid rgba(168, 85, 247, 0.3);">
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <span style="font-size: 0.95rem;">🎉</span>
+              <strong style="color: #fff; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px;">YOUR PARTY</strong>
+            </div>
+            <span style="font-size: 0.72rem; font-weight: 900; background: var(--accent-purple); color: #fff; padding: 0.1rem 0.35rem; border-radius: 4px;">
+              ${partyCount}/${window.partyEngine.maxMembers}
+            </span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+            ${partyMembers.map(m => {
+              const isLocal = m.isLocal;
+              const isLeader = m.isLeader;
+              const avatarContent = (m.avatar && m.avatar.startsWith('http'))
+                ? `<img src="${m.avatar}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1.5px solid ${m.ready ? 'var(--accent-green)' : 'var(--accent-gold)'};">`
+                : `<span style="font-size: 1rem;">${m.avatar || '🎮'}</span>`;
+
+              return `
+                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 0.3rem 0.45rem; border-radius: 6px; border: 1px solid ${isLocal ? 'rgba(0, 242, 254, 0.4)' : 'rgba(255,255,255,0.06)'};">
+                  <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
+                    ${avatarContent}
+                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      <span style="font-weight: 800; font-size: 0.8rem; color: #fff;">${m.name}${isLocal ? ' (You)' : ''}</span>
+                      ${isLeader ? '<span style="font-size: 0.65rem; margin-left: 0.2rem;" title="Party Leader">👑</span>' : ''}
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span style="font-size: 0.65rem; color: ${m.ready ? 'var(--accent-green)' : 'var(--accent-gold)'}; font-weight: 700;">
+                      ${m.ready ? '🟢' : '🟡'}
+                    </span>
+                    ${!isLocal ? `
+                      <button onclick="window.partyEngine.kickMember('${m.name}')" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.75rem; padding: 0 0.2rem;" title="Kick from Party">✕</button>
+                    ` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div style="display: flex; gap: 0.35rem; margin-top: 0.5rem;">
+            <button class="btn btn-primary btn-sm btn-block" onclick="window.partyEngine.openPartyInviteModal()" ${isFull ? 'disabled' : ''} style="font-size: 0.72rem; padding: 0.25rem 0.4rem; font-weight: 800;">
+              <span>➕</span> Invite Online
+            </button>
+            ${partyCount > 1 ? `
+              <button class="btn btn-secondary btn-sm" onclick="window.partyEngine.leaveParty()" style="font-size: 0.7rem; padding: 0.25rem 0.5rem; color: var(--accent-red);" title="Leave Party">
+                Leave
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    // 2. DISCORD VOICE CHANNEL PARTICIPANTS
+    if (window.discordActivityEngine && (window.discordActivityEngine.isDiscordActivity || window.discordActivityEngine.isSimulatorMode)) {
+      const dParts = window.discordActivityEngine.participants || [];
+      if (dParts.length > 0) {
+        html += `<div style="font-size: 0.7rem; font-weight: 800; color: #5865F2; text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+          <span>👾</span> DISCORD VOICE CHANNEL - ${dParts.length}
+        </div>`;
+        dParts.forEach(dp => {
+          const isSpk = dp.speaking ? 'border: 2px solid #23a55a;' : '';
+          const inParty = window.partyEngine && window.partyEngine.isInParty(dp.username);
+          html += `
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <img src="${dp.avatar}" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; ${isSpk}">
+                <span style="font-weight: 700; color: #fff;">${dp.global_name || dp.username}</span>
+                ${dp.speaking ? '<span style="font-size: 0.65rem; color: #23a55a;">● mic</span>' : ''}
+              </div>
+              ${inParty ? `
+                <span style="font-size: 0.65rem; background: rgba(168, 85, 247, 0.25); color: #d8b4fe; border: 1px solid var(--accent-purple); padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 800;">PARTY</span>
+              ` : `
+                <button onclick="window.partyEngine ? window.partyEngine.invitePlayer('${dp.username}') : window.chatVoiceManager.invitePlayerToTeam('${dp.username}')" style="background: rgba(88, 101, 242, 0.2); border: 1px solid #5865F2; color: #fff; cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 800;" title="Invite to Party">➕ Party</button>
+              `}
+            </div>
+          `;
+        });
+      }
+    }
 
     const defaultRoles = [
       { name: 'Staff / Admin', color: '#ff5252' },
@@ -2942,50 +3054,35 @@ class ChatVoiceManager {
       }
     });
 
-    let html = '';
+    const renderUserRow = (u, dotColor) => {
+      const badge = u.teamTag ? `<span style="background: rgba(255, 171, 0, 0.15); border: 1px solid rgba(255,171,0,0.5); color: #ffab00; font-size: 0.6rem; padding: 0.05rem 0.25rem; border-radius: 3px; font-weight: 900;">${u.teamTag}</span>` : '';
+      const inParty = window.partyEngine && window.partyEngine.isInParty(u.name);
 
-    // Render Discord Activity Voice Channel Participants if active
-    if (window.discordActivityEngine && (window.discordActivityEngine.isDiscordActivity || window.discordActivityEngine.isSimulatorMode)) {
-      const dParts = window.discordActivityEngine.participants || [];
-      if (dParts.length > 0) {
-        html += `<div style="font-size: 0.7rem; font-weight: 800; color: #5865F2; text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
-          <span>👾</span> DISCORD VOICE CHANNEL - ${dParts.length}
-        </div>`;
-        dParts.forEach(dp => {
-          const isSpk = dp.speaking ? 'border: 2px solid #23a55a;' : '';
-          html += `
-            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
-              <div style="display: flex; align-items: center; gap: 0.4rem;">
-                <img src="${dp.avatar}" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; ${isSpk}">
-                <span style="font-weight: 700; color: #fff;">${dp.global_name || dp.username}</span>
-                ${dp.speaking ? '<span style="font-size: 0.65rem; color: #23a55a;">● mic</span>' : ''}
-              </div>
-              <button onclick="window.chatVoiceManager.invitePlayerToTeam('${dp.username}')" style="background: rgba(88, 101, 242, 0.2); border: 1px solid #5865F2; color: #fff; cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite Discord Teammate">➕</button>
-            </div>
-          `;
-        });
-      }
-    }
-    
+      return `
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem; padding: 0.2rem 0.3rem; border-radius: 4px; ${inParty ? 'background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3);' : ''}">
+          <div style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: ${dotColor}; box-shadow: 0 0 5px ${dotColor}; flex-shrink: 0;"></span>
+            ${badge}
+            <span style="font-weight: 600; color: ${dotColor}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${u.name}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
+            <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.72rem;">${u.mmr}</span>
+            ${inParty ? `
+              <span style="font-size: 0.6rem; background: rgba(168, 85, 247, 0.3); color: #d8b4fe; border: 1px solid var(--accent-purple); padding: 0.05rem 0.25rem; border-radius: 3px; font-weight: 900;">IN PARTY</span>
+            ` : `
+              <button onclick="window.partyEngine ? window.partyEngine.invitePlayer('${u.name}') : window.chatVoiceManager.invitePlayerToTeam('${u.name}')" style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 800;" title="Invite to Your Party">➕ Party</button>
+            `}
+          </div>
+        </div>
+      `;
+    };
+
     // Render custom roles first
     rolesMap.forEach(r => {
       if (categorized[r.name] && categorized[r.name].users.length > 0) {
         html += `<div style="font-size: 0.7rem; font-weight: 800; color: ${r.color}; text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.8rem;">${r.name} - ${categorized[r.name].users.length}</div>`;
         categorized[r.name].users.forEach(u => {
-          const badge = u.teamTag ? `<span style="background: rgba(255, 171, 0, 0.15); border: 1px solid rgba(255,171,0,0.5); color: #ffab00; font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 900;">${u.teamTag}</span>` : '';
-          html += `
-            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
-              <div style="display: flex; align-items: center; gap: 0.4rem;">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: ${r.color}; box-shadow: 0 0 5px ${r.color};"></span>
-                ${badge}
-                <span style="font-weight: 600; color: ${r.color};">${u.name}</span>
-              </div>
-              <div style="display: flex; align-items: center; gap: 0.4rem;">
-                <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.75rem;">${u.mmr}</span>
-                <button onclick="window.chatVoiceManager.invitePlayerToTeam('${u.name}')" style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite to Team">➕</button>
-              </div>
-            </div>
-          `;
+          html += renderUserRow(u, r.color);
         });
       }
     });
@@ -2994,20 +3091,7 @@ class ChatVoiceManager {
     if (categorized['Online'].length > 0) {
       html += `<div style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem; margin-top: 0.8rem;">Online - ${categorized['Online'].length}</div>`;
       categorized['Online'].forEach(u => {
-        const badge = u.teamTag ? `<span style="background: rgba(255, 171, 0, 0.15); border: 1px solid rgba(255,171,0,0.5); color: #ffab00; font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 900;">${u.teamTag}</span>` : '';
-        html += `
-          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
-            <div style="display: flex; align-items: center; gap: 0.4rem;">
-              <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green);"></span>
-              ${badge}
-              <span style="font-weight: 600;">${u.name}</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.4rem;">
-              <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.75rem;">${u.mmr}</span>
-              <button onclick="window.chatVoiceManager.invitePlayerToTeam('${u.name}')" style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan); cursor: pointer; font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 800;" title="Invite to Team">➕</button>
-            </div>
-          </div>
-        `;
+        html += renderUserRow(u, 'var(--accent-green)');
       });
     }
 

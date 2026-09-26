@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELIX Pacifica World Map Radar</title>
+  <link rel="stylesheet" href="map.css">
+</head>
+<body>
+  <div id="map-radar-modal" class="modal hidden">
+    <div class="map-container">
+      <div class="map-header">
+        <div class="map-title">
+          <span class="world-tag">PACIFICA CITY & OUTSKIRTS</span>
+          <h2>WORLD GPS RADAR & DISTRICT DIRECTORY</h2>
+        </div>
+        <button class="btn-close" onclick="toggleMapModal()">✕</button>
+      </div>
+
+      <div class="map-body">
+        <!-- Interactive Radar Canvas -->
+        <div class="radar-view">
+          <div class="grid-overlay"></div>
+          <div class="radar-sweep"></div>
+          <div id="district-zones"></div>
+          <div id="map-waypoints"></div>
+          <div id="player-marker" class="player-ping">
+            <div class="ping-circle"></div>
+            <div class="ping-label">YOU</div>
+          </div>
+        </div>
+
+        <!-- Sidebar Legend & Districts -->
+        <div class="map-sidebar">
+          <h3>DISTRICTS & POI</h3>
+          <div class="district-list">
+            <div class="district-card" style="border-left-color: #00ffc8;">
+              <span class="dist-name">Downtown Financial District</span>
+              <div class="poi-item">🏦 First National Bank Vault</div>
+              <div class="poi-item">🖥️ Security Terminal A & B</div>
+            </div>
+            <div class="district-card" style="border-left-color: #ff6432;">
+              <span class="dist-name">Industrial Docks & Warehouses</span>
+              <div class="poi-item">🧪 Underground Meth Laboratory</div>
+              <div class="poi-item">🌿 Hydroponic Cannabis Farm</div>
+              <div class="poi-item">💻 Crypto GPU Mining Facility</div>
+            </div>
+            <div class="district-card" style="border-left-color: #b450f0;">
+              <span class="dist-name">Neon Strip Commercial District</span>
+              <div class="poi-item">🍸 Velvet Lounge Nightclub</div>
+              <div class="poi-item">💎 Downtown Pawn & Vault</div>
+              <div class="poi-item">🕵️ Black Market Dealer Alley</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="map.js"></script>
+</body>
+</html>

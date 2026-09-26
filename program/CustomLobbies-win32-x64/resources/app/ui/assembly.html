@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELIX Modular 3D Assembly & Socketing Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #080b11;
+      --bg-card: #0f1520;
+      --bg-hover: #162030;
+      --border: #223046;
+      --cyan: #06b6d4;
+      --blue: #3b82f6;
+      --green: #10b981;
+      --purple: #8b5cf6;
+      --amber: #f59e0b;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    header {
+      background: linear-gradient(180deg, #131c2c 0%, #0c111a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      color: #03141a;
+    }
+
+    main {
+      padding: 24px;
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 20px;
+      max-width: 1500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .panel-header {
+      padding: 1rem 1.25rem;
+      background: #0b0f17;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cyan);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-body {
+      padding: 1.25rem;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .prop-item {
+      background: #080a0f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .prop-item:hover {
+      background: var(--bg-hover);
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .socket-card {
+      background: #07090e;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+
+    .socket-card.occupied {
+      border: 1px solid var(--green);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .btn-snap {
+      background: var(--blue);
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-snap:hover { opacity: 0.9; }
+    .btn-detach { background: #ef4444; }
+
+    /* 3D Blueprint Visualizer Viewport */
+    .viewport {
+      background: radial-gradient(circle at center, #111a2e 0%, #06090e 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blueprint-diagram {
+      border: 2px dashed rgba(6, 182, 212, 0.4);
+      border-radius: 16px;
+      padding: 40px;
+      width: 80%;
+      height: 70%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      background: rgba(6, 182, 212, 0.02);
+      position: relative;
+    }
+
+    .socket-node {
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid var(--cyan);
+      border-radius: 12px;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="brand-badge">HELIX 3D SOCKETING</div>
+      <h1 style="font-size:1.15rem; font-weight:700;">Modular Prop Nesting & Socket Assembly Engine</h1>
+    </div>
+
+    <div style="display:flex; gap:8px;">
+      <select id="station-type" onchange="changeStation()" style="background:#0b0f17; color:#fff; border:1px solid var(--border); padding:6px 12px; border-radius:6px;">
+        <option value="meth_lab">⚗ Chemical Meth Synthesis Apparatus</option>
+        <option value="hydroponic">🌿 Hydroponic Planter Grow Station</option>
+        <option value="press">🧱 Hydraulic 1kg Brick Stamping Press</option>
+        <option value="crypto">🖥 42U GPU Mining Server Rack</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left Parts Inventory (Props ready to be inserted) -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>📦 Modular Sub-Props</span>
+      </div>
+      <div class="panel-body" id="props-inventory">
+        <!-- Dynamically injected prop items -->
+      </div>
+    </div>
+
+    <!-- Center 3D Blueprint Assembly Viewport -->
+    <div class="viewport">
+      <div class="blueprint-diagram" id="blueprint-area">
+        <!-- Visual Socket Nodes -->
+      </div>
+    </div>
+
+    <!-- Right Sockets Status & Unlocked Gameplay Capabilities -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>⚙ Active Socket Connections</span>
+      </div>
+      <div class="panel-body" id="sockets-list">
+        <!-- Sockets Status -->
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const STATIONS = {
+      meth_lab: {
+        title: "Underground Meth Distillation Apparatus",
+        parentModel: "assets/models/meth_lab.glb",
+        props: [
+          { key: "flask", name: "Borosilicate Round Flask", targetSocket: "heating_mantle" },
+          { key: "condenser", name: "Reflux Condenser Coil Tube", targetSocket: "condenser_column" },
+          { key: "probe", name: "Digital Thermocouple Temp Probe", targetSocket: "thermometer_probe" }
+        ],
+        sockets: {
+          heating_mantle: { name: "Boiling Well Socket", model: null, feature: "Enables Thermal Heating Reactions" },
+          condenser_column: { name: "Distillation Neck Socket", model: null, feature: "Enables Reflux Vapor Cooling" },
+          thermometer_probe: { name: "Temp Probe Jack", model: null, feature: "Enables Real-time Temperature Gauge" }
+        }
+      },
+      hydroponic: {
+        title: "Hydroponic Planter Box Station",
+        parentModel: "assets/models/weed_box.glb",
+        props: [
+          { key: "pot_1", name: "Terracotta Pot (OG Kush)", targetSocket: "soil_pot_slot_1" },
+          { key: "pot_2", name: "Terracotta Pot (Purple Haze)", targetSocket: "soil_pot_slot_2" },
+          { key: "uv_lamp", name: "Quantum Board Full-Spectrum LED", targetSocket: "grow_lamp_rail" },
+          { key: "hose", name: "Automated Drip Irrigation Line", targetSocket: "irrigation_tube" }
+        ],
+        sockets: {
+          grow_lamp_rail: { name: "Top Rail Light Mount", model: null, feature: "Enables +35% UV Photosynthesis Speed" },
+          soil_pot_slot_1: { name: "Pot Well Slot #1", model: null, feature: "Enables Slot 1 Cannabis Cultivation" },
+          soil_pot_slot_2: { name: "Pot Well Slot #2", model: null, feature: "Enables Slot 2 Cannabis Cultivation" },
+          irrigation_tube: { name: "Watering Hose Fitting", model: null, feature: "Enables Automated Drip Hydration" }
+        }
+      },
+      press: {
+        title: "Hydraulic 1kg Contraband Press",
+        parentModel: "assets/models/drillable_safe.glb",
+        props: [
+          { key: "die", name: "Hardened Steel 1kg Mold Die", targetSocket: "die_mold_bed" },
+          { key: "stamp", name: "Golden Scorpion Cartel Stamp Die", targetSocket: "cartel_stamp_insert" }
+        ],
+        sockets: {
+          die_mold_bed: { name: "Hydraulic Bed Cavity", model: null, feature: "Enables 1,000g Powder Compaction" },
+          cartel_stamp_insert: { name: "Piston Stamping Head", model: null, feature: "Enables Cartel Logo Stamping" }
+        }
+      },
+      crypto: {
+        title: "42U GPU Mining Server Rack",
+        parentModel: "assets/models/crypto_farm.glb",
+        props: [
+          { key: "gpu_1", name: "NVIDIA RTX 4090 GPU Module 1", targetSocket: "gpu_slot_1" },
+          { key: "gpu_2", name: "NVIDIA RTX 4090 GPU Module 2", targetSocket: "gpu_slot_2" },
+          { key: "usb", name: "Encrypted Hardware USB Key", targetSocket: "crypto_usb_port" }
+        ],
+        sockets: {
+          gpu_slot_1: { name: "PCI-e Slot #1", model: null, feature: "Enables +120 MH/s Hashrate" },
+          gpu_slot_2: { name: "PCI-e Slot #2", model: null, feature: "Enables +120 MH/s Hashrate" },
+          crypto_usb_port: { name: "Front USB Interface", model: null, feature: "Enables Hardware Siphon Storage" }
+        }
+      }
+    };
+
+    let currentStation = 'meth_lab';
+
+    function changeStation() {
+      currentStation = document.getElementById('station-type').value;
+      renderAll();
+    }
+
+    function renderAll() {
+      const data = STATIONS[currentStation];
+      
+      // Render Left Prop Inventory
+      const inv = document.getElementById('props-inventory');
+      inv.innerHTML = '';
+      data.props.forEach(p => {
+        const isAttached = data.sockets[p.targetSocket].model !== null;
+        inv.innerHTML += `
+          <div class="prop-item" style="opacity:${isAttached ? 0.4 : 1.0};">
+            <div>
+              <div style="font-weight:600; font-size:0.88rem;">${p.name}</div>
+              <div style="font-size:0.75rem; color:var(--text-dim);">Target: ${data.sockets[p.targetSocket].name}</div>
+            </div>
+            ${!isAttached ? `<button class="btn-snap" onclick="snapProp('${p.targetSocket}', '${p.name}')">➕ Insert</button>` : `<span style="font-size:0.75rem; color:var(--green);">✓ Socketed</span>`}
+          </div>
+        `;
+      });
+
+      // Render Center Blueprint
+      const area = document.getElementById('blueprint-area');
+      area.innerHTML = `<h3 style="color:var(--cyan); margin-bottom:10px;">[ ${data.title} ]</h3>`;
+      Object.entries(data.sockets).forEach(([sKey, sData]) => {
+        area.innerHTML += `
+          <div class="socket-node" style="border-color:${sData.model ? 'var(--green)' : 'var(--cyan)'};">
+            <span style="font-size:1.2rem;">${sData.model ? '🔒' : '⭕'}</span>
+            <div>
+              <div style="font-weight:700; font-size:0.9rem;">${sData.name}</div>
+              <div style="font-size:0.75rem; color:${sData.model ? 'var(--green)' : 'var(--text-dim)'};">
+                ${sData.model ? 'Attached: ' + sData.model : 'EMPTY SOCKET - Ready for insertion'}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      // Render Right Sockets List
+      const socketsList = document.getElementById('sockets-list');
+      socketsList.innerHTML = '';
+      Object.entries(data.sockets).forEach(([sKey, sData]) => {
+        socketsList.innerHTML += `
+          <div class="socket-card ${sData.model ? 'occupied' : ''}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; font-size:0.88rem;">${sData.name}</span>
+              ${sData.model ? `<button class="btn-snap btn-detach" onclick="detachProp('${sKey}')">✕ Remove</button>` : `<span style="font-size:0.75rem; color:var(--amber);">Open</span>`}
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-dim);">${sData.feature}</div>
+          </div>
+        `;
+      });
+    }
+
+    function snapProp(socketKey, propName) {
+      STATIONS[currentStation].sockets[socketKey].model = propName;
+      renderAll();
+    }
+
+    function detachProp(socketKey) {
+      STATIONS[currentStation].sockets[socketKey].model = null;
+      renderAll();
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
