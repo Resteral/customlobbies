@@ -165,7 +165,7 @@ class IntegrationsHubEngine {
           color: 62207, // Cyan hex
           fields: [
             { name: "Game", value: "Valorant 5v5 Custom Scrims", inline: true },
-            { name: "Current ELO", value: "1840 MMR (Diamond II)", inline: true }
+            { name: "Current ELO", value: (window.app && window.app.user && window.app.user.elo) ? `${window.app.user.elo} MMR` : "1,500 MMR", inline: true }
           ],
           footer: { text: "CustomLobbies.com x Twitch x Streamlabs x Discord" }
         }

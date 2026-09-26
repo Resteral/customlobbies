@@ -13,8 +13,8 @@ class CustomLobbiesApp {
     this.userCaptainOptOut = false;
     this.playerCaptainOptOuts = new Set();
     this.acStatus = 'ACTIVE_RING0';
-    this.clPoints = 2450;
-    this.equippedTitle = '💎 Diamond Veteran';
+    this.clPoints = 0;
+    this.equippedTitle = 'Novice Challenger';
     this.equippedBanner = 'Cyberpunk Neon Matrix';
     this.equippedFrame = 'Gold Crown Ring';
 
@@ -272,6 +272,7 @@ class CustomLobbiesApp {
     try {
       const savedPoints = localStorage.getItem('cl_points_v2');
       if (savedPoints) this.clPoints = parseInt(savedPoints);
+      else this.clPoints = 0;
       
       const defaultLobbies = this.getDefaultLobbies();
       const savedLobbies = localStorage.getItem('cl_lobbies_v2');
@@ -558,7 +559,9 @@ class CustomLobbiesApp {
 
   updatePointsWidget() {
     const el = document.getElementById('userCLPointsValue');
-    if (el) el.textContent = `${this.clPoints.toLocaleString()} Points`;
+    if (el) el.textContent = `${this.clPoints.toLocaleString()} Pts`;
+    const shopEl = document.getElementById('shopPointsValue');
+    if (shopEl) shopEl.textContent = this.clPoints.toLocaleString();
     const passportTitle = document.getElementById('userPassportTitle');
     if (passportTitle) passportTitle.textContent = this.equippedTitle;
     this.saveState();
@@ -880,8 +883,8 @@ class CustomLobbiesApp {
     const ranksList = document.getElementById('userPassportRanksList');
 
     const displayName = (this.user && this.user.displayName) ? this.user.displayName : 'You (Host)';
-    const elo = (this.user && this.user.elo) ? this.user.elo : 1840;
-    const title = (this.user && this.user.title) ? this.user.title : this.equippedTitle || 'Gamer';
+    const elo = (this.user && this.user.elo) ? this.user.elo : 1500;
+    const title = (this.user && this.user.title) ? this.user.title : this.equippedTitle || 'Novice Challenger';
 
     if (nameEl) nameEl.textContent = displayName;
     if (subtitleEl) subtitleEl.textContent = `${title} (${elo} MMR)`;
@@ -1016,7 +1019,7 @@ class CustomLobbiesApp {
   promptConnectGameAccounts() {
     const steam = prompt('Enter your Steam ID or Community Profile URL:', (this.user && this.user.steamId) || '');
     if (steam !== null) {
-      if (!this.user) this.user = { displayName: 'You (Host)', elo: 1840, level: 8 };
+      if (!this.user) this.user = { displayName: 'You (Host)', elo: 1500, level: 1 };
       this.user.steamId = steam.trim() || null;
       this.saveState();
       this.renderGamerPassportSidebar();
@@ -1036,7 +1039,7 @@ class CustomLobbiesApp {
     }
 
     const userName = (this.user && this.user.displayName) ? this.user.displayName : 'You (Host)';
-    const userMmr = (this.user && this.user.elo) ? this.user.elo : 1840;
+    const userMmr = (this.user && this.user.elo) ? this.user.elo : 1500;
     const userAvatar = (this.user && this.user.emblem) ? this.user.emblem : '👑';
 
     if (!Array.isArray(this.gamersWallPosts)) {
@@ -1073,7 +1076,7 @@ class CustomLobbiesApp {
   // Publish Auto-Farmed Clip to The Gamers Wall Feed
   postAutoClipToGamersWall(clipTitle, gameTitle, triggerName) {
     const userName = (this.user && this.user.displayName) ? this.user.displayName : 'You (Host)';
-    const userMmr = (this.user && this.user.elo) ? this.user.elo : 1840;
+    const userMmr = (this.user && this.user.elo) ? this.user.elo : 1500;
     const userAvatar = (this.user && this.user.emblem) ? this.user.emblem : '👑';
 
     if (!Array.isArray(this.gamersWallPosts)) {
@@ -1121,7 +1124,7 @@ class CustomLobbiesApp {
       this.poolFeed.unshift({
         id: Date.now(),
         name: 'You (Queued for Draft)',
-        elo: 1840,
+        elo: (this.user && this.user.elo) ? this.user.elo : 1500,
         time: 'Just Now',
         isCaptain: false,
         votes: 1
@@ -2249,12 +2252,14 @@ class CustomLobbiesApp {
       const count = document.getElementById('relCount');
       const badge = document.getElementById('relBadge');
       const noShows = document.getElementById('relNoShows');
+      const honor = document.getElementById('relHonor');
 
       if (title) title.textContent = `Reliability Rating: ${userHandle}`;
       if (rate) rate.textContent = p.completionRate;
       if (count) count.textContent = `${p.completedMatches} Matches`;
       if (badge) badge.textContent = p.trustBadge;
       if (noShows) noShows.textContent = `${p.noShows} No-Shows`;
+      if (honor && p.honorLevel) honor.textContent = p.honorLevel;
     }
   }
 
@@ -3200,6 +3205,11 @@ class CustomLobbiesApp {
     if (!historyContainer || !window.matchmakingHubEngine) return;
 
     const history = window.matchmakingHubEngine.matchHistory;
+
+    if (!history || history.length === 0) {
+      historyContainer.innerHTML = '<div style="color: var(--text-dim); font-size: 0.85rem; padding: 1.5rem; text-align: center; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px dashed var(--border-color);">No ranked match scorecards recorded yet. Enter matchmaking queue to play competitive scrims.</div>';
+      return;
+    }
 
     historyContainer.innerHTML = history.map(m => `
       <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.8rem 1rem;">
@@ -4314,9 +4324,9 @@ class CustomLobbiesApp {
         username: 'Sean',
         displayName: 'Sean',
         email: 'sean@customlobbies.com',
-        elo: 1840,
-        level: 8,
-        title: '💎 Diamond Veteran',
+        elo: 1500,
+        level: 1,
+        title: 'Novice Challenger',
         avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
         acVerified: true
       };
@@ -4354,9 +4364,9 @@ class CustomLobbiesApp {
         this.user = {
           username: 'Sean',
           displayName: 'Sean (Host)',
-          elo: 1840,
-          level: 8,
-          title: '💎 Diamond Veteran',
+          elo: 1500,
+          level: 1,
+          title: 'Novice Challenger',
           emblem: emblem
         };
       } else {
@@ -4391,10 +4401,10 @@ class CustomLobbiesApp {
         btnOpenAuthModal.onclick = () => this.signOutUser();
       }
       if (userPassportTitle) {
-        userPassportTitle.textContent = this.user.title || '💎 Diamond Veteran';
+        userPassportTitle.textContent = this.user.title || this.equippedTitle || 'Novice Challenger';
       }
       if (userMMRValue) {
-        userMMRValue.textContent = `Level ${this.user.level || 8} (${this.user.elo || 1840} ELO)`;
+        userMMRValue.textContent = `Level ${this.user.level || 1} (${this.user.elo || 1500} ELO)`;
       }
     } else {
       if (authBtnLabel) {
@@ -4402,6 +4412,12 @@ class CustomLobbiesApp {
       }
       if (btnOpenAuthModal) {
         btnOpenAuthModal.onclick = () => this.openAuthModal();
+      }
+      if (userPassportTitle) {
+        userPassportTitle.textContent = this.equippedTitle || 'Novice Challenger';
+      }
+      if (userMMRValue) {
+        userMMRValue.textContent = '1,500 ELO';
       }
     }
     this.renderGamerPassportSidebar();
@@ -5380,7 +5396,7 @@ class CustomLobbiesApp {
         this.poolFeed.unshift({
           id: Date.now(),
           name: 'You (Queued)',
-          elo: 1840,
+          elo: (this.user && this.user.elo) ? this.user.elo : 1500,
           time: 'Just Now',
           isCaptain: false,
           votes: 1
@@ -5601,15 +5617,30 @@ class CustomLobbiesApp {
     if (!modal) return;
 
     this.activePassportPlayer = playerName;
-    const p = this.leaderboardData.find(user => user.name === playerName) || this.leaderboardData[0];
+    let p = this.leaderboardData.find(user => user.name === playerName);
+    if (!p) {
+      const isCurrentUser = (!playerName || playerName === 'Sean' || playerName === 'You (Host)' || (this.user && this.user.displayName === playerName));
+      p = {
+        name: isCurrentUser ? ((this.user && this.user.displayName) || 'Sean') : playerName,
+        avatar: isCurrentUser ? ((this.user && this.user.emblem) || '👑') : '🎮',
+        region: 'NA-East',
+        targetElo: (isCurrentUser && this.user && this.user.elo) ? this.user.elo : 1500,
+        honorPoints: 100,
+        commendations: { leadership: 0, friendly: 0, clutch: 0, teacher: 0 },
+        badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
+        writtenRemarks: [],
+        matchHistory: [],
+        games: {}
+      };
+    }
 
     document.getElementById('passportAvatar').textContent = p.avatar || '👑';
     document.getElementById('passportName').textContent = p.name;
-    document.getElementById('passportPrimaryRank').textContent = `${p.region} Region • ${p.targetElo || 1840} Rating`;
+    document.getElementById('passportPrimaryRank').textContent = `${p.region || 'Global'} Region • ${p.targetElo || 1500} Rating`;
 
     const passportHonorBadge = document.getElementById('passportHonorBadge');
     if (passportHonorBadge) {
-      const hTier = window.eloEngine.getHonorTier(p.honorPoints || 120);
+      const hTier = window.eloEngine ? window.eloEngine.getHonorTier(p.honorPoints || 100) : { badge: '👑', name: 'Honor Level 1: Standard', color: 'var(--accent-gold)' };
       passportHonorBadge.textContent = `${hTier.badge}: ${hTier.name}`;
       passportHonorBadge.style.color = hTier.color;
       passportHonorBadge.style.borderColor = hTier.color;
@@ -5617,30 +5648,39 @@ class CustomLobbiesApp {
 
     // Per-game ranks grid
     const gamesContainer = document.getElementById('passportGamesGrid');
-    if (gamesContainer && p.games) {
-      gamesContainer.innerHTML = Object.entries(p.games).map(([gName, gStat]) => {
-        const rInfo = window.eloEngine.getGameSpecificRank(gName, gStat.elo);
-        return `
-          <div style="background: rgba(255,255,255,0.03); padding: 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
-            <div style="font-weight: 800; color: var(--accent-cyan); font-size: 0.8rem;">${gName}</div>
-            <div style="font-weight: 800; color: ${rInfo.color}; margin: 0.2rem 0;">${rInfo.badge} (${gStat.elo} ELO)</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">${gStat.wins}W / ${gStat.losses}L • Win Rate: ${gStat.winRate}%</div>
-          </div>
-        `;
-      }).join('');
+    if (gamesContainer) {
+      if (p.games && Object.keys(p.games).length > 0) {
+        gamesContainer.innerHTML = Object.entries(p.games).map(([gName, gStat]) => {
+          const rInfo = window.eloEngine ? window.eloEngine.getGameSpecificRank(gName, gStat.elo) : { badge: 'Uncalibrated', color: 'var(--text-muted)' };
+          return `
+            <div style="background: rgba(255,255,255,0.03); padding: 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-weight: 800; color: var(--accent-cyan); font-size: 0.8rem;">${gName}</div>
+              <div style="font-weight: 800; color: ${rInfo.color}; margin: 0.2rem 0;">${rInfo.badge} (${gStat.elo} ELO)</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${gStat.wins}W / ${gStat.losses}L • Win Rate: ${gStat.winRate}%</div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        gamesContainer.innerHTML = '<div style="color: var(--text-dim); font-size: 0.8rem; padding: 0.8rem; text-align: center; grid-column: 1 / -1;">No calibrated game rankings yet. Play matches to earn game-specific ranks.</div>';
+      }
     }
 
     // Commendations & Bad Remarks calculations
-    const commends = p.commendations || { leadership: 15, friendly: 22, clutch: 28, teacher: 10 };
-    const remarks = p.badRemarks || { toxic: 1, afk: 0, griefing: 0, suspected: 0 };
+    const commends = p.commendations || { leadership: 0, friendly: 0, clutch: 0, teacher: 0 };
+    const remarks = p.badRemarks || { toxic: 0, afk: 0, griefing: 0, suspected: 0 };
 
     const totalCommends = (commends.leadership || 0) + (commends.friendly || 0) + (commends.clutch || 0) + (commends.teacher || 0);
     const totalRemarks = (remarks.toxic || 0) + (remarks.afk || 0) + (remarks.griefing || 0) + (remarks.suspected || 0);
-    const karmaPct = Math.round((totalCommends / (totalCommends + totalRemarks || 1)) * 100);
+    const totalKarmaEvents = totalCommends + totalRemarks;
+    const karmaPct = totalKarmaEvents > 0 ? Math.round((totalCommends / totalKarmaEvents) * 100) : 100;
 
     const karmaBadge = document.getElementById('passportKarmaBadge');
     if (karmaBadge) {
-      if (totalRemarks > 5) {
+      if (totalKarmaEvents === 0) {
+        karmaBadge.style.background = 'rgba(255, 255, 255, 0.08)';
+        karmaBadge.style.color = 'var(--text-muted)';
+        karmaBadge.textContent = '⭐ Unrated Karma';
+      } else if (totalRemarks > 5) {
         karmaBadge.style.background = 'rgba(255, 82, 82, 0.2)';
         karmaBadge.style.color = 'var(--accent-red)';
         karmaBadge.textContent = `⚠️ Warning Karma (${karmaPct}% Positivity)`;
@@ -5695,47 +5735,45 @@ class CustomLobbiesApp {
     // Written remarks & endorsements wall feed
     const remarksFeed = document.getElementById('passportRemarksFeed');
     if (remarksFeed) {
-      const comments = p.writtenRemarks || [
-        { id: 1, author: 'Valkyrie_CS', text: 'Insane clutch player! Always stays calm in 1v3 situations and calls great site retakes.', type: 'positive', date: '2 hours ago' },
-        { id: 2, author: 'ApexGod99', text: 'Awesome IGL shotcaller, great communication on Discord voice channel!', type: 'positive', date: '1 day ago' }
-      ];
-
-      remarksFeed.innerHTML = comments.map(c => `
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem 0.7rem; border-radius: 6px; font-size: 0.82rem;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
-            <strong style="color: var(--accent-cyan);">${c.author}</strong>
-            <span style="font-size: 0.75rem; color: var(--text-dim);">${c.date}</span>
+      const comments = p.writtenRemarks || [];
+      if (comments.length === 0) {
+        remarksFeed.innerHTML = '<div style="color: var(--text-dim); font-size: 0.8rem; padding: 0.8rem; text-align: center;">No written remarks or endorsements yet.</div>';
+      } else {
+        remarksFeed.innerHTML = comments.map(c => `
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem 0.7rem; border-radius: 6px; font-size: 0.82rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
+              <strong style="color: var(--accent-cyan);">${c.author}</strong>
+              <span style="font-size: 0.75rem; color: var(--text-dim);">${c.date}</span>
+            </div>
+            <p style="margin: 0; color: var(--text-main); font-size: 0.8rem;">${c.text}</p>
           </div>
-          <p style="margin: 0; color: var(--text-main); font-size: 0.8rem;">${c.text}</p>
-        </div>
-      `).join('');
+        `).join('');
+      }
     }
 
     // Render Player Recent Match History
     const historyContainer = document.getElementById('passportMatchHistoryList');
     if (historyContainer) {
-      const matchHistory = p.matchHistory || [
-        { id: 101, game: 'Counter-Strike 2', map: 'de_mirage', mode: '5v5 FACEIT Premier', score: '13 - 9', result: 'WIN', eloChange: '+26 ELO', kd: '22 / 11 / 7', hs: '64%', mvp: '👑 MVP' },
-        { id: 102, game: 'Empulse', map: 'Empulse Facility', mode: '5v5 Cyber Arena', score: '16 - 12', result: 'WIN', eloChange: '+24 ELO', kd: '25 / 10 / 8', hs: '72%', mvp: '⚡ MVP' },
-        { id: 103, game: 'REMATCH', map: 'Nexus Arena', mode: '5v5 Champion Scrim', score: '13 - 11', result: 'WIN', eloChange: '+28 ELO', kd: '28 / 14 / 6', hs: '68%', mvp: '👑 MVP' },
-        { id: 104, game: 'Valorant', map: 'Ascent', mode: '5v5 Radiant Scrim', score: '11 - 13', result: 'LOSS', eloChange: '-16 ELO', kd: '17 / 15 / 4', hs: '58%', mvp: '🎯 Top Fragger' }
-      ];
-
-      historyContainer.innerHTML = matchHistory.map(m => `
-        <div class="match-history-card ${m.result === 'WIN' ? 'match-result-win' : 'match-result-loss'}">
-          <div style="display: flex; align-items: center; gap: 0.8rem;">
-            <span class="${m.result === 'WIN' ? 'badge-win' : 'badge-loss'}">${m.result} (${m.score})</span>
-            <div>
-              <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">${m.game} • ${m.map}</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">${m.mode} • Performance: ${m.mvp}</div>
+      const matchHistory = p.matchHistory || [];
+      if (matchHistory.length === 0) {
+        historyContainer.innerHTML = '<div style="color: var(--text-dim); font-size: 0.8rem; padding: 0.8rem; text-align: center;">No recent match history recorded.</div>';
+      } else {
+        historyContainer.innerHTML = matchHistory.map(m => `
+          <div class="match-history-card ${m.result === 'WIN' ? 'match-result-win' : 'match-result-loss'}">
+            <div style="display: flex; align-items: center; gap: 0.8rem;">
+              <span class="${m.result === 'WIN' ? 'badge-win' : 'badge-loss'}">${m.result} (${m.score})</span>
+              <div>
+                <div style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">${m.game} • ${m.map}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">${m.mode} • Performance: ${m.mvp}</div>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 800; font-size: 0.85rem; color: var(--accent-gold);">${m.kd} (${m.hs} HS)</div>
+              <div style="font-size: 0.78rem; font-weight: 800; color: ${m.result === 'WIN' ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.eloChange}</div>
             </div>
           </div>
-          <div style="text-align: right;">
-            <div style="font-weight: 800; font-size: 0.85rem; color: var(--accent-gold);">${m.kd} (${m.hs} HS)</div>
-            <div style="font-size: 0.78rem; font-weight: 800; color: ${m.result === 'WIN' ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.eloChange}</div>
-          </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
     }
 
     modal.classList.add('active');
@@ -5803,70 +5841,100 @@ class CustomLobbiesApp {
     if (!input || !input.value.trim()) return;
 
     const text = input.value.trim();
-    const targetName = this.activePassportPlayer || 'RadiantReaper';
-    const p = this.leaderboardData.find(user => user.name === targetName);
+    const targetName = this.activePassportPlayer || (this.user ? this.user.displayName : 'You (Host)');
+    let p = this.leaderboardData.find(user => user.name === targetName);
 
-    if (p) {
-      if (!p.writtenRemarks) {
-        p.writtenRemarks = [
-          { id: 1, author: 'Valkyrie_CS', text: 'Insane clutch player! Always stays calm in 1v3 situations and calls great site retakes.', type: 'positive', date: '2 hours ago' },
-          { id: 2, author: 'ApexGod99', text: 'Awesome IGL shotcaller, great communication on Discord voice channel!', type: 'positive', date: '1 day ago' }
-        ];
-      }
-
-      p.writtenRemarks.unshift({
-        id: Date.now(),
-        author: 'You (Host)',
-        text: text,
-        type: 'positive',
-        date: 'Just now'
-      });
-
-      if (!p.commendations) p.commendations = { leadership: 10, friendly: 10, clutch: 10, teacher: 5 };
-      p.commendations.friendly = (p.commendations.friendly || 0) + 1;
-
-      input.value = '';
-
-      if (window.widgetBuilderEngine) {
-        window.widgetBuilderEngine.playSoundEffect('fanfare');
-      }
-
-      this.openPlayerPassportModal(targetName);
-      alert(`💬 REMARK POSTED!\n\nYour remark was published live to ${p.name}'s profile wall!`);
+    if (!p) {
+      const isCurrentUser = (!targetName || targetName === 'Sean' || targetName === 'You (Host)' || (this.user && this.user.displayName === targetName));
+      p = {
+        name: isCurrentUser ? ((this.user && this.user.displayName) || 'Sean') : targetName,
+        avatar: isCurrentUser ? ((this.user && this.user.emblem) || '👑') : '🎮',
+        region: 'NA-East',
+        targetElo: (isCurrentUser && this.user && this.user.elo) ? this.user.elo : 1500,
+        honorPoints: 100,
+        commendations: { leadership: 0, friendly: 0, clutch: 0, teacher: 0 },
+        badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
+        writtenRemarks: [],
+        matchHistory: [],
+        games: {}
+      };
+      this.leaderboardData.push(p);
     }
+
+    if (!p.writtenRemarks) {
+      p.writtenRemarks = [];
+    }
+
+    const authorName = (this.user && this.user.displayName) ? this.user.displayName : 'You (Host)';
+    p.writtenRemarks.unshift({
+      id: Date.now(),
+      author: authorName,
+      text: text,
+      type: 'positive',
+      date: 'Just now'
+    });
+
+    if (!p.commendations) p.commendations = { leadership: 0, friendly: 0, clutch: 0, teacher: 0 };
+    p.commendations.friendly = (p.commendations.friendly || 0) + 1;
+
+    input.value = '';
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    this.openPlayerPassportModal(targetName);
+    this.saveState();
+    alert(`💬 REMARK POSTED!\n\nYour remark was published live to ${p.name}'s profile wall!`);
   }
 
   triggerCommendPlayer(type) {
-    const targetName = this.activePassportPlayer || 'RadiantReaper';
-    const p = this.leaderboardData.find(user => user.name === targetName);
+    const targetName = this.activePassportPlayer || (this.user ? this.user.displayName : 'You (Host)');
+    let p = this.leaderboardData.find(user => user.name === targetName);
 
-    if (p) {
-      if (!p.commendations) {
-        p.commendations = { leadership: 10, friendly: 10, clutch: 10, teacher: 5 };
-      }
-      p.commendations[type] = (p.commendations[type] || 0) + 1;
-
-      if (window.widgetBuilderEngine) {
-        window.widgetBuilderEngine.playSoundEffect('fanfare');
-      }
-
-      this.openPlayerPassportModal(targetName);
-      this.renderLeaderboard();
-
-      const titles = {
-        leadership: '🧠 Leadership & Shotcalling',
-        friendly: '🎯 Sportsmanship & Friendly Teammate',
-        clutch: '⚡ Clutch Player & Aim Skill',
-        teacher: '🎓 Helpful Teacher & Guide'
+    if (!p) {
+      const isCurrentUser = (!targetName || targetName === 'Sean' || targetName === 'You (Host)' || (this.user && this.user.displayName === targetName));
+      p = {
+        name: isCurrentUser ? ((this.user && this.user.displayName) || 'Sean') : targetName,
+        avatar: isCurrentUser ? ((this.user && this.user.emblem) || '👑') : '🎮',
+        region: 'NA-East',
+        targetElo: (isCurrentUser && this.user && this.user.elo) ? this.user.elo : 1500,
+        honorPoints: 100,
+        commendations: { leadership: 0, friendly: 0, clutch: 0, teacher: 0 },
+        badRemarks: { toxic: 0, afk: 0, griefing: 0, suspected: 0 },
+        writtenRemarks: [],
+        matchHistory: [],
+        games: {}
       };
-
-      alert(`⭐ PLAYER COMMENDED!\n\nYou awarded +1 Commendation for "${titles[type]}" to ${p.name}!`);
+      this.leaderboardData.push(p);
     }
+
+    if (!p.commendations) {
+      p.commendations = { leadership: 0, friendly: 0, clutch: 0, teacher: 0 };
+    }
+    p.commendations[type] = (p.commendations[type] || 0) + 1;
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('fanfare');
+    }
+
+    this.openPlayerPassportModal(targetName);
+    this.renderLeaderboard();
+    this.saveState();
+
+    const titles = {
+      leadership: '🧠 Leadership & Shotcalling',
+      friendly: '🎯 Sportsmanship & Friendly Teammate',
+      clutch: '⚡ Clutch Player & Aim Skill',
+      teacher: '🎓 Helpful Teacher & Guide'
+    };
+
+    alert(`⭐ PLAYER COMMENDED!\n\nYou awarded +1 Commendation for "${titles[type]}" to ${p.name}!`);
   }
 
   triggerBadRemarkPlayer() {
-    const targetName = this.activePassportPlayer || 'RadiantReaper';
-    const p = this.leaderboardData.find(user => user.name === targetName);
+    const targetName = this.activePassportPlayer || (this.user ? this.user.displayName : 'You (Host)');
+    let p = this.leaderboardData.find(user => user.name === targetName);
 
     if (p) {
       const reason = prompt(`⚠️ REPORT MISCONDUCT FOR ${p.name}:\n\nChoose category code:\n1 - ☣️ Toxic / Verbal Abuse\n2 - 🏃 AFK / Match Leaver\n3 - 🛑 Griefing / Team Flash\n4 - ⚠️ Suspected Cheating\n\nEnter number (1-4):`, '1');
@@ -5918,7 +5986,7 @@ class CustomLobbiesApp {
                   <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: ${hTier.color}; font-size: 0.7rem; padding: 0.1rem 0.4rem; border: 1px solid ${hTier.color};">${hTier.badge}</span>
                   <span class="lobby-game-tag" style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted); font-size: 0.7rem; padding: 0.1rem 0.4rem;">${flagStatus}</span>
                 </div>
-                <div style="font-size: 0.78rem; color: var(--text-muted);">${p.region} • ${p.targetElo || 1840} ELO • Honor XP: ${p.honorPoints || 120}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">${p.region || 'Global'} • ${p.targetElo || 1500} ELO • Honor XP: ${p.honorPoints || 100}</div>
               </div>
             </div>
 
@@ -7399,7 +7467,7 @@ class CustomLobbiesApp {
       id: 'pulse_' + Date.now(),
       author: this.user ? this.user.displayName : 'Sean (You)',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sean',
-      rank: '💎 Diamond (1840 MMR)',
+      rank: (this.user && this.user.title) ? `${this.user.title} (${this.user.elo || 1500} MMR)` : `${this.equippedTitle || 'Novice Challenger'} (1,500 MMR)`,
       game,
       gameIcon: '🎮',
       time: 'Just now',

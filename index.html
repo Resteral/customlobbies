@@ -172,13 +172,13 @@
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
         <div style="display: flex; gap: 0.4rem; align-items: center;">
           <div class="mmr-badge" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); border-color: var(--accent-gold); padding: 0.35rem 0.7rem; font-size: 0.82rem; font-weight: 900;" title="Earn +50 Points per match played & +100 Points per win!">
-            <span>🪙</span> <span id="userCLPointsValue">2,450 Pts</span>
+            <span>🪙</span> <span id="userCLPointsValue">0 Pts</span>
           </div>
           <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 0.2rem 0.5rem; font-size: 0.75rem; font-weight: 800;" title="Guardian Kernel Anti-Cheat Engine Active">
             🛡️ AC Active
           </span>
-          <div class="mmr-badge" id="userMMRBadge" style="padding: 0.35rem 0.8rem; font-size: 0.82rem; cursor: pointer;" onclick="window.app.openPlayerPassportModal(window.app.user ? window.app.user.displayName : 'Sean')" title="Click to view full Gamer Passport & ELO stats!">
-            <span>👑</span> <span id="userPassportTitle">💎 Diamond</span> • <span id="userMMRValue">1840 ELO</span>
+          <div class="mmr-badge" id="userMMRBadge" style="padding: 0.35rem 0.8rem; font-size: 0.82rem; cursor: pointer;" onclick="window.app.openPlayerPassportModal(window.app.user ? window.app.user.displayName : 'You (Host)')" title="Click to view full Gamer Passport & ELO stats!">
+            <span>👑</span> <span id="userPassportTitle">Novice Challenger</span> • <span id="userMMRValue">1,500 ELO</span>
           </div>
         </div>
       </div>
@@ -734,7 +734,7 @@
             <div style="text-align: center; margin-bottom: 1.2rem;">
               <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); margin: 0 auto 0.6rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--accent-gold); cursor: pointer; transition: transform 0.2s;" id="userProfileEmblemAvatar" onclick="window.app.promptCustomizePassportEmblem()" title="Click to Change Custom Gamer Crest / Emblem">👑</div>
               <h4 style="font-size: 1.1rem; font-weight: 800; margin: 0;" id="userPassportDisplayName">You (Host)</h4>
-              <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.2rem;" id="userPassportSubTitle">💎 Diamond Veteran (1840 MMR)</p>
+              <p style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.2rem;" id="userPassportSubTitle">Novice Challenger (1,500 MMR)</p>
               <button class="btn btn-purple btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; margin-top: 0.4rem; gap: 0.3rem;" onclick="window.app.promptCustomizePassportEmblem()">
                 <span>🎨</span> Custom Emblem
               </button>
@@ -1642,7 +1642,7 @@
           </div>
         </div>
         <div style="display: flex; gap: 0.8rem; align-items: center;">
-          <span class="mmr-badge" style="font-size: 0.9rem; padding: 0.5rem 1rem;">👑 Level 8 (1840 ELO)</span>
+          <span class="mmr-badge" id="matchmakingHubUserMMRBadge" style="font-size: 0.9rem; padding: 0.5rem 1rem;">👑 Level 1 (1,500 ELO)</span>
           <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 0.4rem 0.8rem; font-size: 0.85rem; font-weight: 900;">
             🛡️ Guardian AC Verified
           </span>
@@ -1744,7 +1744,7 @@
             <div style="background: rgba(0,0,0,0.4); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1rem;">
               <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; margin-bottom: 0.4rem;">
                 <span>You (Host)</span>
-                <span style="color: var(--accent-gold);">1840 ELO</span>
+                <span id="mmPartyHostELO" style="color: var(--accent-gold);">1,500 ELO</span>
               </div>
               <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); font-size: 0.72rem;">✔ Ready</span>
             </div>
@@ -3285,10 +3285,10 @@
         <div style="display: flex; align-items: center; gap: 1rem;">
           <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 2px solid var(--accent-gold);" id="passportAvatar">👑</div>
           <div>
-            <h3 style="font-size: 1.4rem; font-weight: 900; margin: 0;" id="passportName">RadiantReaper</h3>
+            <h3 style="font-size: 1.4rem; font-weight: 900; margin: 0;" id="passportName">Player Profile</h3>
             <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.3rem; flex-wrap: wrap;">
-              <span class="mmr-badge" id="passportPrimaryRank">🔴 Radiant #14 (2540 MMR)</span>
-              <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 900;" id="passportHonorBadge">👑 Honor Level 5: Legend</span>
+              <span class="mmr-badge" id="passportPrimaryRank">Unrated Rating</span>
+              <span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-weight: 900;" id="passportHonorBadge">👑 Honor Level 1: Standard</span>
               <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);" id="passportACStatus">🛡️ Guardian AC Verified</span>
             </div>
           </div>
@@ -3311,8 +3311,8 @@
           <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--accent-gold); margin: 0; display: flex; align-items: center; gap: 0.4rem;">
             <span>⭐</span> Player Reputation & Karma Score
           </h4>
-          <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); font-weight: 900; font-size: 0.82rem;" id="passportKarmaBadge">
-            👍 98% Positive Karma
+          <span class="lobby-game-tag" style="background: rgba(255, 255, 255, 0.08); color: var(--text-muted); font-weight: 900; font-size: 0.82rem;" id="passportKarmaBadge">
+            ⭐ Unrated Karma
           </span>
         </div>
 
@@ -3322,7 +3322,7 @@
           <div style="background: rgba(0, 230, 118, 0.05); padding: 0.8rem; border-radius: 6px; border: 1px solid rgba(0, 230, 118, 0.2);">
             <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-green); margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
               <span>👍 Positive Commendations</span>
-              <span id="passportTotalCommends" style="font-weight: 900;">+84</span>
+              <span id="passportTotalCommends" style="font-weight: 900;">+0</span>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: 0.78rem;" id="passportCommendsGrid">
               <!-- Injected via app.js -->
@@ -3333,7 +3333,7 @@
           <div style="background: rgba(255, 82, 82, 0.05); padding: 0.8rem; border-radius: 6px; border: 1px solid rgba(255, 82, 82, 0.2);">
             <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-red); margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
               <span>👎 Bad Remarks & Reports</span>
-              <span id="passportTotalRemarks" style="font-weight: 900;">-1</span>
+              <span id="passportTotalRemarks" style="font-weight: 900;">-0</span>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: 0.78rem;" id="passportRemarksGrid">
               <!-- Injected via app.js -->
@@ -4948,19 +4948,19 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.2rem;">
         <div style="background: rgba(0, 230, 118, 0.08); border: 1px solid rgba(0, 230, 118, 0.3); padding: 0.8rem; border-radius: 8px; text-align: center;">
           <div style="font-size: 0.72rem; color: var(--text-muted);">COMPLETION RATE</div>
-          <div style="font-size: 1.5rem; font-weight: 900; color: #00e676;" id="relRate">99.2%</div>
-          <div style="font-size: 0.68rem; color: #00e676;" id="relBadge">🛡️ Verified Pristine</div>
+          <div style="font-size: 1.5rem; font-weight: 900; color: #00e676;" id="relRate">100%</div>
+          <div style="font-size: 0.68rem; color: #00e676;" id="relBadge">🛡️ Verified Gamer</div>
         </div>
         <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.3); padding: 0.8rem; border-radius: 8px; text-align: center;">
           <div style="font-size: 0.72rem; color: var(--text-muted);">COMPLETED MATCHES</div>
-          <div style="font-size: 1.5rem; font-weight: 900; color: #00f2fe;" id="relCount">124 Matches</div>
+          <div style="font-size: 1.5rem; font-weight: 900; color: #00f2fe;" id="relCount">0 Matches</div>
           <div style="font-size: 0.68rem; color: var(--text-muted);" id="relNoShows">0 No-Shows</div>
         </div>
       </div>
 
       <div style="background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1rem;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.82rem; font-weight: 700; color: #fff;">Honor Standing: <span id="relHonor" style="color: var(--accent-gold);">Level 5 (Legendary)</span></span>
+          <span style="font-size: 0.82rem; font-weight: 700; color: #fff;">Honor Standing: <span id="relHonor" style="color: var(--accent-gold);">Level 1 (Standard)</span></span>
           <button class="btn btn-secondary btn-xs" onclick="window.app.submitDisputeAppeal()">⚠️ Appeal Report</button>
         </div>
       </div>

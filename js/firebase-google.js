@@ -50,7 +50,7 @@ class FirebaseGoogleEngine {
         // Sign Out
         this.user = null;
         btnGoogle.innerHTML = '<span>🔴</span> Sign in with Google';
-        document.getElementById('userMMRValue').textContent = '1840 MMR';
+        document.getElementById('userMMRValue').textContent = '1,500 ELO';
         alert('Signed out from Google Account.');
       } else {
         // Simulate Google Identity Provider Login

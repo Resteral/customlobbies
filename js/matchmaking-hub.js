@@ -12,12 +12,12 @@ class MatchmakingHubEngine {
     this.partyMembers = ['You (Host)'];
 
     // Recent Match History Scorecards
-    this.matchHistory = [
-      { id: 'MM-9042', game: 'Counter-Strike 2', mode: '5v5 Premier', map: 'de_mirage', result: 'VICTORY 13 - 9', eloChange: '+25 ELO', mvp: 'RadiantReaper', date: '20 mins ago' },
-      { id: 'MM-9039', game: 'Slapshot: Rebound', mode: '3v3 Arcade', map: 'Puck Arena Stadium', result: 'VICTORY 5 - 2', eloChange: '+20 ELO', mvp: 'PuckMaster99', date: '2 hours ago' },
-      { id: 'MM-9031', game: 'Empulse', mode: '5v5 Premier', map: 'Empulse Facility', result: 'DEFEAT 11 - 13', eloChange: '-15 ELO', mvp: 'Empulse_Overlord', date: '5 hours ago' },
-      { id: 'MM-9025', game: 'REMATCH', mode: '5v5 Premier', map: 'Nexus Arena', result: 'VICTORY 13 - 7', eloChange: '+28 ELO', mvp: 'Rematch_God', date: '1 day ago' }
-    ];
+    try {
+      const savedHistory = localStorage.getItem('cl_mm_match_history');
+      this.matchHistory = savedHistory ? JSON.parse(savedHistory) : [];
+    } catch(e) {
+      this.matchHistory = [];
+    }
   }
 
   // Start Searching for Match
@@ -121,6 +121,9 @@ class MatchmakingHubEngine {
     };
 
     this.matchHistory.unshift(newMatch);
+    try {
+      localStorage.setItem('cl_mm_match_history', JSON.stringify(this.matchHistory));
+    } catch(e) {}
   }
 }
 

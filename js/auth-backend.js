@@ -326,9 +326,9 @@ class AuthBackendEngine {
         username: data.user.user_metadata?.username || usernameOrEmail.split('@')[0],
         displayName: data.user.user_metadata?.username || usernameOrEmail.split('@')[0],
         email: data.user.email,
-        elo: 1840,
+        elo: 1500,
         level: 1,
-        title: 'Supabase Member',
+        title: 'Novice Challenger',
         avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=100&auto=format&fit=crop&q=80',
         acVerified: true
       };

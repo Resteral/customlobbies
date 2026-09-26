@@ -101,14 +101,14 @@ class WardogsEngine {
   }
 
   // Register Solo Mercenary
-  registerSoloMercenary(handle, callsign, game, role, elo = 1840) {
+  registerSoloMercenary(handle, callsign, game, role, elo = 1500) {
     const newMerc = {
       id: Date.now(),
       name: handle || 'Operative_X',
       callsign: callsign ? callsign.toUpperCase() : `DOG-${Math.floor(Math.random() * 90 + 10)}`,
       game: game || 'WARDOGS',
       role: role || '⚡ Breacher / Assault',
-      elo: parseInt(elo) || 1840,
+      elo: parseInt(elo) || 1500,
       kd: '2.00',
       status: 'Available',
       contracts: 1,

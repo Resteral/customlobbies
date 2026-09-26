@@ -329,11 +329,11 @@ class LeaguesEngine {
   getReliabilityProfile(userHandle) {
     if (!this.playerReliability[userHandle]) {
       this.playerReliability[userHandle] = {
-        completionRate: '98.5%',
-        completedMatches: 45 + Math.floor(Math.random() * 50),
-        noShows: Math.floor(Math.random() * 2),
+        completionRate: '100%',
+        completedMatches: 0,
+        noShows: 0,
         trustBadge: '🛡️ Verified Gamer',
-        honorLevel: 'Level 4 (Honorable)',
+        honorLevel: 'Level 1 (Standard)',
         activeAppeals: 0
       };
     }
