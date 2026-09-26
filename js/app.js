@@ -4130,19 +4130,39 @@ class CustomLobbiesApp {
   }
 
   setupTabNavigation() {
+    if (this._tabNavInitialized) return;
+    this._tabNavInitialized = true;
+
     const btns = document.querySelectorAll('.nav-btn');
     const moreMenu = document.getElementById('navMoreDropdownMenu');
     const moreBtn = document.getElementById('navMoreDropdownBtn');
     const moreLabel = document.getElementById('navMoreBtnLabel');
+    const moreWrapper = document.getElementById('navMoreDropdownWrapper');
 
     // Close More dropdown helper
     const closeMoreDropdown = () => {
-      if (document.activeElement) document.activeElement.blur();
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
       if (moreMenu) {
-        moreMenu.style.display = 'none';
-        setTimeout(() => { if (moreMenu) moreMenu.style.display = ''; }, 250);
+        moreMenu.classList.add('dropdown-menu-closed');
       }
     };
+
+    if (moreWrapper && moreMenu) {
+      moreWrapper.addEventListener('mouseenter', () => {
+        moreMenu.classList.remove('dropdown-menu-closed');
+      });
+      moreBtn?.addEventListener('focus', () => {
+        moreMenu.classList.remove('dropdown-menu-closed');
+      });
+      moreBtn?.addEventListener('click', (e) => {
+        if (moreMenu.classList.contains('dropdown-menu-closed')) {
+          e.stopPropagation();
+          moreMenu.classList.remove('dropdown-menu-closed');
+        }
+      });
+    }
 
     // Close when clicking dropdown items that trigger modals/actions without data-tab
     if (moreMenu) {
@@ -4152,6 +4172,27 @@ class CustomLobbiesApp {
         });
       });
     }
+
+    // Setup interactive closing for other dropdown menus (Auto-Draft, Match Tools, Queue Options)
+    document.querySelectorAll('.dropdown-wrapper').forEach(wrapper => {
+      const menu = wrapper.querySelector('.dropdown-menu');
+      if (!menu) return;
+      wrapper.addEventListener('mouseenter', () => {
+        menu.classList.remove('dropdown-menu-closed');
+      });
+      const btn = wrapper.querySelector('button');
+      btn?.addEventListener('focus', () => {
+        menu.classList.remove('dropdown-menu-closed');
+      });
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+          }
+          menu.classList.add('dropdown-menu-closed');
+        });
+      });
+    });
 
     btns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -4182,37 +4223,47 @@ class CustomLobbiesApp {
         const targetSection = document.getElementById(tabId);
         if (targetSection) {
           targetSection.classList.add('active');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo(0, 0);
         }
 
-        // Dynamically re-render target view components so user never needs a manual page refresh!
-        if (tabId === 'lobbies-view') {
-          this.renderLobbies();
-          this.renderMyCreatedTeams();
-          this.renderFrontpageServers();
-          if (window.tournamentsStoreEngine) window.tournamentsStoreEngine.renderDashboardBracketWidget();
-        } else if (tabId === 'servers-view') {
-          this.renderFrontpageServers();
-        } else if (tabId === 'tournaments-view') {
-          if (window.tournamentsStoreEngine) {
-            window.tournamentsStoreEngine.renderTournaments();
-            window.tournamentsStoreEngine.renderMonthlyCalendarGrid();
+        // Dynamically re-render target view components asynchronously so UI thread stays 60fps and never freezes
+        requestAnimationFrame(() => {
+          try {
+            if (tabId === 'lobbies-view') {
+              this.renderLobbies();
+              this.renderMyCreatedTeams();
+              this.renderFrontpageServers();
+              if (window.tournamentsStoreEngine && typeof window.tournamentsStoreEngine.renderDashboardBracketWidget === 'function') {
+                window.tournamentsStoreEngine.renderDashboardBracketWidget();
+              }
+            } else if (tabId === 'servers-view') {
+              this.renderFrontpageServers();
+            } else if (tabId === 'tournaments-view') {
+              if (window.tournamentsStoreEngine) {
+                if (typeof window.tournamentsStoreEngine.renderTournaments === 'function') window.tournamentsStoreEngine.renderTournaments();
+                if (typeof window.tournamentsStoreEngine.renderMonthlyCalendarGrid === 'function') window.tournamentsStoreEngine.renderMonthlyCalendarGrid();
+              }
+            } else if (tabId === 'community-view') {
+              if (window.chatVoiceManager) {
+                if (typeof window.chatVoiceManager.renderMessages === 'function') window.chatVoiceManager.renderMessages();
+                if (typeof window.chatVoiceManager.renderOnlineUsers === 'function') window.chatVoiceManager.renderOnlineUsers();
+                if (typeof window.chatVoiceManager.renderDashboardStickers === 'function') window.chatVoiceManager.renderDashboardStickers();
+              }
+            } else if (tabId === 'debate-view') {
+              this.renderDebateLobbies();
+            } else if (tabId === 'leaderboard-view') {
+              this.renderLeaderboard();
+            } else if (tabId === 'wardogs-view') {
+              this.renderWardogsView();
+            } else if (tabId === 'matchmaking-view') {
+              if (window.matchmakingHubEngine && typeof window.matchmakingHubEngine.updateRadarUI === 'function') {
+                window.matchmakingHubEngine.updateRadarUI();
+              }
+            }
+          } catch (renderErr) {
+            console.warn('Non-blocking error during tab view render:', renderErr);
           }
-        } else if (tabId === 'community-view') {
-          if (window.chatVoiceManager) {
-            window.chatVoiceManager.renderMessages();
-            window.chatVoiceManager.renderOnlineUsers();
-            window.chatVoiceManager.renderDashboardStickers();
-          }
-        } else if (tabId === 'debate-view') {
-          this.renderDebateLobbies();
-        } else if (tabId === 'leaderboard-view') {
-          this.renderLeaderboard();
-        } else if (tabId === 'wardogs-view') {
-          this.renderWardogsView();
-        } else if (tabId === 'matchmaking-view') {
-          if (window.matchmakingHubEngine) window.matchmakingHubEngine.updateRadarUI();
-        }
+        });
       });
     });
   }

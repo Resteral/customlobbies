@@ -210,17 +210,27 @@ body {
 /* Ensure parent card stacking context elevates above subsequent sibling cards when a dropdown inside it is open */
 .card:has(.dropdown-wrapper:hover),
 .card:has(.dropdown-wrapper:focus-within),
-div:has(.dropdown-wrapper:hover),
-div:has(.dropdown-wrapper:focus-within) {
+.navbar:has(.nav-dropdown-wrapper:hover),
+.navbar:has(.nav-dropdown-wrapper:focus-within),
+.header-bar:has(.dropdown-wrapper:hover),
+.header-bar:has(.dropdown-wrapper:focus-within),
+.lobby-filter-bar:has(.dropdown-wrapper:hover),
+.lobby-filter-bar:has(.dropdown-wrapper:focus-within) {
   position: relative;
   z-index: 10000 !important;
 }
 
-.nav-dropdown-wrapper:hover .nav-dropdown-menu,
-.nav-dropdown-wrapper:focus-within .nav-dropdown-menu,
-.dropdown-wrapper:hover .dropdown-menu,
-.dropdown-wrapper:focus-within .dropdown-menu {
+.nav-dropdown-wrapper:hover .nav-dropdown-menu:not(.dropdown-menu-closed),
+.nav-dropdown-wrapper:focus-within .nav-dropdown-menu:not(.dropdown-menu-closed),
+.dropdown-wrapper:hover .dropdown-menu:not(.dropdown-menu-closed),
+.dropdown-wrapper:focus-within .dropdown-menu:not(.dropdown-menu-closed) {
   display: flex;
+}
+
+.nav-dropdown-menu.dropdown-menu-closed,
+.dropdown-menu.dropdown-menu-closed {
+  display: none !important;
+  pointer-events: none !important;
 }
 
 .dropdown-item {
