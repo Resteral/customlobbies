@@ -373,6 +373,9 @@
               <button class="dropdown-item" onclick="window.app.openMapVetoModal('Counter-Strike 2')">🗺️ Map Veto Room</button>
               <button class="dropdown-item" onclick="window.app.openChromeExtensionModal()">🧩 Chrome Extension Overlay</button>
             </div>
+            <button class="btn btn-purple btn-sm" onclick="const btn = document.querySelector('[data-tab=\'community-view\']'); if(btn) btn.click();" title="Jump to Community Hub Comms & Channels" style="background: rgba(88, 101, 242, 0.25); border-color: #5865F2; color: #fff; font-weight: 800;">
+              <span>💬</span> Community Hub
+            </button>
           </div>
         </div>
 
@@ -990,6 +993,21 @@
               <div class="channel-item" data-channel="arkheron" title="Arkheron 5v5 Dark Fantasy Arena"><div class="channel-item-left"><span>🏰</span> # arkheron</div><button class="channel-delete-btn" onclick="event.stopPropagation(); window.chatVoiceManager.confirmDeleteChannel('arkheron')" title="Delete Channel">🗑️</button></div>
             </div>
 
+            <!-- Category: LIVE CUSTOM LOBBIES (Direct Connection to Active Lobbies) -->
+            <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--accent-cyan); display: flex; align-items: center; gap: 0.4rem;">
+                <span class="live-dot" style="width: 7px; height: 7px; background: var(--accent-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--accent-cyan); display: inline-block;"></span>
+                <span>🎮 LIVE CUSTOM LOBBIES</span>
+              </span>
+              <div style="display: flex; gap: 0.25rem;">
+                <button class="add-channel-btn" id="btnBrowseAllCustomLobbies" onclick="event.stopPropagation(); const btn = document.querySelector('[data-tab=\'lobbies-view\']'); if(btn) btn.click();" title="Browse All Active Custom Lobbies" style="font-size: 0.72rem; padding: 0 0.35rem;">⚡</button>
+                <button class="add-channel-btn" id="btnRefreshLobbyChannels" onclick="event.stopPropagation(); window.chatVoiceManager.syncCustomLobbiesChannels();" title="Refresh Live Lobby Channels">🔄</button>
+              </div>
+            </div>
+            <div id="textChannelsCustomLobbies">
+              <!-- Dynamically populated from window.app.lobbies -->
+            </div>
+
             <!-- Category: TEAMS & SQUADS CHANNELS -->
             <div class="channel-section-title" style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
               <span>🛡️ TEAM & CLAN CHANNELS</span>
@@ -1024,6 +1042,8 @@
             <div id="voiceChannelsList">
               <!-- Team Voice Comms injected here -->
               <div id="voiceChannelsTeams"></div>
+              <!-- Live Custom Lobbies Voice Rooms injected here -->
+              <div id="voiceChannelsCustomLobbies"></div>
               <!-- Private Lobby Voice Rooms injected here -->
               <div id="voiceChannelsPrivateLobbies"></div>
               <div class="channel-item" data-voice="general-lounge">
@@ -1101,6 +1121,9 @@
             <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
               <button class="btn btn-success btn-sm" onclick="window.chatVoiceManager.syncVoiceToCurrentChannel()" title="Sync and Auto-Join the Voice Channel for this Text Room">
                 <span>🎙️</span> Sync Voice
+              </button>
+              <button class="btn btn-primary btn-sm" id="btnHeaderCustomLobbies" onclick="const btn = document.querySelector('[data-tab=\'lobbies-view\']'); if(btn) btn.click();" title="Open Custom Lobbies & Matchmaking Hub" style="box-shadow: 0 0 12px rgba(0, 242, 254, 0.3); font-weight: 800;">
+                <span>🎮</span> Custom Lobbies
               </button>
               <button class="btn btn-cyan btn-sm" id="btnHeaderChannelPool" onclick="const btn = document.querySelector('[data-tab=\'lobbies-view\']'); if(btn) btn.click();" title="Go to Team Pool & Lobbies Hub">
                 <span>👥</span> Team Pool
@@ -1184,6 +1207,41 @@
               </button>
               <button class="btn btn-danger btn-sm" id="btnTeamDeleteChannel" onclick="window.chatVoiceManager.confirmDeleteCurrentChannel()" title="Delete this Squad Channel">
                 <span>🗑️</span> Delete Squad
+              </button>
+            </div>
+          </div>
+
+          <!-- In-Channel Live Custom Lobby Action Bar (Direct Game Connect, Draft, IP, Queue) -->
+          <div id="channelCustomLobbyActionBar" class="channel-custom-lobby-action-bar" style="display: none; background: linear-gradient(135deg, rgba(8, 14, 26, 0.95), rgba(16, 24, 42, 0.98)); border-bottom: 1px solid var(--accent-cyan); padding: 0.75rem 1.25rem; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; box-shadow: 0 4px 20px rgba(0, 242, 254, 0.15);">
+            <div style="display: flex; align-items: center; gap: 0.85rem; min-width: 260px;">
+              <span id="channelCustomLobbyIcon" style="font-size: 1.8rem;">🎮</span>
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <span id="channelCustomLobbyTitle" style="font-weight: 900; font-size: 1.05rem; color: #fff;">CS2 128-Tick Premier Scrim #104</span>
+                  <span class="lobby-game-tag" id="channelCustomLobbyStatusTag" style="background: rgba(0, 230, 118, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); font-weight: 800; font-size: 0.7rem;">🔥 RECRUITING</span>
+                  <span class="lobby-game-tag" id="channelCustomLobbyGameTag" style="background: rgba(0, 242, 254, 0.2); color: var(--accent-cyan); font-weight: 800; font-size: 0.7rem;">Counter-Strike 2</span>
+                  <span class="lobby-game-tag" id="channelCustomLobbyPlayersTag" style="background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); font-weight: 800; font-size: 0.7rem;">8/10 Players</span>
+                </div>
+                <div id="channelCustomLobbyDetail" style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem;">
+                  Host: S1mple_Pro • Map: de_mirage • Server: 192.168.1.85:27015 • 128-Tick Dedicated
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-sm" id="btnLobbyBarJoinQueue" onclick="window.chatVoiceManager.connectActiveLobbyDirect()" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); font-weight: 800; padding: 0.45rem 0.9rem;">
+                <span>⚡</span> Join / Connect Lobby
+              </button>
+              <button class="btn btn-cyan btn-sm" id="btnLobbyBarDirectDraft" onclick="window.chatVoiceManager.launchLobbyDraftDirect()" style="font-weight: 800; padding: 0.45rem 0.8rem;">
+                <span>🐍</span> Snake Draft
+              </button>
+              <button class="btn btn-purple btn-sm" id="btnLobbyBarVoice" onclick="window.chatVoiceManager.joinActiveLobbyVoice()" style="font-weight: 800; padding: 0.45rem 0.8rem;">
+                <span>🎙️</span> Join Voice
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnLobbyBarCopyIP" onclick="window.chatVoiceManager.copyActiveLobbyIP()" title="Copy Server Console Command">
+                <span>📋</span> Copy IP
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnLobbyBarOpenCard" onclick="window.chatVoiceManager.goToLobbyInLobbiesView()" title="Jump to Lobby Card in Lobbies Hub">
+                <span>🎮</span> View in Lobbies
               </button>
             </div>
           </div>

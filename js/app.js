@@ -342,6 +342,9 @@ class CustomLobbiesApp {
       localStorage.setItem('cl_captain_opt_out', this.userCaptainOptOut ? 'true' : 'false');
       localStorage.setItem('cl_player_opt_outs', JSON.stringify([...(this.playerCaptainOptOuts || [])]));
       this.saveFrontpageServers();
+      if (window.chatVoiceManager && typeof window.chatVoiceManager.syncCustomLobbiesChannels === 'function') {
+        window.chatVoiceManager.syncCustomLobbiesChannels();
+      }
     } catch (e) {
       console.warn('Error saving app state:', e);
     }
@@ -372,6 +375,9 @@ class CustomLobbiesApp {
     this.setupGameDraftPoolButton();
     this.setupLeaderboardHandlers();
     this.updateCaptainOptOutUI();
+    if (window.chatVoiceManager && typeof window.chatVoiceManager.syncCustomLobbiesChannels === 'function') {
+      window.chatVoiceManager.syncCustomLobbiesChannels();
+    }
   }
 
   loadFavorites() {
@@ -4145,14 +4151,15 @@ class CustomLobbiesApp {
   }
 
   connectLobbyVoice(lobbyTitle) {
+    if (window.chatVoiceManager && typeof window.chatVoiceManager.openLobbyChannelByTitle === 'function') {
+      window.chatVoiceManager.openLobbyChannelByTitle(lobbyTitle);
+      return;
+    }
     const communityTabBtn = document.querySelector('[data-tab="community-view"]');
     if (communityTabBtn) communityTabBtn.click();
-
-    if (window.chatVoiceEngine) {
-      window.chatVoiceEngine.connectVoiceRoom(101, '🔊 Team 1 - Alpha');
+    if (window.chatVoiceManager) {
+      window.chatVoiceManager.selectVoiceRoom('voice-lobby-general');
     }
-
-    alert(`🎙️ CONNECTED TO VOICE!\n\nJoined Team 1 Voice Room for custom lobby "${lobbyTitle}". Mic active!`);
   }
 
   setupRandomPickerHandler() {
@@ -5011,7 +5018,7 @@ class CustomLobbiesApp {
                 (${spotsLeft > 0 ? `${spotsLeft} Spots Left • Open to Join` : 'Full Match'})
               </span>
             </div>
-            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
               ${spotsLeft > 0 ? `
                 <button class="btn btn-primary btn-sm" onclick="window.app.joinAndQueueLobby('${l.id}')" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); font-weight: 800; padding: 0.35rem 0.75rem;">
                   <span>⚡</span> Queue Up / Join (${l.players}/${l.max})
@@ -5019,10 +5026,12 @@ class CustomLobbiesApp {
               ` : `
                 <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.6;">Full</button>
               `}
+              <button class="btn btn-purple btn-sm" onclick="window.chatVoiceManager ? window.chatVoiceManager.openLobbyChannel('${l.id}') : window.app.connectLobbyVoice('${l.title}')" title="Open Dedicated Live Chat & Voice Comms in Community Hub" style="background: rgba(88, 101, 242, 0.25); border-color: #5865F2; color: #fff; font-weight: 800; box-shadow: 0 0 12px rgba(88, 101, 242, 0.3);">
+                <span>💬</span> Hub & Voice
+              </button>
               <button class="btn btn-cyan btn-sm" onclick="window.app.launchFaceitMatchRoom('${l.title}', '${l.game}')">🏆 Direct Join</button>
               <button class="btn btn-purple btn-sm" onclick="window.app.triggerLobbySnakeDraft('${l.title}', '${l.game}')" title="Launch Snake Draft Board">🐍 Draft</button>
               <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('${l.serverIp || '192.168.1.85:27015'}')" title="Copy IP">📋 IP</button>
-              <button class="btn btn-secondary btn-sm" onclick="window.app.connectLobbyVoice('${l.title}')" title="Voice">🎙️</button>
             </div>
           </div>
         </div>

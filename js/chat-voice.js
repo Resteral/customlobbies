@@ -7,6 +7,7 @@ class ChatVoiceManager {
     this.isMicMuted = false;
     this.isDeafened = false;
     this.creatingChannelType = 'text';
+    this.activeCustomLobby = null;
 
     // In-Chat Customization & Theme State
     this.currentChatTheme = 'cyber';
@@ -319,6 +320,7 @@ class ChatVoiceManager {
     this.renderGuildRail();
     this.renderTeamChannels();
     this.renderPrivateLobbies();
+    this.syncCustomLobbiesChannels();
     this.renderCustomCategories();
     this.renderCustomChannelsInDefaultCategories();
     this.populateCategoryDropdown();
@@ -962,88 +964,135 @@ class ChatVoiceManager {
     const gInfo = this.channelGameMap ? this.channelGameMap[channelName] : null;
     const teamChan = this.teamChannels ? this.teamChannels.find(t => t.channelName === channelName || t.id === channelName) : null;
     const privateLobby = this.privateLobbies ? this.privateLobbies.find(l => l.channelName === channelName || l.id === channelName) : null;
+    const customLobby = this.getCustomLobbyForChannel(channelName);
     const header = document.getElementById('currentChannelHeader');
     const topic = document.getElementById('currentChannelTopic');
     const input = document.getElementById('chatInputText');
     const actionBar = document.getElementById('channelGameActionBar');
     const teamActionBar = document.getElementById('channelTeamActionBar');
     const privateLobbyActionBar = document.getElementById('channelPrivateLobbyActionBar');
+    const customLobbyActionBar = document.getElementById('channelCustomLobbyActionBar');
 
-    if (privateLobby) {
+    if (customLobby) {
+      this.activeCustomLobby = customLobby;
       if (actionBar) actionBar.style.display = 'none';
       if (teamActionBar) teamActionBar.style.display = 'none';
-      if (privateLobbyActionBar) {
-        privateLobbyActionBar.style.display = 'flex';
-        const pIcon = document.getElementById('channelPrivateLobbyIcon');
-        const pTitle = document.getElementById('channelPrivateLobbyTitle');
-        const pCodeTag = document.getElementById('channelPrivateLobbyCodeTag');
-        const pGameTag = document.getElementById('channelPrivateLobbyGameTag');
-        const pDetail = document.getElementById('channelPrivateLobbyDetail');
-        if (pIcon) pIcon.textContent = '🔒';
-        if (pTitle) pTitle.textContent = privateLobby.title;
-        if (pCodeTag) pCodeTag.textContent = `CODE: ${privateLobby.code}`;
-        if (pGameTag) pGameTag.textContent = privateLobby.game;
-        if (pDetail) pDetail.textContent = `Map: ${privateLobby.map || 'Competitive'} • Server: ${privateLobby.serverIp || '192.168.1.85:27015'} • Host: ${privateLobby.host} • ${privateLobby.players || 1}/${privateLobby.max || 10} Players`;
-      }
-      if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">🔒</span> #${channelName}`;
-      if (topic) topic.textContent = `🔒 ${privateLobby.title} — ${privateLobby.game} [Code: ${privateLobby.code}]. Private match room & squad comms.`;
-      if (input) input.placeholder = `Message private lobby members, share strats or type -j...`;
-    } else if (teamChan) {
-      if (actionBar) actionBar.style.display = 'none';
       if (privateLobbyActionBar) privateLobbyActionBar.style.display = 'none';
-      if (teamActionBar) {
-        teamActionBar.style.display = 'flex';
-        const teamEmblem = document.getElementById('channelTeamEmblem');
-        const teamTitle = document.getElementById('channelTeamTitle');
-        const teamGameTag = document.getElementById('channelTeamGameTag');
-        const teamDetail = document.getElementById('channelTeamDetail');
-        if (teamEmblem) teamEmblem.textContent = teamChan.emblem || '🛡️';
-        if (teamTitle) teamTitle.textContent = `${teamChan.tag ? teamChan.tag + ' ' : ''}${teamChan.name}`;
-        if (teamGameTag) teamGameTag.textContent = `${teamChan.game} Squad Channel`;
-        const count = teamChan.membersCount || (teamChan.members ? teamChan.members.length : 5);
-        if (teamDetail) teamDetail.textContent = `${count} Members • Captain: ${teamChan.captain || 'Sean'} • ${teamChan.motto || 'Competitive Scrims'}`;
-      }
-      if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">${teamChan.emblem || '🛡️'}</span> #${channelName}`;
-      if (topic) topic.textContent = `${teamChan.name} (${teamChan.tag || ''}) — ${teamChan.game} • ${teamChan.motto || 'Official Team Hub'}`;
-      if (input) input.placeholder = `Message ${teamChan.tag || ''} squad members, type strats, or type -j to queue...`;
-    } else if (gInfo) {
-      if (teamActionBar) teamActionBar.style.display = 'none';
-      if (privateLobbyActionBar) privateLobbyActionBar.style.display = 'none';
-      if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">${gInfo.icon}</span> #${channelName}`;
-      if (topic) topic.textContent = gInfo.topic;
-      if (input) input.placeholder = `Message #${channelName} or type -j (join match pool), -help...`;
+      if (customLobbyActionBar) {
+        customLobbyActionBar.style.display = 'flex';
+        const cIcon = document.getElementById('channelCustomLobbyIcon');
+        const cTitle = document.getElementById('channelCustomLobbyTitle');
+        const cStatusTag = document.getElementById('channelCustomLobbyStatusTag');
+        const cGameTag = document.getElementById('channelCustomLobbyGameTag');
+        const cPlayersTag = document.getElementById('channelCustomLobbyPlayersTag');
+        const cDetail = document.getElementById('channelCustomLobbyDetail');
+        const btnJoin = document.getElementById('btnLobbyBarJoinQueue');
 
-      if (actionBar) {
-        actionBar.style.display = 'flex';
-        const gameIcon = document.getElementById('channelGameIcon');
-        const gameTitle = document.getElementById('channelGameTitle');
-        const gameDetail = document.getElementById('channelGameDetail');
-        const btnHost = document.getElementById('btnChannelHostLobby');
-        const btnBrowse = document.getElementById('btnChannelBrowseLobbies');
-        const btnDraft = document.getElementById('btnChannelSnakeDraft');
-        const btnJoin = document.getElementById('btnChannelJoinPool');
+        const gameIcon = customLobby.game === 'WARDOGS' ? '🐕' :
+                         customLobby.game === 'Counter-Strike 2' ? '🎯' :
+                         customLobby.game === 'Valorant' ? '⚡' :
+                         customLobby.game === 'Marvel Rivals' ? '💥' :
+                         customLobby.game === 'Rocket League' ? '🏎️' :
+                         customLobby.game === 'Slapshot: Rebound' ? '🏒' :
+                         customLobby.game === 'The Finals' ? '🏆' :
+                         customLobby.game === 'Deadlock' ? '🔮' : '🎮';
 
-        if (gameIcon) gameIcon.textContent = gInfo.icon;
-        if (gameTitle) gameTitle.textContent = gInfo.game;
-        if (gameDetail) {
-          if (channelName === 'wardogs' || gInfo.game === 'WARDOGS') {
-            gameDetail.textContent = `99p Tri-Faction Conquest (33v33v33) • Map: ${gInfo.map}`;
+        if (cIcon) cIcon.textContent = gameIcon;
+        if (cTitle) cTitle.textContent = customLobby.title;
+        if (cStatusTag) cStatusTag.textContent = customLobby.matchStatus || '🔥 RECRUITING';
+        if (cGameTag) cGameTag.textContent = customLobby.game;
+        if (cPlayersTag) cPlayersTag.textContent = `${customLobby.players}/${customLobby.max} Players`;
+        if (cDetail) cDetail.textContent = `Host: ${customLobby.host} • Map: ${customLobby.map || 'Competitive'} • Server: ${customLobby.serverIp || '192.168.1.85:27015'} • ${customLobby.tickrate || 128}-Tick Dedicated • Region: ${customLobby.region || 'NA East'}`;
+        if (btnJoin) {
+          if (customLobby.players >= customLobby.max) {
+            btnJoin.innerHTML = `<span>⚡</span> Launch Match (Full)`;
           } else {
-            gameDetail.textContent = `${gInfo.maxPerTeam * 2}p Matchmaking Hub (${gInfo.maxPerTeam}v${gInfo.maxPerTeam}) • Map: ${gInfo.map}`;
+            btnJoin.innerHTML = `<span>⚡</span> Join / Connect (${customLobby.players}/${customLobby.max})`;
           }
         }
-        if (btnHost) btnHost.innerHTML = `<span>➕</span> Host ${gInfo.game} Lobby`;
-        if (btnBrowse) btnBrowse.innerHTML = `<span>🔥</span> Browse ${gInfo.game} Lobbies`;
-        if (btnDraft) btnDraft.innerHTML = `<span>🐍</span> Snake Draft (${gInfo.game})`;
-        if (btnJoin) btnJoin.innerHTML = `<span>⚡</span> Join ${gInfo.game} Pool (-j)`;
       }
+      if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">🎮</span> #${channelName}`;
+      if (topic) topic.textContent = `🎮 ${customLobby.title} — Direct custom lobby chat & 128-tick node (${customLobby.players}/${customLobby.max} Players)`;
+      if (input) input.placeholder = `Message lobby players in #${channelName}, share strats, or type -j...`;
     } else {
-      if (teamActionBar) teamActionBar.style.display = 'none';
-      if (privateLobbyActionBar) privateLobbyActionBar.style.display = 'none';
-      if (header) header.textContent = `# ${channelName}`;
-      if (topic) topic.textContent = `Discussion and chat for #${channelName}`;
-      if (input) input.placeholder = `Send a message to #${channelName}...`;
-      if (actionBar) actionBar.style.display = 'none';
+      this.activeCustomLobby = null;
+      if (customLobbyActionBar) customLobbyActionBar.style.display = 'none';
+      if (privateLobby) {
+        if (actionBar) actionBar.style.display = 'none';
+        if (teamActionBar) teamActionBar.style.display = 'none';
+        if (privateLobbyActionBar) {
+          privateLobbyActionBar.style.display = 'flex';
+          const pIcon = document.getElementById('channelPrivateLobbyIcon');
+          const pTitle = document.getElementById('channelPrivateLobbyTitle');
+          const pCodeTag = document.getElementById('channelPrivateLobbyCodeTag');
+          const pGameTag = document.getElementById('channelPrivateLobbyGameTag');
+          const pDetail = document.getElementById('channelPrivateLobbyDetail');
+          if (pIcon) pIcon.textContent = '🔒';
+          if (pTitle) pTitle.textContent = privateLobby.title;
+          if (pCodeTag) pCodeTag.textContent = `CODE: ${privateLobby.code}`;
+          if (pGameTag) pGameTag.textContent = privateLobby.game;
+          if (pDetail) pDetail.textContent = `Map: ${privateLobby.map || 'Competitive'} • Server: ${privateLobby.serverIp || '192.168.1.85:27015'} • Host: ${privateLobby.host} • ${privateLobby.players || 1}/${privateLobby.max || 10} Players`;
+        }
+        if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">🔒</span> #${channelName}`;
+        if (topic) topic.textContent = `🔒 ${privateLobby.title} — ${privateLobby.game} [Code: ${privateLobby.code}]. Private match room & squad comms.`;
+        if (input) input.placeholder = `Message private lobby members, share strats or type -j...`;
+      } else if (teamChan) {
+        if (actionBar) actionBar.style.display = 'none';
+        if (privateLobbyActionBar) privateLobbyActionBar.style.display = 'none';
+        if (teamActionBar) {
+          teamActionBar.style.display = 'flex';
+          const teamEmblem = document.getElementById('channelTeamEmblem');
+          const teamTitle = document.getElementById('channelTeamTitle');
+          const teamGameTag = document.getElementById('channelTeamGameTag');
+          const teamDetail = document.getElementById('channelTeamDetail');
+          if (teamEmblem) teamEmblem.textContent = teamChan.emblem || '🛡️';
+          if (teamTitle) teamTitle.textContent = `${teamChan.tag ? teamChan.tag + ' ' : ''}${teamChan.name}`;
+          if (teamGameTag) teamGameTag.textContent = `${teamChan.game} Squad Channel`;
+          const count = teamChan.membersCount || (teamChan.members ? teamChan.members.length : 5);
+          if (teamDetail) teamDetail.textContent = `${count} Members • Captain: ${teamChan.captain || 'Sean'} • ${teamChan.motto || 'Competitive Scrims'}`;
+        }
+        if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">${teamChan.emblem || '🛡️'}</span> #${channelName}`;
+        if (topic) topic.textContent = `${teamChan.name} (${teamChan.tag || ''}) — ${teamChan.game} • ${teamChan.motto || 'Official Team Hub'}`;
+        if (input) input.placeholder = `Message ${teamChan.tag || ''} squad members, type strats, or type -j to queue...`;
+      } else if (gInfo) {
+        if (teamActionBar) teamActionBar.style.display = 'none';
+        if (privateLobbyActionBar) privateLobbyActionBar.style.display = 'none';
+        if (header) header.innerHTML = `<span style="margin-right: 0.35rem;">${gInfo.icon}</span> #${channelName}`;
+        if (topic) topic.textContent = gInfo.topic;
+        if (input) input.placeholder = `Message #${channelName} or type -j (join match pool), -help...`;
+
+        if (actionBar) {
+          actionBar.style.display = 'flex';
+          const gameIcon = document.getElementById('channelGameIcon');
+          const gameTitle = document.getElementById('channelGameTitle');
+          const gameDetail = document.getElementById('channelGameDetail');
+          const btnHost = document.getElementById('btnChannelHostLobby');
+          const btnBrowse = document.getElementById('btnChannelBrowseLobbies');
+          const btnDraft = document.getElementById('btnChannelSnakeDraft');
+          const btnJoin = document.getElementById('btnChannelJoinPool');
+
+          if (gameIcon) gameIcon.textContent = gInfo.icon;
+          if (gameTitle) gameTitle.textContent = gInfo.game;
+          if (gameDetail) {
+            if (channelName === 'wardogs' || gInfo.game === 'WARDOGS') {
+              gameDetail.textContent = `99p Tri-Faction Conquest (33v33v33) • Map: ${gInfo.map}`;
+            } else {
+              gameDetail.textContent = `${gInfo.maxPerTeam * 2}p Matchmaking Hub (${gInfo.maxPerTeam}v${gInfo.maxPerTeam}) • Map: ${gInfo.map}`;
+            }
+          }
+          if (btnHost) btnHost.innerHTML = `<span>➕</span> Host ${gInfo.game} Lobby`;
+          if (btnBrowse) btnBrowse.innerHTML = `<span>🔥</span> Browse ${gInfo.game} Lobbies`;
+          if (btnDraft) btnDraft.innerHTML = `<span>🐍</span> Snake Draft (${gInfo.game})`;
+          if (btnJoin) btnJoin.innerHTML = `<span>⚡</span> Join ${gInfo.game} Pool (-j)`;
+        }
+      } else {
+        if (teamActionBar) teamActionBar.style.display = 'none';
+        if (privateLobbyActionBar) privateLobbyActionBar.style.display = 'none';
+        if (header) header.textContent = `# ${channelName}`;
+        if (topic) topic.textContent = `Discussion and chat for #${channelName}`;
+        if (input) input.placeholder = `Send a message to #${channelName}...`;
+        if (actionBar) actionBar.style.display = 'none';
+      }
     }
 
     const protectedChannels = ['general', 'welcome', 'rules'];
@@ -2195,6 +2244,203 @@ class ChatVoiceManager {
 
     this.renderPrivateLobbies();
     return newLobby;
+  }
+
+  // --- DIRECT CUSTOM LOBBIES INTEGRATION SUITE ---
+  syncCustomLobbiesChannels() {
+    const textContainer = document.getElementById('textChannelsCustomLobbies');
+    const voiceContainer = document.getElementById('voiceChannelsCustomLobbies');
+    const lobbies = (window.app && Array.isArray(window.app.lobbies)) ? window.app.lobbies : [];
+
+    if (textContainer) {
+      if (lobbies.length === 0) {
+        textContainer.innerHTML = `
+          <div style="padding: 0.4rem 0.6rem; font-size: 0.72rem; color: var(--text-dim); font-style: italic;">
+            No active custom lobbies. <a href="#" onclick="const b=document.querySelector('[data-tab=lobbies-view]'); if(b) b.click(); return false;" style="color: var(--accent-cyan); text-decoration: underline;">Host or Browse in Lobbies Hub!</a>
+          </div>
+        `;
+      } else {
+        textContainer.innerHTML = lobbies.map(l => {
+          const slug = `lobby-${String(l.id).replace(/[^a-zA-Z0-9_-]/g, '')}`;
+          const isActive = this.currentTextChannel === slug ? 'active' : '';
+          const spotsLeft = (l.max || 10) - (l.players || 0);
+          const icon = l.game === 'WARDOGS' ? '🐕' :
+                       l.game === 'Counter-Strike 2' ? '🎯' :
+                       l.game === 'Valorant' ? '⚡' :
+                       l.game === 'Marvel Rivals' ? '💥' :
+                       l.game === 'Rocket League' ? '🏎️' :
+                       l.game === 'Slapshot: Rebound' ? '🏒' :
+                       l.game === 'The Finals' ? '🏆' :
+                       l.game === 'Deadlock' ? '🔮' : '🎮';
+          
+          const fillBadgeColor = spotsLeft <= 0 ? 'var(--accent-red)' : (spotsLeft <= 2 ? 'var(--accent-green)' : 'var(--accent-cyan)');
+          
+          return `
+            <div class="channel-item ${isActive}" data-channel="${slug}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.6rem; margin-bottom: 2px;" title="${l.title} (${l.game})">
+              <div class="channel-item-left" style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                <span style="font-size: 0.85rem;">${icon}</span>
+                <span style="font-weight: 600; color: ${isActive ? '#fff' : 'var(--text-normal)'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.82rem;">#${slug}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
+                <span style="font-size: 0.65rem; background: rgba(0, 0, 0, 0.4); color: ${fillBadgeColor}; padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 800; border: 1px solid ${fillBadgeColor};">
+                  ${l.players}/${l.max}
+                </span>
+                <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); window.chatVoiceManager.openLobbyChannel('${l.id}')" title="Connect to Lobby & Voice" style="padding: 0.15rem 0.4rem; font-size: 0.65rem; font-weight: 800; line-height: 1;">⚡</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    if (voiceContainer) {
+      if (lobbies.length === 0) {
+        voiceContainer.innerHTML = '';
+      } else {
+        voiceContainer.innerHTML = lobbies.map(l => {
+          const vroom = `voice-lobby-${l.id}`;
+          const isVActive = this.currentVoiceRoom === vroom ? 'active' : '';
+          const icon = l.game === 'WARDOGS' ? '🐕' : (l.game === 'Counter-Strike 2' ? '🎯' : '🔊');
+          return `
+            <div class="channel-item ${isVActive}" data-voice="${vroom}" style="margin-top: 0.25rem; border-left: 2px solid var(--accent-cyan); padding: 0.3rem 0.6rem;" title="Voice Room for ${l.title}">
+              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <div class="channel-item-left" style="display: flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <span>${icon}</span>
+                  <span style="font-weight: 600; font-size: 0.8rem;">[${l.game}] ${l.title}</span>
+                </div>
+                <span style="font-size: 0.65rem; color: var(--accent-cyan); font-weight: 800;">
+                  ${l.players}/${l.max}
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+  }
+
+  getCustomLobbyForChannel(channelName) {
+    if (!channelName) return null;
+    if (window.app && Array.isArray(window.app.lobbies)) {
+      const found = window.app.lobbies.find(l => {
+        const slug = `lobby-${String(l.id).replace(/[^a-zA-Z0-9_-]/g, '')}`;
+        return slug === channelName || l.id == channelName || l.channelName === channelName;
+      });
+      if (found) return found;
+    }
+    return null;
+  }
+
+  openLobbyChannel(lobbyId) {
+    let lobby = null;
+    if (window.app && Array.isArray(window.app.lobbies)) {
+      lobby = window.app.lobbies.find(l => l.id == lobbyId || l.id === lobbyId);
+    }
+    if (!lobby && this.privateLobbies) {
+      lobby = this.privateLobbies.find(l => l.id == lobbyId || l.channelName === lobbyId);
+    }
+    if (!lobby) {
+      this.notifyToast(`Lobby ${lobbyId} not found.`, 'error');
+      return;
+    }
+
+    // Switch view to community-view if not currently active
+    const commTab = document.querySelector('[data-tab="community-view"]');
+    if (commTab && !commTab.classList.contains('active')) {
+      commTab.click();
+    }
+
+    const slug = `lobby-${String(lobby.id).replace(/[^a-zA-Z0-9_-]/g, '')}`;
+    
+    // Seed welcoming briefing message if not present
+    if (!this.textMessages[slug]) {
+      this.textMessages[slug] = [
+        {
+          id: Date.now() - 30000,
+          author: 'CustomLobbiesBot',
+          text: `🎮 Connected to live custom lobby <b>${lobby.title}</b>!<br>• Game: <b>${lobby.game}</b> | Map: <b>${lobby.map || 'Competitive'}</b><br>• Dedicated Server: <code>${lobby.serverIp || '192.168.1.85:27015'}</code> (${lobby.tickrate || 128}-Tick)<br>• Host: <b>${lobby.host || 'You (Host)'}</b> | Players: <b>${lobby.players}/${lobby.max}</b><br><br>⚡ Click <b>"Join / Connect Lobby"</b> in the top bar to queue up or connect directly!`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80'
+        }
+      ];
+    }
+
+    this.switchTextChannel(slug);
+    
+    // Auto-connect voice for this lobby
+    const vroom = `voice-lobby-${lobby.id}`;
+    this.selectVoiceRoom(vroom);
+    const badge = document.getElementById('voiceStatusBadge');
+    if (badge && badge.textContent !== 'Connected') {
+      this.toggleVoiceConnection();
+    }
+
+    this.notifyToast(`🎮 Connected to #${slug} & Voice for "${lobby.title}"!`, 'success');
+  }
+
+  openLobbyChannelByTitle(title) {
+    if (!title) return;
+    let lobby = null;
+    if (window.app && Array.isArray(window.app.lobbies)) {
+      lobby = window.app.lobbies.find(l => l.title === title || l.title.includes(title));
+    }
+    if (lobby) {
+      this.openLobbyChannel(lobby.id);
+    } else {
+      const commTab = document.querySelector('[data-tab="community-view"]');
+      if (commTab) commTab.click();
+    }
+  }
+
+  connectActiveLobbyDirect() {
+    if (!this.activeCustomLobby) return;
+    if (window.app && typeof window.app.joinAndQueueLobby === 'function') {
+      window.app.joinAndQueueLobby(this.activeCustomLobby.id);
+      this.syncCustomLobbiesChannels();
+      const playersTag = document.getElementById('channelCustomLobbyPlayersTag');
+      if (playersTag) playersTag.textContent = `${this.activeCustomLobby.players}/${this.activeCustomLobby.max} Players`;
+      const btn = document.getElementById('btnLobbyBarJoinQueue');
+      if (btn) btn.innerHTML = `<span>⚡</span> Join / Connect (${this.activeCustomLobby.players}/${this.activeCustomLobby.max})`;
+    }
+  }
+
+  launchLobbyDraftDirect() {
+    if (!this.activeCustomLobby) return;
+    if (window.app && typeof window.app.triggerLobbySnakeDraft === 'function') {
+      window.app.triggerLobbySnakeDraft(this.activeCustomLobby.title, this.activeCustomLobby.game);
+    }
+  }
+
+  joinActiveLobbyVoice() {
+    if (!this.activeCustomLobby) return;
+    const vroom = `voice-lobby-${this.activeCustomLobby.id}`;
+    this.selectVoiceRoom(vroom);
+    const badge = document.getElementById('voiceStatusBadge');
+    if (badge && badge.textContent !== 'Connected') {
+      this.toggleVoiceConnection();
+    }
+    this.notifyToast(`🎙️ Connected to Voice for "${this.activeCustomLobby.title}"!`, 'success');
+  }
+
+  copyActiveLobbyIP() {
+    if (!this.activeCustomLobby) return;
+    const ip = this.activeCustomLobby.serverIp || '192.168.1.85:27015';
+    if (window.app && typeof window.app.copyServerIP === 'function') {
+      window.app.copyServerIP(ip);
+    } else {
+      this.copyToClipboard(`connect ${ip}`, `Copied connect ${ip} to clipboard!`);
+    }
+  }
+
+  goToLobbyInLobbiesView() {
+    const lobbiesTab = document.querySelector('[data-tab="lobbies-view"]');
+    if (lobbiesTab) lobbiesTab.click();
+    setTimeout(() => {
+      const grid = document.getElementById('lobbiesGrid');
+      if (grid) {
+        grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   }
 
   copyPrivateLobbyCode() {
@@ -3806,5 +4052,6 @@ class ChatVoiceManager {
 }
 
 window.chatVoiceManager = new ChatVoiceManager();
+window.chatVoiceEngine = window.chatVoiceManager;
 document.addEventListener('DOMContentLoaded', () => window.chatVoiceManager.init());
 
