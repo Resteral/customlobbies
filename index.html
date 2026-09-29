@@ -2812,7 +2812,7 @@
 
   <!-- Create Lobby Modal -->
   <div class="modal-overlay" id="createLobbyModal">
-    <div class="modal-card" style="max-width: 520px;">
+    <div class="modal-card" style="max-width: 540px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <h3 style="font-size: 1.3rem; font-weight: 800; margin: 0;">🎮 Host Custom Lobby</h3>
         <span class="mmr-badge" style="background: rgba(255,215,0,0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold);">🪙 +50 CL-Points Host Reward</span>
@@ -2821,6 +2821,18 @@
       <div class="input-group">
         <label class="input-label">Lobby Title</label>
         <input type="text" class="input-field" id="newLobbyTitle" placeholder="e.g. 5v5 High MMR Scrims & Map Veto">
+      </div>
+
+      <!-- Lobby Type / Privacy: Unstarted Queue vs Private Custom Lobby -->
+      <div class="input-group">
+        <label class="input-label" style="display: flex; justify-content: space-between;">
+          <span>Lobby Type & Access</span>
+          <span style="font-size: 0.72rem; color: var(--accent-gold);">Host Control Policy</span>
+        </label>
+        <select class="input-field" id="newLobbyAccess">
+          <option value="private_custom">🔒 Private Custom Lobby (Host controls settings & must start)</option>
+          <option value="public_queue">⚡ Open Matchmaking Queue (Unstarted, auto-drafts when full)</option>
+        </select>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
@@ -2856,6 +2868,7 @@
             <option value="6">6 Players (3v3 Arena / Rocket / Finals)</option>
             <option value="4">4 Players (2v2 Wingman)</option>
             <option value="2">2 Players (1v1 Duel)</option>
+            <option value="20">20 Players (10v10 Big Team)</option>
             <option value="99">99 Players (33v33v33 WARDOGS)</option>
           </select>
         </div>
@@ -2885,19 +2898,156 @@
         </div>
       </div>
 
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Draft Type</label>
+          <select class="input-field" id="newLobbyDraftType">
+            <option value="Snake Draft 1-2-2-1">🐍 Snake Draft (1-2-2-1)</option>
+            <option value="Captains Alternating Pick 1-1-1-1">⚔️ Alternating (1-1-1-1)</option>
+            <option value="Random Selection (Auto-Shuffle & MMR Balance)">🎲 Random Balanced Teams</option>
+            <option value="Blind Pick">🎭 Blind Pick</option>
+            <option value="No Draft (Open Join)">🚫 No Draft (Open Join)</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Who are Captains?</label>
+          <select class="input-field" id="newLobbyCaptainMode">
+            <option value="random">🎲 Random Selection</option>
+            <option value="host">👑 Host Selects Captains</option>
+            <option value="highest_mmr">⭐ Highest MMR Captains</option>
+          </select>
+        </div>
+      </div>
+
       <div class="input-group">
-        <label class="input-label">Draft Type</label>
-        <select class="input-field" id="newLobbyDraftType">
-          <option value="FACEIT Competitive">FACEIT Competitive (Balanced ELO)</option>
-          <option value="Snake Draft 1-2-2-1">Snake Draft (1-2-2-1 Captain Pick)</option>
-          <option value="Open Community LFG">Open Community LFG (Casual)</option>
-          <option value="Pro Tournament Seeded">Pro Tournament Seeded</option>
+        <label class="input-label" style="display: flex; justify-content: space-between;">
+          <span>How many players if there is a draft?</span>
+          <span style="font-size: 0.72rem; color: var(--accent-purple);">Draft Roster Size</span>
+        </label>
+        <select class="input-field" id="newLobbyDraftPlayers">
+          <option value="10">10 Players (5v5 Standard Draft)</option>
+          <option value="4">4 Players (2v2 Wingman Draft)</option>
+          <option value="6">6 Players (3v3 Arena Draft)</option>
+          <option value="8">8 Players (4v4 Scrim Draft)</option>
+          <option value="12">12 Players (6v6 Rivals / Deadlock Draft)</option>
+          <option value="14">14 Players (7v7 Fireteam Draft)</option>
+          <option value="20">20 Players (10v10 Big Team Draft)</option>
         </select>
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.5rem;">
         <button class="btn btn-secondary" id="btnCloseLobbyModal">Cancel</button>
         <button class="btn btn-primary" id="btnSubmitNewLobby">🚀 Create Custom Lobby (+50 🪙)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Host Custom Lobby Settings & Draft Control Modal -->
+  <div class="modal-overlay" id="hostCustomLobbySettingsModal">
+    <div class="modal-card" style="max-width: 580px; width: 92%;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.4rem;">👑</span>
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; margin: 0; color: #fff;">Host Lobby Settings</h3>
+            <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 700;">Host must configure draft & start match</span>
+          </div>
+        </div>
+        <button class="icon-btn-sm" onclick="window.app.closeHostLobbySettingsModal()">✕</button>
+      </div>
+
+      <input type="hidden" id="hostLobbySettingsTargetId">
+
+      <div class="input-group">
+        <label class="input-label">Lobby Title</label>
+        <input type="text" class="input-field" id="hostSettingsTitle" readonly style="opacity: 0.85; background: rgba(0,0,0,0.3);">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+        <div class="input-group">
+          <label class="input-label">Game</label>
+          <input type="text" class="input-field" id="hostSettingsGame" readonly style="opacity: 0.85; background: rgba(0,0,0,0.3);">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Map / Veto Pool</label>
+          <input type="text" class="input-field" id="hostSettingsMap">
+        </div>
+      </div>
+
+      <!-- Draft Type Selection -->
+      <div class="input-group">
+        <label class="input-label" style="display: flex; justify-content: space-between;">
+          <span>Draft Type</span>
+          <span style="font-size: 0.72rem; color: var(--accent-cyan);">Defines pick format</span>
+        </label>
+        <select class="input-field" id="hostSettingsDraftType">
+          <option value="Snake Draft 1-2-2-1">🐍 Snake Draft (1-2-2-1 Captain Pick)</option>
+          <option value="Captains Alternating Pick 1-1-1-1">⚔️ Captains Alternating Pick (1-1-1-1)</option>
+          <option value="Random Selection (Auto-Shuffle & MMR Balance)">🎲 Random Selection (Auto-Shuffle & Balance)</option>
+          <option value="Blind Pick">🎭 Blind Pick</option>
+          <option value="No Draft (Open Join)">🚫 No Draft (Open Join)</option>
+        </select>
+      </div>
+
+      <!-- Captain Selection Mode & Random Roller -->
+      <div class="input-group">
+        <label class="input-label" style="display: flex; justify-content: space-between;">
+          <span>Who are Captains?</span>
+          <span style="font-size: 0.72rem; color: var(--accent-gold);">Captain Assignment Policy</span>
+        </label>
+        <select class="input-field" id="hostSettingsCaptainMode" onchange="window.app.onHostCaptainModeChange(this.value)">
+          <option value="random">🎲 Random Selection (System Rolls Captains)</option>
+          <option value="host">👑 Host Selects Captains</option>
+          <option value="highest_mmr">⭐ Highest MMR Auto-Designated</option>
+        </select>
+      </div>
+
+      <!-- Live Captains Display & Roll Button -->
+      <div style="background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.8rem; font-weight: 800; color: var(--accent-cyan);">Designated Captains:</span>
+          <button class="btn btn-sm btn-cyan" type="button" onclick="window.app.rollRandomCaptains()" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; font-weight: 800;">
+            🎲 Roll Random Captains
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+          <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 6px; padding: 0.5rem;">
+            <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 800;">🔵 TEAM 1 CAPTAIN</div>
+            <div id="hostCap1Display" style="font-size: 0.9rem; font-weight: 800; color: #fff; margin-top: 0.2rem;">Pending Selection</div>
+          </div>
+          <div style="background: rgba(255, 82, 82, 0.1); border: 1px solid rgba(255, 82, 82, 0.3); border-radius: 6px; padding: 0.5rem;">
+            <div style="font-size: 0.68rem; color: var(--accent-red); font-weight: 800;">🔴 TEAM 2 CAPTAIN</div>
+            <div id="hostCap2Display" style="font-size: 0.9rem; font-weight: 800; color: #fff; margin-top: 0.2rem;">Pending Selection</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How Many Players if Draft -->
+      <div class="input-group">
+        <label class="input-label" style="display: flex; justify-content: space-between;">
+          <span>How many players if there is a draft?</span>
+          <span style="font-size: 0.72rem; color: var(--accent-purple);">Draft Roster Capacity</span>
+        </label>
+        <select class="input-field" id="hostSettingsDraftCount">
+          <option value="10">10 Players (5v5 Standard Draft)</option>
+          <option value="4">4 Players (2v2 Wingman Draft)</option>
+          <option value="6">6 Players (3v3 Arena Draft)</option>
+          <option value="8">8 Players (4v4 Scrim Draft)</option>
+          <option value="12">12 Players (6v6 Rivals / Deadlock Draft)</option>
+          <option value="14">14 Players (7v7 Fireteam Draft)</option>
+          <option value="20">20 Players (10v10 Big Team Draft)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="window.app.closeHostLobbySettingsModal()">Cancel</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-primary" onclick="window.app.saveHostLobbySettings(false)">💾 Save Settings</button>
+          <button class="btn btn-gold" onclick="window.app.saveHostLobbySettings(true)" style="background: linear-gradient(135deg, #ffd700, #ff9100); color: #000; font-weight: 900; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);">
+            🚀 Start Match & Launch Draft
+          </button>
+        </div>
       </div>
     </div>
   </div>

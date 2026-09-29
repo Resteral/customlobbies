@@ -178,6 +178,26 @@ class CustomLobbiesApp {
         isPublic: true
       },
       {
+        id: 'lobby_custom_hosted_1',
+        title: '👑 Apex Private Scrim & Snake Draft',
+        game: 'Counter-Strike 2',
+        host: 'You (Host)',
+        players: 1,
+        max: 10,
+        region: 'NA East',
+        map: 'Captain Pick / Ban Veto',
+        draftType: 'Snake Draft 1-2-2-1',
+        captainMode: 'random',
+        isPrivate: true,
+        isCustomHosted: true,
+        draftPlayerCount: 10,
+        serverIp: '192.168.1.85:27015',
+        tickrate: 128,
+        matchStatus: '🔒 HOSTED PRIVATE (Waiting for Host)',
+        started: false,
+        isPublic: false
+      },
+      {
         id: 'lobby_empulse_5v5',
         title: 'Empulse 5v5 Arena Championship',
         game: 'Empulse',
@@ -189,7 +209,8 @@ class CustomLobbiesApp {
         draftType: '5v5 Ranked',
         serverIp: '192.168.1.85:7782',
         tickrate: 128,
-        matchStatus: '🟢 IN-GAME (8/10)',
+        matchStatus: '⚡ QUEUING (8/10)',
+        started: false,
         isPublic: true
       },
       {
@@ -5090,6 +5111,15 @@ class CustomLobbiesApp {
 
     let list = [...this.lobbies];
 
+    // Filter: Lobbies should ONLY be unstarted queues, OR private custom lobbies that were hosted
+    list = list.filter(l => {
+      const isPrivateCustom = Boolean(l.isPrivate || l.isCustomHosted || l.host === 'You (Host)' || (l.host && l.host.includes('Host')));
+      const isStarted = Boolean(l.started || (l.matchStatus && (l.matchStatus.includes('IN-GAME') || l.matchStatus.includes('LIVE'))));
+      // Only unstarted queues OR private custom hosted lobbies
+      if (isPrivateCustom) return true;
+      return !isStarted;
+    });
+
     // Filter by Lobby Type
     if (this.lobbyFilterType === 'public_with_players') {
       list = list.filter(l => (l.players || 0) > 0 && (l.players < l.max) && (l.isPublic !== false));
@@ -5124,12 +5154,21 @@ class CustomLobbiesApp {
     grid.innerHTML = list.map(l => {
       this.ensureLobbyTeams(l);
 
+      const isPrivateCustom = Boolean(l.isPrivate || l.isCustomHosted || l.host === 'You (Host)' || (l.host && l.host.includes('Host')));
+      const isHost = l.host === 'You (Host)' || l.isHost === true;
       const fillPct = Math.round((l.players / l.max) * 100);
       const isFav = this.favoriteGames.has(l.game);
-      const isPublic = l.isPublic !== false;
+      const isPublic = l.isPublic !== false && !isPrivateCustom;
       const spotsLeft = l.max - l.players;
-      const statusBadge = l.matchStatus || (fillPct >= 90 ? '🟢 IN-GAME (Live)' : (fillPct >= 70 ? '⚡ DRAFTING' : '🔥 RECRUITING'));
-      const statusColor = statusBadge.includes('IN-GAME') || statusBadge.includes('LIVE') ? 'var(--accent-green)' : (statusBadge.includes('DRAFT') ? 'var(--accent-cyan)' : 'var(--accent-gold)');
+
+      let statusBadge = l.matchStatus;
+      if (!statusBadge) {
+        if (isPrivateCustom) statusBadge = '🔒 HOSTED PRIVATE (Waiting for Host)';
+        else if (fillPct >= 90) statusBadge = '⚡ FULL (Ready)';
+        else if (fillPct >= 70) statusBadge = '⚡ DRAFTING';
+        else statusBadge = '🔥 QUEUING';
+      }
+      const statusColor = isPrivateCustom ? 'var(--accent-gold)' : (statusBadge.includes('DRAFT') ? 'var(--accent-cyan)' : 'var(--accent-gold)');
 
       const t1 = l.teams.team1;
       const t2 = l.teams.team2;
@@ -5171,7 +5210,7 @@ class CustomLobbiesApp {
       };
 
       return `
-        <div class="lobby-card" style="${isFav ? 'border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);' : (isPublic ? 'border-color: rgba(0, 242, 254, 0.35);' : '')}">
+        <div class="lobby-card" style="${isFav ? 'border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);' : (isPrivateCustom ? 'border-color: rgba(255, 215, 0, 0.4); box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);' : (isPublic ? 'border-color: rgba(0, 242, 254, 0.35);' : ''))}">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap;">
             <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
               <span class="lobby-game-tag" style="${isFav ? 'background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); font-weight: 800;' : ''}">
@@ -5180,8 +5219,11 @@ class CustomLobbiesApp {
               <span class="lobby-game-tag" style="background: rgba(0, 230, 118, 0.15); color: ${statusColor}; font-weight: 800; border: 1px solid ${statusColor};">
                 ${statusBadge}
               </span>
-              ${isPublic ? '<span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-weight: 800; border: 1px solid rgba(0, 242, 254, 0.4);">🟢 Public Lobby</span>' : ''}
+              ${isPrivateCustom 
+                ? '<span class="lobby-game-tag" style="background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); font-weight: 800; border: 1px solid var(--accent-gold);">🔒 HOSTED PRIVATE</span>' 
+                : '<span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); font-weight: 800; border: 1px solid rgba(0, 242, 254, 0.4);">⚡ UNSTARTED QUEUE</span>'}
               ${l.map ? `<span class="lobby-game-tag" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">🗺️ ${l.map}</span>` : ''}
+              ${isPrivateCustom ? `<span class="lobby-game-tag" style="background: rgba(0, 242, 254, 0.12); color: var(--accent-cyan); border: 1px solid rgba(0, 242, 254, 0.3);">👥 Draft Size: ${l.draftPlayerCount || l.max}p</span>` : ''}
             </div>
             <button style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: ${isFav ? 'var(--accent-gold)' : 'var(--text-dim)'};" onclick="window.app.toggleFavorite('${l.game}')" title="Pin / Favorite Game">
               ${isFav ? '⭐' : '☆'}
@@ -5189,7 +5231,12 @@ class CustomLobbiesApp {
           </div>
 
           <h3 style="font-size: 1.15rem; font-weight: 900; margin: 0.5rem 0; color: #fff;">${l.title}</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">Host: <strong style="color: var(--accent-cyan);">${l.host}</strong> | Type: <strong style="color: var(--accent-gold);">${l.draftType}</strong> | Region: <strong style="color: var(--text-main);">${l.region || 'NA East'}</strong></p>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">
+            Host: <strong style="color: var(--accent-cyan);">${l.host}</strong> | 
+            Draft: <strong style="color: var(--accent-gold);">${l.draftType || 'Snake Draft 1-2-2-1'}</strong> | 
+            Captains: <strong style="color: var(--accent-purple);">${l.captainMode === 'random' ? '🎲 Random Selection' : (l.captainMode === 'host' ? '👑 Host Pick' : '⭐ Highest MMR')}</strong> | 
+            Region: <strong style="color: var(--text-main);">${l.region || 'NA East'}</strong>
+          </p>
 
           <!-- DIRECT TEAMS VIEW -->
           <div class="lobby-teams-direct-box" style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.75rem; margin: 0.75rem 0;">
@@ -5239,14 +5286,29 @@ class CustomLobbiesApp {
               </span>
             </div>
             <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
-              <button class="btn btn-primary btn-sm" onclick="window.app.joinAndQueueLobby('${l.id}')" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); font-weight: 800; padding: 0.35rem 0.75rem;" ${spotsLeft <= 0 ? 'disabled' : ''}>
-                <span>⚡</span> Auto-Queue Party
-              </button>
+              ${isPrivateCustom ? (
+                isHost ? `
+                  <button class="btn btn-gold btn-sm" onclick="window.app.openHostLobbySettingsModal('${l.id}')" style="font-weight: 800; background: linear-gradient(135deg, #ffd700, #ff9100); color: #000; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);">
+                    <span>👑</span> Host Settings
+                  </button>
+                  <button class="btn btn-primary btn-sm" onclick="window.app.hostStartLobbyMatch('${l.id}')" style="font-weight: 800; box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);">
+                    <span>🚀</span> Start Match
+                  </button>
+                ` : `
+                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); background: rgba(255, 215, 0, 0.1); border: 1px dashed var(--accent-gold); padding: 0.3rem 0.6rem; border-radius: 6px; display: flex; align-items: center; gap: 0.3rem;">
+                    <span>⏳</span> Waiting for Host (<strong>${l.host}</strong>) to set settings & start match...
+                  </div>
+                `
+              ) : `
+                <button class="btn btn-primary btn-sm" onclick="window.app.joinAndQueueLobby('${l.id}')" style="box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); font-weight: 800; padding: 0.35rem 0.75rem;" ${spotsLeft <= 0 ? 'disabled' : ''}>
+                  <span>⚡</span> Auto-Queue Party
+                </button>
+              `}
               <button class="btn btn-purple btn-sm" onclick="window.chatVoiceManager ? window.chatVoiceManager.openLobbyChannel('${l.id}') : window.app.connectLobbyVoice('${l.title}')" title="Open Dedicated Live Chat & Voice Comms in Community Hub" style="background: rgba(88, 101, 242, 0.25); border-color: #5865F2; color: #fff; font-weight: 800; box-shadow: 0 0 12px rgba(88, 101, 242, 0.3);">
                 <span>💬</span> Hub & Voice
               </button>
               <button class="btn btn-cyan btn-sm" onclick="window.app.launchFaceitMatchRoom('${l.title}', '${l.game}')">🏆 Direct Join</button>
-              <button class="btn btn-purple btn-sm" onclick="window.app.triggerLobbySnakeDraft('${l.title}', '${l.game}')" title="Launch Snake Draft Board">🐍 Draft</button>
+              <button class="btn btn-purple btn-sm" onclick="window.app.triggerLobbySnakeDraft('${l.title}', '${l.game}', window.app.lobbies.find(x => String(x.id) === '${l.id}'))" title="Launch Snake Draft Board">🐍 Draft</button>
               <button class="btn btn-secondary btn-sm" onclick="window.app.copyServerIP('${l.serverIp || '192.168.1.85:27015'}')" title="Copy IP">📋 IP</button>
             </div>
           </div>
@@ -5434,13 +5496,17 @@ class CustomLobbiesApp {
     return baseList.slice(0, targetCapacity);
   }
 
-  triggerLobbySnakeDraft(lobbyTitle, gameTitle) {
+  triggerLobbySnakeDraft(lobbyTitle, gameTitle, lobbyObj = null) {
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('lobby_start');
     }
     this.currentDraftLobby = lobbyTitle;
     this.currentDraftGame = gameTitle || 'Counter-Strike 2';
-    this.captainSelectionMode = 'highest_mmr';
+    this.currentDraftLobbyObj = lobbyObj;
+    this.captainSelectionMode = (lobbyObj && lobbyObj.captainMode) ? lobbyObj.captainMode : 'random';
+    this.draftExplicitCap1 = (lobbyObj && lobbyObj.explicitCap1) ? lobbyObj.explicitCap1 : null;
+    this.draftExplicitCap2 = (lobbyObj && lobbyObj.explicitCap2) ? lobbyObj.explicitCap2 : null;
+    this.draftCustomCapacity = (lobbyObj && lobbyObj.draftPlayerCount) ? lobbyObj.draftPlayerCount : null;
     this.bannedMaps.clear();
     this.selectedMatchMap = null;
     this.passedFirstPick = false;
@@ -5645,19 +5711,25 @@ class CustomLobbiesApp {
   }
 
   runDraftSimulation() {
-    this.captainSelectionMode = 'highest_mmr';
-    const maxCap = window.eloEngine.getGameCapacity(this.currentDraftGame);
+    const selectionMode = this.captainSelectionMode || 'random';
+    const maxCap = this.draftCustomCapacity || window.eloEngine.getGameCapacity(this.currentDraftGame);
     
     // Get dedicated, filled roster pool specifically for this game
     const draftPool = this.getDraftPoolForGame(this.currentDraftGame, maxCap);
-    const result = window.eloEngine.performCustomSnakeDraft(draftPool, this.passedFirstPick, 'highest_mmr');
+    const result = window.eloEngine.performCustomSnakeDraft(
+      draftPool, 
+      this.passedFirstPick, 
+      selectionMode,
+      this.draftExplicitCap1,
+      this.draftExplicitCap2
+    );
 
     const capAEl = document.getElementById('captainAName');
     const capBEl = document.getElementById('captainBName');
     if (capAEl) {
       capAEl.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem;">
-          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Alpha (1st Pick):</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain1.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">AUTO-CAPTAIN (2ND HIGHEST ELO)</span></div>
+          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Alpha (1st Pick):</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain1.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">${result.criteriaLabel || 'CAPTAIN #1'}</span></div>
           <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold);">${result.captain1.elo} MMR</span>
         </div>
       `;
@@ -5665,7 +5737,7 @@ class CustomLobbiesApp {
     if (capBEl) {
       capBEl.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem;">
-          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Bravo:</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain2.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">AUTO-CAPTAIN (HIGHEST ELO)</span></div>
+          <div><span style="color: var(--accent-gold); font-weight: 800;">👑 Captain Bravo:</span> <strong style="color: #fff; font-size: 0.95rem;">${result.captain2.name}</strong> <span style="font-size: 0.7rem; color: var(--accent-gold); background: rgba(255,215,0,0.18); border: 1px solid rgba(255,215,0,0.4); padding: 1px 6px; border-radius: 4px; font-weight: 800;">${result.criteriaLabel || 'CAPTAIN #2'}</span></div>
           <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold);">${result.captain2.elo} MMR</span>
         </div>
       `;
@@ -6775,7 +6847,11 @@ class CustomLobbiesApp {
         const max = parseInt(document.getElementById('newLobbyMax').value);
         const region = document.getElementById('newLobbyRegion')?.value || 'NA East';
         const map = document.getElementById('newLobbyMap')?.value || 'Mirage & Inferno';
-        const draftType = document.getElementById('newLobbyDraftType')?.value || 'FACEIT Competitive';
+        const draftType = document.getElementById('newLobbyDraftType')?.value || 'Snake Draft 1-2-2-1';
+        const access = document.getElementById('newLobbyAccess')?.value || 'private_custom';
+        const isPrivate = access === 'private_custom';
+        const captainMode = document.getElementById('newLobbyCaptainMode')?.value || 'random';
+        const draftPlayerCount = parseInt(document.getElementById('newLobbyDraftPlayers')?.value || max);
 
         this.lobbies.unshift({
           id: Date.now(),
@@ -6787,8 +6863,13 @@ class CustomLobbiesApp {
           region,
           map,
           draftType,
+          captainMode,
+          draftPlayerCount,
+          isPrivate,
+          isCustomHosted: isPrivate,
+          started: false,
           serverIp: region === 'Helix Local' ? '127.0.0.1:7777' : '192.168.1.85:27015',
-          matchStatus: '🔥 RECRUITING (1/' + max + ')'
+          matchStatus: isPrivate ? '🔒 HOSTED PRIVATE (Waiting for Host)' : '🔥 QUEUING (1/' + max + ')'
         });
 
         // Automatically spin up dedicated private lobby channel in Community Hub
@@ -6800,6 +6881,8 @@ class CustomLobbiesApp {
             region,
             map,
             draftType,
+            captainMode,
+            draftPlayerCount,
             serverIp: region === 'Helix Local' ? '127.0.0.1:7777' : '192.168.1.85:27015',
             host: 'You (Host)',
             players: 1
@@ -6847,6 +6930,135 @@ class CustomLobbiesApp {
     window.addEventListener('storage', () => {
       this.liveRefreshAllUI();
     });
+  }
+
+  openHostLobbySettingsModal(lobbyId) {
+    const lobby = this.lobbies.find(l => String(l.id) === String(lobbyId));
+    if (!lobby) return;
+
+    this.currentEditingLobbyId = lobbyId;
+    const modal = document.getElementById('hostCustomLobbySettingsModal');
+    if (!modal) return;
+
+    const targetInput = document.getElementById('hostLobbySettingsTargetId');
+    const titleInput = document.getElementById('hostSettingsTitle');
+    const gameInput = document.getElementById('hostSettingsGame');
+    const mapInput = document.getElementById('hostSettingsMap');
+    const draftTypeInput = document.getElementById('hostSettingsDraftType');
+    const capModeInput = document.getElementById('hostSettingsCaptainMode');
+    const draftCountInput = document.getElementById('hostSettingsDraftCount');
+
+    if (targetInput) targetInput.value = lobby.id;
+    if (titleInput) titleInput.value = lobby.title;
+    if (gameInput) gameInput.value = lobby.game;
+    if (mapInput) mapInput.value = lobby.map || 'Captain Pick / Ban Veto';
+    if (draftTypeInput) draftTypeInput.value = lobby.draftType || 'Snake Draft 1-2-2-1';
+    if (capModeInput) capModeInput.value = lobby.captainMode || 'random';
+    if (draftCountInput) draftCountInput.value = String(lobby.draftPlayerCount || lobby.max || 10);
+
+    // Initial Captains Display
+    this._tempHostCaptains = {
+      cap1: lobby.explicitCap1 || null,
+      cap2: lobby.explicitCap2 || null
+    };
+
+    if (!this._tempHostCaptains.cap1) {
+      this.rollRandomCaptains(lobby.id, false);
+    } else {
+      this.updateHostCaptainsDisplay();
+    }
+
+    modal.classList.add('active');
+  }
+
+  closeHostLobbySettingsModal() {
+    const modal = document.getElementById('hostCustomLobbySettingsModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  onHostCaptainModeChange(mode) {
+    if (mode === 'random') {
+      this.rollRandomCaptains(this.currentEditingLobbyId, true);
+    } else if (mode === 'highest_mmr') {
+      const lobby = this.lobbies.find(l => String(l.id) === String(this.currentEditingLobbyId));
+      const game = lobby ? lobby.game : 'Counter-Strike 2';
+      const pool = this.getDraftPoolForGame(game, 10);
+      const sorted = [...pool].sort((a,b) => (b.elo||0) - (a.elo||0));
+      this._tempHostCaptains = {
+        cap1: sorted[1] ? sorted[1].name : 'Captain Alpha',
+        cap2: sorted[0] ? sorted[0].name : 'Captain Bravo'
+      };
+      this.updateHostCaptainsDisplay();
+    }
+  }
+
+  rollRandomCaptains(lobbyId = null, showToast = true) {
+    const targetId = lobbyId || this.currentEditingLobbyId;
+    const lobby = this.lobbies.find(l => String(l.id) === String(targetId));
+    const game = lobby ? lobby.game : 'Counter-Strike 2';
+    const pool = this.getDraftPoolForGame(game, 10);
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    const cap1 = shuffled[0] ? shuffled[0].name : 'Captain Alpha';
+    const cap2 = shuffled[1] ? shuffled[1].name : 'Captain Bravo';
+
+    this._tempHostCaptains = { cap1, cap2 };
+    this.updateHostCaptainsDisplay();
+
+    if (showToast && window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('click');
+      window.widgetBuilderEngine.showToast(`🎲 Rolled Random Captains: ${cap1} & ${cap2}`, 'info');
+    }
+  }
+
+  updateHostCaptainsDisplay() {
+    const c1El = document.getElementById('hostCap1Display');
+    const c2El = document.getElementById('hostCap2Display');
+    if (c1El) c1El.textContent = this._tempHostCaptains?.cap1 || 'Auto (Draft Roll)';
+    if (c2El) c2El.textContent = this._tempHostCaptains?.cap2 || 'Auto (Draft Roll)';
+  }
+
+  saveHostLobbySettings(startNow = false) {
+    const targetId = document.getElementById('hostLobbySettingsTargetId')?.value || this.currentEditingLobbyId;
+    const lobby = this.lobbies.find(l => String(l.id) === String(targetId));
+    if (!lobby) return;
+
+    lobby.draftType = document.getElementById('hostSettingsDraftType')?.value || 'Snake Draft 1-2-2-1';
+    lobby.captainMode = document.getElementById('hostSettingsCaptainMode')?.value || 'random';
+    lobby.draftPlayerCount = parseInt(document.getElementById('hostSettingsDraftCount')?.value || 10);
+    lobby.map = document.getElementById('hostSettingsMap')?.value || lobby.map;
+    if (this._tempHostCaptains?.cap1) lobby.explicitCap1 = this._tempHostCaptains.cap1;
+    if (this._tempHostCaptains?.cap2) lobby.explicitCap2 = this._tempHostCaptains.cap2;
+
+    this.saveState();
+    this.renderLobbies();
+
+    if (startNow) {
+      this.closeHostLobbySettingsModal();
+      this.hostStartLobbyMatch(lobby.id);
+    } else {
+      this.closeHostLobbySettingsModal();
+      if (window.widgetBuilderEngine) {
+        window.widgetBuilderEngine.playSoundEffect('success');
+        window.widgetBuilderEngine.showToast(`💾 Host settings updated for "${lobby.title}"!`, 'success');
+      }
+    }
+  }
+
+  hostStartLobbyMatch(lobbyId) {
+    const lobby = this.lobbies.find(l => String(l.id) === String(lobbyId));
+    if (!lobby) return;
+
+    lobby.started = true;
+    lobby.matchStatus = '⚡ DRAFTING (Host Started Match)';
+    this.saveState();
+    this.renderLobbies();
+
+    if (window.widgetBuilderEngine) {
+      window.widgetBuilderEngine.playSoundEffect('lobby_start');
+      window.widgetBuilderEngine.showToast(`🚀 Host started match for "${lobby.title}"! Launching draft session...`, 'success');
+    }
+
+    this.triggerLobbySnakeDraft(lobby.title, lobby.game, lobby);
   }
 
   liveRefreshAllUI() {

@@ -306,7 +306,7 @@ class EloEngine {
   }
 
   // Modified Captain Snake Draft (Highest MMRs get Captain, respecting opt-out settings)
-  performCustomSnakeDraft(playersPool, passFirstPick = false, selectionMode = 'highest_mmr') {
+  performCustomSnakeDraft(playersPool, passFirstPick = false, selectionMode = 'highest_mmr', explicitCap1 = null, explicitCap2 = null) {
     let sorted = [...playersPool];
 
     // Sort players by MMR descending
@@ -315,22 +315,37 @@ class EloEngine {
     // Filter players who allow being captain (not opted out)
     const eligibleCaptains = sorted.filter(p => !p.optOutCaptain && !p.neverCaptain);
 
-    // Identify highest and second highest eligible MMR players
-    const highestPlayer = eligibleCaptains[0] || sorted[0] || { name: 'Captain Bravo', elo: 2540, role: 'Team Captain' };
-    const secondHighestPlayer = eligibleCaptains.find(p => p.name !== highestPlayer.name) || sorted.find(p => p.name !== highestPlayer.name) || sorted[1] || { name: 'Captain Alpha', elo: 2480, role: 'Team Captain' };
+    let cap1, cap2, criteriaLabel;
 
-    // The second highest ELO gets Captain #1 (gets first pick)
-    const cap1 = secondHighestPlayer;
-    // The highest ELO gets Captain #2
-    const cap2 = highestPlayer;
+    if (explicitCap1 && explicitCap2) {
+      cap1 = sorted.find(p => p.name === explicitCap1) || { name: explicitCap1, elo: 2450, role: 'Team Captain' };
+      cap2 = sorted.find(p => p.name === explicitCap2) || { name: explicitCap2, elo: 2450, role: 'Team Captain' };
+      criteriaLabel = '👑 Host-Selected Captains';
+    } else if (selectionMode === 'random') {
+      const candidates = eligibleCaptains.length >= 2 ? eligibleCaptains : sorted;
+      const shuffled = [...candidates].sort(() => Math.random() - 0.5);
+      cap1 = shuffled[0] || { name: 'Captain Alpha', elo: 2400, role: 'Team Captain' };
+      cap2 = shuffled[1] || { name: 'Captain Bravo', elo: 2400, role: 'Team Captain' };
+      criteriaLabel = '🎲 Random Selection Captains';
+    } else {
+      // Identify highest and second highest eligible MMR players
+      const highestPlayer = eligibleCaptains[0] || sorted[0] || { name: 'Captain Bravo', elo: 2540, role: 'Team Captain' };
+      const secondHighestPlayer = eligibleCaptains.find(p => p.name !== highestPlayer.name) || sorted.find(p => p.name !== highestPlayer.name) || sorted[1] || { name: 'Captain Alpha', elo: 2480, role: 'Team Captain' };
+      cap1 = secondHighestPlayer;
+      cap2 = highestPlayer;
+      const optedOutCount = sorted.filter(p => p.optOutCaptain || p.neverCaptain).length;
+      criteriaLabel = optedOutCount > 0 
+        ? `Auto-Designated (2nd Highest ELO = 1st Captain • ${optedOutCount} opted out)` 
+        : 'Auto-Designated (2nd Highest ELO = 1st Captain)';
+    }
 
     // Remaining unpicked players (includes high MMR players who opted out of captaincy)
     const unpicked = sorted.filter(p => p.name !== cap1.name && p.name !== cap2.name);
 
-    const team1 = [{ ...cap1, isCaptain: true, captainRank: 1, pickNumber: 0, pickLabel: '👑 Auto-Captain (1st Pick • 2nd Highest ELO)' }];
-    const team2 = [{ ...cap2, isCaptain: true, captainRank: 2, pickNumber: 0, pickLabel: '👑 Auto-Captain (Highest ELO)' }];
+    const team1 = [{ ...cap1, isCaptain: true, captainRank: 1, pickNumber: 0, pickLabel: `👑 Captain Alpha (1st Pick • ${criteriaLabel})` }];
+    const team2 = [{ ...cap2, isCaptain: true, captainRank: 2, pickNumber: 0, pickLabel: `👑 Captain Bravo (${criteriaLabel})` }];
 
-    let turnOwner = passFirstPick ? 2 : 1; // Default: Captain 1 (2nd highest ELO) picks first
+    let turnOwner = passFirstPick ? 2 : 1; // Default: Captain 1 picks first
     let picksRemainingForTurn = (turnOwner === 1 && !passFirstPick) ? 1 : 2;
     let globalPick = 1;
 
@@ -362,9 +377,6 @@ class EloEngine {
     const sum2 = team2.reduce((acc, p) => acc + (p.elo || 1800), 0);
 
     const optedOutCount = sorted.filter(p => p.optOutCaptain || p.neverCaptain).length;
-    const criteriaLabel = optedOutCount > 0 
-      ? `Auto-Designated (2nd Highest ELO = 1st Captain • ${optedOutCount} opted out)` 
-      : 'Auto-Designated (2nd Highest ELO = 1st Captain)';
 
     return {
       captain1: cap1,
