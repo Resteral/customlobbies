@@ -361,7 +361,7 @@ class ChatVoiceManager {
     if (!rail) return;
     
     // Clear existing servers and dividers (keep the boost badge container, purchase button, and discord link button)
-    Array.from(rail.children).forEach(child => {
+    Array.from((rail && rail.children) ? rail.children : []).forEach(child => {
         if (child.id !== 'serverBoostBadgeContainer' && child.id !== 'serverPurchaseBtnContainer' && child.id !== 'serverDiscordLinkBtn') {
             child.remove();
         }

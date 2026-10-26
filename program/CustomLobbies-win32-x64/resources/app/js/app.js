@@ -4746,7 +4746,7 @@ class CustomLobbiesApp {
     }
 
     // Close when clicking dropdown items that trigger modals/actions without data-tab
-    if (moreMenu) {
+    if (moreMenu && typeof moreMenu.querySelectorAll === 'function') {
       moreMenu.querySelectorAll('.dropdown-item').forEach(item => {
         item.addEventListener('click', () => {
           closeMoreDropdown();
@@ -8375,7 +8375,11 @@ class CustomLobbiesApp {
       }
       annBanner.innerHTML = `📢 ${settings.announcement}`;
     } else if (annBanner) {
-      annBanner.remove();
+      if (typeof annBanner.remove === 'function') {
+        annBanner.remove();
+      } else if (annBanner.parentNode) {
+        annBanner.parentNode.removeChild(annBanner);
+      }
     }
     
     // Update global state for other scripts (like Gatekeeper)

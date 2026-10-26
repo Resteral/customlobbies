@@ -1574,8 +1574,8 @@ body.obs-transparent-mode {
   height: 38px;
 }
 
-/* Full Discord Client Standalone Mode */
-body.discord-client-fullscreen .navbar {
+/* Full Discord Client Standalone Mode - only hide navbar inside desktop client */
+body.is-desktop-app.discord-client-fullscreen .navbar {
   display: none !important;
 }
 
@@ -2052,9 +2052,9 @@ body.discord-client-fullscreen .discord-hub-container {
   font-weight: 700;
 }
 
-/* Desktop Program Client Titlebar & Controls */
+/* Desktop Program Client Titlebar & Controls - Hidden on Web, visible only in Desktop App */
 .desktop-program-titlebar {
-  display: flex;
+  display: none;
   justify-content: space-between;
   align-items: center;
   background: rgba(10, 11, 16, 0.95);
@@ -2064,6 +2064,10 @@ body.discord-client-fullscreen .discord-hub-container {
   user-select: none;
   z-index: 10000;
   backdrop-filter: blur(10px);
+}
+
+body.is-desktop-app .desktop-program-titlebar {
+  display: flex;
 }
 
 .desktop-program-badge {

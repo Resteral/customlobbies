@@ -16,12 +16,21 @@ class ProgramClientSuite {
   }
 
   initClientMode() {
-    const saved = localStorage.getItem('cl_discord_client_mode');
-    const isDesktopApp = !!(window.require || (window.process && window.process.type));
-    if (saved === 'true' || (saved === null && isDesktopApp)) {
-      document.body.classList.add('discord-client-fullscreen');
+    const isDesktopApp = !!(window.require || (window.process && window.process.type) || (navigator.userAgent && navigator.userAgent.includes('Electron')));
+    if (isDesktopApp) {
+      document.body.classList.add('is-desktop-app');
+      const saved = localStorage.getItem('cl_discord_client_mode');
+      if (saved === 'true' || saved === null) {
+        document.body.classList.add('discord-client-fullscreen');
+        const label = document.getElementById('labelDesktopClientMode');
+        if (label) label.textContent = 'Web View';
+      }
+    } else {
+      // In web browser, ensure website is never trapped in fullscreen client mode
+      document.body.classList.remove('discord-client-fullscreen');
+      document.body.classList.remove('is-desktop-app');
       const label = document.getElementById('labelDesktopClientMode');
-      if (label) label.textContent = 'Web View';
+      if (label) label.textContent = 'Full Client View';
     }
   }
 

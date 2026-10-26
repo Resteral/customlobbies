@@ -12,7 +12,8 @@ class DiscordActivityEngine {
     this.clientSecret = localStorage.getItem('cl_discord_client_secret') || '';
     
     // Discord query parameters passed to the Activity iframe
-    const urlParams = new URLSearchParams(window.location.search);
+    const searchStr = (typeof window !== 'undefined' && window.location && window.location.search) ? window.location.search : '';
+    const urlParams = new URLSearchParams(searchStr);
     this.frameId = urlParams.get('frame_id') || null;
     this.instanceId = urlParams.get('instance_id') || null;
     this.channelId = urlParams.get('channel_id') || null;
@@ -85,10 +86,10 @@ class DiscordActivityEngine {
 
   checkEnvironment() {
     // Detect if inside an iframe with Discord query params
-    const inIframe = window.parent !== window;
+    const inIframe = Boolean(typeof window !== 'undefined' && window.parent && window.parent !== window);
     const hasDiscordParams = Boolean(this.frameId || this.instanceId || this.channelId);
     
-    if (inIframe || hasDiscordParams) {
+    if (inIframe && hasDiscordParams) {
       this.isDiscordActivity = true;
       document.body.classList.add('discord-activity-mode');
     }
@@ -245,6 +246,7 @@ class DiscordActivityEngine {
 
   syncUserIdentityWithApp() {
     if (!window.app) return;
+    if (!window.app.user) window.app.user = {};
 
     // Harmonize Discord identity into CustomLobbies Gamer Passport
     if (this.discordUser.username) {

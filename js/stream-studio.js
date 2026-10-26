@@ -118,7 +118,7 @@ class StreamStudioEngine {
 
   init() {
     this.canvas = document.getElementById('streamCanvas');
-    if (this.canvas) {
+    if (this.canvas && typeof this.canvas.getContext === 'function') {
       this.ctx = this.canvas.getContext('2d');
       this.drawPlaceholderCanvas();
     }
