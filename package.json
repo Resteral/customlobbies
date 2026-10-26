@@ -27,6 +27,7 @@
     "unrealEngine": "5.7+"
   },
   "scripts": {
+    "serve": "node tools/web-server.js",
     "start": "node js/index.js",
     "play:pacifica": "node js/index.js",
     "server:pacifica": "node js/index.js",
