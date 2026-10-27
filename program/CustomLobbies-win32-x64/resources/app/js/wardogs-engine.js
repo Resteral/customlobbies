@@ -212,13 +212,31 @@ class WardogsEngine {
     // Sort registered pre-formed squads by highest member count created before entry
     const sortedSquads = eligibleCommanders.sort((a, b) => (b.membersCount || 0) - (a.membersCount || 0));
 
-    // If we don't have enough 22+ player teams, fill with AI placeholders just for the UI
-    const squad1 = sortedSquads[0] || { name: 'Awaiting Team...', captain: 'Searching...', membersCount: 0 };
-    const squad2 = sortedSquads[1] || { name: 'Awaiting Team...', captain: 'Searching...', membersCount: 0 };
-    const squad3 = sortedSquads[2] || { name: 'Awaiting Team...', captain: 'Searching...', membersCount: 0 };
+    // If we don't have enough 22+ player teams, fill with elite faction commanders
+    const squad1 = sortedSquads[0] || { name: 'Alpha Vanguard Command', captain: 'Commander Viper', membersCount: 33 };
+    const squad2 = sortedSquads[1] || { name: 'Apex Raiders Coalition', captain: 'Commander Hammer', membersCount: 33 };
+    const squad3 = sortedSquads[2] || { name: 'Cyber Spectre Syndicate', captain: 'Commander Valkyrie', membersCount: 33 };
+
+    let partyOperatives = [];
+    if (typeof window !== 'undefined' && window.partyEngine && typeof window.partyEngine.getMembers === 'function') {
+      const pMembers = window.partyEngine.getMembers();
+      if (Array.isArray(pMembers) && pMembers.length > 0) {
+        partyOperatives = pMembers.map((m, idx) => ({
+          id: 880 + idx,
+          name: m.name || 'You (Host)',
+          callsign: `PARTY-${idx + 1}`,
+          game: 'WARDOGS',
+          role: m.role || '⚡ Breacher / Assault',
+          elo: m.elo || 2150,
+          kd: '2.35',
+          status: 'Selected for Ranked',
+          badge: '👑 Party Member'
+        }));
+      }
+    }
 
     const eligibleSolos = this.soloMercenaries.filter(m => m.game === gameName || m.game === 'WARDOGS');
-    const pool = [...eligibleSolos].sort((a, b) => b.elo - a.elo);
+    const pool = [...partyOperatives, ...eligibleSolos].sort((a, b) => b.elo - a.elo);
 
     const capacity = 99; // 33 v 33 v 33 Tri-Faction
 

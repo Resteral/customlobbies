@@ -149,18 +149,19 @@ class CustomLobbiesApp {
       },
       {
         id: 'lobby_wd_33v33v33',
-        title: '🐕 WARDOGS 33v33v33 Tri-Faction Conquest',
+        title: '🐕 WARDOGS Ranked (99 Players to Start)',
         game: 'WARDOGS',
         host: 'Ghost_Dog_99',
-        players: 68,
+        players: 72,
         max: 99,
         region: 'NA-East (Virginia)',
         map: 'Sector 4 Outpost',
-        draftType: '33v33v33 Tri-Faction',
+        draftType: 'WARDOGS Ranked (33v33v33)',
         serverIp: '192.168.1.85:7778',
         tickrate: 128,
-        matchStatus: '⚡ QUEUED (68/99)',
-        isPublic: true
+        matchStatus: '⚡ QUEUING (72/99 • Need 99 to Start)',
+        isPublic: true,
+        started: false
       },
       {
         id: 'lobby_rematch_5v5',
@@ -3128,23 +3129,7 @@ class CustomLobbiesApp {
     this.renderMyCreatedTeams();
   }
 
-  start99PlayerQueue() {
-    // 1. Verify User has a registered WARDOGS Team with >= 22 members
-    let hasEligibleTeam = false;
-    let userTeamName = "";
-    if (window.wardogsEngine && window.wardogsEngine.registeredSquads) {
-        const eligibleSquad = window.wardogsEngine.registeredSquads.find(s => s.membersCount >= 22);
-        if (eligibleSquad) {
-            hasEligibleTeam = true;
-            userTeamName = eligibleSquad.name;
-        }
-    }
-
-    if (!hasEligibleTeam) {
-        alert("❌ INELIGIBLE FOR RANKED DRAFT\n\nYour Team must have at least 22 members online and ready to compete in a Tri-Faction ranked match.\n\nPlease recruit more mercenaries from the Draft Queue to reach the 22-player threshold. The remaining slots will be filled automatically from the Solo Pool.");
-        return;
-    }
-
+  start99PlayerQueue(targetLobby = null) {
     const modal = document.getElementById('wardogsPoolQueueModal');
     if (!modal) {
       this.runWardogsRankedDraft();
@@ -3152,7 +3137,7 @@ class CustomLobbiesApp {
     }
 
     modal.style.display = 'flex';
-    let queuedCount = 22; // Start the queue counter at the minimum online team members
+
     const progressBar = document.getElementById('queue99ProgressBar');
     const counterText = document.getElementById('queue99CounterText');
     const statusText = document.getElementById('queue99StatusText');
@@ -3161,26 +3146,66 @@ class CustomLobbiesApp {
     if (rosterList) rosterList.innerHTML = '';
     if (this.queue99Interval) clearInterval(this.queue99Interval);
 
-    const callsigns = ['VIPER-1', 'HAMMER-6', 'VALKYRIE-3', 'SPECTRE-4', 'ALPHA-DOG', 'SHADOW-9', 'IRON-CLAW', 'TITAN-1', 'GHOST-7', 'K9-VANGUARD'];
+    // Retrieve active party members or default solo user
+    const partyMembers = (window.partyEngine && typeof window.partyEngine.getMembers === 'function')
+      ? window.partyEngine.getMembers()
+      : [{ name: 'You (Host)', avatar: '👑', elo: 2150, role: 'Party Leader', isParty: true }];
+
+    const partyCount = partyMembers.length;
+
+    // Locate active WARDOGS lobby
+    let lobby = targetLobby || (this.lobbies || []).find(l => l.game === 'WARDOGS' || l.id === 'lobby_wd_33v33v33');
+    let queuedCount = lobby ? Math.max(lobby.players || 0, 72) : 74;
+
+    // Add user and squad/party members directly into queue roster list
+    if (rosterList) {
+      partyMembers.forEach((member, idx) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding: 0.35rem 0.6rem; background: rgba(0, 242, 254, 0.15); border-radius: 4px; font-size: 0.8rem; display: flex; justify-content: space-between; margin-bottom: 0.25rem; border: 1px solid rgba(0, 242, 254, 0.4); font-weight: 700;';
+        item.innerHTML = `<span>👑 <strong style="color: #00f2fe;">${member.name}</strong> [Party Member #${idx + 1}] entered 99-Player Pool</span><span style="color: var(--accent-gold); font-weight: 800;">Slot #${idx + 1} (READY)</span>`;
+        rosterList.appendChild(item);
+      });
+    }
+
+    const callsigns = ['VIPER-1', 'HAMMER-6', 'VALKYRIE-3', 'SPECTRE-4', 'ALPHA-DOG', 'SHADOW-9', 'IRON-CLAW', 'TITAN-1', 'GHOST-7', 'K9-VANGUARD', 'RAZOR-2', 'STORM-8', 'NIGHT-5', 'BLAZE-11', 'REAPER-0'];
 
     const updatePoolUI = () => {
-      const pct = Math.round((queuedCount / 99) * 100);
+      const pct = Math.min(100, Math.round((queuedCount / 99) * 100));
       if (progressBar) progressBar.style.width = `${pct}%`;
       if (counterText) counterText.textContent = `${queuedCount} / 99 Operatives Queued (${pct}%)`;
 
-      if (rosterList) {
+      const remaining = Math.max(0, 99 - queuedCount);
+      if (statusText) {
+        if (remaining > 0) {
+          statusText.innerHTML = `⏳ <strong>Need ${remaining} more operatives to start match</strong> (99 Players Required) • Filling queue pool...`;
+        } else {
+          statusText.innerHTML = '🎉 <strong style="color: var(--accent-green); font-size: 0.95rem;">99/99 COMBATANTS READY!</strong> Starting Tri-Faction 33v33v33 Selection Draft...';
+        }
+      }
+
+      if (lobby) {
+        lobby.players = queuedCount;
+        lobby.matchStatus = remaining > 0 ? `⚡ QUEUING (${queuedCount}/99 • Need 99 to Start)` : '⚔️ MATCH IN PROGRESS (99/99)';
+        this.renderLobbies();
+      }
+
+      if (rosterList && queuedCount < 99) {
         const randomCall = callsigns[Math.floor(Math.random() * callsigns.length)];
         const newItem = document.createElement('div');
-        newItem.style.cssText = 'padding: 0.3rem 0.6rem; background: rgba(0, 242, 254, 0.08); border-radius: 4px; font-size: 0.78rem; display: flex; justify-content: space-between; margin-bottom: 0.25rem; border: 1px solid rgba(0, 242, 254, 0.2);';
-        newItem.innerHTML = `<span>🟢 Operative_${randomCall}_${queuedCount} queued into Server Node</span><span style="color: var(--accent-cyan); font-weight: 700;">Slot #${queuedCount}</span>`;
-        rosterList.insertBefore(newItem, rosterList.firstChild);
+        newItem.style.cssText = 'padding: 0.3rem 0.6rem; background: rgba(255, 111, 0, 0.08); border-radius: 4px; font-size: 0.78rem; display: flex; justify-content: space-between; margin-bottom: 0.25rem; border: 1px solid rgba(255, 111, 0, 0.2);';
+        newItem.innerHTML = `<span>🟢 Operative_${randomCall}_${queuedCount} queued into Server Node</span><span style="color: #ffab00; font-weight: 700;">Slot #${queuedCount}</span>`;
+        rosterList.insertBefore(newItem, rosterList.children[partyCount] || null);
       }
     };
 
     updatePoolUI();
 
+    if (window.widgetBuilderEngine?.showToast) {
+      window.widgetBuilderEngine.showToast(`🐕 Joined WARDOGS Ranked Queue! Needs 99 players to start (${queuedCount}/99 queued).`, 'info');
+    }
+
     this.queue99Interval = setInterval(() => {
-      queuedCount += Math.floor(Math.random() * 7) + 3;
+      queuedCount += Math.floor(Math.random() * 5) + 2;
       if (queuedCount >= 99) {
         queuedCount = 99;
         updatePoolUI();
@@ -3192,6 +3217,16 @@ class CustomLobbiesApp {
 
         if (window.widgetBuilderEngine) {
           window.widgetBuilderEngine.playSoundEffect('match_found');
+          if (typeof window.widgetBuilderEngine.showToast === 'function') {
+            window.widgetBuilderEngine.showToast('🎉 WARDOGS Ranked 99-Player Match Found! Launching Draft Room...', 'success');
+          }
+        }
+
+        if (lobby) {
+          lobby.started = true;
+          lobby.matchStatus = '⚔️ MATCH IN PROGRESS (99/99)';
+          this.saveState();
+          this.renderLobbies();
         }
 
         setTimeout(() => {
@@ -3201,7 +3236,7 @@ class CustomLobbiesApp {
       } else {
         updatePoolUI();
       }
-    }, 280);
+    }, 320);
   }
 
   fillQueueImmediately() {
@@ -3215,8 +3250,20 @@ class CustomLobbiesApp {
     if (counterText) counterText.textContent = '99 / 99 Operatives Queued (100%)';
     if (statusText) statusText.innerHTML = '🎉 <strong style="color: var(--accent-green);">SERVER FULL! 99/99 COMBATANTS QUEUED!</strong> Launching 33v33v33 Selection Draft...';
 
+    const lobby = (this.lobbies || []).find(l => l.game === 'WARDOGS' || l.id === 'lobby_wd_33v33v33');
+    if (lobby) {
+      lobby.players = 99;
+      lobby.started = true;
+      lobby.matchStatus = '⚔️ MATCH IN PROGRESS (99/99)';
+      this.saveState();
+      this.renderLobbies();
+    }
+
     if (window.widgetBuilderEngine) {
       window.widgetBuilderEngine.playSoundEffect('match_found');
+      if (typeof window.widgetBuilderEngine.showToast === 'function') {
+        window.widgetBuilderEngine.showToast('🎉 WARDOGS Ranked 99/99 Match Ready! Launching Draft Room...', 'success');
+      }
     }
 
     setTimeout(() => {
@@ -3233,7 +3280,7 @@ class CustomLobbiesApp {
 
   runWardogsRankedDraft() {
     const gameSelect = document.getElementById('wardogsGameSelect');
-    const selectedGame = gameSelect ? gameSelect.value : 'Counter-Strike 2';
+    const selectedGame = gameSelect ? gameSelect.value : 'WARDOGS';
 
     if (!window.wardogsEngine) return;
 
@@ -3343,6 +3390,11 @@ class CustomLobbiesApp {
     const mode = modeSelect ? modeSelect.value : '5v5 Premier Scrim';
     const regionSelect = document.getElementById('mmRegionSelect');
     const region = regionSelect ? regionSelect.value : 'US East (12ms)';
+
+    if (game === 'WARDOGS' || game === 'WARDOGS Ranked') {
+      this.start99PlayerQueue();
+      return;
+    }
 
     if (game === 'random') {
       this.quickJoinRandomGame();
@@ -4886,6 +4938,11 @@ class CustomLobbiesApp {
       targetGame = selectEl ? selectEl.value : 'random';
     }
 
+    if (targetGame === 'WARDOGS' || targetGame === 'WARDOGS Ranked') {
+      this.start99PlayerQueue();
+      return;
+    }
+
     if (targetGame === 'random') {
       this.quickJoinRandomGame();
       return;
@@ -5004,6 +5061,11 @@ class CustomLobbiesApp {
   joinAndQueueLobby(id, preferredTeamKey = null) {
     const lobby = this.lobbies.find(l => l.id == id);
     if (!lobby) return;
+
+    if (lobby.game === 'WARDOGS' || lobby.max === 99 || lobby.id === 'lobby_wd_33v33v33') {
+      this.start99PlayerQueue(lobby);
+      return;
+    }
 
     this.ensureLobbyTeams(lobby);
 
